@@ -6,15 +6,18 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.study.StudyUpdateRequestDTO;
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.InstanceExternalReference;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -23,6 +26,7 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ontology.CategoricalValueNameValidator;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
@@ -51,10 +55,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Transactional
@@ -314,14 +320,143 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 	}
 
 	@Override
-	public StudyInstanceDto updateObservationVariable(final Integer studyDbId, final StudyUpdateRequestDTO studyUpdateRequestDTO) {
+	public StudyInstanceDto updateStudyInstance(final Integer studyDbId, final StudyUpdateRequestDTO studyUpdateRequestDTO) {
 
-		// For Study
-		// Update environmentParemeters
-		// Update locationDbId
-		// Update observationVariableDbIds
+		final Integer trialDbId = Integer.valueOf(studyUpdateRequestDTO.getTrialDbId());
 
-		return null;
+		// Update existing environment variable values
+		// TODO: Check if this method can be merged with addEnvironmentVariableValues()
+		this.updateEnvironmentVariableValues(studyDbId, studyUpdateRequestDTO);
+		// Associate variables to study if not yet existing.
+		this.associateVariablesToStudy(studyUpdateRequestDTO, trialDbId);
+
+		final StudySearchFilter filter = new StudySearchFilter();
+		filter.setStudyDbIds(Arrays.asList(String.valueOf(studyDbId)));
+		final List<StudyInstanceDto> studyInstanceDtos = this.getStudyInstancesWithMetadata(filter, null);
+		return studyInstanceDtos.get(0);
+
+	}
+
+	private void updateEnvironmentVariableValues(final Integer studyDbId, final StudyUpdateRequestDTO studyUpdateRequestDTO) {
+
+		final List<String> environmentVariableIds =
+			studyUpdateRequestDTO.getEnvironmentParameters().stream().map(EnvironmentParameter::getParameterPUI).collect(toList());
+		final Map<Integer, MeasurementVariable> environmentVariablesMap = this.daoFactory.getCvTermDao()
+			.getVariablesByIdsAndVariableTypes(environmentVariableIds,
+				Arrays.asList(VariableType.ENVIRONMENT_CONDITION.getName(), VariableType.ENVIRONMENT_DETAIL.getName()));
+
+		final List<Integer> categoricalVariableIds =
+			environmentVariablesMap.values().stream()
+				.filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
+				.map(MeasurementVariable::getTermId).collect(Collectors.toList());
+
+		final Map<Integer, List<ValueReference>> categoricalValuesMap =
+			this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(categoricalVariableIds);
+
+		final ExperimentModel experimentModel =
+			this.daoFactory.getExperimentDao().getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), studyDbId);
+		final Map<Integer, GeolocationProperty> geolocationPropertyMap =
+			experimentModel.getGeoLocation().getProperties().stream()
+				.collect(Collectors.toMap(GeolocationProperty::getTypeId, Function.identity()));
+
+		if (!CollectionUtils.isEmpty(studyUpdateRequestDTO.getEnvironmentParameters())) {
+			for (final EnvironmentParameter environmentParameter : studyUpdateRequestDTO.getEnvironmentParameters()) {
+				final Integer variableId = Integer.valueOf(environmentParameter.getParameterPUI());
+				if (environmentVariablesMap.containsKey(variableId) && StringUtils.isNotEmpty(environmentParameter.getValue())) {
+					final MeasurementVariable measurementVariable = environmentVariablesMap.get(variableId);
+					final String newValue = this.getEnvironmentParameterValue(environmentParameter, categoricalValuesMap);
+					if (VariableType.ENVIRONMENT_DETAIL.getId().equals(measurementVariable.getVariableType().getId())
+						&& StringUtils.isNotEmpty(newValue)) {
+						if (StudyInstanceServiceImpl.GEOLOCATION_METADATA.contains(measurementVariable.getTermId())) {
+							// For LATITUDE, LONGITUDE, GEODETIC_DATUM, ALTITUDE variables,
+							// Set the values in their respective fields in Geolocation
+							this.mapGeolocationMetaData(experimentModel.getGeoLocation(), environmentParameter);
+							this.daoFactory.getGeolocationDao().update(experimentModel.getGeoLocation());
+						} else {
+
+							if (geolocationPropertyMap.containsKey(measurementVariable.getTermId())) {
+								// Update the GeolocationProperty
+								final GeolocationProperty geolocationProperty =
+									geolocationPropertyMap.get(measurementVariable.getTermId());
+								geolocationProperty.setValue(newValue);
+								this.daoFactory.getGeolocationPropertyDao().update(geolocationProperty);
+							} else {
+								// Create new
+								final GeolocationProperty newGeolocationProperty = new GeolocationProperty(experimentModel.getGeoLocation(),
+									newValue, 1, measurementVariable.getTermId());
+								this.daoFactory.getGeolocationPropertyDao().save(newGeolocationProperty);
+							}
+
+						}
+					} else if (VariableType.ENVIRONMENT_CONDITION.getId().equals(measurementVariable.getVariableType().getId())
+						&& StringUtils.isNotEmpty(newValue)) {
+						// Environment condition is saved as Phenotype of trial environment experiment
+						final Optional<Phenotype> phenotypeOptional = experimentModel.getPhenotypes().stream()
+							.filter(p -> p.getObservableId() == measurementVariable.getTermId()).findAny();
+						if (phenotypeOptional.isPresent()) {
+							final Phenotype phenotype = phenotypeOptional.get();
+							phenotype.setUpdatedDate(new Date());
+							phenotype.setValue(newValue);
+							this.daoFactory.getPhenotypeDAO().update(phenotype);
+						} else {
+							final Phenotype phenotype = new Phenotype(measurementVariable.getTermId(), newValue, experimentModel);
+							phenotype.setCreatedDate(new Date());
+							phenotype.setUpdatedDate(new Date());
+							phenotype.setName(String.valueOf(measurementVariable.getTermId()));
+							this.daoFactory.getPhenotypeDAO().save(phenotype);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void associateVariablesToStudy(final StudyUpdateRequestDTO studyUpdateRequestDTO, final Integer trialDbId) {
+		// Get the variables to be associated to study
+		if (!CollectionUtils.isEmpty(studyUpdateRequestDTO.getObservationVariableDbIds())) {
+
+			// Get the existing variables associated to the plot dataset of a study
+			final DmsProject plotDataset =
+				this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialDbId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+			final Map<Integer, ProjectProperty> existingVariablesOfPlotDataset =
+				plotDataset.getProperties().stream().collect(Collectors.toMap(ProjectProperty::getVariableId, Function.identity()));
+
+			// Get the variables from the request
+			final Set<Integer> variableIdsToAdd =
+				studyUpdateRequestDTO.getObservationVariableDbIds().stream().map(Integer::valueOf).collect(
+					Collectors.toSet());
+			final VariableFilter variableFilter = new VariableFilter();
+			variableIdsToAdd.stream().forEach(variableFilter::addVariableId);
+			final Map<Integer, Variable> variablesMap = this.daoFactory.getCvTermDao().getVariablesWithFilterById(variableFilter);
+
+			// Get the variableTypes of the variables
+			final Map<Integer, List<VariableType>> variableTypesOfVariables =
+				this.daoFactory.getCvTermPropertyDao()
+					.getByCvTermIdsAndType(new ArrayList<>(variableIdsToAdd), TermId.VARIABLE_TYPE.getId()).stream()
+					.collect(
+						groupingBy(CVTermProperty::getCvTermId, Collectors.mapping(o -> VariableType.getByName(o.getValue()), toList())));
+
+			// Support adding of TRAIT variables to the plot dataset for now.
+			variablesMap.forEach((variableId, variable) -> {
+				if (!existingVariablesOfPlotDataset.containsKey(variableId) && variableTypesOfVariables.get(variableId)
+					.contains(VariableType.TRAIT)) {
+					this.addProjectPropertyToDataset(plotDataset, variable, VariableType.TRAIT);
+				}
+			});
+
+		}
+	}
+
+	private void addProjectPropertyToDataset(final DmsProject dmsProject, final Variable variable, final VariableType variableType) {
+		final ProjectPropertyDao projectPropertyDao = this.daoFactory.getProjectPropertyDAO();
+		final ProjectProperty projectProperty = new ProjectProperty();
+		projectProperty.setProject(dmsProject);
+		projectProperty.setTypeId(variableType.getId());
+		projectProperty.setAlias(
+			org.springframework.util.StringUtils.isEmpty(variable.getAlias()) ? variable.getName() : variable.getAlias());
+		projectProperty.setVariableId(Integer.valueOf(variable.getId()));
+		projectProperty.setRank(projectPropertyDao.getNextRank(dmsProject.getProjectId()));
+		projectPropertyDao.save(projectProperty);
 	}
 
 	private Map<Integer, Location> getLocationsMap(final List<Integer> locationDbIds) {

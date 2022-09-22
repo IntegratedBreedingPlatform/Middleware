@@ -22,5 +22,5 @@ public interface StudyServiceBrapi {
 
 	List<StudyInstanceDto> saveStudyInstances(String crop, List<StudyImportRequestDTO> studyImportRequestDTOS, Integer userId);
 
-	StudyInstanceDto updateObservationVariable(Integer studyDbId, StudyUpdateRequestDTO studyUpdateRequestDTO);
+	StudyInstanceDto updateStudyInstance(Integer studyDbId, StudyUpdateRequestDTO studyUpdateRequestDTO);
 }
