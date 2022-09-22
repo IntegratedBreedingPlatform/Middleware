@@ -420,6 +420,11 @@ public class ExperimentBuilder extends Builder {
 				factors.add(new Variable(groupSourceNameVariableType, groupSourceName));
 			}
 
+			final DMSVariableType breedingMethodAbbrVariableType = variableTypes.findById(TermId.BREEDING_METHOD_ABBR);
+			if (breedingMethodAbbrVariableType != null) {
+				factors.add(new Variable(breedingMethodAbbrVariableType, stockModel.getGermplasm().getMethod().getMcode()));
+			}
+
 			if (variableTypes.getVariableTypes().stream().anyMatch(this::entryVariablesHasParent)) {
 				this.generatePedigreeTable(pedigreeTreeNodeTable, stockModel, variableTypes, factors);
 			}
@@ -485,7 +490,9 @@ public class ExperimentBuilder extends Builder {
 			return new Variable(variableType, stockModel.getGermplasm().getGid());
 		}
 		if (standardVariable.getId() == TermId.DESIG.getId()) {
-			return new Variable(variableType, stockModel.getName());
+			// Fix to test cases where the names are not getting from the germplasm
+			final Name preferredName = stockModel.getGermplasm().getPreferredName();
+			return new Variable(variableType, preferredName != null ? preferredName.getNval() : "");
 		}
 		final String val = this.findStockValue(variableType.getId(), stockModel.getProperties());
 
@@ -557,8 +564,8 @@ public class ExperimentBuilder extends Builder {
 		return variable;
 	}
 
-	public boolean hasFieldmap(final int datasetId) {
-		return this.daoFactory.getExperimentDao().hasFieldmap(datasetId);
+	public boolean hasFieldLayout(final int datasetId) {
+		return this.daoFactory.getExperimentDao().hasFieldLayout(datasetId);
 	}
 
 }

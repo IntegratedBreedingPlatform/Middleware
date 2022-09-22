@@ -181,7 +181,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				.identity()));
 		final List<Attribute> attributes = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Arrays.asList(germplasm.getGid()));
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(newLocation.getLocid(), savedGermplasm.getLocationId());
 		assertEquals(creationDate, savedGermplasm.getGdate().intValue());
 		assertNotNull(savedGermplasm.getReferenceId());
@@ -250,7 +250,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				.identity()));
 		final List<Attribute> attributes = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Arrays.asList(germplasm.getGid()));
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(newLocation.getLocid(), savedGermplasm.getLocationId());
 		assertEquals(creationDate, savedGermplasm.getGdate().intValue());
 		assertNotNull(savedGermplasm.getReferenceId());
@@ -477,7 +477,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(method.getMid(), savedGermplasm.getMethodId());
+		assertEquals(method.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(2, savedGermplasm.getGnpgs().intValue());
 		assertEquals(germplasmFemale.getGid(), savedGermplasm.getGpid1());
 		assertEquals(germplasmMale.getGid(), savedGermplasm.getGpid2());
@@ -587,7 +587,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(2, savedGermplasm.getGnpgs().intValue());
 		assertEquals(germplasmFemale.getGid(), savedGermplasm.getGpid1());
 		assertEquals(germplasmMale.getGid(), savedGermplasm.getGpid2());
@@ -620,7 +620,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(3, savedGermplasm.getGnpgs().intValue());
 		assertEquals(germplasmFemale.getGid(), savedGermplasm.getGpid1());
 		assertEquals(germplasmMale.getGid(), savedGermplasm.getGpid2());
@@ -653,7 +653,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(2, savedGermplasm.getGnpgs().intValue());
 		assertEquals(germplasmFemale.getGid(), savedGermplasm.getGpid1());
 		assertEquals(germplasmMale.getGid(), savedGermplasm.getGpid2());
@@ -684,7 +684,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(2, savedGermplasm.getGnpgs().intValue());
 		assertEquals(germplasmFemale.getGid(), savedGermplasm.getGpid1());
 		assertEquals(0, savedGermplasm.getGpid2().intValue());
@@ -699,7 +699,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(2, savedGermplasm.getGnpgs().intValue());
 		assertEquals(0, savedGermplasm.getGpid1().intValue());
 		assertEquals(germplasmMale.getGid(), savedGermplasm.getGpid2());
@@ -772,7 +772,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(-1, savedGermplasm.getGnpgs().intValue());
 		assertEquals(germplasmWithDescendants.getGid(), savedGermplasm.getGpid1());
 		assertEquals(germplasmDescendant2.getGid(), savedGermplasm.getGpid2());
@@ -799,7 +799,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(-1, savedGermplasm.getGnpgs().intValue());
 		assertEquals(germplasmFemale.getGid(), savedGermplasm.getGpid1());
 		assertEquals(0, savedGermplasm.getGpid2().intValue());
@@ -832,7 +832,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(-1, savedGermplasm.getGnpgs().intValue());
 		assertEquals(germplasmWithDescendants.getGid(), savedGermplasm.getGpid1());
 		assertEquals(germplasmDescendant.getGid(), savedGermplasm.getGpid2());
@@ -863,7 +863,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(-1, savedGermplasm.getGnpgs().intValue());
 		assertEquals(germplasmParent.getGid(), savedGermplasm.getGpid1());
 		assertEquals(germplasmParent.getGid(), savedGermplasm.getGpid2());
@@ -893,7 +893,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(-1, savedGermplasm.getGnpgs().intValue());
 		assertEquals(germplasmParent.getGid(), savedGermplasm.getGpid1());
 		assertEquals(germplasmParent.getGid(), savedGermplasm.getGpid2());
@@ -915,7 +915,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(0, savedGermplasm.getGnpgs().intValue());
 		assertEquals(0, savedGermplasm.getGpid1().intValue());
 		assertEquals(0, savedGermplasm.getGpid2().intValue());
@@ -942,7 +942,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(-1, savedGermplasm.getGnpgs().intValue());
 		assertEquals(parentGermplasm.getGid(), savedGermplasm.getGpid1());
 		assertEquals(parentGermplasm.getGid(), savedGermplasm.getGpid2());
@@ -970,7 +970,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(-1, savedGermplasm.getGnpgs().intValue());
 		assertEquals(parentGermplasm.getGid(), savedGermplasm.getGpid1());
 		assertEquals(parentGermplasm.getGid(), savedGermplasm.getGpid2());
@@ -995,7 +995,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
 
-		assertEquals(method.getMid(), savedGermplasm.getMethodId());
+		assertEquals(method.getMid(), savedGermplasm.getMethod().getMid());
 		assertEquals(2, savedGermplasm.getGnpgs().intValue());
 		assertEquals(germplasm.getGpid1(), savedGermplasm.getGpid1());
 		assertEquals(germplasm.getGpid2(), savedGermplasm.getGpid2());
@@ -1041,7 +1041,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(response.get(this.clientId).getGids().size(), is(1));
 
 		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(response.get(this.clientId).getGids().get(0));
-		assertThat(germplasm.getMethodId(), equalTo(this.generativeMethod.getMid()));
+		assertThat(germplasm.getMethod().getMid(), equalTo(this.generativeMethod.getMid()));
 		assertThat(germplasm.getGnpgs(), equalTo(0));
 		assertThat(germplasm.getGpid1(), equalTo(0));
 		assertThat(germplasm.getGpid2(), equalTo(0));
@@ -1085,7 +1085,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(response.get(this.clientId).getGids().size(), is(1));
 
 		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(response.get(this.clientId).getGids().get(0));
-		assertThat(germplasm.getMethodId(), equalTo(this.derivativeMethod.getMid()));
+		assertThat(germplasm.getMethod().getMid(), equalTo(this.derivativeMethod.getMid()));
 		assertThat(germplasm.getGnpgs(), equalTo(-1));
 		assertThat(germplasm.getGpid1(), equalTo(0));
 		assertThat(germplasm.getGpid2(), equalTo(0));
@@ -1185,7 +1185,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(response.get(this.clientId).getGids().size(), is(1));
 
 		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(response.get(this.clientId).getGids().get(0));
-		assertThat(germplasm.getMethodId(), equalTo(this.generativeMethod.getMid()));
+		assertThat(germplasm.getMethod().getMid(), equalTo(this.generativeMethod.getMid()));
 		assertThat(germplasm.getGnpgs(), equalTo(2));
 		assertThat(germplasm.getGpid1(), equalTo(0));
 		assertThat(germplasm.getGpid2(), equalTo(progenitor2.getGid()));
@@ -1227,7 +1227,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(response.get(this.clientId).getGids().size(), is(1));
 
 		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(response.get(this.clientId).getGids().get(0));
-		assertThat(germplasm.getMethodId(), equalTo(this.generativeMethod.getMid()));
+		assertThat(germplasm.getMethod().getMid(), equalTo(this.generativeMethod.getMid()));
 		assertThat(germplasm.getGnpgs(), equalTo(2));
 		assertThat(germplasm.getGpid1(), equalTo(progenitor1.getGid()));
 		assertThat(germplasm.getGpid2(), equalTo(progenitor2.getGid()));
@@ -1301,7 +1301,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(response.get(this.clientId).getGids().size(), is(1));
 
 		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(response.get(this.clientId).getGids().get(0));
-		assertThat(germplasm.getMethodId(), equalTo(this.derivativeMethod.getMid()));
+		assertThat(germplasm.getMethod().getMid(), equalTo(this.derivativeMethod.getMid()));
 		assertThat(germplasm.getGnpgs(), equalTo(-1));
 		assertThat(germplasm.getGpid1(), equalTo(progenitor2FemaleParent.getGid()));
 		assertThat(germplasm.getGpid2(), equalTo(progenitor2.getGid()));
@@ -1342,7 +1342,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(response.get(this.clientId).getGids().size(), is(1));
 
 		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(response.get(this.clientId).getGids().get(0));
-		assertThat(germplasm.getMethodId(), equalTo(this.derivativeMethod.getMid()));
+		assertThat(germplasm.getMethod().getMid(), equalTo(this.derivativeMethod.getMid()));
 		assertThat(germplasm.getGnpgs(), equalTo(-1));
 		assertThat(germplasm.getGpid1(), equalTo(progenitor2FemaleParent.getGid()));
 		assertThat(germplasm.getGpid2(), equalTo(progenitor2.getGid()));
@@ -1527,7 +1527,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasm.getGpid1(), equalTo(progenitor1.getGid()));
 		assertThat(germplasm.getGpid2(), equalTo(progenitor2.getGid()));
 		assertThat(germplasm.getOtherProgenitors(), hasSize(1));
-		assertThat(germplasm.getMethodId(), equalTo(this.generativeMethod.getMid()));
+		assertThat(germplasm.getMethod().getMid(), equalTo(this.generativeMethod.getMid()));
 	}
 
 	@Test
@@ -1560,17 +1560,17 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(nodeC.getGpid1(), equalTo(nodeA.getGid()));
 		assertThat(nodeC.getGpid2(), equalTo(nodeA.getGid()));
 		assertThat(nodeC.getOtherProgenitors(), hasSize(0));
-		assertThat(nodeC.getMethodId(), equalTo(this.derivativeMethod.getMid()));
+		assertThat(nodeC.getMethod().getMid(), equalTo(this.derivativeMethod.getMid()));
 
 		assertThat(nodeD.getGpid1(), equalTo(nodeA.getGid()));
 		assertThat(nodeD.getGpid2(), equalTo(nodeC.getGid()));
 		assertThat(nodeD.getOtherProgenitors(), hasSize(0));
-		assertThat(nodeD.getMethodId(), equalTo(this.derivativeMethod.getMid()));
+		assertThat(nodeD.getMethod().getMid(), equalTo(this.derivativeMethod.getMid()));
 
 		assertThat(nodeE.getGpid1(), equalTo(nodeA.getGid()));
 		assertThat(nodeE.getGpid2(), equalTo(nodeD.getGid()));
 		assertThat(nodeE.getOtherProgenitors(), hasSize(0));
-		assertThat(nodeE.getMethodId(), equalTo(this.derivativeMethod.getMid()));
+		assertThat(nodeE.getMethod().getMid(), equalTo(this.derivativeMethod.getMid()));
 	}
 
 	@Test
@@ -1607,17 +1607,17 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(nodeD.getGpid1(), equalTo(0));
 		assertThat(nodeD.getGpid2(), equalTo(0));
 		assertThat(nodeD.getOtherProgenitors(), hasSize(0));
-		assertThat(nodeD.getMethodId(), equalTo(this.derivativeMethod.getMid()));
+		assertThat(nodeD.getMethod().getMid(), equalTo(this.derivativeMethod.getMid()));
 
 		assertThat(nodeE.getGpid1(), equalTo(nodeD.getGid()));
 		assertThat(nodeE.getGpid2(), equalTo(nodeD.getGid()));
 		assertThat(nodeE.getOtherProgenitors(), hasSize(0));
-		assertThat(nodeE.getMethodId(), equalTo(this.derivativeMethod.getMid()));
+		assertThat(nodeE.getMethod().getMid(), equalTo(this.derivativeMethod.getMid()));
 
 		assertThat(nodeF.getGpid1(), equalTo(nodeD.getGid()));
 		assertThat(nodeF.getGpid2(), equalTo(nodeE.getGid()));
 		assertThat(nodeF.getOtherProgenitors(), hasSize(0));
-		assertThat(nodeF.getMethodId(), equalTo(this.derivativeMethod.getMid()));
+		assertThat(nodeF.getMethod().getMid(), equalTo(this.derivativeMethod.getMid()));
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
@@ -1876,7 +1876,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final StockModel stockModel =
 			new StockModel(null, null, RandomStringUtils.randomAlphabetic(5), RandomStringUtils.randomAlphabetic(5),
-				RandomStringUtils.randomAlphabetic(5),
 				false);
 		stockModel.setGermplasm(germplasm);
 		stockModel.setProject(dmsProject);
@@ -2028,9 +2027,9 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
-		final Germplasm targetGermplasm = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
-		final Germplasm germplasmToMerge1 = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
-		final Germplasm germplasmToMerge2 = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
+		final Germplasm targetGermplasm = this.createGermplasmWithPreferredName(method, null, null, 0, 0, 0, null, null);
+		final Germplasm germplasmToMerge1 = this.createGermplasmWithPreferredName(method, null, null, 0, 0, 0, null, null);
+		final Germplasm germplasmToMerge2 = this.createGermplasmWithPreferredName(method, null, null, 0, 0, 0, null, null);
 
 		final DmsProject study = this.createStudy();
 		this.daoFactory.getStockDao().save(new StockModel(study.getProjectId(), this.createTestStudyEntry(1, germplasmToMerge1.getGid())));
@@ -2603,9 +2602,30 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		return this.createGermplasm(method, germplasmUUID, location, gnpgs, gpid1, gpid2, null, germplasmPUI);
 	}
 
+	private Germplasm createGermplasmWithPreferredName(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
+		final Integer gpid1, final Integer gpid2, final Bibref reference, final String germplasmPUI) {
+
+		final Germplasm germplasm = new Germplasm(null, gnpgs, gpid1, gpid2,
+			0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
+			0, 0, null, null, method);
+		germplasm.setBibref(reference);
+
+		final Name preferredName = new Name(null, germplasm, this.variableTypeId, 1, "Name " + germplasm.getGid(), this.noLocationId,
+			Integer.valueOf(this.creationDate), 0);
+		germplasm.getNames().add(preferredName);
+		this.daoFactory.getGermplasmDao().save(germplasm);
+
+		assertThat(germplasm.getCreatedBy(), is(this.userId));
+		assertNotNull(germplasm.getCreatedBy());
+		assertNull(germplasm.getModifiedBy());
+		assertNull(germplasm.getModifiedDate());
+
+		return germplasm;
+	}
+
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
 		final Integer gpid1, final Integer gpid2, final Bibref reference, final String germplasmPUI) {
-		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2,
+		final Germplasm germplasm = new Germplasm(null, gnpgs, gpid1, gpid2,
 			0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
 			0, 0, null, null, method);
 		if (StringUtils.isNotEmpty(germplasmUUID)) {
