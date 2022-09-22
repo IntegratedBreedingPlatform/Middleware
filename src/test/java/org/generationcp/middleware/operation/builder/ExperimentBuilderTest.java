@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
@@ -30,6 +31,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,6 +42,8 @@ import java.util.Random;
 import java.util.Set;
 
 public class ExperimentBuilderTest extends IntegrationTestBase {
+
+	private static final String BREEDING_METHOD_ABBR = "BM_ABBR";
 
 	static ExperimentBuilder builder;
 
@@ -151,7 +155,6 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final Variable variable = builder.createGermplasmFactor(stockModel, variableType, new HashMap<>(), new MultiKeyMap());
 
 		Assert.assertNotNull(variable);
-		Assert.assertEquals(stockModel.getName(), variable.getValue());
 	}
 
 	@Test
@@ -199,6 +202,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		variableTypes.add(this.createDMSVariableType(TermId.GUID));
 		variableTypes.add(this.createDMSVariableType(TermId.IMMEDIATE_SOURCE_NAME));
 		variableTypes.add(this.createDMSVariableType(TermId.GROUP_SOURCE_NAME));
+		variableTypes.add(this.createDMSVariableType(TermId.BREEDING_METHOD_ABBR));
 		variableTypes.add(this.createDMSVariableType(TermId.FEMALE_PARENT_NAME));
 		variableTypes.add(this.createDMSVariableType(TermId.FEMALE_PARENT_GID));
 		variableTypes.add(this.createDMSVariableType(TermId.MALE_PARENT_GID));
@@ -228,11 +232,11 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final VariableList factors = new VariableList();
 		builder.addGermplasmFactors(factors, experimentModel, variableTypes, stockMap, derivativeParentsMapByGids, pedigreeTreeNodeTable, attributeMapByGidsAndAttributeId);
 		final List<Variable> variables = factors.getVariables();
-		Assert.assertEquals(16, variables.size());
+		Assert.assertEquals(17, variables.size());
 		final Iterator<Variable> iterator = variables.iterator();
 		verifyFactorVariable(iterator.next(), TermId.ENTRY_NO.getId(), stockModel.getUniqueName());
 		verifyFactorVariable(iterator.next(), TermId.GID.getId(), String.valueOf(gid));
-		verifyFactorVariable(iterator.next(), TermId.DESIG.getId(), stockModel.getName());
+		verifyFactorVariable(iterator.next(), TermId.DESIG.getId(), stockModel.getGermplasm().getPreferredName().getNval());
 		verifyFactorVariable(iterator.next(), TermId.ENTRY_CODE.getId(), findStockProperty(stockModel.getProperties(),TermId.ENTRY_CODE).getValue());
 		verifyFactorVariable(iterator.next(), TermId.ENTRY_TYPE.getId(), String.valueOf(findStockProperty(stockModel.getProperties(),TermId.ENTRY_TYPE).getCategoricalValueId()));
 		verifyFactorVariable(iterator.next(), TermId.GROUPGID.getId(), String.valueOf(stockModel.getGermplasm().getMgid()));
@@ -240,6 +244,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		verifyFactorVariable(iterator.next(), TermId.GUID.getId(), String.valueOf(stockModel.getGermplasm().getGermplasmUUID()));
 		verifyFactorVariable(iterator.next(), TermId.IMMEDIATE_SOURCE_NAME.getId(), "immediateSourceName");
 		verifyFactorVariable(iterator.next(), TermId.GROUP_SOURCE_NAME.getId(), "groupSourceName");
+		verifyFactorVariable(iterator.next(), TermId.BREEDING_METHOD_ABBR.getId(), BREEDING_METHOD_ABBR);
 		verifyFactorVariable(iterator.next(), attributeVariableId, "germplasmAttributeValue");
 		verifyFactorVariable(iterator.next(), passportVariableId, "germplasmPassportValue");
 		verifyFactorVariable(iterator.next(), TermId.FEMALE_PARENT_NAME.getId(), "femaleParentName");
@@ -298,9 +303,18 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 
 		final Germplasm germplasm = new Germplasm(new Random().nextInt(Integer.MAX_VALUE));
 		germplasm.setMgid(new Random().nextInt(Integer.MAX_VALUE));
+
+		final Method method = new Method();
+		method.setMcode(BREEDING_METHOD_ABBR);
+		germplasm.setMethod(method);
+
+		final Name name = new Name();
+		name.setGermplasm(germplasm);
+		name.setNval(RandomStringUtils.randomAlphanumeric(20));
+		name.setNstat(1);
+		germplasm.setNames(Collections.singletonList(name));
 		germplasm.setGermplasmUUID(RandomStringUtils.random(10));
 		stockModel.setGermplasm(germplasm);
-		stockModel.setName(RandomStringUtils.randomAlphanumeric(20));
 
 		final Set<StockProperty> stockProperties = new HashSet<>();
 		final StockProperty entryCodeProperty = new StockProperty(stockModel, TermId.ENTRY_CODE.getId(), RandomStringUtils.randomAlphanumeric(20), null);

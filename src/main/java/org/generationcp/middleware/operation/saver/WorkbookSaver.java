@@ -869,10 +869,8 @@ public class WorkbookSaver extends Saver {
 				.map(Integer::valueOf)
 				.collect(Collectors.toSet());
 
-			final Map<Integer, String> preferredNamesByGIDs = new HashMap<>();
 			final Map<Integer, String> pedigreeByGids = new HashMap<>();
 			if (!newStocksGids.isEmpty()) {
-				preferredNamesByGIDs.putAll(this.daoFactory.getNameDao().getPreferredNamesByGIDs(new ArrayList<>(newStocksGids)));
 				pedigreeByGids.putAll(this.pedigreeService.getCrossExpansionsBulk(newStocksGids, 1, this.crossExpansionProperties));
 			}
 
@@ -884,7 +882,7 @@ public class WorkbookSaver extends Saver {
 					final String entryNumber = this.getEntryNumber(stock);
 					Integer stockId = entryNoStockIdMap.get(entryNumber);
 					if (stockId == null) {
-						stockId = this.getStockSaver().saveStock(studyId, stock, preferredNamesByGIDs, pedigreeByGids);
+						stockId = this.getStockSaver().saveStock(studyId, stock, pedigreeByGids);
 						entryNoStockIdMap.put(String.valueOf(entryNumber), stockId);
 					} else {
 						this.getStockSaver().saveOrUpdateStock(stock, stockId);

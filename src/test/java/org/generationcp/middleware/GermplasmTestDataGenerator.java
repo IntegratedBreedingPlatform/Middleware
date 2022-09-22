@@ -6,6 +6,7 @@ import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.workbench.CropType;
 
@@ -62,7 +63,7 @@ public class GermplasmTestDataGenerator {
 
 		germplasm.setGpid1(parentGermplasm.getGid());
 		germplasm.setGpid2(parentGermplasm.getGid());
-		germplasm.setMethodId(GermplasmTestDataGenerator.TEST_METHOD_ID);
+		germplasm.setMethod(new Method(GermplasmTestDataGenerator.TEST_METHOD_ID));
 
 		this.daoFactory.getGermplasmDao().save(germplasm);
 		this.daoFactory.getGermplasmDao().refresh(germplasm);
