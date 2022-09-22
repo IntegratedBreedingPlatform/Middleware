@@ -364,7 +364,6 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	private StockModel getStock() {
 		if (this.stock == null) {			
 			this.stock = new StockModel();
-			this.stock.setName("Germplasm ");
 			this.stock.setIsObsolete(false);
 			this.stock.setUniqueName("1");
 			this.stock.setGermplasm(getGermplasm());

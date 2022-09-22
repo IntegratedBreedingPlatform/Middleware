@@ -35,7 +35,6 @@ public class PedigreeStringTestUtil {
 		germplasm.setGnpgs(numberOfProgenitor);
 		final Method method = new Method(methodId);
 		germplasm.setMethod(method);
-		germplasm.setMethodId(methodId);
 		method.setMname(methodName);
 
 		if (StringUtils.isNotBlank(preferredName)) {

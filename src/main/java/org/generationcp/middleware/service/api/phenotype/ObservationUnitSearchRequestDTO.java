@@ -1,10 +1,12 @@
 package org.generationcp.middleware.service.api.phenotype;
 
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 @AutoProperty
 public class ObservationUnitSearchRequestDTO implements Serializable {
@@ -20,9 +22,16 @@ public class ObservationUnitSearchRequestDTO implements Serializable {
 	private List<String> studyDbIds;
 	private List<String> programDbIds;
 	private List<String> trialDbIds;
+	private List<String> seasonDbIds;
+	private List<ObservationLevelRelationship> observationLevelRelationships;
+	private Boolean includeObservations = false;
 	private List<String> observationUnitDbIds;
 	private List<String> externalReferenceIDs;
 	private List<String> externalReferenceSources;
+
+	// extracted from observation level relationships
+	private List<String> observationLevelCodes;
+	private Set<String> datasetTypeNames;
 
 	public List<String> getObservationUnitDbIds() {
 		return this.observationUnitDbIds;
@@ -134,6 +143,47 @@ public class ObservationUnitSearchRequestDTO implements Serializable {
 
 	public void setExternalReferenceSources(final List<String> externalReferenceSources) {
 		this.externalReferenceSources = externalReferenceSources;
+	}
+
+	public List<String> getSeasonDbIds() {
+		return this.seasonDbIds;
+	}
+
+	public void setSeasonDbIds(final List<String> seasonDbIds) {
+		this.seasonDbIds = seasonDbIds;
+	}
+
+	public List<ObservationLevelRelationship> getObservationLevelRelationships() {
+		return this.observationLevelRelationships;
+	}
+
+	public void setObservationLevelRelationships(
+		final List<ObservationLevelRelationship> observationLevelRelationships) {
+		this.observationLevelRelationships = observationLevelRelationships;
+	}
+
+	public Boolean getIncludeObservations() {
+		return this.includeObservations;
+	}
+
+	public void setIncludeObservations(final Boolean includeObservations) {
+		this.includeObservations = includeObservations;
+	}
+
+	public List<String> getObservationLevelCodes() {
+		return this.observationLevelCodes;
+	}
+
+	public void setObservationLevelCodes(final List<String> observationLevelCodes) {
+		this.observationLevelCodes = observationLevelCodes;
+	}
+
+	public Set<String> getDatasetTypeNames() {
+		return this.datasetTypeNames;
+	}
+
+	public void setDatasetTypeNames(final Set<String> datasetTypeNames) {
+		this.datasetTypeNames = datasetTypeNames;
 	}
 
 	@Override

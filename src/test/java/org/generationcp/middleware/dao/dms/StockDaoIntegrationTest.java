@@ -226,7 +226,6 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 	private StockModel createTestStock(final DmsProject study, final Germplasm germplasm) {
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(10));
-		stockModel.setName(RandomStringUtils.randomAlphanumeric(10));
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
 		stockModel.setCross("-");

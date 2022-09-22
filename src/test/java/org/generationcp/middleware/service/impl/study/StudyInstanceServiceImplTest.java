@@ -158,7 +158,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertEquals(1, studyInstance1.getInstanceNumber());
 		assertNotNull(studyInstance1.getInstanceId());
 		assertNotNull(studyInstance1.getLocationId());
-		assertFalse(studyInstance1.isHasFieldmap());
+		assertFalse(studyInstance1.getHasFieldLayout());
 		assertEquals("Argentina", studyInstance1.getLocationName());
 		assertEquals("ARG", studyInstance1.getLocationAbbreviation());
 		assertNull(studyInstance1.getCustomLocationAbbreviation());
@@ -173,7 +173,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertEquals(2, studyInstance2.getInstanceNumber());
 		assertNotNull(studyInstance2.getInstanceId());
 		assertNotNull(studyInstance2.getLocationId());
-		assertFalse(studyInstance2.isHasFieldmap());
+		assertFalse(studyInstance2.getHasFieldLayout());
 		assertEquals("Argentina", studyInstance2.getLocationName());
 		assertEquals("ARG", studyInstance2.getLocationAbbreviation());
 		assertNull(studyInstance2.getCustomLocationAbbreviation());
@@ -203,7 +203,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertNull(studyInstance1.getCustomLocationAbbreviation());
 		Assert.assertEquals("AFG", studyInstance1.getLocationAbbreviation());
 		Assert.assertEquals("Afghanistan", studyInstance1.getLocationName());
-		Assert.assertFalse(studyInstance1.isHasFieldmap());
+		Assert.assertTrue(studyInstance1.getHasFieldLayout());
 		Assert.assertTrue(studyInstance1.isHasExperimentalDesign());
 		// Instance deletion not allowed because instance has subobservation
 		Assert.assertFalse(studyInstance1.getCanBeDeleted());
@@ -215,7 +215,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertNull(studyInstance2.getCustomLocationAbbreviation());
 		Assert.assertEquals("ALB", studyInstance2.getLocationAbbreviation());
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
-		Assert.assertTrue(studyInstance2.isHasFieldmap());
+		Assert.assertTrue(studyInstance2.getHasFieldLayout());
 		Assert.assertTrue(studyInstance2.isHasExperimentalDesign());
 		Assert.assertTrue(studyInstance2.getCanBeDeleted());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
@@ -226,7 +226,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertNull(studyInstance3.getCustomLocationAbbreviation());
 		Assert.assertEquals("DZA", studyInstance3.getLocationAbbreviation());
 		Assert.assertEquals("Algeria", studyInstance3.getLocationName());
-		Assert.assertFalse(studyInstance3.isHasFieldmap());
+		Assert.assertFalse(studyInstance3.getHasFieldLayout());
 		Assert.assertFalse(studyInstance3.isHasExperimentalDesign());
 		Assert.assertTrue(studyInstance3.getCanBeDeleted());
 		Assert.assertFalse(studyInstance3.isHasMeasurements());
@@ -246,7 +246,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertNull(studyInstance1.getCustomLocationAbbreviation());
 		Assert.assertEquals("AFG", studyInstance1.getLocationAbbreviation());
 		Assert.assertEquals("Afghanistan", studyInstance1.getLocationName());
-		Assert.assertFalse(studyInstance1.isHasFieldmap());
+		Assert.assertTrue(studyInstance1.getHasFieldLayout());
 		Assert.assertTrue(studyInstance1.isHasExperimentalDesign());
 		// Instance deletion not allowed because instance has subobservation
 		Assert.assertFalse(studyInstance1.getCanBeDeleted());
@@ -259,7 +259,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertNull(studyInstance2.getCustomLocationAbbreviation());
 		Assert.assertEquals("ALB", studyInstance2.getLocationAbbreviation());
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
-		Assert.assertTrue(studyInstance2.isHasFieldmap());
+		Assert.assertTrue(studyInstance2.getHasFieldLayout());
 		Assert.assertTrue(studyInstance2.isHasExperimentalDesign());
 		Assert.assertTrue(studyInstance2.getCanBeDeleted());
 		Assert.assertFalse(studyInstance2.isHasMeasurements());
@@ -271,7 +271,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertNull(studyInstance3.getCustomLocationAbbreviation());
 		Assert.assertEquals("DZA", studyInstance3.getLocationAbbreviation());
 		Assert.assertEquals("Algeria", studyInstance3.getLocationName());
-		Assert.assertFalse(studyInstance3.isHasFieldmap());
+		Assert.assertFalse(studyInstance3.getHasFieldLayout());
 		Assert.assertFalse(studyInstance3.isHasExperimentalDesign());
 		Assert.assertTrue(studyInstance3.getCanBeDeleted());
 		Assert.assertFalse(studyInstance3.isHasMeasurements());
@@ -534,9 +534,9 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		this.testDataInitializer.addGeolocationProp(this.instance2, TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5), 1);
 
 		// Instance 1
-		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance1, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance1, TermId.SUMMARY_EXPERIMENT.getId(), "0", null, true);
 		final ExperimentModel instance1PlotExperiment =
-			this.testDataInitializer.createTestExperiment(plotDataset, this.instance1, TermId.PLOT_EXPERIMENT.getId(), "1", null);
+			this.testDataInitializer.createTestExperiment(plotDataset, this.instance1, TermId.PLOT_EXPERIMENT.getId(), "1", null, true);
 		// Create 2 Sub-obs records
 		final ExperimentModel instance1SubObsExperiment1 =
 			this.testDataInitializer
@@ -554,11 +554,11 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		}
 
 		// Instance 2
-		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance2, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance2, TermId.SUMMARY_EXPERIMENT.getId(), "0", null, true);
 		this.testDataInitializer.createTestExperiment(plotDataset, this.instance2, TermId.PLOT_EXPERIMENT.getId(), "1", null);
 
 		// Instance 3 has no plot experiments
-		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance3, TermId.SUMMARY_EXPERIMENT.getId(), "0", null);
+		this.testDataInitializer.createTestExperiment(environmentDataset, this.instance3, TermId.SUMMARY_EXPERIMENT.getId(), "0", null, false);
 		this.sessionProvder.getSession().flush();
 		return study;
 	}
@@ -604,7 +604,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertNull(studyInstance1.getCustomLocationAbbreviation());
 		Assert.assertEquals("AFG", studyInstance1.getLocationAbbreviation());
 		Assert.assertEquals("Afghanistan", studyInstance1.getLocationName());
-		Assert.assertFalse(studyInstance1.isHasFieldmap());
+		Assert.assertTrue(studyInstance1.getHasFieldLayout());
 		Assert.assertTrue(studyInstance1.isHasExperimentalDesign());
 		// Instance deletion not allowed because instance has subobservation
 		Assert.assertFalse(studyInstance1.getCanBeDeleted());
@@ -617,7 +617,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertNull(studyInstance2.getCustomLocationAbbreviation());
 		Assert.assertEquals("ALB", studyInstance2.getLocationAbbreviation());
 		Assert.assertEquals("Albania", studyInstance2.getLocationName());
-		Assert.assertTrue(studyInstance2.isHasFieldmap());
+		Assert.assertTrue(studyInstance2.getHasFieldLayout());
 		Assert.assertTrue(studyInstance2.isHasExperimentalDesign());
 		// Instance deletion not allowed because instance has means dataset
 		Assert.assertTrue(studyInstance2.getCanBeDeleted());
@@ -630,7 +630,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertNull(studyInstance3.getCustomLocationAbbreviation());
 		Assert.assertEquals("DZA", studyInstance3.getLocationAbbreviation());
 		Assert.assertEquals("Algeria", studyInstance3.getLocationName());
-		Assert.assertFalse(studyInstance3.isHasFieldmap());
+		Assert.assertFalse(studyInstance3.getHasFieldLayout());
 		Assert.assertFalse(studyInstance3.isHasExperimentalDesign());
 		// Instance deletion not allowed because instance has means dataset
 		Assert.assertTrue(studyInstance3.getCanBeDeleted());

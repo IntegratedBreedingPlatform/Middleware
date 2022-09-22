@@ -121,7 +121,7 @@ public class ObservationUnitServiceImplTest {
 
 		this.observationUnitService.getObservationLevels(filter);
 		Mockito.verify(this.dmsProjectDao).getDatasets(studyId);
-		Mockito.verify(this.experimentDao).hasFieldmap(datasetDTO.getDatasetId());
+		Mockito.verify(this.experimentDao).hasFieldLayout(datasetDTO.getDatasetId());
 		Mockito.verify(this.projectPropertyDao).getByProjectId(datasetDTO.getDatasetId());
 	}
 }

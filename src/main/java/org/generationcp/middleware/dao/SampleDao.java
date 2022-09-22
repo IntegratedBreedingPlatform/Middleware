@@ -164,6 +164,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias(SAMPLE_EXPERIMENT, EXPERIMENT)
 			.createAlias("experiment.stock", "stock")
 			.createAlias("stock.germplasm", "germplasm")
+			.createAlias("germplasm.names", "name",
+				Criteria.LEFT_JOIN, Restrictions.eq("name.nstat", 1))
 			.createAlias("sample.accMetadataSets", "accMetadataSets", Criteria.LEFT_JOIN)
 			.createAlias("accMetadataSets.dataset", "dataset", Criteria.LEFT_JOIN)
 			.setProjection(Projections.distinct(Projections.projectionList()
@@ -175,7 +177,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.property("dataset.datasetId")) //row[5]
 				.add(Projections.property("dataset.datasetName")) //row[6]
 				.add(Projections.property("germplasm.gid")) //row[7]
-				.add(Projections.property("stock.name")) //row[8] TODO preferred name
+				.add(Projections.property("name.nval")) //row[8]
 				.add(Projections.property("samplingDate")) //row[9]
 				.add(Projections.property("entryNumber")) //row[10]
 				.add(Projections.property("sample.plateId")) //row[11]
@@ -233,6 +235,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.createAlias("study.studyType", "studyType", Criteria.LEFT_JOIN)
 			.createAlias("experiment.stock", "stock")
 			.createAlias("stock.germplasm", "germplasm")
+			.createAlias("germplasm.names", "name",
+				Criteria.LEFT_JOIN, Restrictions.eq("name.nstat", 1))
 			.createAlias("sample.accMetadataSets", "accMetadataSets", CriteriaSpecification.LEFT_JOIN)
 			.createAlias("accMetadataSets.dataset", "dataset", CriteriaSpecification.LEFT_JOIN)
 			.setProjection(Projections.distinct(Projections.projectionList()
@@ -240,7 +244,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				.add(Projections.alias(Projections.property("sample.entryNumber"), "entryNumber"))
 				.add(Projections.alias(Projections.property("germplasm.gid"), "gid"))
 				.add(Projections.alias(Projections.property("sample.takenBy"), "takenBy"))
-				.add(Projections.alias(Projections.property("stock.name"), "designation"))
+				.add(Projections.alias(Projections.property("name.nval"), "designation"))
 				.add(Projections.alias(Projections.property("sample.sampleNumber"), "sampleNumber"))
 				.add(Projections.alias(Projections.property("sample.sampleName"), "sampleName"))
 				.add(Projections.alias(Projections.property("sample.sampleBusinessKey"), "sampleBusinessKey"))

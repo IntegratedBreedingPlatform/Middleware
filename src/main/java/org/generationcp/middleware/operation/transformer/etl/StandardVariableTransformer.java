@@ -53,6 +53,7 @@ public class StandardVariableTransformer extends Transformer {
 		standardVariable.setEnumerations(this.getValidValues(variable));
 		standardVariable.setCropOntologyId(variable.getProperty().getCropOntologyId());
 		standardVariable.setVariableTypes(variable.getVariableTypes());
+		standardVariable.setSystem(variable.getIsSystem());
 		return standardVariable;
 	}
 
