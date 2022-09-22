@@ -77,4 +77,28 @@
 		</createTable>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="v22.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="atributs_invalid_atype_bkp"/>
+		</preConditions>
+		<comment>
+			Drop table 'atributs_invalid_atype_bkp'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE atributs_invalid_atype_bkp;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v22.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="udflds_attributes_bkp"/>
+		</preConditions>
+		<comment>
+			Drop table 'udflds_attributes_bkp'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE udflds_attributes_bkp;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
