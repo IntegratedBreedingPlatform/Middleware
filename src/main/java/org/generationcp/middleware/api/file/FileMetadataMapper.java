@@ -5,12 +5,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
+import org.generationcp.middleware.pojos.FileMetadataExternalReference;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.file.FileMetadata;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FileMetadataMapper {
@@ -33,6 +38,16 @@ public class FileMetadataMapper {
 			}
 		} catch (final JsonProcessingException e) {
 			throw new MiddlewareRequestException("", "filemetadata.brapi.location.parse.error");
+		}
+
+		if (!CollectionUtils.isEmpty(from.getExternalReferences())) {
+			final List<FileMetadataExternalReference> externalReferences = new ArrayList<>();
+			for (final ExternalReferenceDTO externalReferenceDTO: from.getExternalReferences()) {
+				final FileMetadataExternalReference fileMetadataExternalReference = new FileMetadataExternalReference(to,
+					externalReferenceDTO.getReferenceID(), externalReferenceDTO.getReferenceSource());
+				externalReferences.add(fileMetadataExternalReference);
+			}
+			to.setExternalReferences(externalReferences);
 		}
 	}
 
@@ -61,6 +76,16 @@ public class FileMetadataMapper {
 		}
 
 		image.setImageDbId(fileMetadata.getFileUUID());
+
+		if(!CollectionUtils.isEmpty(fileMetadata.getExternalReferences())) {
+			final List<ExternalReferenceDTO> externalReferenceDTOS = new ArrayList<>();
+			for (final FileMetadataExternalReference externalReference: fileMetadata.getExternalReferences()) {
+				final ExternalReferenceDTO externalReferenceDTO = new ExternalReferenceDTO(fileMetadata.getFileId().toString(),
+					externalReference.getReferenceId(), externalReference.getSource());
+				externalReferenceDTOS.add(externalReferenceDTO);
+			}
+			image.setExternalReferences(externalReferenceDTOS);
+		}
 		return image;
 	}
 
