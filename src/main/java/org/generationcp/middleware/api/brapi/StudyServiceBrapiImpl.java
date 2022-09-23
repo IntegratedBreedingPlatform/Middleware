@@ -287,7 +287,8 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 		for (final StudyImportRequestDTO requestDTO : studyImportRequestDTOS) {
 			final Integer trialId = Integer.valueOf(requestDTO.getTrialDbId());
 			final Integer environmentDatasetId = trialIdEnvironmentDatasetMap.get(trialId).getProjectId();
-			this.addEnvironmentVariablesIfNecessary(requestDTO, studyIdEnvironmentVariablesMap, environmentVariablesMap,
+			this.addEnvironmentVariablesIfNecessary(trialId, requestDTO.getEnvironmentParameters(), studyIdEnvironmentVariablesMap,
+				environmentVariablesMap,
 				trialIdEnvironmentDatasetMap);
 
 			final Geolocation geolocation = this.resolveGeolocationForStudy(trialId);
@@ -295,14 +296,24 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 			final ExperimentModel experimentModel =
 				this.experimentModelGenerator
 					.generate(cropType, environmentDatasetId, Optional.of(geolocation), ExperimentType.TRIAL_ENVIRONMENT);
-			this.addEnvironmentVariableValues(requestDTO, environmentVariablesMap, categoricalVariablesMap, experimentModel,
-				unspecifiedLocation, locationsMap);
-			this.addSeasonVariableIfNecessary(requestDTO, studyIdEnvironmentVariablesMap, geolocation, categoricalVariablesMap,
+			this.daoFactory.getExperimentDao().save(experimentModel);
+
+			// Add LOCATION geolocation property, the default value of an instance's location name is "Unspecified Location"
+			final Integer locationId;
+			if (locationsMap.containsKey(Integer.parseInt(requestDTO.getLocationDbId()))) {
+				locationId = locationsMap.get(Integer.parseInt(requestDTO.getLocationDbId())).getLocid();
+			} else {
+				locationId = unspecifiedLocation.isPresent() ? unspecifiedLocation.get().getLocid() : null;
+			}
+
+			this.addOrUpdateEnvironmentVariableValues(requestDTO.getEnvironmentParameters(), locationId,
+				environmentVariablesMap, categoricalVariablesMap, experimentModel);
+
+			this.addOrUpdateSeasonVariableIfNecessary(requestDTO, studyIdEnvironmentVariablesMap, geolocation, categoricalVariablesMap,
 				trialIdEnvironmentDatasetMap);
 			this.addExperimentalDesignIfNecessary(requestDTO, trialIdEnvironmentDatasetMap, geolocation, studyIdEnvironmentVariablesMap);
-			this.setInstanceExternalReferences(requestDTO, geolocation);
-			this.daoFactory.getGeolocationDao().saveOrUpdate(geolocation);
-			this.daoFactory.getExperimentDao().save(experimentModel);
+			this.addInstanceExternalReferences(requestDTO, geolocation);
+
 			// Unless the session is flushed, the latest changes are not reflected in DTOs returned by method
 			this.sessionProvider.getSession().flush();
 			studyIds.add(geolocation.getLocationId().toString());
@@ -324,26 +335,19 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 		final Integer trialDbId = Integer.valueOf(studyUpdateRequestDTO.getTrialDbId());
 
-		// Update existing environment variable values
-		// TODO: Check if this method can be merged with addEnvironmentVariableValues()
-		this.updateEnvironmentVariableValues(studyDbId, studyUpdateRequestDTO);
-		// Associate variables to study if not yet existing.
-		this.associateVariablesToStudy(studyUpdateRequestDTO, trialDbId);
-
-		final StudySearchFilter filter = new StudySearchFilter();
-		filter.setStudyDbIds(Arrays.asList(String.valueOf(studyDbId)));
-		final List<StudyInstanceDto> studyInstanceDtos = this.getStudyInstancesWithMetadata(filter, null);
-		return studyInstanceDtos.get(0);
-
-	}
-
-	private void updateEnvironmentVariableValues(final Integer studyDbId, final StudyUpdateRequestDTO studyUpdateRequestDTO) {
+		final Map<Integer, DmsProject> trialIdEnvironmentDatasetMap =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(Arrays.asList(trialDbId), DatasetTypeEnum.SUMMARY_DATA.getId())
+				.stream()
+				.collect(Collectors.toMap(environmentDataset -> environmentDataset.getStudy().getProjectId(), Function.identity()));
 
 		final List<String> environmentVariableIds =
 			studyUpdateRequestDTO.getEnvironmentParameters().stream().map(EnvironmentParameter::getParameterPUI).collect(toList());
 		final Map<Integer, MeasurementVariable> environmentVariablesMap = this.daoFactory.getCvTermDao()
 			.getVariablesByIdsAndVariableTypes(environmentVariableIds,
 				Arrays.asList(VariableType.ENVIRONMENT_CONDITION.getName(), VariableType.ENVIRONMENT_DETAIL.getName()));
+
+		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap =
+			this.daoFactory.getProjectPropertyDAO().getEnvironmentDatasetVariables(Arrays.asList(trialDbId));
 
 		final List<Integer> categoricalVariableIds =
 			environmentVariablesMap.values().stream()
@@ -355,60 +359,30 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 		final ExperimentModel experimentModel =
 			this.daoFactory.getExperimentDao().getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), studyDbId);
-		final Map<Integer, GeolocationProperty> geolocationPropertyMap =
-			experimentModel.getGeoLocation().getProperties().stream()
-				.collect(Collectors.toMap(GeolocationProperty::getTypeId, Function.identity()));
 
-		if (!CollectionUtils.isEmpty(studyUpdateRequestDTO.getEnvironmentParameters())) {
-			for (final EnvironmentParameter environmentParameter : studyUpdateRequestDTO.getEnvironmentParameters()) {
-				final Integer variableId = Integer.valueOf(environmentParameter.getParameterPUI());
-				if (environmentVariablesMap.containsKey(variableId) && StringUtils.isNotEmpty(environmentParameter.getValue())) {
-					final MeasurementVariable measurementVariable = environmentVariablesMap.get(variableId);
-					final String newValue = this.getEnvironmentParameterValue(environmentParameter, categoricalValuesMap);
-					if (VariableType.ENVIRONMENT_DETAIL.getId().equals(measurementVariable.getVariableType().getId())
-						&& StringUtils.isNotEmpty(newValue)) {
-						if (StudyInstanceServiceImpl.GEOLOCATION_METADATA.contains(measurementVariable.getTermId())) {
-							// For LATITUDE, LONGITUDE, GEODETIC_DATUM, ALTITUDE variables,
-							// Set the values in their respective fields in Geolocation
-							this.mapGeolocationMetaData(experimentModel.getGeoLocation(), environmentParameter);
-							this.daoFactory.getGeolocationDao().update(experimentModel.getGeoLocation());
-						} else {
+		final Integer locationDbId =
+			StringUtils.isNotEmpty(studyUpdateRequestDTO.getLocationDbId()) ? Integer.valueOf(studyUpdateRequestDTO.getLocationDbId()) :
+				null;
 
-							if (geolocationPropertyMap.containsKey(measurementVariable.getTermId())) {
-								// Update the GeolocationProperty
-								final GeolocationProperty geolocationProperty =
-									geolocationPropertyMap.get(measurementVariable.getTermId());
-								geolocationProperty.setValue(newValue);
-								this.daoFactory.getGeolocationPropertyDao().update(geolocationProperty);
-							} else {
-								// Create new
-								final GeolocationProperty newGeolocationProperty = new GeolocationProperty(experimentModel.getGeoLocation(),
-									newValue, 1, measurementVariable.getTermId());
-								this.daoFactory.getGeolocationPropertyDao().save(newGeolocationProperty);
-							}
+		// Add anevironment variable to the environment dataset if they are not yet existing
+		this.addEnvironmentVariablesIfNecessary(trialDbId, studyUpdateRequestDTO.getEnvironmentParameters(), studyIdEnvironmentVariablesMap,
+			environmentVariablesMap,
+			trialIdEnvironmentDatasetMap);
 
-						}
-					} else if (VariableType.ENVIRONMENT_CONDITION.getId().equals(measurementVariable.getVariableType().getId())
-						&& StringUtils.isNotEmpty(newValue)) {
-						// Environment condition is saved as Phenotype of trial environment experiment
-						final Optional<Phenotype> phenotypeOptional = experimentModel.getPhenotypes().stream()
-							.filter(p -> p.getObservableId() == measurementVariable.getTermId()).findAny();
-						if (phenotypeOptional.isPresent()) {
-							final Phenotype phenotype = phenotypeOptional.get();
-							phenotype.setUpdatedDate(new Date());
-							phenotype.setValue(newValue);
-							this.daoFactory.getPhenotypeDAO().update(phenotype);
-						} else {
-							final Phenotype phenotype = new Phenotype(measurementVariable.getTermId(), newValue, experimentModel);
-							phenotype.setCreatedDate(new Date());
-							phenotype.setUpdatedDate(new Date());
-							phenotype.setName(String.valueOf(measurementVariable.getTermId()));
-							this.daoFactory.getPhenotypeDAO().save(phenotype);
-						}
-					}
-				}
-			}
-		}
+		// Update existing environment variable values
+		this.addOrUpdateEnvironmentVariableValues(studyUpdateRequestDTO.getEnvironmentParameters(), locationDbId, environmentVariablesMap,
+			categoricalValuesMap, experimentModel);
+
+		// Associate variables to study if not yet existing.
+		this.associateVariablesToStudy(studyUpdateRequestDTO, trialDbId);
+
+		// TODO: update external references
+
+		final StudySearchFilter filter = new StudySearchFilter();
+		filter.setStudyDbIds(Arrays.asList(String.valueOf(studyDbId)));
+		final List<StudyInstanceDto> studyInstanceDtos = this.getStudyInstancesWithMetadata(filter, null);
+		return studyInstanceDtos.get(0);
+
 	}
 
 	private void associateVariablesToStudy(final StudyUpdateRequestDTO studyUpdateRequestDTO, final Integer trialDbId) {
@@ -528,14 +502,12 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 		final String externallyGeneratedDesignId = String.valueOf(TermId.EXTERNALLY_GENERATED.getId());
 		if (experimentalDesignProperty.get(0).getValue().equals(externallyGeneratedDesignId)) {
-			final GeolocationProperty experimentalDesignGeolocProperty = new GeolocationProperty(geolocation,
-				externallyGeneratedDesignId, 1, TermId.EXPERIMENT_DESIGN_FACTOR.getId());
-			geolocation.getProperties().add(experimentalDesignGeolocProperty);
+			this.saveOrUpdateGeolocationProperty(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), externallyGeneratedDesignId, geolocation);
 		}
 
 	}
 
-	private void addSeasonVariableIfNecessary(final StudyImportRequestDTO requestDTO,
+	private void addOrUpdateSeasonVariableIfNecessary(final StudyImportRequestDTO requestDTO,
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap, final Geolocation geolocation,
 		final Map<Integer, List<ValueReference>> categoricalVariablesMap,
 		final Map<Integer, DmsProject> environmentDatasetMap) {
@@ -552,42 +524,29 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 					this.addProjectProperty(studyIdEnvironmentVariablesMap, environmentDatasetMap, trialDbId,
 						VariableType.ENVIRONMENT_DETAIL, TermId.SEASON_VAR.getId(), null, CROP_SEASON_CODE);
 				}
-
-				//Add season value for the environment
-				if (geolocation.getProperties() == null) {
-					geolocation.setProperties(new ArrayList<>());
-				}
 				final Map<String, Integer> seasonValuesMap = categoricalVariablesMap.get(TermId.SEASON_VAR.getId()).stream()
 					.collect(Collectors.toMap(ValueReference::getDescription, ValueReference::getId));
-				final GeolocationProperty seasonProperty = new GeolocationProperty(geolocation,
-					String.valueOf(seasonValuesMap.get(seasonValue)), 1, TermId.SEASON_VAR.getId());
-				geolocation.getProperties().add(seasonProperty);
+				this.saveOrUpdateGeolocationProperty(TermId.SEASON_VAR.getId(), String.valueOf(seasonValuesMap.get(seasonValue)),
+					geolocation);
 			}
 		}
 	}
 
-	private void addEnvironmentVariableValues(final StudyImportRequestDTO requestDTO,
+	private void addOrUpdateEnvironmentVariableValues(final List<EnvironmentParameter> environmentParameters,
+		final Integer locationDbId,
 		final Map<Integer, MeasurementVariable> environmentVariablesMap, final Map<Integer, List<ValueReference>> categoricalValuesMap,
-		final ExperimentModel experimentModel, final Optional<Location> unspecifiedLocation, final Map<Integer, Location> locationsMap) {
+		final ExperimentModel experimentModel) {
 
-		// The default value of an instance's location name is "Unspecified Location"
-		final Optional<Location> location =
-			StringUtils.isEmpty(requestDTO.getLocationDbId()) ? unspecifiedLocation :
-				Optional.of(locationsMap.get(Integer.parseInt(requestDTO.getLocationDbId())));
+		// Add or update LOCATION geolocation property
+		if (locationDbId != null) {
+			this.saveOrUpdateGeolocationProperty(TermId.LOCATION_ID.getId(), String.valueOf(locationDbId),
+				experimentModel.getGeoLocation());
+		}
 
-		final List<GeolocationProperty> properties = new ArrayList<>();
-		final List<Phenotype> phenotypes = new ArrayList<>();
-
-		// Add location property
-		final GeolocationProperty locationGeolocationProperty =
-			new GeolocationProperty(experimentModel.getGeoLocation(), String.valueOf(location.get().getLocid()), 1,
-				TermId.LOCATION_ID.getId());
-		properties.add(locationGeolocationProperty);
-
-		if (!CollectionUtils.isEmpty(requestDTO.getEnvironmentParameters())) {
+		if (!CollectionUtils.isEmpty(environmentParameters)) {
 			// Use name of categorical value in validating inputs
 			final CategoricalValueNameValidator categoricalValueNameValidator = new CategoricalValueNameValidator();
-			for (final EnvironmentParameter environmentParameter : requestDTO.getEnvironmentParameters()) {
+			for (final EnvironmentParameter environmentParameter : environmentParameters) {
 				if (StringUtils.isNotEmpty(environmentParameter.getValue())) {
 					final MeasurementVariable measurementVariable =
 						environmentVariablesMap.get(Integer.valueOf(environmentParameter.getParameterPUI()));
@@ -601,32 +560,67 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 							measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
 						}
 						if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
+							final String value = this.getEnvironmentParameterValue(environmentParameter, categoricalValuesMap);
 							if (VariableType.ENVIRONMENT_DETAIL.getId().equals(measurementVariable.getVariableType().getId())) {
-								if (StudyInstanceServiceImpl.GEOLOCATION_METADATA.contains(measurementVariable.getTermId())) {
-									this.mapGeolocationMetaData(experimentModel.getGeoLocation(), environmentParameter);
-								} else {
-									final GeolocationProperty property = new GeolocationProperty(experimentModel.getGeoLocation(),
-										this.getEnvironmentParameterValue(environmentParameter, categoricalValuesMap), 1,
-										measurementVariable.getTermId());
-									properties.add(property);
-								}
+
+								this.saveGeolocationMetaData(measurementVariable.getTermId(), environmentParameter,
+									experimentModel.getGeoLocation());
+								this.saveOrUpdateGeolocationProperty(measurementVariable.getTermId(), value,
+									experimentModel.getGeoLocation());
+
 							} else if (VariableType.ENVIRONMENT_CONDITION.getId().equals(measurementVariable.getVariableType().getId())) {
-								final Phenotype phenotype = new Phenotype(measurementVariable.getTermId(),
-									this.getEnvironmentParameterValue(environmentParameter, categoricalValuesMap), experimentModel);
-								phenotype.setCreatedDate(new Date());
-								phenotype.setUpdatedDate(new Date());
-								phenotype.setName(String.valueOf(measurementVariable.getTermId()));
-								phenotypes.add(phenotype);
+								// Environment condition is saved as Phenotype of trial environment experiment
+								this.saveOrUpdatePhenotype(measurementVariable.getTermId(), value, experimentModel);
 							}
 						}
 					}
-
 				}
 			}
 		}
+	}
 
-		experimentModel.getGeoLocation().setProperties(properties);
-		experimentModel.setPhenotypes(phenotypes);
+	private void saveGeolocationMetaData(final int variableId, final EnvironmentParameter environmentParameter,
+		final Geolocation geolocation) {
+		if (StudyInstanceServiceImpl.GEOLOCATION_METADATA.contains(variableId)) {
+			// For LATITUDE, LONGITUDE, GEODETIC_DATUM, ALTITUDE variables,
+			// Set the values in their respective fields in Geolocation
+			this.mapGeolocationMetaData(geolocation, environmentParameter);
+			this.daoFactory.getGeolocationDao().update(geolocation);
+		}
+	}
+
+	private void saveOrUpdateGeolocationProperty(final int variableId, final String value, final Geolocation geolocation) {
+		if (!StudyInstanceServiceImpl.GEOLOCATION_METADATA.contains(variableId)) {
+			final Optional<GeolocationProperty> geolocationPropertyOptional = geolocation.getProperties().stream()
+				.filter(g -> g.getTypeId() == variableId).findAny();
+			if (geolocationPropertyOptional.isPresent()) {
+				// Update the GeolocationProperty
+				final GeolocationProperty geolocationProperty = geolocationPropertyOptional.get();
+				geolocationProperty.setValue(value);
+				this.daoFactory.getGeolocationPropertyDao().update(geolocationProperty);
+			} else {
+				// Create new
+				final GeolocationProperty newGeolocationProperty = new GeolocationProperty(geolocation, value, 1, variableId);
+				this.daoFactory.getGeolocationPropertyDao().save(newGeolocationProperty);
+			}
+		}
+	}
+
+	private void saveOrUpdatePhenotype(final int variableId, final String value, final ExperimentModel experimentModel) {
+		final Optional<Phenotype> phenotypeOptional = experimentModel.getPhenotypes().stream()
+			.filter(p -> p.getObservableId() == variableId).findAny();
+		if (phenotypeOptional.isPresent()) {
+			final Phenotype phenotype = phenotypeOptional.get();
+			phenotype.setUpdatedDate(new Date());
+			phenotype.setValue(value);
+			this.daoFactory.getPhenotypeDAO().update(phenotype);
+		} else {
+			final Phenotype phenotype = new Phenotype(variableId, value, experimentModel);
+			phenotype.setCreatedDate(new Date());
+			phenotype.setUpdatedDate(new Date());
+			phenotype.setName(String.valueOf(variableId));
+			this.daoFactory.getPhenotypeDAO().save(phenotype);
+		}
 	}
 
 	private String getEnvironmentParameterValue(final EnvironmentParameter environmentParameter,
@@ -656,12 +650,11 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 		}
 	}
 
-	private void addEnvironmentVariablesIfNecessary(final StudyImportRequestDTO requestDTO,
+	private void addEnvironmentVariablesIfNecessary(final Integer trialDbId, final List<EnvironmentParameter> environmentParameters,
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap, final Map<Integer, MeasurementVariable> environmentVariablesMap,
 		final Map<Integer, DmsProject> trialIdEnvironmentDatasetMap) {
-		if (!CollectionUtils.isEmpty(requestDTO.getEnvironmentParameters())) {
-			final Integer trialDbId = Integer.valueOf(requestDTO.getTrialDbId());
-			for (final EnvironmentParameter environmentParameter : requestDTO.getEnvironmentParameters()) {
+		if (!CollectionUtils.isEmpty(environmentParameters)) {
+			for (final EnvironmentParameter environmentParameter : environmentParameters) {
 				final Integer variableId = Integer.valueOf(environmentParameter.getParameterPUI());
 				if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(variableId) && environmentVariablesMap
 					.containsKey(variableId)) {
@@ -724,15 +717,13 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 		studyIdEnvironmentVariablesMap.get(trialDbId).add(termId);
 	}
 
-	private void setInstanceExternalReferences(final StudyImportRequestDTO studyImportRequestDTO, final Geolocation geolocation) {
+	private void addInstanceExternalReferences(final StudyImportRequestDTO studyImportRequestDTO, final Geolocation geolocation) {
 		if (studyImportRequestDTO.getExternalReferences() != null) {
-			final List<InstanceExternalReference> references = new ArrayList<>();
 			studyImportRequestDTO.getExternalReferences().forEach(reference -> {
 				final InstanceExternalReference externalReference =
 					new InstanceExternalReference(geolocation, reference.getReferenceID(), reference.getReferenceSource());
-				references.add(externalReference);
+				this.daoFactory.getStudyInstanceExternalReferenceDao().save(externalReference);
 			});
-			geolocation.setExternalReferences(references);
 		}
 	}
 
