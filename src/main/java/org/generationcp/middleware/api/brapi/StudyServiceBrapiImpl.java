@@ -292,6 +292,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 				trialIdEnvironmentDatasetMap);
 
 			final Geolocation geolocation = this.resolveGeolocationForStudy(trialId);
+			this.daoFactory.getGeolocationDao().save(geolocation);
 
 			final ExperimentModel experimentModel =
 				this.experimentModelGenerator
@@ -300,7 +301,8 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 			// Add LOCATION geolocation property, the default value of an instance's location name is "Unspecified Location"
 			final Integer locationId;
-			if (locationsMap.containsKey(Integer.parseInt(requestDTO.getLocationDbId()))) {
+			if (StringUtils.isNotEmpty(requestDTO.getLocationDbId()) && locationsMap.containsKey(
+				Integer.parseInt(requestDTO.getLocationDbId()))) {
 				locationId = locationsMap.get(Integer.parseInt(requestDTO.getLocationDbId())).getLocid();
 			} else {
 				locationId = unspecifiedLocation.isPresent() ? unspecifiedLocation.get().getLocid() : null;
@@ -591,8 +593,9 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 	private void saveOrUpdateGeolocationProperty(final int variableId, final String value, final Geolocation geolocation) {
 		if (!StudyInstanceServiceImpl.GEOLOCATION_METADATA.contains(variableId)) {
-			final Optional<GeolocationProperty> geolocationPropertyOptional = geolocation.getProperties().stream()
-				.filter(g -> g.getTypeId() == variableId).findAny();
+			final Optional<GeolocationProperty> geolocationPropertyOptional =
+				!CollectionUtils.isEmpty(geolocation.getProperties()) ? geolocation.getProperties().stream()
+					.filter(g -> g.getTypeId() == variableId).findAny() : Optional.empty();
 			if (geolocationPropertyOptional.isPresent()) {
 				// Update the GeolocationProperty
 				final GeolocationProperty geolocationProperty = geolocationPropertyOptional.get();
@@ -607,8 +610,9 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 	}
 
 	private void saveOrUpdatePhenotype(final int variableId, final String value, final ExperimentModel experimentModel) {
-		final Optional<Phenotype> phenotypeOptional = experimentModel.getPhenotypes().stream()
-			.filter(p -> p.getObservableId() == variableId).findAny();
+		final Optional<Phenotype> phenotypeOptional =
+			!CollectionUtils.isEmpty(experimentModel.getPhenotypes()) ? experimentModel.getPhenotypes().stream()
+				.filter(p -> p.getObservableId() == variableId).findAny() : Optional.empty();
 		if (phenotypeOptional.isPresent()) {
 			final Phenotype phenotype = phenotypeOptional.get();
 			phenotype.setUpdatedDate(new Date());
