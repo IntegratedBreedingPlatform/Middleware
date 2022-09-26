@@ -21,6 +21,12 @@ public class ExternalReferenceDTO {
 	public ExternalReferenceDTO() {
 	}
 
+	public ExternalReferenceDTO(final String entityId, final String referenceID, final String referenceSource) {
+		this.entityId = entityId;
+		this.referenceID = referenceID;
+		this.referenceSource = referenceSource;
+	}
+
 	public String getReferenceID() {
 		return this.referenceID;
 	}

@@ -1,15 +1,18 @@
 package org.generationcp.middleware.api.brapi.v1.image;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.service.api.BrapiView;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
-import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@AutoProperty
 public class ImageNewRequest {
-
 	private Map<String, String> additionalInfo;
 	private String copyright;
 	private String description;
@@ -18,6 +21,10 @@ public class ImageNewRequest {
 	private Integer imageFileSize;
 	private Integer imageHeight;
 	private Map<String, Object> imageLocation;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<ExternalReferenceDTO> externalReferences;
+
 	/**
 	 * human readable file name. Ignored for the moment
 	 */
@@ -154,5 +161,28 @@ public class ImageNewRequest {
 
 	public void setObservationUnitDbId(final String observationUnitDbId) {
 		this.observationUnitDbId = observationUnitDbId;
+	}
+
+	public List<ExternalReferenceDTO> getExternalReferences() {
+		return this.externalReferences;
+	}
+
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
+		this.externalReferences = externalReferences;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 }
