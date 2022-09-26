@@ -135,7 +135,7 @@
 				AND l1.cntryid = l2.cntryid 
 				AND l1.locid=l1.snl1id;
         
-      		UPDATE NAMES a 
+      			UPDATE NAMES a 
 				INNER JOIN location l1 
 				INNER JOIN location l2
 				SET a.nlocn = l1.locid 
@@ -157,10 +157,10 @@
 				AND l1.cntryid = l2.cntryid 
 				AND l1.locid=l1.snl1id;
 			
-     		UPDATE locdes a 
+     			UPDATE locdes a 
 				INNER JOIN location l1 
 				INNER JOIN location l2
-     			SET a.locid= l1.locid 
+     				SET a.locid= l1.locid 
 		 		WHERE a.locid = l2.locid 
 				AND l1.locid &lt; l2.locid 
 				AND l1.lname = l2.lname 
@@ -176,29 +176,29 @@
 				AND type_id = 8190 
 				AND l1.locid &lt;l2.locid 
 				AND l1.lname = l2.lname 
-    			AND l1.ltype= l2.ltype 
+    				AND l1.ltype= l2.ltype 
 				AND l1.cntryid = l2.cntryid 
 				AND l1.locid=l1.snl1id ;
 			
     		UPDATE  program_favorites f 
 				INNER JOIN location l1 
 				INNER JOIN location l2  
-    			SET f.entity_id= l1.locid 
-    			WHERE  f.entity_id = l2.locid  
+    				SET f.entity_id= l1.locid 
+    				WHERE  f.entity_id = l2.locid  
 				AND l1.locid &lt; l2.locid
-    			AND l1.lname = l2.lname 
+    			 	AND l1.lname = l2.lname 
 				AND l1.ltype= l2.ltype 
 				AND l1.cntryid = l2.cntryid 
-    			AND l1.locid=l1.snl1id 
+    				AND l1.locid=l1.snl1id 
 				AND entity_type = "LOCATION";
       
-    		UPDATE atributs_aud g 
+    			UPDATE atributs_aud g 
 				INNER JOIN location l1 
 				INNER JOIN location l2  
-    			SET g.alocn = l1.locid
-    			WHERE  g.alocn = l2.locid  
+    				SET g.alocn = l1.locid
+    				WHERE  g.alocn = l2.locid  
 				AND l1.locid &lt; l2.locid
-    			AND l1.lname = l2.lname 
+    				AND l1.lname = l2.lname 
 				AND l1.ltype= l2.ltype 
 				AND l1.cntryid = l2.cntryid 
 				AND l1.locid=l1.snl1id;
