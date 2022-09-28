@@ -146,7 +146,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     @Test
     public void testGetObservationUnitRows() {
         final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO();
-        searchDto.setInstanceId(this.instanceIds.get(0));
+        searchDto.setInstanceIds(this.instanceIds);
         final List<ObservationUnitRow> observationUnitRows = this.datasetService.getObservationUnitRows(this.studyId, this.subObsDatasetId,
                 searchDto, new PageRequest(0, Integer.MAX_VALUE));
         Assert.assertNotNull(observationUnitRows);
@@ -160,7 +160,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     @Test
     public void testGetObservationUnitRowsAsMapList() {
         final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO();
-        searchDto.setInstanceId(this.instanceIds.get(0));
+        searchDto.setInstanceIds(this.instanceIds);
         searchDto.getFilterColumns().add("TRIAL_INSTANCE");
         searchDto.getFilterColumns().add(TRAIT_NAME);
         final List<Map<String, Object>> rowsAsListMap = this.datasetService.getObservationUnitRowsAsMapList(this.studyId, this.subObsDatasetId,

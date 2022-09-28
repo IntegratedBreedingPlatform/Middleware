@@ -570,7 +570,7 @@ public class DatasetServiceImplTest {
 		final List<ObservationUnitRow> testMeasurements = Collections.singletonList(observationUnitRow);
 		Mockito.when(this.obsUnitsSearchDao.getObservationVariableName(DATASET_ID)).thenReturn("PLANT_NO");
 		final ObservationUnitsSearchDTO
-			searchDTO = new ObservationUnitsSearchDTO(DATASET_ID, INSTANCE_ID, Lists.newArrayList(this.germplasmDescriptorsMap.values()),
+			searchDTO = new ObservationUnitsSearchDTO(DATASET_ID, Arrays.asList(INSTANCE_ID), Lists.newArrayList(this.germplasmDescriptorsMap.values()),
 			Lists.newArrayList(this.designFactorsMap.values()), projectTraits);
 
 		Mockito.when(this.obsUnitsSearchDao.getObservationUnitTable(searchDTO, new PageRequest(0, 100))).thenReturn(testMeasurements);

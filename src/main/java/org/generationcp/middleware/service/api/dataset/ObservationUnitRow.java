@@ -35,6 +35,8 @@ public class ObservationUnitRow {
 
 	private String stockId;
 
+	private Integer instanceId;
+
 	public ObservationUnitRow() {
 
 	}
@@ -142,6 +144,14 @@ public class ObservationUnitRow {
 
 	public void setStockId(final String stockId) {
 		this.stockId = stockId;
+	}
+
+	public Integer getInstanceId() {
+		return instanceId;
+	}
+
+	public void setInstanceId(final Integer instanceId) {
+		this.instanceId = instanceId;
 	}
 
 	@Override

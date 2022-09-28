@@ -827,20 +827,20 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Integer countAllObservationUnitsForDataset(
-		final Integer datasetId, final Integer instanceId, final Boolean draftMode) {
-		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, null);
+		final Integer datasetId, final List<Integer> instanceIds, final Boolean draftMode) {
+		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceIds, draftMode, null);
 	}
 
 	@Override
 	public long countFilteredObservationUnitsForDataset(
-		final Integer datasetId, final Integer instanceId, final Boolean draftMode,
+		final Integer datasetId, final List<Integer> instanceIds, final Boolean draftMode,
 		final ObservationUnitsSearchDTO.Filter filter) {
 		// FIXME: It was implemented pre-filters to FEMALE and MALE Parents by NAME or GID.
 		//  Is need a workaround solution to implement filters into the query if possible.
 		if(filter != null){
 			this.addPreFilteredGids(filter);
 		}
-		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, filter);
+		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceIds, draftMode, filter);
 	}
 
 	@Override
@@ -1293,7 +1293,6 @@ public class DatasetServiceImpl implements DatasetService {
 	public Map<Integer, List<ObservationUnitRow>> getInstanceIdToObservationUnitRowsMap(
 		final int studyId, final int datasetId,
 		final List<Integer> instanceIds) {
-		final Map<Integer, List<ObservationUnitRow>> instanceMap = new LinkedHashMap<>();
 
 		final DmsProject environmentDataset =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
@@ -1301,26 +1300,25 @@ public class DatasetServiceImpl implements DatasetService {
 			studyId,
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
-		for (final Integer instanceId : instanceIds) {
-			final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-			searchDTO.setDatasetId(datasetId);
-			searchDTO.setInstanceId(instanceId);
-			searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
-			searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
-			searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
-			this.updateSearchDto(studyId, datasetId, searchDTO);
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+		searchDTO.setDatasetId(datasetId);
+		searchDTO.setInstanceIds(instanceIds);
+		searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
+		searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
+		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
+		this.updateSearchDto(studyId, datasetId, searchDTO);
 
-			final List<ObservationUnitRow> observationUnits =
-				this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, null);
-			this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
-			instanceMap.put(instanceId, observationUnits);
+		final List<ObservationUnitRow> observationUnits =
+			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, null);
+		this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 
-			if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
-				final Set<Integer> gids = observationUnits.stream().map(s -> s.getGid()).collect(Collectors.toSet());
-				this.addParentsFromPedigreeTable(gids, observationUnits);
-			}
+		if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
+			final Set<Integer> gids = observationUnits.stream().map(s -> s.getGid()).collect(Collectors.toSet());
+			this.addParentsFromPedigreeTable(gids, observationUnits);
 		}
-		return instanceMap;
+
+		return observationUnits.stream()
+			.collect(Collectors.groupingBy(ObservationUnitRow::getInstanceId, LinkedHashMap::new, Collectors.toList()));
 	}
 
 	@Override
