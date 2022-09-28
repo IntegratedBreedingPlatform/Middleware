@@ -220,6 +220,28 @@
 				AND l1.ltype= l2.ltype 
 				AND l1.cntryid = l2.cntryid 
 				AND l1.locid=l1.snl1id;
+
+			UPDATE program_location_default l
+				INNER JOIN location l1  
+				INNER JOIN location l2
+				SET l.breeding_location_id =   l1.locid
+				WHERE  l.breeding_location_id = l2.locid  
+				AND l1.locid &lt;l2.locid
+				AND l1.lname = l2.lname 
+				AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
+			
+			UPDATE program_location_default l
+				INNER JOIN location l1  
+				INNER JOIN location l2
+				SET l.storage_location_id =   l1.locid
+				WHERE  l.storage_location_id = l2.locid  
+				AND l1.locid &lt;l2.locid
+				AND l1.lname = l2.lname 
+				AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
 			
 			DELETE g 
 				FROM georef g 
