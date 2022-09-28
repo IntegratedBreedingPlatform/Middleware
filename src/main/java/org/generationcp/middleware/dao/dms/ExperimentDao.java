@@ -122,9 +122,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCK = "SELECT count(e.nd_experiment_id) "
 		+ "FROM nd_experiment e INNER JOIN stock s ON s.stock_id = e.stock_id "
+		+ " LEFT JOIN names name ON name.gid = s.dbxref_id AND name.nstat = 1 "
 		+ "WHERE (" + TermId.ENTRY_NO.getId() + "= :variableId AND s.uniquename IS NOT NULL)  OR (" + TermId.GID.getId()
 		+ " = :variableId AND s.dbxref_id IS NOT NULL) "
-		+ "OR (" + TermId.DESIG.getId() + " = :variableId AND s.name IS NOT NULL)";
+		+ "OR (" + TermId.DESIG.getId() + " = :variableId AND name.nval IS NOT NULL)";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP = "SELECT count(e.nd_experiment_id) "
 		+ "FROM nd_experiment e INNER JOIN stockprop sp ON sp.stock_id = e.stock_id "
