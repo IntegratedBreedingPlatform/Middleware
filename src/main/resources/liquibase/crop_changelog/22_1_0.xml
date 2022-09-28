@@ -167,16 +167,17 @@
 			UPDATE nd_geolocationprop n 
 				INNER JOIN location l1 
 				INNER JOIN location l2
-				SET n.value= l1.locid 
-				WHERE CAST(VALUE AS UNSIGNED) = l2.locid  
-				AND type_id = 8190 
+				SET n.value= CAST(l1.locid AS CHAR)
+				WHERE CAST(n.VALUE AS UNSIGNED) = l2.locid
+				AND n.type_id = 8190
 				AND l1.locid &lt;l2.locid 
 				AND l1.lname = l2.lname 
     				AND l1.ltype= l2.ltype 
 				AND l1.cntryid = l2.cntryid 
-				AND l1.locid=l1.snl1id ;
-			
-    		UPDATE  program_favorites f 
+				AND l1.locid=l1.snl1id
+				AND n.value is not null and n.value REGEXP '^[0-9]+$'= 1;
+
+			UPDATE  program_favorites f
 				INNER JOIN location l1 
 				INNER JOIN location l2  
     				SET f.entity_id= l1.locid 
