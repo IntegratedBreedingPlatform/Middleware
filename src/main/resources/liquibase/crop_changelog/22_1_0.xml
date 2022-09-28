@@ -167,7 +167,7 @@
 			UPDATE nd_geolocationprop n 
 				INNER JOIN location l1 
 				INNER JOIN location l2
-				SET n.value= l1.locid 
+				SET n.value= CAST(l1.locid AS CHAR)
 				WHERE CAST(VALUE AS UNSIGNED) = l2.locid  
 				AND type_id = 8190 
 				AND l1.locid &lt;l2.locid 
