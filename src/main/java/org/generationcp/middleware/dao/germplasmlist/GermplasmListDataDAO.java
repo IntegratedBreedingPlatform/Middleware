@@ -361,7 +361,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			+ "              AND entryid <= :greatest\n"
 			+ "              AND\n"
 			+ "                    lrecid NOT IN (:selectedEntries)\n"
-			+ "                ORDER BY lrecid) AS to_modify\n"
+			+ "                ORDER BY entryid) AS to_modify\n"
 			+ "        WHERE new_value.row_num = to_modify.row_num) m\n"
 			+ "    ON m.rec_id_mod = l.lrecid\n"
 			+ "        AND l.listid = :listId\n"
