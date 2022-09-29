@@ -49,6 +49,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,6 +62,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @Service
 @Transactional
@@ -188,7 +190,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 						ExternalReferenceDTO::getEntityId));
 
 			this.populateStudyEnvironmentVariablesMap(studyEnvironmentVariablesMap, studyInstanceDtos, studyEnvironmentDatasetIdMap);
-			final List<Integer> variableIds = studyEnvironmentVariablesMap.values().stream().flatMap(variables -> variables.stream())
+			final List<Integer> variableIds = studyEnvironmentVariablesMap.values().stream().flatMap(Collection::stream)
 				.map(MeasurementVariable::getTermId).collect(Collectors.toList());
 			final Map<Integer, List<MeasurementVariable>> environmentConditionsVariablesMap = this.daoFactory.getPhenotypeDAO()
 				.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(studyInstanceIds, variableIds);
@@ -311,10 +313,13 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 			this.addOrUpdateEnvironmentVariableValues(requestDTO.getEnvironmentParameters(), locationId,
 				environmentVariablesMap, categoricalVariablesMap, experimentModel);
 
-			this.addOrUpdateSeasonVariableIfNecessary(requestDTO, studyIdEnvironmentVariablesMap, geolocation, categoricalVariablesMap,
+			this.addOrUpdateSeasonVariableIfNecessary(trialId, requestDTO.getSeasons(), studyIdEnvironmentVariablesMap, geolocation,
+				categoricalVariablesMap,
 				trialIdEnvironmentDatasetMap);
+
 			this.addExperimentalDesignIfNecessary(requestDTO, trialIdEnvironmentDatasetMap, geolocation, studyIdEnvironmentVariablesMap);
-			this.addInstanceExternalReferences(requestDTO, geolocation);
+
+			this.addOrUpdateInstanceExternalReferences(requestDTO.getExternalReferences(), geolocation);
 
 			// Unless the session is flushed, the latest changes are not reflected in DTOs returned by method
 			this.sessionProvider.getSession().flush();
@@ -337,17 +342,20 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 		final Integer trialDbId = Integer.valueOf(studyUpdateRequestDTO.getTrialDbId());
 
+		// Get the dataset for environments
 		final Map<Integer, DmsProject> trialIdEnvironmentDatasetMap =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(Arrays.asList(trialDbId), DatasetTypeEnum.SUMMARY_DATA.getId())
 				.stream()
 				.collect(Collectors.toMap(environmentDataset -> environmentDataset.getStudy().getProjectId(), Function.identity()));
 
+		// Retrieve the environment details/condition variables
 		final List<String> environmentVariableIds =
 			studyUpdateRequestDTO.getEnvironmentParameters().stream().map(EnvironmentParameter::getParameterPUI).collect(toList());
 		final Map<Integer, MeasurementVariable> environmentVariablesMap = this.daoFactory.getCvTermDao()
 			.getVariablesByIdsAndVariableTypes(environmentVariableIds,
 				Arrays.asList(VariableType.ENVIRONMENT_CONDITION.getName(), VariableType.ENVIRONMENT_DETAIL.getName()));
 
+		// Retrieve the existing environment details/condition variables of the study
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap =
 			this.daoFactory.getProjectPropertyDAO().getEnvironmentDatasetVariables(Arrays.asList(trialDbId));
 
@@ -356,9 +364,14 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 				.filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(Collectors.toList());
 
+		//Include season variable to the categorical values
+		categoricalVariableIds.add(TermId.SEASON_VAR.getId());
+
+		// Retrieve the possible values for categorical variables
 		final Map<Integer, List<ValueReference>> categoricalValuesMap =
 			this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(categoricalVariableIds);
 
+		// Get the ExperimentModel of the study instance
 		final ExperimentModel experimentModel =
 			this.daoFactory.getExperimentDao().getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), studyDbId);
 
@@ -366,19 +379,26 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 			StringUtils.isNotEmpty(studyUpdateRequestDTO.getLocationDbId()) ? Integer.valueOf(studyUpdateRequestDTO.getLocationDbId()) :
 				null;
 
-		// Add anevironment variable to the environment dataset if they are not yet existing
+		// Add anevironment variables to the environment dataset if they are not yet existing
 		this.addEnvironmentVariablesIfNecessary(trialDbId, studyUpdateRequestDTO.getEnvironmentParameters(), studyIdEnvironmentVariablesMap,
 			environmentVariablesMap,
 			trialIdEnvironmentDatasetMap);
 
-		// Update existing environment variable values
+		// Update existing environment variable values. If the variable does not yet exist. It will insert a new record.
 		this.addOrUpdateEnvironmentVariableValues(studyUpdateRequestDTO.getEnvironmentParameters(), locationDbId, environmentVariablesMap,
 			categoricalValuesMap, experimentModel);
 
-		// Associate variables to study if not yet existing.
+		// Add or update seasons
+		this.addOrUpdateSeasonVariableIfNecessary(trialDbId, studyUpdateRequestDTO.getSeasons(), studyIdEnvironmentVariablesMap,
+			experimentModel.getGeoLocation(), categoricalValuesMap, trialIdEnvironmentDatasetMap);
+
+		// Associate TRAIT variables to study if not yet existing.
 		this.associateVariablesToStudy(studyUpdateRequestDTO, trialDbId);
 
-		// TODO: update external references
+		// Add or update study instance external references
+		this.addOrUpdateInstanceExternalReferences(studyUpdateRequestDTO.getExternalReferences(), experimentModel.getGeoLocation());
+
+		this.sessionProvider.getSession().flush();
 
 		final StudySearchFilter filter = new StudySearchFilter();
 		filter.setStudyDbIds(Arrays.asList(String.valueOf(studyDbId)));
@@ -509,13 +529,12 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 	}
 
-	private void addOrUpdateSeasonVariableIfNecessary(final StudyImportRequestDTO requestDTO,
+	private void addOrUpdateSeasonVariableIfNecessary(final Integer trialDbId, final List<String> seasons,
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap, final Geolocation geolocation,
 		final Map<Integer, List<ValueReference>> categoricalVariablesMap,
 		final Map<Integer, DmsProject> environmentDatasetMap) {
-		if (!CollectionUtils.isEmpty(requestDTO.getSeasons())) {
-			final Integer trialDbId = Integer.valueOf(requestDTO.getTrialDbId());
-			final String seasonValue = requestDTO.getSeasons().get(0);
+		if (!CollectionUtils.isEmpty(seasons)) {
+			final String seasonValue = seasons.get(0);
 
 			final List<String> possibleValues =
 				categoricalVariablesMap.get(TermId.SEASON_VAR.getId()).stream().map(ValueReference::getDescription)
@@ -721,12 +740,21 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 		studyIdEnvironmentVariablesMap.get(trialDbId).add(termId);
 	}
 
-	private void addInstanceExternalReferences(final StudyImportRequestDTO studyImportRequestDTO, final Geolocation geolocation) {
-		if (studyImportRequestDTO.getExternalReferences() != null) {
-			studyImportRequestDTO.getExternalReferences().forEach(reference -> {
-				final InstanceExternalReference externalReference =
-					new InstanceExternalReference(geolocation, reference.getReferenceID(), reference.getReferenceSource());
-				this.daoFactory.getStudyInstanceExternalReferenceDao().save(externalReference);
+	private void addOrUpdateInstanceExternalReferences(final List<ExternalReferenceDTO> externalReferenceDTOList,
+		final Geolocation geolocation) {
+		final Map<String, InstanceExternalReference> instanceExternalReferenceMap =
+			geolocation.getExternalReferences().stream().collect(toMap(InstanceExternalReference::getReferenceId, Function.identity()));
+		if (!CollectionUtils.isEmpty(externalReferenceDTOList)) {
+			externalReferenceDTOList.forEach(reference -> {
+				if (instanceExternalReferenceMap.containsKey(reference.getReferenceID())) {
+					final InstanceExternalReference externalReference = instanceExternalReferenceMap.get(reference.getReferenceID());
+					externalReference.setSource(reference.getReferenceSource());
+					this.daoFactory.getStudyInstanceExternalReferenceDao().update(externalReference);
+				} else {
+					final InstanceExternalReference externalReference =
+						new InstanceExternalReference(geolocation, reference.getReferenceID(), reference.getReferenceSource());
+					this.daoFactory.getStudyInstanceExternalReferenceDao().save(externalReference);
+				}
 			});
 		}
 	}

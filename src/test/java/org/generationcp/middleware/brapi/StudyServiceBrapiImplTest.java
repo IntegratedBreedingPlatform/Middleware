@@ -7,8 +7,10 @@ import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
+import org.generationcp.middleware.api.brapi.v2.study.StudyUpdateRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.crop.CropService;
+import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -117,6 +119,7 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		final EnvironmentParameter categoricalEnvironmentParameter = new EnvironmentParameter();
 		categoricalEnvironmentParameter.setParameterPUI(categoricalVariable.getCvTermId().toString());
 		categoricalEnvironmentParameter.setValue(possibleValues.get(0));
+
 		dto.setEnvironmentParameters(Arrays.asList(numericEnvironmentParameter, categoricalEnvironmentParameter));
 
 		final ExternalReferenceDTO externalReference = new ExternalReferenceDTO();
@@ -207,6 +210,94 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testUpdateStudyInstance_AllInfoSaved() {
+		final StudySummary trial = this.createTrial();
+		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
+		dto.setTrialDbId(String.valueOf(trial.getTrialDbId()));
+		dto.setLocationDbId("0");
+		final List<ValueReference> seasonPossibleValues = this.daoFactory.getCvTermRelationshipDao()
+			.getCategoriesForCategoricalVariables(Collections.singletonList(TermId.SEASON_VAR.getId())).get(TermId.SEASON_VAR.getId());
+		dto.setSeasons(Collections.singletonList(seasonPossibleValues.get(0).getDescription()));
+
+		final CVTerm numericVariable =
+			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ENVIRONMENT_DETAIL);
+		final EnvironmentParameter numericEnvironmentParameter = new EnvironmentParameter();
+		numericEnvironmentParameter.setValue("1");
+		numericEnvironmentParameter.setParameterPUI(numericVariable.getCvTermId().toString());
+
+		final List<String> possibleValues = Arrays
+			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
+		final CVTerm categoricalVariable = this.testDataInitializer
+			.createCategoricalVariable(VariableType.ENVIRONMENT_CONDITION, possibleValues);
+		final EnvironmentParameter categoricalEnvironmentParameter = new EnvironmentParameter();
+		categoricalEnvironmentParameter.setParameterPUI(categoricalVariable.getCvTermId().toString());
+		categoricalEnvironmentParameter.setValue(possibleValues.get(0));
+
+		dto.setEnvironmentParameters(Arrays.asList(numericEnvironmentParameter, categoricalEnvironmentParameter));
+
+		final ExternalReferenceDTO externalReference = new ExternalReferenceDTO();
+		externalReference.setReferenceID(RandomStringUtils.randomAlphabetic(20));
+		externalReference.setReferenceSource(RandomStringUtils.randomAlphabetic(20));
+		dto.setExternalReferences(Collections.singletonList(externalReference));
+
+		this.sessionProvder.getSession().flush();
+
+		// Save the study instance first
+		final StudyInstanceDto savedInstance = this.studyServiceBrapi
+			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
+
+		// Create a study update request dto
+		final StudyUpdateRequestDTO studyUpdateRequestDTO = new StudyUpdateRequestDTO();
+		studyUpdateRequestDTO.setTrialDbId(savedInstance.getTrialDbId());
+		studyUpdateRequestDTO.setLocationDbId("1");
+
+		// Change the value of the existing environment variables to test update
+		numericEnvironmentParameter.setValue("100");
+		categoricalEnvironmentParameter.setValue(possibleValues.get(1));
+		// Create a new environment variable to test addition
+		final CVTerm variableForAdd =
+			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ENVIRONMENT_DETAIL);
+		final EnvironmentParameter newEnvironmentParameter = new EnvironmentParameter();
+		newEnvironmentParameter.setValue("101");
+		newEnvironmentParameter.setParameterPUI(variableForAdd.getCvTermId().toString());
+		studyUpdateRequestDTO.setEnvironmentParameters(
+			Arrays.asList(numericEnvironmentParameter, categoricalEnvironmentParameter, newEnvironmentParameter));
+
+		// Update the value of season
+		studyUpdateRequestDTO.setSeasons(Collections.singletonList(seasonPossibleValues.get(1).getDescription()));
+
+		// Update the value of external reference
+		final ExternalReferenceDTO externalReferenceDTO = savedInstance.getExternalReferences().get(0);
+		externalReferenceDTO.setReferenceSource(RandomStringUtils.randomAlphabetic(10));
+		studyUpdateRequestDTO.setExternalReferences(Arrays.asList(externalReferenceDTO));
+
+		this.sessionProvder.getSession().flush();
+		final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(Integer.valueOf(savedInstance.getStudyDbId()));
+		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao()
+			.getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), Integer.valueOf(savedInstance.getStudyDbId()));
+		this.daoFactory.getGeolocationDao().refresh(geolocation);
+		this.daoFactory.getExperimentDao().refresh(experimentModel);
+
+		final StudyInstanceDto updatedInstance =
+			this.studyServiceBrapi.updateStudyInstance(Integer.valueOf(savedInstance.getStudyDbId()), studyUpdateRequestDTO);
+
+		Assert.assertEquals(studyUpdateRequestDTO.getTrialDbId(), updatedInstance.getTrialDbId());
+		Assert.assertEquals(studyUpdateRequestDTO.getLocationDbId(), updatedInstance.getLocationDbId());
+		Assert.assertEquals(4, updatedInstance.getEnvironmentParameters().size());
+		this.assertEnvironmentParameter(updatedInstance.getEnvironmentParameters(), numericEnvironmentParameter.getParameterPUI(), "100");
+		this.assertEnvironmentParameter(updatedInstance.getEnvironmentParameters(), categoricalEnvironmentParameter.getParameterPUI(),
+			possibleValues.get(1));
+		this.assertEnvironmentParameter(updatedInstance.getEnvironmentParameters(), newEnvironmentParameter.getParameterPUI(), "101");
+		Assert.assertEquals(1, updatedInstance.getExternalReferences().size());
+		Assert.assertEquals(studyUpdateRequestDTO.getExternalReferences().get(0).getReferenceID(),
+			updatedInstance.getExternalReferences().get(0).getReferenceID());
+		Assert.assertEquals(studyUpdateRequestDTO.getExternalReferences().get(0).getReferenceSource(),
+			updatedInstance.getExternalReferences().get(0).getReferenceSource());
+		Assert.assertEquals(studyUpdateRequestDTO.getSeasons().get(0), updatedInstance.getSeasons().get(0).getSeason());
+
+	}
+
+	@Test
 	public void testGetStudyDetailsByInstanceWithPI_ID() {
 		final DmsProject environmentDataset =
 			this.testDataInitializer
@@ -222,7 +313,8 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		this.testDataInitializer
 			.addProjectProp(this.study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, String.valueOf(user.getPerson().getId()), 6);
 
-		final Optional<StudyDetailsDto> studyDetailsDtoOptional = this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId());
+		final Optional<StudyDetailsDto> studyDetailsDtoOptional =
+			this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId());
 		Assert.assertTrue(studyDetailsDtoOptional.isPresent());
 		final StudyDetailsDto studyDetailsDto = studyDetailsDtoOptional.get();
 		Assert.assertEquals(1, studyDetailsDto.getContacts().size());
@@ -288,7 +380,8 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 		this.sessionProvder.getSession().clear();
 
-		final Optional<StudyDetailsDto> studyDetailsDtoOptional = this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId());
+		final Optional<StudyDetailsDto> studyDetailsDtoOptional =
+			this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId());
 		Assert.assertTrue(studyDetailsDtoOptional.isPresent());
 		final StudyDetailsDto studyDetailsDto = studyDetailsDtoOptional.get();
 
@@ -318,7 +411,8 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
 		this.sessionProvder.getSession().flush();
-		final Optional<StudyDetailsDto> studyDetailsDtoOptional = this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId());
+		final Optional<StudyDetailsDto> studyDetailsDtoOptional =
+			this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId());
 		Assert.assertTrue(studyDetailsDtoOptional.isPresent());
 		final StudyDetailsDto studyDetailsDto = studyDetailsDtoOptional.get();
 		Assert.assertTrue(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
@@ -351,6 +445,17 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		assertThat(envParam.getValue(), is(expectedValue));
 	}
 
+	private void assertEnvironmentParameter(final List<EnvironmentParameter> environmentParameters, final String expectedTermId,
+		final String expectedValue) {
+		final Optional<EnvironmentParameter> optional = environmentParameters
+			.stream()
+			.filter(environmentParameter -> environmentParameter.getParameterPUI().equalsIgnoreCase(expectedTermId))
+			.findFirst();
+		assertTrue(optional.isPresent());
+		final EnvironmentParameter envParam = optional.get();
+		assertThat(envParam.getValue(), is(expectedValue));
+	}
+
 	private StudySummary createTrial() {
 		final TrialImportRequestDTO dto = new TrialImportRequestDTO();
 		dto.setStartDate("2019-01-01");
@@ -358,7 +463,8 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		dto.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		dto.setProgramDbId(this.commonTestProject.getUniqueID());
 
-		return this.trialServiceBrapi.saveStudies(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
+		return this.trialServiceBrapi.saveStudies(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid())
+			.get(0);
 	}
 
 }
