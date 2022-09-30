@@ -403,6 +403,15 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 		final StudySearchFilter filter = new StudySearchFilter();
 		filter.setStudyDbIds(Arrays.asList(String.valueOf(studyDbId)));
 		final List<StudyInstanceDto> studyInstanceDtos = this.getStudyInstancesWithMetadata(filter, null);
+		final StudyInstanceDto studyInstanceDto = studyInstanceDtos.get(0);
+
+		final DmsProject plotDataset =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialDbId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+
+		studyInstanceDto.setObservationVariableDbIds(
+			plotDataset.getProperties().stream().filter(pp -> pp.getTypeId() == VariableType.TRAIT.getId())
+				.map(pp -> pp.getVariableId().toString()).collect(toList()));
+
 		return studyInstanceDtos.get(0);
 
 	}
@@ -452,7 +461,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 			org.springframework.util.StringUtils.isEmpty(variable.getAlias()) ? variable.getName() : variable.getAlias());
 		projectProperty.setVariableId(Integer.valueOf(variable.getId()));
 		projectProperty.setRank(projectPropertyDao.getNextRank(dmsProject.getProjectId()));
-		projectPropertyDao.save(projectProperty);
+		dmsProject.getProperties().add(projectPropertyDao.save(projectProperty));
 	}
 
 	private Map<Integer, Location> getLocationsMap(final List<Integer> locationDbIds) {
