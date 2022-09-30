@@ -665,6 +665,20 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 	}
 
+	public void deletePhenotypes(final List<Integer> phenotypeIds) {
+		try {
+			// Delete phenotypes
+			this.getSession().createSQLQuery("DELETE FROM phenotype "
+				+ " WHERE phenotype.phenotype_id IN (:phenotypeIds)")
+				.setParameterList("phenotypeIds", phenotypeIds)
+				.executeUpdate();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in deletePhenotypes=" + phenotypeIds
+				+ IN_PHENOTYPE_DAO + e.getMessage(), e);
+		}
+	}
+
 	public int updatePhenotypesByExperimentIdAndObervableId(final Integer experimentId, final Integer cvTermId, final String value) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out

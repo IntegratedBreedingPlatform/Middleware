@@ -635,7 +635,6 @@ public class DatasetServiceImpl implements DatasetService {
 			final List<Integer> targetVariableIds = Lists.transform(formulaList, formula -> formula.getTargetCVTerm().getCvTermId());
 			this.daoFactory.getPhenotypeDAO()
 				.updateOutOfSyncPhenotypes(observationUnitIds, Sets.newHashSet(targetVariableIds));
-
 		}
 
 	}
@@ -701,9 +700,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.updateSearchDto(studyId, datasetId, searchDTO);
 		// FIXME: It was implemented pre-filters to FEMALE and MALE Parents by NAME or GID.
 		//  Is need a workaround solution to implement filters into the query if possible.
-		if(searchDTO.getFilter() != null){
-			this.addPreFilteredGids(searchDTO.getFilter());
-		}
+		this.addPreFilteredGids(searchDTO.getFilter());
 
 		// TODO: fix me! This is a workaround until the implementation of this ticket https://ibplatform.atlassian.net/browse/IBP-5837
 		final DmsProject dataset = this.daoFactory.getDmsProjectDAO().getById(datasetId);
@@ -727,9 +724,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.updateSearchDto(studyId, datasetId, searchDTO);
 		// FIXME: It was implemented pre-filters to FEMALE and MALE Parents by NAME or GID.
 		//  Is need a workaround solution to implement filters into the query if possible.
-		if(searchDTO.getFilter() != null){
-			this.addPreFilteredGids(searchDTO.getFilter());
-		}
+		this.addPreFilteredGids(searchDTO.getFilter());
 		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTableMapList(searchDTO, pageable);
 	}
 
@@ -837,9 +832,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final ObservationUnitsSearchDTO.Filter filter) {
 		// FIXME: It was implemented pre-filters to FEMALE and MALE Parents by NAME or GID.
 		//  Is need a workaround solution to implement filters into the query if possible.
-		if(filter != null){
-			this.addPreFilteredGids(filter);
-		}
+		this.addPreFilteredGids(filter);
 		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, filter);
 	}
 
@@ -1026,9 +1019,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.updateSearchDto(studyId, datasetId, searchDTO);
 		// FIXME: It was implemented pre-filters to FEMALE and MALE Parents by NAME or GID.
 		//  Is need a workaround solution to implement filters into the query if possible.
-		if(searchDTO.getFilter() != null){
-			this.addPreFilteredGids(searchDTO.getFilter());
-		}
+		this.addPreFilteredGids(searchDTO.getFilter());
 
 		final List<ObservationUnitRow> observationUnitsByVariable =
 			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitsByVariable(searchDTO);
@@ -1070,17 +1061,13 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final String newValue = paramDTO.getNewValue();
 		final String variableId = paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId().toString();
-		final List<Phenotype> phenotypes = new ArrayList<>();
-		if(paramDTO.getObservationUnitsSearchDTO().getFilter() != null){
-			this.addPreFilteredGids(paramDTO.getObservationUnitsSearchDTO().getFilter());
-		}
-		this.updateSearchDto(studyId, datasetId, paramDTO.getObservationUnitsSearchDTO());
 		final Boolean draftMode = paramDTO.getObservationUnitsSearchDTO().getDraftMode();
+
 		final List<ObservationUnitRow> observationUnitsByVariable =
-			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitsByVariable(paramDTO.getObservationUnitsSearchDTO());
+			this.getObservationUnitsByVariable(datasetId, paramDTO.getObservationUnitsSearchDTO(), studyId);
 
+		final List<Phenotype> phenotypes = new ArrayList<>();
 		if (!observationUnitsByVariable.isEmpty()) {
-
 			for (final ObservationUnitRow observationUnitRow : observationUnitsByVariable) {
 				final ObservationUnitData observationUnitData = observationUnitRow.getVariables().get(variableId);
 				Phenotype phenotype = null;
@@ -1099,10 +1086,10 @@ public class DatasetServiceImpl implements DatasetService {
 				if (phenotype != null) {
 					if (draftMode) {
 						this.updatePhenotype(phenotype,
-							phenotype.getcValueId(), phenotype.getValue(), newCategoricalValueId, newValue, draftMode);
+							phenotype.getcValueId(), phenotype.getValue(), newCategoricalValueId, newValue, true);
 					} else {
 						this.updatePhenotype(phenotype,
-							newCategoricalValueId, newValue, phenotype.getDraftCValueId(), phenotype.getDraftValue(), draftMode);
+							newCategoricalValueId, newValue, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
 					}
 				} else {
 					final ObservationDto observationDto =
@@ -1122,6 +1109,54 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public void deleteVariableValues(final Integer studyId, final Integer datasetId, final ObservationUnitsSearchDTO searchDTO) {
+		final String variableId = searchDTO.getFilter().getVariableId().toString();
+		final Boolean draftMode = searchDTO.getDraftMode();
+
+		final List<ObservationUnitRow> observationUnitsByVariable =
+			this.getObservationUnitsByVariable(datasetId, searchDTO, studyId);
+
+		final List<Integer> phenotypeIdsToDelete = new ArrayList<>();
+		final Set<Integer> observationUnitIdsToUpdate = new HashSet<>();
+		if (!observationUnitsByVariable.isEmpty()) {
+			for (final ObservationUnitRow observationUnitRow : observationUnitsByVariable) {
+				final ObservationUnitData observationUnitData = observationUnitRow.getVariables().get(variableId);
+				Phenotype phenotype = null;
+
+				if (observationUnitData != null) {
+					phenotype = this.daoFactory.getPhenotypeDAO().getById(observationUnitData.getObservationId());
+				}
+
+				if (phenotype != null) {
+					if (draftMode) {
+						if(phenotype.getcValueId() == null && StringUtils.isEmpty(phenotype.getValue())) {
+							phenotypeIdsToDelete.add(phenotype.getPhenotypeId());
+						} else {
+							this.updatePhenotype(phenotype,
+								phenotype.getcValueId(), phenotype.getValue(), null, null, true);
+						}
+					} else {
+						if(phenotype.getDraftCValueId() == null && StringUtils.isEmpty(phenotype.getDraftValue())) {
+							phenotypeIdsToDelete.add(phenotype.getPhenotypeId());
+						} else {
+							this.updatePhenotype(phenotype,
+								null, null, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+						}
+						observationUnitIdsToUpdate.add(observationUnitRow.getObservationUnitId());
+					}
+				}
+			}
+
+			if(!org.springframework.util.CollectionUtils.isEmpty(phenotypeIdsToDelete)) {
+				this.daoFactory.getPhenotypeDAO().deletePhenotypes(phenotypeIdsToDelete);
+			}
+			if(!org.springframework.util.CollectionUtils.isEmpty(observationUnitIdsToUpdate)) {
+				this.updateDependentPhenotypesAsOutOfSync(searchDTO.getFilter().getVariableId(), observationUnitIdsToUpdate);
+			}
+		}
+	}
+
+	@Override
 	public boolean allDatasetIdsBelongToStudy(final Integer studyId, final List<Integer> datasetIds) {
 		return this.daoFactory.getDmsProjectDAO().allDatasetIdsBelongToStudy(studyId, datasetIds);
 	}
@@ -1130,6 +1165,16 @@ public class DatasetServiceImpl implements DatasetService {
 	public Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer datasetId,
 		final Set<Integer> instanceNumbers, final Set<Integer> plotNumbers) {
 		return this.daoFactory.getExperimentDao().getTrialNumberPlotNumberObservationUnitIdTable(datasetId, instanceNumbers, plotNumbers);
+	}
+
+	private List<ObservationUnitRow> getObservationUnitsByVariable(
+		final Integer datasetId, final ObservationUnitsSearchDTO observationUnitsSearchDTO, final Integer studyId) {
+		this.addPreFilteredGids(observationUnitsSearchDTO.getFilter());
+
+		this.updateSearchDto(studyId, datasetId, observationUnitsSearchDTO);
+		final List<ObservationUnitRow> observationUnitsByVariable =
+			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitsByVariable(observationUnitsSearchDTO);
+		return observationUnitsByVariable;
 	}
 
 	private void acceptDraftData(final Phenotype phenotype) {
@@ -1546,9 +1591,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
 		final Integer datasetId, final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
-		if(observationUnitsSearchDTO.getFilter() != null){
-			this.addPreFilteredGids(observationUnitsSearchDTO.getFilter());
-		}
+		this.addPreFilteredGids(observationUnitsSearchDTO.getFilter());
 		return this.daoFactory.getObservationUnitsSearchDAO().countFilteredInstancesAndPhenotypes(datasetId, observationUnitsSearchDTO);
 	}
 
@@ -1601,13 +1644,15 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private void addPreFilteredGids(final ObservationUnitsSearchDTO.Filter filter) {
-		Set<String> textKeys = filter.getFilteredTextValues().keySet();
-		if(textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_GID.getId())) ||
-			textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_NAME.getId())) ||
-			textKeys.contains(String.valueOf(TermId.MALE_PARENT_GID.getId())) ||
-			textKeys.contains(String.valueOf(TermId.MALE_PARENT_NAME.getId()))
-		){
-			filter.setPreFilteredGids(this.daoFactory.getObservationUnitsSearchDAO().addPreFilteredGids(filter));
+		if(filter != null) {
+			Set<String> textKeys = filter.getFilteredTextValues().keySet();
+			if (textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_GID.getId())) ||
+				textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_NAME.getId())) ||
+				textKeys.contains(String.valueOf(TermId.MALE_PARENT_GID.getId())) ||
+				textKeys.contains(String.valueOf(TermId.MALE_PARENT_NAME.getId()))
+			) {
+				filter.setPreFilteredGids(this.daoFactory.getObservationUnitsSearchDAO().addPreFilteredGids(filter));
+			}
 		}
 	}
 }
