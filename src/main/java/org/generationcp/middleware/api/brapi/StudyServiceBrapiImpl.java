@@ -350,10 +350,12 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 		// Retrieve the environment details/condition variables
 		final List<String> environmentVariableIds =
-			studyUpdateRequestDTO.getEnvironmentParameters().stream().map(EnvironmentParameter::getParameterPUI).collect(toList());
-		final Map<Integer, MeasurementVariable> environmentVariablesMap = this.daoFactory.getCvTermDao()
-			.getVariablesByIdsAndVariableTypes(environmentVariableIds,
-				Arrays.asList(VariableType.ENVIRONMENT_CONDITION.getName(), VariableType.ENVIRONMENT_DETAIL.getName()));
+			CollectionUtils.isEmpty(studyUpdateRequestDTO.getEnvironmentParameters()) ? new ArrayList<>() :
+				studyUpdateRequestDTO.getEnvironmentParameters().stream().map(EnvironmentParameter::getParameterPUI).collect(toList());
+		final Map<Integer, MeasurementVariable> environmentVariablesMap =
+			CollectionUtils.isEmpty(studyUpdateRequestDTO.getEnvironmentParameters()) ? new HashMap<>() : this.daoFactory.getCvTermDao()
+				.getVariablesByIdsAndVariableTypes(environmentVariableIds,
+					Arrays.asList(VariableType.ENVIRONMENT_CONDITION.getName(), VariableType.ENVIRONMENT_DETAIL.getName()));
 
 		// Retrieve the existing environment details/condition variables of the study
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap =
