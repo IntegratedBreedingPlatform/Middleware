@@ -755,12 +755,12 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 	private void addOrUpdateInstanceExternalReferences(final List<ExternalReferenceDTO> externalReferenceDTOList,
 		final Geolocation geolocation) {
 		final Map<String, InstanceExternalReference> instanceExternalReferenceMap =
-			geolocation.getExternalReferences().stream().collect(toMap(InstanceExternalReference::getReferenceId, Function.identity()));
+			geolocation.getExternalReferences().stream().collect(toMap(InstanceExternalReference::getSource, Function.identity()));
 		if (!CollectionUtils.isEmpty(externalReferenceDTOList)) {
 			externalReferenceDTOList.forEach(reference -> {
-				if (instanceExternalReferenceMap.containsKey(reference.getReferenceID())) {
-					final InstanceExternalReference externalReference = instanceExternalReferenceMap.get(reference.getReferenceID());
-					externalReference.setSource(reference.getReferenceSource());
+				if (instanceExternalReferenceMap.containsKey(reference.getReferenceSource())) {
+					final InstanceExternalReference externalReference = instanceExternalReferenceMap.get(reference.getReferenceSource());
+					externalReference.setReferenceId(reference.getReferenceID());
 					this.daoFactory.getStudyInstanceExternalReferenceDao().update(externalReference);
 				} else {
 					final InstanceExternalReference externalReference =

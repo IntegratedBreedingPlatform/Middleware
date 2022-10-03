@@ -277,9 +277,9 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		final EnvironmentParameter newEnvironmentParameter =
 			this.createEnvironmentParameter(environmentDetailVariableToAdd.getCvTermId(), RandomStringUtils.randomNumeric(4));
 
-		// Update the value of existing external reference
+		// Update the referenceId of existing external reference
 		final ExternalReferenceDTO externalReferenceDTO = savedInstance.getExternalReferences().get(0);
-		externalReferenceDTO.setReferenceSource(RandomStringUtils.randomAlphabetic(10));
+		externalReferenceDTO.setReferenceID(RandomStringUtils.randomAlphabetic(10));
 
 		// Create a new external reference to test addition
 		final ExternalReferenceDTO externalReferenceToAdd = new ExternalReferenceDTO();
@@ -506,11 +506,11 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		final String expectedReferenceSource) {
 		final Optional<ExternalReferenceDTO> optional = externalReferenceDTOS
 			.stream()
-			.filter(externalReferenceDTO -> externalReferenceDTO.getReferenceID().equalsIgnoreCase(expectedReferenceId))
+			.filter(externalReferenceDTO -> externalReferenceDTO.getReferenceSource().equalsIgnoreCase(expectedReferenceSource))
 			.findFirst();
 		assertTrue(optional.isPresent());
 		final ExternalReferenceDTO externalReferenceDTO = optional.get();
-		assertThat(externalReferenceDTO.getReferenceSource(), is(expectedReferenceSource));
+		assertThat(externalReferenceDTO.getReferenceID(), is(expectedReferenceId));
 	}
 
 	private StudySummary createTrial() {
