@@ -1645,7 +1645,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private void addPreFilteredGids(final ObservationUnitsSearchDTO.Filter filter) {
 		if(filter != null) {
-			Set<String> textKeys = filter.getFilteredTextValues().keySet();
+			final Set<String> textKeys = filter.getFilteredTextValues().keySet();
 			if (textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_GID.getId())) ||
 				textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_NAME.getId())) ||
 				textKeys.contains(String.valueOf(TermId.MALE_PARENT_GID.getId())) ||

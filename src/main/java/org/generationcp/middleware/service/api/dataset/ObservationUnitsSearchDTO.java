@@ -280,7 +280,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	}
 
 	public List<MeasurementVariableDto> getPassportAndAttributes() {
-		return passportAndAttributes;
+		return this.passportAndAttributes;
 	}
 
 	public void setPassportAndAttributes(final List<MeasurementVariableDto> passportAndAttributes) {
