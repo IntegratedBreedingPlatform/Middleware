@@ -387,7 +387,7 @@ public interface DatasetService {
 	 * @param filter    Filter
 	 * @return FilteredPhenotypesInstancesCountDTO
 	 */
-	FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
+	FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndObservationUnits(
 		Integer datasetId, ObservationUnitsSearchDTO filter);
 
 	/**

@@ -1589,10 +1589,10 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
+	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndObservationUnits(
 		final Integer datasetId, final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
 		this.addPreFilteredGids(observationUnitsSearchDTO.getFilter());
-		return this.daoFactory.getObservationUnitsSearchDAO().countFilteredInstancesAndPhenotypes(datasetId, observationUnitsSearchDTO);
+		return this.daoFactory.getObservationUnitsSearchDAO().countFilteredInstancesAndObservationUnits(datasetId, observationUnitsSearchDTO);
 	}
 
 	private boolean shouldAddStockIdColumn(final Integer studyId) {

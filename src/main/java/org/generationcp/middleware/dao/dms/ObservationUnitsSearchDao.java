@@ -207,7 +207,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(final Integer datasetId,
+	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndObservationUnits(final Integer datasetId,
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
 
 		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.getFilter();
@@ -237,6 +237,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					+ filterByVariableSQL
 					+ "         and (ph.draft_value is not null "
 					+ "                or ph.draft_cvalue_id is not null)) ");
+			} else if (Boolean.TRUE.equals(filter.getVariableHasValue())) {
+				sql.append(" and exists(select 1"
+					+ "   from phenotype ph"
+					+ "   where ph.nd_experiment_id = nde.nd_experiment_id "
+					+ filterByVariableSQL
+					+ "         and (ph.value is not null "
+					+ "                or ph.cvalue_id is not null)) ");
 			}
 
 			this.addFilters(sql, filter, observationUnitsSearchDTO.getDraftMode());
