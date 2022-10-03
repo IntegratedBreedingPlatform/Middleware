@@ -364,7 +364,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 				.filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(Collectors.toList());
 
-		//Include season variable to the categorical values
+		// Include season variable to the list of categorical variable ids.
 		categoricalVariableIds.add(TermId.SEASON_VAR.getId());
 
 		// Retrieve the possible values for categorical variables
@@ -409,7 +409,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialDbId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
 
 		studyInstanceDto.setObservationVariableDbIds(
-			plotDataset.getProperties().stream().filter(pp -> pp.getTypeId() == VariableType.TRAIT.getId())
+			plotDataset.getProperties().stream().filter(pp -> pp.getTypeId().equals(VariableType.TRAIT.getId()))
 				.map(pp -> pp.getVariableId().toString()).collect(toList()));
 
 		return studyInstanceDtos.get(0);
@@ -417,12 +417,15 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 	}
 
 	private void associateVariablesToStudy(final StudyUpdateRequestDTO studyUpdateRequestDTO, final Integer trialDbId) {
-		// Get the variables to be associated to study
-		if (!CollectionUtils.isEmpty(studyUpdateRequestDTO.getObservationVariableDbIds())) {
+		// Get the existing variables associated to the plot dataset of a study
+		final List<DmsProject> datasets =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialDbId, DatasetTypeEnum.PLOT_DATA.getId());
 
-			// Get the existing variables associated to the plot dataset of a study
-			final DmsProject plotDataset =
-				this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialDbId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+		// Get the variables to be associated to study
+		if (!CollectionUtils.isEmpty(datasets) && !CollectionUtils.isEmpty(studyUpdateRequestDTO.getObservationVariableDbIds())) {
+
+			final DmsProject plotDataset = datasets.get(0);
+
 			final Map<Integer, ProjectProperty> existingVariablesOfPlotDataset =
 				plotDataset.getProperties().stream().collect(Collectors.toMap(ProjectProperty::getVariableId, Function.identity()));
 
@@ -670,7 +673,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 	}
 
 	private void mapGeolocationMetaData(final Geolocation geolocation, final EnvironmentParameter environmentParameter) {
-		final Integer variableId = Integer.valueOf(environmentParameter.getParameterPUI());
+		final int variableId = Integer.parseInt(environmentParameter.getParameterPUI());
 		if (TermId.LATITUDE.getId() == variableId) {
 			geolocation.setLatitude(Double.valueOf(environmentParameter.getValue()));
 		} else if (TermId.LONGITUDE.getId() == variableId) {

@@ -71,6 +71,8 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 	private Project commonTestProject;
 	private DmsProject study;
 
+	private final Random random = new Random();
+
 	@Before
 	public void setup() throws Exception {
 
@@ -221,15 +223,26 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ENVIRONMENT_DETAIL);
 		final CVTerm environmentCondition_Categorical =
 			this.testDataInitializer.createCategoricalVariable(VariableType.ENVIRONMENT_CONDITION, possibleValues);
-		final CVTerm traitVariable =
+		final CVTerm traitVariable1 =
+			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.TRAIT);
+		final CVTerm traitVariable2 =
 			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.TRAIT);
 
-		final EnvironmentParameter numericEnvironmentParameter = new EnvironmentParameter();
-		numericEnvironmentParameter.setValue("1");
-		numericEnvironmentParameter.setParameterPUI(environmentDetailVariable_Numeric.getCvTermId().toString());
-		final EnvironmentParameter categoricalEnvironmentParameter = new EnvironmentParameter();
-		categoricalEnvironmentParameter.setParameterPUI(environmentCondition_Categorical.getCvTermId().toString());
-		categoricalEnvironmentParameter.setValue(possibleValues.get(0));
+		// Add existing Environment Parameters
+		// ENVIRONMENT DETAIL and ENVIRONMENT CONDITION
+		final EnvironmentParameter numericEnvironmentParameter =
+			this.createEnvironmentParameter(environmentDetailVariable_Numeric.getCvTermId(), RandomStringUtils.randomNumeric(4));
+		final EnvironmentParameter categoricalEnvironmentParameter =
+			this.createEnvironmentParameter(environmentCondition_Categorical.getCvTermId(), possibleValues.get(0));
+		// GEOLOCATION type variables
+		final EnvironmentParameter altitudeEnvironmentParameter =
+			this.createEnvironmentParameter(TermId.ALTITUDE.getId(), String.valueOf(this.random.nextDouble()));
+		final EnvironmentParameter latitudeEnvironmentParameter =
+			this.createEnvironmentParameter(TermId.LATITUDE.getId(), String.valueOf(this.random.nextDouble()));
+		final EnvironmentParameter longitudeEnvironmentParameter =
+			this.createEnvironmentParameter(TermId.LONGITUDE.getId(), String.valueOf(this.random.nextDouble()));
+		final EnvironmentParameter geodeticDatumEnvironmentParameter =
+			this.createEnvironmentParameter(TermId.GEODETIC_DATUM.getId(), String.valueOf(this.random.nextDouble()));
 
 		final ExternalReferenceDTO externalReference = new ExternalReferenceDTO();
 		externalReference.setReferenceID(RandomStringUtils.randomAlphabetic(20));
@@ -239,7 +252,9 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		studyImportRequestDTO.setTrialDbId(String.valueOf(trial.getTrialDbId()));
 		studyImportRequestDTO.setLocationDbId("0");
 		studyImportRequestDTO.setSeasons(Collections.singletonList(seasonPossibleValues.get(0).getDescription()));
-		studyImportRequestDTO.setEnvironmentParameters(Arrays.asList(numericEnvironmentParameter, categoricalEnvironmentParameter));
+		studyImportRequestDTO.setEnvironmentParameters(
+			Arrays.asList(numericEnvironmentParameter, categoricalEnvironmentParameter, altitudeEnvironmentParameter,
+				longitudeEnvironmentParameter, latitudeEnvironmentParameter, geodeticDatumEnvironmentParameter));
 		studyImportRequestDTO.setExternalReferences(Collections.singletonList(externalReference));
 
 		// Save the study instance first
@@ -248,16 +263,19 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 			.get(0);
 
 		// Change the value of the existing environment detail variable to test update
-		numericEnvironmentParameter.setValue("100");
+		numericEnvironmentParameter.setValue(RandomStringUtils.randomNumeric(4));
 		// Change the value of the existing environment condition variable to test update
 		categoricalEnvironmentParameter.setValue(possibleValues.get(1));
-
+		// Change the value if GEOLOCATION type variables
+		altitudeEnvironmentParameter.setValue(String.valueOf(this.random.nextDouble()));
+		latitudeEnvironmentParameter.setValue(String.valueOf(this.random.nextDouble()));
+		longitudeEnvironmentParameter.setValue(String.valueOf(this.random.nextDouble()));
+		geodeticDatumEnvironmentParameter.setValue(String.valueOf(this.random.nextDouble()));
 		// Create a new environment detail variable to test addition
 		final CVTerm environmentDetailVariableToAdd =
 			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ENVIRONMENT_DETAIL);
-		final EnvironmentParameter newEnvironmentParameter = new EnvironmentParameter();
-		newEnvironmentParameter.setValue("101");
-		newEnvironmentParameter.setParameterPUI(environmentDetailVariableToAdd.getCvTermId().toString());
+		final EnvironmentParameter newEnvironmentParameter =
+			this.createEnvironmentParameter(environmentDetailVariableToAdd.getCvTermId(), RandomStringUtils.randomNumeric(4));
 
 		// Update the value of existing external reference
 		final ExternalReferenceDTO externalReferenceDTO = savedInstance.getExternalReferences().get(0);
@@ -275,15 +293,18 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		this.daoFactory.getGeolocationDao().refresh(geolocation);
 		this.daoFactory.getExperimentDao().refresh(experimentModel);
 
-		// Create a study update request dto
+		// Create a study update request dto with the updated values
 		final StudyUpdateRequestDTO studyUpdateRequestDTO = new StudyUpdateRequestDTO();
 		studyUpdateRequestDTO.setTrialDbId(savedInstance.getTrialDbId());
 		studyUpdateRequestDTO.setLocationDbId("1");
 		studyUpdateRequestDTO.setSeasons(Collections.singletonList(seasonPossibleValues.get(1).getDescription()));
 		studyUpdateRequestDTO.setEnvironmentParameters(
-			Arrays.asList(numericEnvironmentParameter, categoricalEnvironmentParameter, newEnvironmentParameter));
+			Arrays.asList(numericEnvironmentParameter, categoricalEnvironmentParameter, newEnvironmentParameter,
+				altitudeEnvironmentParameter, longitudeEnvironmentParameter, latitudeEnvironmentParameter,
+				geodeticDatumEnvironmentParameter));
 		studyUpdateRequestDTO.setExternalReferences(Arrays.asList(externalReferenceDTO, externalReferenceToAdd));
-		studyUpdateRequestDTO.setObservationVariableDbIds(Arrays.asList(traitVariable.getCvTermId().toString()));
+		studyUpdateRequestDTO.setObservationVariableDbIds(
+			Arrays.asList(traitVariable1.getCvTermId().toString(), traitVariable2.getCvTermId().toString()));
 
 		final StudyInstanceDto updatedInstance =
 			this.studyServiceBrapi.updateStudyInstance(Integer.valueOf(savedInstance.getStudyDbId()), studyUpdateRequestDTO);
@@ -291,18 +312,34 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		// Assertion
 		Assert.assertEquals(studyUpdateRequestDTO.getTrialDbId(), updatedInstance.getTrialDbId());
 		Assert.assertEquals(studyUpdateRequestDTO.getLocationDbId(), updatedInstance.getLocationDbId());
-		Assert.assertEquals(4, updatedInstance.getEnvironmentParameters().size());
-		this.assertEnvironmentParameter(updatedInstance.getEnvironmentParameters(), numericEnvironmentParameter.getParameterPUI(), "100");
+		Assert.assertEquals(8, updatedInstance.getEnvironmentParameters().size());
+		// Assert updated environment parameters
+		this.assertEnvironmentParameter(updatedInstance.getEnvironmentParameters(), numericEnvironmentParameter.getParameterPUI(),
+			numericEnvironmentParameter.getValue());
 		this.assertEnvironmentParameter(updatedInstance.getEnvironmentParameters(), categoricalEnvironmentParameter.getParameterPUI(),
 			possibleValues.get(1));
-		this.assertEnvironmentParameter(updatedInstance.getEnvironmentParameters(), newEnvironmentParameter.getParameterPUI(), "101");
+		this.assertEnvironmentParameter(updatedInstance.getEnvironmentParameters(), newEnvironmentParameter.getParameterPUI(),
+			newEnvironmentParameter.getValue());
+		this.assertEnvironmentParameter(updatedInstance.getEnvironmentParameters(), altitudeEnvironmentParameter.getParameterPUI(),
+			altitudeEnvironmentParameter.getValue());
+		this.assertEnvironmentParameter(updatedInstance.getEnvironmentParameters(), latitudeEnvironmentParameter.getParameterPUI(),
+			latitudeEnvironmentParameter.getValue());
+		this.assertEnvironmentParameter(updatedInstance.getEnvironmentParameters(), longitudeEnvironmentParameter.getParameterPUI(),
+			longitudeEnvironmentParameter.getValue());
+		this.assertEnvironmentParameter(updatedInstance.getEnvironmentParameters(), geodeticDatumEnvironmentParameter.getParameterPUI(),
+			geodeticDatumEnvironmentParameter.getValue());
+		// Assert external reference
 		Assert.assertEquals(2, updatedInstance.getExternalReferences().size());
 		this.assertExternalReference(updatedInstance.getExternalReferences(), externalReferenceDTO.getReferenceID(),
 			externalReferenceDTO.getReferenceSource());
 		this.assertExternalReference(updatedInstance.getExternalReferences(), externalReferenceToAdd.getReferenceID(),
 			externalReferenceToAdd.getReferenceSource());
+		// Assert season
 		Assert.assertEquals(studyUpdateRequestDTO.getSeasons().get(0), updatedInstance.getSeasons().get(0).getSeason());
-		Assert.assertTrue(updatedInstance.getObservationVariableDbIds().contains(traitVariable.getCvTermId().toString()));
+		// Asser observationVariableDbIds
+		Assert.assertEquals(2, updatedInstance.getObservationVariableDbIds().size());
+		Assert.assertTrue(updatedInstance.getObservationVariableDbIds().contains(traitVariable1.getCvTermId().toString()));
+		Assert.assertTrue(updatedInstance.getObservationVariableDbIds().contains(traitVariable2.getCvTermId().toString()));
 
 	}
 
@@ -485,6 +522,13 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 
 		return this.trialServiceBrapi.saveStudies(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid())
 			.get(0);
+	}
+
+	private EnvironmentParameter createEnvironmentParameter(final Integer parameterPUI, final String value) {
+		final EnvironmentParameter environmentParameter = new EnvironmentParameter();
+		environmentParameter.setValue(value);
+		environmentParameter.setParameterPUI(String.valueOf(parameterPUI));
+		return environmentParameter;
 	}
 
 }
