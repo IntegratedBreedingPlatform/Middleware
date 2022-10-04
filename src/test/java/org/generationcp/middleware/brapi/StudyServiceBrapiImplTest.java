@@ -227,6 +227,8 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.TRAIT);
 		final CVTerm traitVariable2 =
 			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.TRAIT);
+		final CVTerm selectionVariable =
+			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.SELECTION_METHOD);
 
 		// Add existing Environment Parameters
 		// ENVIRONMENT DETAIL and ENVIRONMENT CONDITION
@@ -304,7 +306,8 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 				geodeticDatumEnvironmentParameter));
 		studyUpdateRequestDTO.setExternalReferences(Arrays.asList(externalReferenceDTO, externalReferenceToAdd));
 		studyUpdateRequestDTO.setObservationVariableDbIds(
-			Arrays.asList(traitVariable1.getCvTermId().toString(), traitVariable2.getCvTermId().toString()));
+			Arrays.asList(traitVariable1.getCvTermId().toString(), traitVariable2.getCvTermId().toString(),
+				selectionVariable.getCvTermId().toString()));
 
 		final StudyInstanceDto updatedInstance =
 			this.studyServiceBrapi.updateStudyInstance(Integer.valueOf(savedInstance.getStudyDbId()), studyUpdateRequestDTO);
@@ -337,9 +340,10 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		// Assert season
 		Assert.assertEquals(studyUpdateRequestDTO.getSeasons().get(0), updatedInstance.getSeasons().get(0).getSeason());
 		// Asser observationVariableDbIds
-		Assert.assertEquals(2, updatedInstance.getObservationVariableDbIds().size());
+		Assert.assertEquals(3, updatedInstance.getObservationVariableDbIds().size());
 		Assert.assertTrue(updatedInstance.getObservationVariableDbIds().contains(traitVariable1.getCvTermId().toString()));
 		Assert.assertTrue(updatedInstance.getObservationVariableDbIds().contains(traitVariable2.getCvTermId().toString()));
+		Assert.assertTrue(updatedInstance.getObservationVariableDbIds().contains(selectionVariable.getCvTermId().toString()));
 
 	}
 

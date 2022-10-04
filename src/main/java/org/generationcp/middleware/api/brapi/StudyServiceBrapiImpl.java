@@ -394,7 +394,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 		this.addOrUpdateSeasonVariableIfNecessary(trialDbId, studyUpdateRequestDTO.getSeasons(), studyIdEnvironmentVariablesMap,
 			experimentModel.getGeoLocation(), categoricalValuesMap, trialIdEnvironmentDatasetMap);
 
-		// Associate TRAIT variables to study if not yet existing.
+		// Associate TRAIT and SELECTION_METHOD variables to study if not yet existing.
 		this.associateVariablesToStudy(studyUpdateRequestDTO, trialDbId);
 
 		// Add or update study instance external references
@@ -411,7 +411,9 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialDbId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
 
 		studyInstanceDto.setObservationVariableDbIds(
-			plotDataset.getProperties().stream().filter(pp -> pp.getTypeId().equals(VariableType.TRAIT.getId()))
+			plotDataset.getProperties().stream()
+				.filter(
+					pp -> pp.getTypeId().equals(VariableType.TRAIT.getId()) || pp.getTypeId().equals(VariableType.SELECTION_METHOD.getId()))
 				.map(pp -> pp.getVariableId().toString()).collect(toList()));
 
 		return studyInstanceDtos.get(0);
@@ -446,11 +448,14 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 					.collect(
 						groupingBy(CVTermProperty::getCvTermId, Collectors.mapping(o -> VariableType.getByName(o.getValue()), toList())));
 
-			// Support adding of TRAIT variables to the plot dataset for now.
+			// Support adding of TRAIT and SELECTION_METHOD variables to the plot dataset for now.
 			variablesMap.forEach((variableId, variable) -> {
 				if (!existingVariablesOfPlotDataset.containsKey(variableId) && variableTypesOfVariables.get(variableId)
 					.contains(VariableType.TRAIT)) {
 					this.addProjectPropertyToDataset(plotDataset, variable, VariableType.TRAIT);
+				} else if (!existingVariablesOfPlotDataset.containsKey(variableId) && variableTypesOfVariables.get(variableId)
+					.contains(VariableType.SELECTION_METHOD)) {
+					this.addProjectPropertyToDataset(plotDataset, variable, VariableType.SELECTION_METHOD);
 				}
 			});
 
