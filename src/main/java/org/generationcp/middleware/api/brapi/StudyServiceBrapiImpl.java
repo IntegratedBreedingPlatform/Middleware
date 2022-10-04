@@ -381,7 +381,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 			StringUtils.isNotEmpty(studyUpdateRequestDTO.getLocationDbId()) ? Integer.valueOf(studyUpdateRequestDTO.getLocationDbId()) :
 				null;
 
-		// Add anevironment variables to the environment dataset if they are not yet existing
+		// Add evironment variables to the environment dataset if they are not yet existing
 		this.addEnvironmentVariablesIfNecessary(trialDbId, studyUpdateRequestDTO.getEnvironmentParameters(), studyIdEnvironmentVariablesMap,
 			environmentVariablesMap,
 			trialIdEnvironmentDatasetMap);
