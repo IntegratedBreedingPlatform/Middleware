@@ -52,6 +52,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		private Set<Integer> filteredNdExperimentIds;
 		private Map<String, String> variableTypeMap;
 		private Integer variableId;
+		private Boolean variableHasValue;
 		// FIXME: Remove it after solver the filter for Female and Male Parents into the query.
 		private Set<Integer> preFilteredGids;
 
@@ -63,6 +64,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 			this.filteredValues = new HashMap<>();
 			this.filteredTextValues = new HashMap<>();
 			this.variableId = null;
+			this.variableHasValue = false;
 		}
 
 		public Map<String, String> getFilteredTextValues() {
@@ -127,6 +129,14 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 
 		public void setVariableId(final Integer variableId) {
 			this.variableId = variableId;
+		}
+
+		public Boolean getVariableHasValue() {
+			return this.variableHasValue;
+		}
+
+		public void setVariableHasValue(final Boolean variableHasValue) {
+			this.variableHasValue = variableHasValue;
 		}
 
 		public Map<String, String> getVariableTypeMap() {
@@ -270,7 +280,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	}
 
 	public List<MeasurementVariableDto> getPassportAndAttributes() {
-		return passportAndAttributes;
+		return this.passportAndAttributes;
 	}
 
 	public void setPassportAndAttributes(final List<MeasurementVariableDto> passportAndAttributes) {

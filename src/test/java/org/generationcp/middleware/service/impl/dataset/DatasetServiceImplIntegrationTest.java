@@ -32,6 +32,7 @@ import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.impl.analysis.MeansImportRequest;
 import org.generationcp.middleware.service.impl.analysis.SummaryStatisticsImportRequest;
@@ -141,6 +142,60 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         Assert.assertNotNull(observationUnitRow.getEnvironmentVariables().get("SITE_LAT"));
         Assert.assertNotNull(observationUnitRow.getEnvironmentVariables().get("SITE_LONG"));
         Assert.assertNotNull(observationUnitRow.getEnvironmentVariables().get("SITE_DATUM"));
+    }
+
+    @Test
+    public void testSetValueToVariable() {
+        Map<Integer, List<ObservationUnitRow>> instanceObsUnitRowMap = this.datasetService.getInstanceIdToObservationUnitRowsMap(this.studyId, this.subObsDatasetId, this.instanceIds);
+        List<ObservationUnitRow> observationUnitRows = instanceObsUnitRowMap.get(this.instanceIds.get(0));
+        for(final ObservationUnitRow row: observationUnitRows) {
+            Assert.assertNull(row.getVariables().get(TRAIT_NAME).getValue());
+        }
+        final ObservationUnitsParamDTO param = new ObservationUnitsParamDTO();
+        param.setNewValue("2");
+        final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+        searchDTO.setDatasetId(subObsDatasetId);
+        searchDTO.setDraftMode(false);
+        searchDTO.setFilter(searchDTO.new Filter());
+        searchDTO.getFilter().setVariableId(TRAIT_ID);
+        param.setObservationUnitsSearchDTO(searchDTO);
+        this.datasetService.setValueToVariable(subObsDatasetId, param, this.studyId);
+        this.sessionProvder.getSession().flush();
+
+        instanceObsUnitRowMap = this.datasetService.getInstanceIdToObservationUnitRowsMap(this.studyId, this.subObsDatasetId, this.instanceIds);
+        observationUnitRows = instanceObsUnitRowMap.get(this.instanceIds.get(0));
+        for(final ObservationUnitRow row: observationUnitRows) {
+            Assert.assertEquals(param.getNewValue(), row.getVariables().get(TRAIT_NAME).getValue());
+        }
+    }
+
+    @Test
+    public void testDeleteVariableValues() {
+        final ObservationUnitsParamDTO param = new ObservationUnitsParamDTO();
+        param.setNewValue("2");
+        final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+        searchDTO.setDatasetId(subObsDatasetId);
+        searchDTO.setDraftMode(false);
+        searchDTO.setFilter(searchDTO.new Filter());
+        searchDTO.getFilter().setVariableId(TRAIT_ID);
+        param.setObservationUnitsSearchDTO(searchDTO);
+        this.datasetService.setValueToVariable(subObsDatasetId, param, this.studyId);
+        this.sessionProvder.getSession().flush();
+
+        Map<Integer, List<ObservationUnitRow>> instanceObsUnitRowMap = this.datasetService.getInstanceIdToObservationUnitRowsMap(this.studyId, this.subObsDatasetId, this.instanceIds);
+        List<ObservationUnitRow> observationUnitRows = instanceObsUnitRowMap.get(this.instanceIds.get(0));
+        for(final ObservationUnitRow row: observationUnitRows) {
+            Assert.assertEquals(param.getNewValue(), row.getVariables().get(TRAIT_NAME).getValue());
+        }
+
+        this.datasetService.deleteVariableValues(this.studyId, this.subObsDatasetId, searchDTO);
+        this.sessionProvder.getSession().flush();
+
+        instanceObsUnitRowMap = this.datasetService.getInstanceIdToObservationUnitRowsMap(this.studyId, this.subObsDatasetId, this.instanceIds);
+        observationUnitRows = instanceObsUnitRowMap.get(this.instanceIds.get(0));
+        for(final ObservationUnitRow row: observationUnitRows) {
+            Assert.assertNull(row.getVariables().get(TRAIT_NAME).getValue());
+        }
     }
 
     @Test
