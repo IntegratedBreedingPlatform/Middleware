@@ -30,7 +30,7 @@ public class RulesServiceImpl implements RulesService {
 	@Override
 	public Object runRules(RuleExecutionContext context) throws RuleException {
 
-		Monitor monitor = MonitorFactory.start("AdvanceNursery:org.generationcp.commons.ruleengine.impl.RulesServiceImpl.runRules");
+		Monitor monitor = MonitorFactory.start(this.getClass().getName() + ".runRules");
 		
 		try{
 		

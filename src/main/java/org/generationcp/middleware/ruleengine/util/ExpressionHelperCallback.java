@@ -6,5 +6,5 @@ package org.generationcp.middleware.ruleengine.util;
  */
 public interface ExpressionHelperCallback {
 
-	public void evaluateCapturedExpression(String capturedText, String originalInput, int start, int end);
+	void evaluateCapturedExpression(String capturedText, String originalInput, int start, int end);
 }
