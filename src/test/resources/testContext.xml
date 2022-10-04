@@ -425,4 +425,8 @@
 		<constructor-arg ref="workbenchSessionProvider" />
 	</bean>
 
+	<bean id="advanceService" class="org.generationcp.middleware.service.impl.study.AdvanceServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 </beans>
