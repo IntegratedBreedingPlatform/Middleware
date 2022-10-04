@@ -29,7 +29,10 @@ import java.util.Map;
  * The POJO containing information needed for Advancing.
  *
  */
-public class AdvancingSource {
+
+// TODO: create an abstract class which implements an interface -> add originGermplasm
+@Deprecated
+public class AdvancingSource extends AbstractAdvancingSource {
 
 	private ImportedGermplasm germplasm;
 	private List<Name> names;
@@ -44,6 +47,7 @@ public class AdvancingSource {
 	private String studyName;
 	private Integer studyId;
 	private Integer environmentDatasetId;
+	// TODO: move to abstract
 	private String season;
 	private String locationAbbreviation;
 	private String rootName;
@@ -53,6 +57,7 @@ public class AdvancingSource {
 	private String prefix;
 	private String suffix;
 	private Integer rootNameType;
+	// TODO: move to abstract
 	private Integer harvestLocationId;
 	private String plotNumber;
     private String selectionTraitValue;
@@ -386,6 +391,7 @@ public class AdvancingSource {
 		this.replicationNumber = replicationNumber;
 	}
 
+	// NOTE: conditions are only being used by BreedersCrossIDExpression
 	public List<MeasurementVariable> getConditions() {
 		return conditions;
 	}
