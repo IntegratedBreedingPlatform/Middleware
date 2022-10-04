@@ -309,6 +309,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 						+ " where l.lotid in (:lotIds) and a.atype = v.cvterm_id) ";
 					listParameters.put(LOT_IDS, lotIds);
 				}
+
+				// check if obsolete variables should be filtered
+				if (!variableFilter.isShowObsoletes()) {
+					filterClause += " and v.is_obsolete = 0 ";
+				}
 			}
 
 			final String selectQueryProgramUUIDDependant;
