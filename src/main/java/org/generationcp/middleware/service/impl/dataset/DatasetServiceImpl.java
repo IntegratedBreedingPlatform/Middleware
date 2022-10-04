@@ -85,7 +85,6 @@ import java.util.stream.Collectors;
  */
 @Transactional
 public class DatasetServiceImpl implements DatasetService {
-
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
 	private static final String LOCATION_NAME = "LOCATION_NAME";
@@ -1060,6 +1059,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public void setValueToVariable(final Integer datasetId, final ObservationUnitsParamDTO paramDTO, final Integer studyId) {
 
 		final String newValue = paramDTO.getNewValue();
+		final Integer newCategoricalValueId = paramDTO.getNewCategoricalValueId();
 		final String variableId = paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId().toString();
 		final Boolean draftMode = paramDTO.getObservationUnitsSearchDTO().getDraftMode();
 
@@ -1067,13 +1067,12 @@ public class DatasetServiceImpl implements DatasetService {
 			this.getObservationUnitsByVariable(datasetId, paramDTO.getObservationUnitsSearchDTO(), studyId);
 
 		final List<Phenotype> phenotypes = new ArrayList<>();
+		final List<Integer> phenotypeIdsToUpdate = new ArrayList<>();
+		final Set<Integer> observationUnitIdsToUpdate = new HashSet<>();
 		if (!observationUnitsByVariable.isEmpty()) {
 			for (final ObservationUnitRow observationUnitRow : observationUnitsByVariable) {
 				final ObservationUnitData observationUnitData = observationUnitRow.getVariables().get(variableId);
 				Phenotype phenotype = null;
-
-				final Integer newCategoricalValueId = paramDTO.getNewCategoricalValueId();
-
 				if (observationUnitData != null) {
 					/* TODO IBP-2822
 					 *  Approach of IBP-2781 (getWithIsDerivedTrait) won't work here
@@ -1084,13 +1083,7 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 
 				if (phenotype != null) {
-					if (draftMode) {
-						this.updatePhenotype(phenotype,
-							phenotype.getcValueId(), phenotype.getValue(), newCategoricalValueId, newValue, true);
-					} else {
-						this.updatePhenotype(phenotype,
-							newCategoricalValueId, newValue, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
-					}
+					phenotypeIdsToUpdate.add(phenotype.getPhenotypeId());
 				} else {
 					final ObservationDto observationDto =
 						new ObservationDto(observationUnitData.getVariableId(), newValue, newCategoricalValueId, null,
@@ -1098,13 +1091,17 @@ public class DatasetServiceImpl implements DatasetService {
 							observationUnitRow.getObservationUnitId(), newCategoricalValueId, newValue);
 					phenotype = this.createPhenotype(observationDto, draftMode);
 				}
-
 				phenotypes.add(phenotype);
+				observationUnitIdsToUpdate.add(observationUnitRow.getObservationUnitId());
 			}
 		}
 
-		if (!draftMode) {
-			this.reorganizePhenotypesStatus(studyId, phenotypes);
+		if(!draftMode && !org.springframework.util.CollectionUtils.isEmpty(observationUnitIdsToUpdate)) {
+			this.updateDependentPhenotypesAsOutOfSync(paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId(), observationUnitIdsToUpdate);
+		}
+		if(!org.springframework.util.CollectionUtils.isEmpty(phenotypeIdsToUpdate)){
+			this.updatePhenotypes(phenotypeIdsToUpdate, paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId(),
+				newCategoricalValueId, newValue, draftMode);
 		}
 	}
 
@@ -1120,6 +1117,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final List<Integer> phenotypeIdsToDelete = new ArrayList<>();
 		final Set<Integer> observationUnitIdsToUpdate = new HashSet<>();
+		final List<Integer> phenotypeIdsToUpdate = new ArrayList<>();
 		if (!observationUnitsByVariable.isEmpty()) {
 			for (final ObservationUnitRow observationUnitRow : observationUnitsByVariable) {
 				final ObservationUnitData observationUnitData = observationUnitRow.getVariables().get(variableId);
@@ -1134,15 +1132,13 @@ public class DatasetServiceImpl implements DatasetService {
 						if(phenotype.getcValueId() == null && StringUtils.isEmpty(phenotype.getValue())) {
 							phenotypeIdsToDelete.add(phenotype.getPhenotypeId());
 						} else {
-							this.updatePhenotype(phenotype,
-								phenotype.getcValueId(), phenotype.getValue(), null, null, true);
+							phenotypeIdsToUpdate.add(phenotype.getPhenotypeId());
 						}
 					} else {
 						if(phenotype.getDraftCValueId() == null && StringUtils.isEmpty(phenotype.getDraftValue())) {
 							phenotypeIdsToDelete.add(phenotype.getPhenotypeId());
 						} else {
-							this.updatePhenotype(phenotype,
-								null, null, phenotype.getDraftCValueId(), phenotype.getDraftValue(), false);
+							phenotypeIdsToUpdate.add(phenotype.getPhenotypeId());
 						}
 						observationUnitIdsToUpdate.add(observationUnitRow.getObservationUnitId());
 					}
@@ -1152,7 +1148,10 @@ public class DatasetServiceImpl implements DatasetService {
 			if(!org.springframework.util.CollectionUtils.isEmpty(phenotypeIdsToDelete)) {
 				this.daoFactory.getPhenotypeDAO().deletePhenotypes(phenotypeIdsToDelete);
 			}
-			if(!org.springframework.util.CollectionUtils.isEmpty(observationUnitIdsToUpdate)) {
+			if(!org.springframework.util.CollectionUtils.isEmpty(phenotypeIdsToUpdate)){
+				this.updatePhenotypes(phenotypeIdsToUpdate, searchDTO.getFilter().getVariableId(), null, null, draftMode);
+			}
+			if(!draftMode && !org.springframework.util.CollectionUtils.isEmpty(observationUnitIdsToUpdate)) {
 				this.updateDependentPhenotypesAsOutOfSync(searchDTO.getFilter().getVariableId(), observationUnitIdsToUpdate);
 			}
 		}
@@ -1433,6 +1432,14 @@ public class DatasetServiceImpl implements DatasetService {
 		if (!CollectionUtils.isEmpty(removeVariableIds)) {
 			this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(plotDataset.getProjectId(), removeVariableIds);
 		}
+	}
+
+	private void updatePhenotypes(final List<Integer> phenotypeIds, final Integer variableId, final Integer newCValueId,
+		final String newValue, final Boolean draftMode) {
+		final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variableId);
+		final boolean isDerivedTrait = formula != null;
+		final Integer cvalueId = Integer.valueOf(0).equals(newCValueId) ? null : newCValueId;
+		this.daoFactory.getPhenotypeDAO().updatePhenotypes(phenotypeIds, cvalueId, newValue, draftMode, isDerivedTrait);
 	}
 
 	void addStudyVariablesToUnitRows(final List<ObservationUnitRow> observationUnits, final List<MeasurementVariable> studyVariables) {

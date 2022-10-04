@@ -667,6 +667,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public void deletePhenotypes(final List<Integer> phenotypeIds) {
 		try {
+			this.getSession().flush();
 			// Delete phenotypes
 			this.getSession().createSQLQuery("DELETE FROM phenotype "
 				+ " WHERE phenotype.phenotype_id IN (:phenotypeIds)")
@@ -700,6 +701,36 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			throw new MiddlewareQueryException(
 				"Error in updatePhenotypesByExperimentIdAndObervableId= " + experimentId + ", " + cvTermId + ", " + value
 					+ IN_PHENOTYPE_DAO + e.getMessage(), e);
+		}
+	}
+
+	public void updatePhenotypes(final List<Integer> phenotypeIds, final Integer newCValueId,
+		final String newValue, final Boolean draftMode, final boolean isDerivedTrait) {
+		try {
+			this.getSession().flush();
+			final StringBuilder query = new StringBuilder("UPDATE phenotype pheno SET ");
+			final String value = newValue == null ? null : "'" + newValue + "'";
+			if(draftMode) {
+				query.append("	pheno.draft_value = " + value);
+				query.append("	, pheno.draft_cvalue_id = " + newCValueId);
+			} else {
+				query.append("	pheno.value = " + value);
+				query.append("	, pheno.cvalue_id = " + newCValueId);
+			}
+			if(isDerivedTrait) {
+				query.append(" , pheno.status = '" + Phenotype.ValueStatus.MANUALLY_EDITED + "' ");
+			}
+
+			query.append("	WHERE pheno.phenotype_id IN (:phenotypeIds) ");
+
+			this.getSession().createSQLQuery(query.toString())
+				.setParameterList("phenotypeIds", phenotypeIds)
+				.executeUpdate();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error in updatePhenotypes= " + phenotypeIds + ", " + newCValueId + ", " + newValue + ", " + draftMode + ", "
+					+ isDerivedTrait + " " + IN_PHENOTYPE_DAO + e.getMessage(), e);
 		}
 	}
 
