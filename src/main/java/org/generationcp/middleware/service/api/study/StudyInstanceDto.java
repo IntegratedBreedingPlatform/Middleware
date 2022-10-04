@@ -56,6 +56,9 @@ public class StudyInstanceDto {
 	@JsonView(BrapiView.BrapiV2.class)
 	private String observationUnitsDescription = StringUtils.EMPTY;
 
+	@JsonView(BrapiView.BrapiV2_1.class)
+	private List<String> observationVariableDbIds;
+
 	@JsonView(BrapiView.BrapiV2.class)
 	private String studyCode = StringUtils.EMPTY;
 
@@ -440,6 +443,14 @@ public class StudyInstanceDto {
 
 	public void setObservationLevels(final List<ObservationLevel> observationLevels) {
 		this.observationLevels = observationLevels;
+	}
+
+	public List<String> getObservationVariableDbIds() {
+		return observationVariableDbIds;
+	}
+
+	public void setObservationVariableDbIds(List<String> observationVariableDbIds) {
+		this.observationVariableDbIds = observationVariableDbIds;
 	}
 
 	@Override
