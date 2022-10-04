@@ -2108,6 +2108,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			paramBuilder.append(" and variable.cvterm_id in (:variableIds) ");
 			paramBuilder.setParameterList("variableIds", variableFilter.getVariableIds());
 		}
+
+		if (!isEmpty(variableFilter.getVariableTypes())) {
+			paramBuilder.append(" and cpvartype.value in (:variableTypeNames) ");
+			paramBuilder.setParameterList("variableTypeNames", variableFilter.getVariableTypes().stream().map(VariableType::getName).collect(
+				Collectors.toList()));
+		}
 		// TODO Complete
 	}
 }
