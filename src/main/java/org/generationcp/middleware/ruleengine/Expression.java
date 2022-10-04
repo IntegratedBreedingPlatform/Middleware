@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface Expression {
 
-	public void apply(List<StringBuilder> values, final String capturedText, final NamingConfiguration namingConfiguration);
+	void apply(List<StringBuilder> values, String capturedText, NamingConfiguration namingConfiguration);
 
-	public String getExpressionKey();
+	String getExpressionKey();
 
 }

@@ -8,8 +8,8 @@ import java.util.List;
  */
 public interface RuleExecutionContext {
 
-	public List<String> getExecutionOrder();
+	List<String> getExecutionOrder();
 
-	public Object getRuleExecutionOutput();
+	Object getRuleExecutionOutput();
 
 }

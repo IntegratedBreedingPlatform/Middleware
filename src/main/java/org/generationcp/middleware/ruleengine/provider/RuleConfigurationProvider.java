@@ -8,5 +8,5 @@ import java.util.Map;
  */
 public interface RuleConfigurationProvider {
 
-	public Map<String, String[]> getRuleSequenceConfiguration();
+	Map<String, String[]> getRuleSequenceConfiguration();
 }
