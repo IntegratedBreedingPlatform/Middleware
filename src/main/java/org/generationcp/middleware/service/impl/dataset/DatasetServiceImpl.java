@@ -1110,6 +1110,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void deleteVariableValues(final Integer studyId, final Integer datasetId, final ObservationUnitsSearchDTO searchDTO) {
+		searchDTO.getFilter().setVariableHasValue(true);
+
 		final String variableId = searchDTO.getFilter().getVariableId().toString();
 		final Boolean draftMode = searchDTO.getDraftMode();
 
