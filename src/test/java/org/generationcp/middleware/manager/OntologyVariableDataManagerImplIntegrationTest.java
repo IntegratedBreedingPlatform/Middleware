@@ -375,7 +375,31 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		Assert.assertFalse("Variable should have no usage", hasUsage);
 	}
 
-	
+	@Test
+	public void testGetWithFilter_FilterObsoletes() throws Exception {
+		// set variable to obsolete
+		final CVTerm testVariableCvTerm = this.cvTermDAO.getById(this.testVariableInfo.getId());
+		testVariableCvTerm.setIsObsolete(true);
+		this.cvTermDAO.update(testVariableCvTerm);
+		this.sessionProvder.getSession().flush();
+
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addVariableId(testVariableCvTerm.getCvTermId());
+
+		variableFilter.setShowObsoletes(true);
+		final List<Variable> variables = this.variableManager.getWithFilter(variableFilter);
+		Assert.assertTrue(!variables.isEmpty());
+		Assert.assertTrue("Variable should be obsolete.", variables.get(0).isObsolete());
+		Debug.println(IntegrationTestBase.INDENT, "From Total Variables:  " + variables.size());
+
+		variableFilter.setShowObsoletes(false);
+		Assert.assertTrue(this.variableManager.getWithFilter(variableFilter).isEmpty());
+
+		// revert changes
+		testVariableCvTerm.setIsObsolete(false);
+		this.cvTermDAO.update(testVariableCvTerm);
+
+	}
 
 	private OntologyVariableInfo buildVariable(final Property property) {
 		OntologyVariableInfo variableInfo = new OntologyVariableInfo();
