@@ -1,0 +1,30 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="cuenyad" id="v22.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="projectprop" columnName="fldno"/>
+			</not>
+		</preConditions>
+			<comment>Add 'fldno' column in projectprop</comment>
+			<sql dbms="mysql" splitStatements="true">
+				ALTER TABLE projectprop ADD COLUMN fldno INT(11) NULL AFTER alias;
+			</sql>
+	</changeSet>
+	<changeSet author="cuenyad" id="v22.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="projectprop" columnName="type_id"/>
+			<columnExists tableName="projectprop" columnName="variable_id"/>
+		</preConditions>
+			<comment>make type_id and variable_id columns nullable from projectprop table</comment>
+			<sql dbms="mysql" splitStatements="true">
+				ALTER TABLE projectprop
+				CHANGE COLUMN type_id type_id INT(11) NULL,
+				CHANGE COLUMN variable_id variable_id INT(11) NULL;
+			</sql>
+	</changeSet>
+</databaseChangeLog>
