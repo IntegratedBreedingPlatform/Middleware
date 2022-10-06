@@ -1,7 +1,7 @@
 package org.generationcp.middleware.domain.search_request.brapi.v2;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -17,7 +17,7 @@ public class ObservationUnitsSearchRequestDto extends SearchRequestDto {
 	private List<String> programDbIds;
 	private List<String> studyDbIds;
 	private List<String> trialDbIds;
-	private String observationLevel;
+	private List<ObservationLevelRelationship> observationLevels;
 	private List<String> externalReferenceIDs;
 	private List<String> externalReferenceSources;
 
@@ -82,12 +82,12 @@ public class ObservationUnitsSearchRequestDto extends SearchRequestDto {
 		this.trialDbIds = trialDbIds;
 	}
 
-	public String getObservationLevel() {
-		return this.observationLevel;
+	public List<ObservationLevelRelationship> getObservationLevels() {
+		return this.observationLevels;
 	}
 
-	public void setObservationLevel(final String observationLevel) {
-		this.observationLevel = observationLevel;
+	public void setObservationLevels(final List<ObservationLevelRelationship> observationLevels) {
+		this.observationLevels = observationLevels;
 	}
 
 	public List<String> getExternalReferenceIDs() {
