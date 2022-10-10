@@ -264,10 +264,11 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		try {
 
 			final String queryString =
-				"select distinct(nd_ep.value) AS position, s.stock_id AS entryId, s.name AS designation, s.dbxref_id AS germplasmId "
+				"select distinct(nd_ep.value) AS position, s.stock_id AS entryId, name.nval AS designation, s.dbxref_id AS germplasmId "
 					+ " FROM nd_experiment e "
 					+ " INNER JOIN nd_experimentprop nd_ep ON e.nd_experiment_id = nd_ep.nd_experiment_id AND nd_ep.type_id IN (:PLOT_NO_TERM_IDS)"
 					+ " INNER JOIN stock s ON s.stock_id = e.stock_id "
+					+ " INNER JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1 "
 					+ " INNER JOIN project p ON e.project_id = p.project_id "
 					+ " WHERE p.dataset_type_id = :DATASET_TYPE "
 					+ " AND p.study_id = :STUDY_ID "
@@ -411,8 +412,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	public void createStudyEntries(final Integer studyId, final Integer listId) {
-		final String insertStockQuery = "INSERT INTO stock(dbxref_id, name, uniquename, project_id, cross_value) "
-			+ "SELECT ld.gid, (SELECT n.nval FROM names n WHERE nstat = 1 AND n.gid = ld.gid), ld.entryid, " + studyId + ", ld.grpname "
+		final String insertStockQuery = "INSERT INTO stock(dbxref_id, uniquename, project_id, cross_value) "
+			+ "SELECT ld.gid, ld.entryid, " + studyId + ", ld.grpname "
 			+ " FROM listdata ld WHERE ld.listid = " + listId;
 		this.getSession().createSQLQuery(insertStockQuery).executeUpdate();
 
@@ -441,8 +442,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public void createStudyEntries(final Integer studyId, final Integer startingEntryNumber, final List<Integer> gids,
 		final Integer entryTypeId, final String entryTypeValue) {
 		final String gidsClause = gids.stream().map(Object::toString).collect(Collectors.joining(","));
-		final String insertStockQuery = "INSERT INTO stock(dbxref_id, name, uniquename, project_id) "
-			+ "SELECT g.gid, (SELECT n.nval FROM names n WHERE n.nstat = 1 AND n.gid = g.gid), (@entryNumber \\:= @entryNumber + 1), " + studyId
+		final String insertStockQuery = "INSERT INTO stock(dbxref_id, uniquename, project_id) "
+			+ "SELECT g.gid, (@entryNumber \\:= @entryNumber + 1), " + studyId
 			+ " 	FROM germplsm g  "
 			+ "		JOIN (SELECT @entryNumber \\:= " + (startingEntryNumber - 1) + ") entryNumber "
 			+ "WHERE g.gid IN (" + gidsClause + ")";

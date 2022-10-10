@@ -37,12 +37,10 @@ public class StockSaver extends Saver {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
-	public Integer saveStock(final int studyId, final VariableList variableList, final Map<Integer, String> preferredNamesByGIDs,
-		final Map<Integer, String> pedigreeByGids) {
+	public Integer saveStock(final int studyId, final VariableList variableList, final Map<Integer, String> pedigreeByGids) {
 		final StockModel stockModel = this.createStock(variableList, null);
 		if (stockModel != null) {
 			final Integer gid = stockModel.getGermplasm().getGid();
-			stockModel.setName(preferredNamesByGIDs.get(gid));
 			stockModel.setCross(pedigreeByGids.get(gid));
 			stockModel.setProject(new DmsProject(studyId));
 			this.daoFactory.getStockDao().save(stockModel);

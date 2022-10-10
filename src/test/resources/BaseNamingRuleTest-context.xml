@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context-4.1.xsd
+			http://www.springframework.org/schema/aop
+			http://www.springframework.org/schema/aop/spring-aop-4.1.xsd">
+
+	<!-- Declare property file locations  -->
+	<context:property-placeholder location="classpath:test.properties, classpath:crossing.properties" />
+
+
+   	<bean class="org.generationcp.middleware.ruleengine.naming.expression.ComponentPostProcessor">
+        <property name="ruleFactory" ref="ruleFactory"/>
+		<property name="processCodeFactory" ref="processCodeFactory" />
+    </bean>
+
+    <bean id="ruleFactory" class="org.generationcp.middleware.ruleengine.ProcessCodeRuleFactory"
+          init-method="init"/>
+
+    <bean id="ruleConfigProvider"
+          class="org.generationcp.middleware.ruleengine.provider.PropertyFileRuleConfigurationProvider">
+        <property name="ruleSequenceConfiguration">
+            <map>
+                <entry key="naming" value="${naming.rules}"/>
+            </map>
+        </property>
+    </bean>
+	<bean id="ruleService" class="org.generationcp.middleware.ruleengine.impl.RulesServiceImpl" />
+
+	<bean id="germplasmNamingService" class="org.generationcp.middleware.ruleengine.naming.impl.GermplasmNamingServiceImpl" />
+
+    <!--
+            This component scan automatically registers all implementations of the Rule interface into the Spring context.
+            In conjunction with the RulesPostProcessor above, this automatically populates the map in the RuleFactory
+             -->
+	<context:component-scan base-package="org.generationcp.middleware.ruleengine.naming" />
+	<context:component-scan base-package="org.generationcp.middleware.ruleengine.naming.expression" />
+
+	<bean id="processCodeFactory"
+		  class="org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory"
+		  init-method="init"/>
+
+	<!-- Singleton bean as there is nothing request specific in here. -->
+	<bean id="germplasmNamingProperties" class="org.generationcp.middleware.ruleengine.service.GermplasmNamingProperties">
+		<property name="germplasmOriginStudiesDefault" value="${germplasm.origin.studies.default}"/>
+		<property name="germplasmOriginStudiesWheat" value="${germplasm.origin.studies.wheat}"/>
+		<property name="germplasmOriginStudiesMaize" value="${germplasm.origin.studies.maize}"/>
+        <property name="breedersCrossIDStudy" value="${breeders.cross.id.study}" />
+	</bean>
+
+    <bean id="breedersCrossIDGenerator" class="org.generationcp.middleware.ruleengine.generator.BreedersCrossIDGenerator">
+	</bean>
+
+<!--	<bean id="workbenchHibernateSessionProvider"-->
+<!--		  class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider"-->
+<!--		  scope="request" destroy-method="close">-->
+<!--		<property name="sessionFactory" ref="WORKBENCH_SessionFactory" />-->
+
+<!--		&lt;!&ndash; JDK Standard Proxy around this request scoped bean, so we can use-->
+<!--			it on longer scoped beans &ndash;&gt;-->
+<!--		<aop:scoped-proxy proxy-target-class="false" />-->
+<!--	</bean>-->
+
+<!--	<bean id="roleService"-->
+<!--		  class="org.generationcp.middleware.api.role.RoleServiceImpl"-->
+<!--		  destroy-method="close">-->
+<!--		<constructor-arg ref="workbenchHibernateSessionProvider" />-->
+<!--	</bean>-->
+
+<!--	<bean id="permissionService"-->
+<!--		  class="org.generationcp.middleware.service.api.permission.PermissionServiceImpl"-->
+<!--		  destroy-method="close">-->
+<!--		<constructor-arg ref="workbenchHibernateSessionProvider" />-->
+<!--	</bean>-->
+
+<!--	<bean id="programServiceMw"-->
+<!--			  class="org.generationcp.middleware.api.program.ProgramServiceImpl">-->
+<!--        <constructor-arg ref="workbenchHibernateSessionProvider"/>-->
+<!--    </bean>-->
+
+<!--	<bean id="managerFactoryProvider"-->
+<!--		  class="org.generationcp.commons.hibernate.DynamicManagerFactoryProviderConcurrency">-->
+<!--		<constructor-arg ref="programServiceMw" />-->
+<!--		<property name="pedigreeProfile" value="${pedigree.profile}"/>-->
+<!--	</bean>-->
+
+<!--	<bean id="managerFactory" name="managerFactory" factory-bean="managerFactoryProvider"-->
+<!--		factory-method="createInstance" scope="request">-->
+<!--		<aop:scoped-proxy />-->
+<!--	</bean>-->
+
+<!--	<bean id="ontologyVariableManager" factory-bean="managerFactory"-->
+<!--		  factory-method="getOntologyVariableDataManager" scope="request">-->
+<!--		<aop:scoped-proxy />-->
+<!--	</bean>-->
+
+<!--	<bean id="studyDataManager" factory-bean="managerFactory"-->
+<!--		  factory-method="getNewStudyDataManager" scope="request">-->
+<!--		<aop:scoped-proxy />-->
+<!--	</bean>-->
+
+<!--	<bean id="germplasmDataManager" factory-bean="managerFactory"-->
+<!--		  factory-method="getGermplasmDataManager" scope="request">-->
+<!--		<aop:scoped-proxy />-->
+<!--	</bean>-->
+
+<!--    <bean id="keySequenceRegisterService" factory-bean="managerFactory"-->
+<!--		  factory-method="getKeySequenceRegisterService" scope="request">-->
+<!--        <aop:scoped-proxy />-->
+<!--    </bean>-->
+
+<!--	<bean id="pedigreeDataManager" factory-bean="managerFactory"-->
+<!--		  factory-method="getPedigreeDataManager" scope="request">-->
+<!--		<aop:scoped-proxy />-->
+<!--	</bean>-->
+
+<!--	<bean id="contextUtil" class="org.generationcp.commons.spring.util.ContextUtil"-->
+<!--		  scope="request">-->
+<!--		<aop:scoped-proxy />-->
+<!--	</bean>-->
+
+<!--	<bean id="datasetService" factory-bean="managerFactory"-->
+<!--		  factory-method="getDatasetMiddlewareService" scope="request">-->
+<!--		<aop:scoped-proxy proxy-target-class="false" />-->
+<!--	</bean>-->
+
+
+<!--	<bean id="studyInstanceService" factory-bean="managerFactory" factory-method="studyInstanceMiddlewareService"-->
+<!--		  scope="request">-->
+<!--		<aop:scoped-proxy/>-->
+<!--	</bean>-->
+
+<!--	<bean id="experimentModelGenerator" factory-bean="managerFactory" factory-method="getExperimentModelGenerator"-->
+<!--		  scope="request">-->
+<!--		<aop:scoped-proxy/>-->
+<!--	</bean>-->
+
+<!--	<bean id="experimentDesignService" factory-bean="managerFactory" factory-method="getExperimentDesignService"-->
+<!--		  scope="request">-->
+<!--		<aop:scoped-proxy/>-->
+<!--	</bean>-->
+
+</beans>

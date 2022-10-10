@@ -191,10 +191,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	private Integer gid;
 
 	@Basic(optional = false)
-	@Column(name = "methn")
-	private Integer methodId;
-
-	@Basic(optional = false)
 	@Column(name = "gnpgs")
 	@XmlElement(name = "numberOfProgenitors")
 	private Integer gnpgs;
@@ -263,8 +259,8 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	@JoinColumn(name = "gref", insertable = false, updatable = false)
 	private Bibref bibref;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "methn", insertable = false, updatable = false)
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "methn")
 	private Method method;
 
 	@OneToMany(mappedBy = "germplasm", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -331,37 +327,11 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 
 	/**
 	 * This variable is populated when the user tries to search germplasm list.
-	 * Previously, germplasm list is loaded and revisit the DB for each germplasm for getting method name.
-	 * This problem is removed by introducing this variable.
-	 */
-	@Transient
-	private String methodName = null;
-
-	/**
-	 * This variable is populated when the user tries to search germplasm list.
 	 * Previously, germplasm list is loaded and revisit the DB for each germplasm for getting location name.
 	 * This problem is removed by introducing this variable.
 	 */
 	@Transient
 	private String locationName = null;
-
-	/**
-	 * This variable is populated when the user tries to search germplasm list.
-	 */
-	@Transient
-	private String methodNumber = null;
-
-	/**
-	 * This variable is populated when the user tries to search germplasm list.
-	 */
-	@Transient
-	private String methodGroup = null;
-
-	/**
-	 * This variable is populated when the user tries to search germplasm list.
-	 */
-	@Transient
-	private String methodCode = null;
 
 	/**
 	 * This variable is populated when the user tries to search germplasm list.
@@ -454,12 +424,11 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		this.deleted = false;
 	}
 
-	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
+	public Germplasm(final Integer gid, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
 		final Integer lgid, final Integer locationId, final Integer gdate, final Integer referenceId,
 		final Integer grplce, final Integer mgid, final Name preferredName, final String preferredAbbreviation, final Method method) {
 		this(gid);
 		this.gid = gid;
-		this.methodId = methodId;
 		this.gnpgs = gnpgs;
 		this.gpid1 = gpid1;
 		this.gpid2 = gpid2;
@@ -473,13 +442,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		this.preferredAbbreviation = preferredAbbreviation;
 		this.method = method;
 		this.deleted = false;
-	}
-
-	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
-		final Integer lgid, final Integer locationId, final Integer gdate, final Name preferredName) {
-
-		// gref =0, grplce = 0, mgid = 0
-		this(gid, methodId, gnpgs, gpid1, gpid2, lgid, locationId, gdate, 0, 0, 0, preferredName, null, null);
 	}
 
 	//TODO: cleanup - remove it.
@@ -568,14 +530,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		this.mgid = mgid;
 	}
 
-	public Integer getMethodId() {
-		return this.methodId;
-	}
-
-	public void setMethodId(final Integer methodId) {
-		this.methodId = methodId;
-	}
-
 	public Integer getLocationId() {
 		return this.locationId;
 	}
@@ -623,14 +577,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		return this.method;
 	}
 
-	public String getMethodName() {
-		return this.methodName;
-	}
-
-	public void setMethodName(final String methodName) {
-		this.methodName = methodName;
-	}
-
 	public String getLocationName() {
 		return this.locationName;
 	}
@@ -673,8 +619,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Germplasm [gid=");
 		builder.append(this.gid);
-		builder.append(", methodId=");
-		builder.append(this.methodId);
 		builder.append(", gnpgs=");
 		builder.append(this.gnpgs);
 		builder.append(", gpid1=");
@@ -703,8 +647,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		builder.append(this.method);
 		builder.append(", inventoryInfo=");
 		builder.append(this.inventoryInfo);
-		builder.append(", methodName=");
-		builder.append(this.methodName);
 		builder.append(", locationName=");
 		builder.append(this.locationName);
 		builder.append("]");
@@ -773,22 +715,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		this.deleted = deleted;
 	}
 
-	public String getMethodNumber() {
-		return this.methodNumber;
-	}
-
-	public void setMethodNumber(final String methodNumber) {
-		this.methodNumber = methodNumber;
-	}
-
-	public String getMethodGroup() {
-		return this.methodGroup;
-	}
-
-	public void setMethodGroup(final String methodGroup) {
-		this.methodGroup = methodGroup;
-	}
-
 	public String getGermplasmPreferredName() {
 		return this.germplasmPreferredName;
 	}
@@ -827,14 +753,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 
 	public void setMaleParentPreferredID(final String maleParentPreferredID) {
 		this.maleParentPreferredID = maleParentPreferredID;
-	}
-
-	public String getMethodCode() {
-		return this.methodCode;
-	}
-
-	public void setMethodCode(final String methodCode) {
-		this.methodCode = methodCode;
 	}
 
 	public String getGermplasmPreferredId() {
@@ -994,10 +912,8 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		try {
 			germplasm = (Germplasm) super.clone();
 		} catch (final CloneNotSupportedException e) {
-			germplasm = new Germplasm(this.gid, this.methodId, this.gnpgs, this.gpid1, this.gpid2,
-				this.lgid, this.locationId, this.gdate, this.preferredName);
-			germplasm.setMethod((Method) this.method.clone());
-			//TODO Complete with other objects
+			germplasm =  new Germplasm(this.getGid(), this.gnpgs, this.gpid1, this.gpid2, this.lgid, this.locationId, this.gdate,
+				this.referenceId, this.grplce, this.mgid, this.preferredName, this.preferredAbbreviation, this.method);
 		}
 		return germplasm;
 	}

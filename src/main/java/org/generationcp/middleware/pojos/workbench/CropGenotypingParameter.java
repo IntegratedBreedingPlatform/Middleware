@@ -40,6 +40,9 @@ public class CropGenotypingParameter implements Serializable {
 	@Column(name = "program_id")
 	private String programId;
 
+	@Column(name = "base_url")
+	private String baseUrl;
+
 	@Transient
 	private String password;
 
@@ -97,6 +100,14 @@ public class CropGenotypingParameter implements Serializable {
 
 	public void setPassword(final String password) {
 		this.password = password;
+	}
+
+	public String getBaseUrl() {
+		return this.baseUrl;
+	}
+
+	public void setBaseUrl(final String baseUrl) {
+		this.baseUrl = baseUrl;
 	}
 
 	@Override

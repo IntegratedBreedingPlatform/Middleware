@@ -243,7 +243,6 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 				Integer.valueOf(stockModel.getUniqueName()).equals(oldEntry.getEntryNumber())).findFirst().get();
 
 		Assert.assertNotEquals(oldEntry.getEntryId(), newEntry.getStockId());
-		Assert.assertEquals(GERMPLASM_PREFERRED_NAME_PREFIX + 1, newEntry.getName());
 		Assert.assertEquals(newGid, newEntry.getGermplasm().getGid());
 		// Some fields should have been copied from old entry
 		final Optional<StockProperty> entryType =

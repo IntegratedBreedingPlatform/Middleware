@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.dao.util.CommonQueryConstants;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -121,9 +122,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCK = "SELECT count(e.nd_experiment_id) "
 		+ "FROM nd_experiment e INNER JOIN stock s ON s.stock_id = e.stock_id "
+		+ " LEFT JOIN names name ON name.gid = s.dbxref_id AND name.nstat = 1 "
 		+ "WHERE (" + TermId.ENTRY_NO.getId() + "= :variableId AND s.uniquename IS NOT NULL)  OR (" + TermId.GID.getId()
 		+ " = :variableId AND s.dbxref_id IS NOT NULL) "
-		+ "OR (" + TermId.DESIG.getId() + " = :variableId AND s.name IS NOT NULL)";
+		+ "OR (" + TermId.DESIG.getId() + " = :variableId AND name.nval IS NOT NULL)";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP = "SELECT count(e.nd_experiment_id) "
 		+ "FROM nd_experiment e INNER JOIN stockprop sp ON sp.stock_id = e.stock_id "
@@ -218,19 +220,19 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public boolean hasFieldmap(final int datasetId) {
+	public boolean hasFieldLayout(final int datasetId) {
 		try {
 			final String sql =
-				"SELECT COUNT(eprop.value) " + " FROM nd_experiment ep "
-					+ " INNER JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = ep.nd_experiment_id "
-					+ "    AND eprop.type_id = " + TermId.RANGE_NO.getId() + " AND eprop.value <> '' " + " WHERE ep.project_id = "
-					+ datasetId + "  LIMIT 1 ";
+				"SELECT " +  CommonQueryConstants.HAS_FIELD_LAYOUT_EXPRESSION +  " FROM nd_experiment ep "
+					+ " INNER JOIN nd_experimentprop ndep ON ndep.nd_experiment_id = ep.nd_experiment_id "
+					+ " WHERE ep.project_id = :datasetId";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("datasetId", datasetId);
 			final BigInteger count = (BigInteger) query.uniqueResult();
 			return count != null && count.longValue() > 0;
 
 		} catch (final HibernateException e) {
-			final String message = "Error at hasFieldmap=" + datasetId + " query at ExperimentDao: " + e.getMessage();
+			final String message = "Error at hasFieldLayout=" + datasetId + " query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

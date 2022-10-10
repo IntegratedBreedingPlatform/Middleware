@@ -1,0 +1,269 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+		<changeSet author="cheryleigh" id="v22.1.0-1">
+			<preConditions onFail="MARK_RAN">
+				<and>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'BREEDING_METHOD_ABBR' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8254;</sqlCheck>
+					<sqlCheck expectedResult="1">select count(*) from cvterm where name = 'Breeding method' and cv_id = 1010 and is_obsolete = 0 and cvterm_id = 2670;</sqlCheck>
+				</and>
+			</preConditions>
+			<comment>Add 'BREEDING_METHOD_ABBR' as germplasm descriptor</comment>
+			<sql dbms="mysql" splitStatements="true">
+				INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+				VALUES (8254, 1040, 'BREEDING_METHOD_ABBR','Breeding Method Abbreviation', NULL, 0, 0, 1);
+
+				INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+				VALUES
+					(1200, 8254, 2670),
+					(1210, 8254, 4030),
+					(1220, 8254, 6015);
+
+				INSERT INTO cvtermprop (cvterm_id, type_id, value, rank) VALUES
+					(8254, 1800, 'Germplasm Descriptor', 0),
+					(8254, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+			</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v22.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="stock" columnName="name"/>
+		</preConditions>
+		<comment> Remove name column from stock table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE stock
+			DROP COLUMN name;
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v22.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="external_reference_file_metadata"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create external_reference_file_metadata table
+		</comment>
+		<createTable tableName="external_reference_file_metadata">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="file_id" type="int">
+				<constraints nullable="false" foreignKeyName="fk_external_reference_file_metadata" references="file_metadata(file_id)"/>
+			</column>
+			<column name="reference_id" type="varchar(2000)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="reference_source" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_by" type="int" defaultValue="0">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_date" type="timestamp">
+				<constraints nullable="true"/>
+			</column>
+			<column name="modified_by" type="int">
+				<constraints nullable="true" />
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v22.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="atributs_invalid_atype_bkp"/>
+		</preConditions>
+		<comment>
+			Drop table 'atributs_invalid_atype_bkp'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE atributs_invalid_atype_bkp;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v22.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="udflds_attributes_bkp"/>
+		</preConditions>
+		<comment>
+			Drop table 'udflds_attributes_bkp'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE udflds_attributes_bkp;
+		</sql>
+	</changeSet>
+
+    <changeSet author="rowena" id="v22.1.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1"> SELECT COUNT(*)>1 FROM location l1 INNER JOIN location l2 WHERE l1.locid  &lt; l2.locid AND l1.lname = l2.lname AND l1.ltype = l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid = l1.snl1id;</sqlCheck>
+		</preConditions>
+		<comment>
+			Delete location duplicates
+		</comment>
+    	<sql>
+     		UPDATE germplsm g 
+				INNER JOIN location l1 
+				INNER JOIN location l2
+		  		SET glocn = l1.locid
+		  		WHERE g.glocn = l2.locid 
+				AND l1.locid &lt; l2.locid 
+				AND l1.lname = l2.lname 
+		  		AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
+		
+		 	UPDATE atributs a 
+				INNER JOIN location l1 
+				INNER JOIN location l2
+		 		SET a.alocn = l1.locid 
+		 		WHERE a.alocn = l2.locid 
+				AND l1.locid &lt; l2.locid 
+				AND l1.lname = l2.lname 
+		 		AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
+        
+      			UPDATE NAMES a 
+				INNER JOIN location l1 
+				INNER JOIN location l2
+				SET a.nlocn = l1.locid 
+				WHERE a.nlocn = l2.locid 
+				AND l1.locid &lt; l2.locid 
+				AND l1.lname = l2.lname 
+				AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
+			
+			UPDATE ims_lot a 
+				INNER JOIN location l1 
+				INNER JOIN location l2
+		 		SET a.locid= l1.locid 
+		 		WHERE a.locid = l2.locid 
+				AND l1.locid &lt; l2.locid 
+				AND l1.lname = l2.lname 
+		 		AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
+			
+     			UPDATE locdes a 
+				INNER JOIN location l1 
+				INNER JOIN location l2
+     				SET a.locid= l1.locid 
+		 		WHERE a.locid = l2.locid 
+				AND l1.locid &lt; l2.locid 
+				AND l1.lname = l2.lname 
+		 		AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
+			
+			UPDATE nd_geolocationprop n 
+				INNER JOIN location l1 
+				INNER JOIN location l2
+				SET n.value= CAST(l1.locid AS CHAR)
+				WHERE CAST(n.VALUE AS UNSIGNED) = l2.locid
+				AND n.type_id = 8190
+				AND l1.locid &lt;l2.locid 
+				AND l1.lname = l2.lname 
+    				AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id
+				AND n.value is not null and n.value REGEXP '^[0-9]+$'= 1;
+
+			UPDATE  program_favorites f
+				INNER JOIN location l1 
+				INNER JOIN location l2  
+    				SET f.entity_id= l1.locid 
+    				WHERE  f.entity_id = l2.locid  
+				AND l1.locid &lt; l2.locid
+    			 	AND l1.lname = l2.lname 
+				AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+    				AND l1.locid=l1.snl1id 
+				AND entity_type = "LOCATION";
+      
+    			UPDATE atributs_aud g 
+				INNER JOIN location l1 
+				INNER JOIN location l2  
+    				SET g.alocn = l1.locid
+    				WHERE  g.alocn = l2.locid  
+				AND l1.locid &lt; l2.locid
+    				AND l1.lname = l2.lname 
+				AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
+      
+			UPDATE names_aud g 
+				INNER JOIN location l1  
+				INNER JOIN location l2
+				SET g.nlocn =   l1.locid
+				WHERE  g.nlocn = l2.locid  
+				AND l1.locid &lt;l2.locid
+				AND l1.lname = l2.lname 
+				AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
+
+			UPDATE germplsm_aud g 
+				INNER JOIN location l1  
+				INNER JOIN location l2
+				SET g.glocn =   l1.locid
+				WHERE  g.glocn = l2.locid  
+				AND l1.locid &lt;l2.locid
+				AND l1.lname = l2.lname 
+				AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
+
+			UPDATE program_location_default l
+				INNER JOIN location l1  
+				INNER JOIN location l2
+				SET l.breeding_location_id =   l1.locid
+				WHERE  l.breeding_location_id = l2.locid  
+				AND l1.locid &lt;l2.locid
+				AND l1.lname = l2.lname 
+				AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
+			
+			UPDATE program_location_default l
+				INNER JOIN location l1  
+				INNER JOIN location l2
+				SET l.storage_location_id =   l1.locid
+				WHERE  l.storage_location_id = l2.locid  
+				AND l1.locid &lt;l2.locid
+				AND l1.lname = l2.lname 
+				AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
+			
+			DELETE g 
+				FROM georef g 
+				INNER JOIN location l1 
+				INNER JOIN location l2
+				WHERE g.locid = l2.locid 
+				AND l1.locid &lt; l2.locid 
+				AND l1.lname = l2.lname 
+				AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
+			
+			DELETE l2 
+				FROM location l1 
+				INNER JOIN location l2
+				WHERE l1.locid &lt; l2.locid 
+				AND l1.lname = l2.lname 
+				AND l1.ltype= l2.ltype 
+				AND l1.cntryid = l2.cntryid 
+				AND l1.locid=l1.snl1id;
+      			
+        </sql>
+    </changeSet>
+</databaseChangeLog>

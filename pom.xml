@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-        <version>21.5</version>
+        <version>22.1</version>
 	<name>Middleware</name>
 
 	<properties>

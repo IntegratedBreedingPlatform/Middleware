@@ -59,7 +59,7 @@ public interface GermplasmGroupingService {
 	 *
 	 * @param germplasm - the germplasm to copy name to.
 	 */
-	void copyParentalSelectionHistoryAtFixation(Germplasm germplasm);
+	void copyParentalSelectionHistoryAtFixation(Germplasm germplasm, Germplasm parent);
 
 	/**
 	 * Get all group members where the given germplasm is a founder. For the

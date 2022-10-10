@@ -287,7 +287,6 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		this.germplasmDao.save(germplasm);
 
 		final StockModel stockModel = new StockModel();
-		stockModel.setName("Germplasm 1");
 		stockModel.setIsObsolete(false);
 		stockModel.setUniqueName("1");
 		stockModel.setGermplasm(germplasm);
