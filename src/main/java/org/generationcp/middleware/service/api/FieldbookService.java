@@ -594,10 +594,10 @@ public interface FieldbookService {
 		boolean deleteFieldAndBlock);
 
 	/**
-	 * Gets all cvterm Ids by obsolete filter
+	 * Gets all variable ids by obsolete filter
 	 *
 	 * @param obsolete
 	 * @return filtered cvterm ids
 	 */
-	Set<Integer> getTermIdsByObsoleteFilter(boolean obsolete);
+	Set<Integer> getVariableIdsByObsoleteFilter(boolean filterObsolete);
 }

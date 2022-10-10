@@ -2110,19 +2110,4 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 		// TODO Complete
 	}
-
-	public Set<Integer> getIdsByObsoleteFilter(final boolean obsolete) {
-		final List<CVTerm> terms;
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("isObsolete", obsolete ? 1 : 0));
-			terms = criteria.list();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at getNonObsoleteVariables query on CVTermDao", e);
-		}
-
-		return terms.stream().map(CVTerm::getCvTermId).collect(Collectors.toSet());
-	}
 }
