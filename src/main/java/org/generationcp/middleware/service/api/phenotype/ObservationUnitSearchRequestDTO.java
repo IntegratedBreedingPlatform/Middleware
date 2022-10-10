@@ -13,7 +13,7 @@ public class ObservationUnitSearchRequestDTO implements Serializable {
 
 	private List<String> germplasmDbIds;
 	private List<String> locationDbIds;
-	private List<ObservationLevelRelationship> observationLevels;
+	private String observationLevel;
 	private String observationTimeStampRangeStart;
 	private String observationTimeStampRangeEnd;
 	private List<String> observationVariableDbIds;
@@ -41,12 +41,12 @@ public class ObservationUnitSearchRequestDTO implements Serializable {
 		this.observationUnitDbIds = observationUnitDbIds;
 	}
 
-	public List<ObservationLevelRelationship> getObservationLevels() {
-		return this.observationLevels;
+	public String getObservationLevel() {
+		return this.observationLevel;
 	}
 
-	public void setObservationLevels(final List<ObservationLevelRelationship> observationLevels) {
-		this.observationLevels = observationLevels;
+	public void setObservationLevels(final String observationLevel) {
+		this.observationLevel = observationLevel;
 	}
 
 	public List<String> getObservationVariableDbIds() {
