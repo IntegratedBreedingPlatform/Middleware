@@ -1105,7 +1105,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
 		}
 
-		if (requestDTO.getObservationLevels() != null) {
+		if (requestDTO.getObservationLevel() != null) {
 			queryString.append(" AND dataset_type.name = :datasetType ");
 		}
 
@@ -1201,9 +1201,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			sqlQuery.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
 		}
 
-		if (requestDTO.getObservationLevels() != null) {
+		if (requestDTO.getObservationLevel() != null) {
 			sqlQuery.setParameter("datasetType",
-				ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(requestDTO.getObservationLevels()));
+				ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(requestDTO.getObservationLevel()));
 		}
 
 		if (requestDTO.getObservationTimeStampRangeStart() != null) {
