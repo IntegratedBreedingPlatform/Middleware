@@ -36,6 +36,7 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This is the API for Fieldbook requirements.
@@ -591,4 +592,12 @@ public interface FieldbookService {
 
 	List<String> deleteAllFieldMapsByTrialInstanceIds(List<Integer> geolocationId, Integer projectId, boolean deleteProjectProp,
 		boolean deleteFieldAndBlock);
+
+	/**
+	 * Gets all cvterm Ids by obsolete filter
+	 *
+	 * @param obsolete
+	 * @return filtered cvterm ids
+	 */
+	Set<Integer> getTermIdsByObsoleteFilter(boolean obsolete);
 }

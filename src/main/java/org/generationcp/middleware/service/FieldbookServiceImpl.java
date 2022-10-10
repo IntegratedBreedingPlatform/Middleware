@@ -812,4 +812,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			.collect(Collectors.toMap(Germplasm::getGid, Function.identity()));
 	}
 
+	@Override
+	public Set<Integer> getTermIdsByObsoleteFilter(final boolean obsolete) {
+		return this.daoFactory.getCvTermDao().getIdsByObsoleteFilter(obsolete);
+	}
 }
