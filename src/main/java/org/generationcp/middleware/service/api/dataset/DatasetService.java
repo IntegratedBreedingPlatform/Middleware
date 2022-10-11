@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.api.dataset;
 
 import com.google.common.collect.Table;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -429,6 +430,6 @@ public interface DatasetService {
 
 	long countObservationsByVariableIdAndValue(final Integer variableId, final String value);
 
-	void updatePlotDatasetProperties(Integer studyId, List<Integer> variableIds, final String programUUID);
+	void updatePlotDatasetProperties(Integer studyId, PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, final String programUUID);
 
 }

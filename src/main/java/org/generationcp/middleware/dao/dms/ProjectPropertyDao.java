@@ -285,12 +285,12 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		query.executeUpdate();
 	}
 
-	public void deleteProjectNameTypes(final Integer projectId, final List<Integer> fldnos) {
-		final String sql = "DELETE FROM projectprop WHERE project_id = :projectId and fldno IN (:fldnos)";
+	public void deleteProjectNameTypes(final Integer projectId, final List<Integer> nameTypes) {
+		final String sql = "DELETE FROM projectprop WHERE project_id = :projectId and nameType IN (:nameTypes)";
 		final Query query =
 			this.getSession().createSQLQuery(sql);
 		query.setParameter("projectId", projectId);
-		query.setParameterList("fldnos", fldnos);
+		query.setParameterList("nameTypes", nameTypes);
 		query.executeUpdate();
 	}
 
