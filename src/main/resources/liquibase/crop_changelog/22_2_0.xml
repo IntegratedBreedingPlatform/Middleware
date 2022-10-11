@@ -7,12 +7,12 @@
 	<changeSet author="cuenyad" id="v22.2.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<columnExists tableName="projectprop" columnName="fldno"/>
+				<columnExists tableName="projectprop" columnName="nameType"/>
 			</not>
 		</preConditions>
-			<comment>Add 'fldno' column in projectprop</comment>
+			<comment>Add 'nameType' column in projectprop</comment>
 			<sql dbms="mysql" splitStatements="true">
-				ALTER TABLE projectprop ADD COLUMN fldno INT(11) NULL AFTER alias;
+				ALTER TABLE projectprop ADD COLUMN nameType INT(11) NULL AFTER alias;
 			</sql>
 	</changeSet>
 	<changeSet author="cuenyad" id="v22.2.0-2">
