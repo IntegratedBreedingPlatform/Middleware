@@ -428,6 +428,13 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 				}
 
 				final String variableType = filter.getVariableTypeMap().get(variableId);
+
+				if(null == variableType){
+					final String finalId = variableId.replace("-", "");
+					queryParams.put(finalId + "_text", "%" + filteredTextValues.get(variableId) + "%");
+					continue;
+				}
+
 				if (!VariableType.GERMPLASM_ATTRIBUTE.name().equals(variableType) &&
 					!VariableType.GERMPLASM_PASSPORT.name().equals(variableType) &&
 					factorsFilterMap.get(variableId) == null) {
@@ -481,6 +488,12 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		if (VariableType.GERMPLASM_PASSPORT.name().equals(variableType) || VariableType.GERMPLASM_ATTRIBUTE.name().equals(variableType)) {
 			final String alias = this.formatVariableAlias(variableId);
 			sql.append(String.format(" AND %s.aval LIKE :%s_text", alias, variableId));
+			return;
+		}
+
+		if (null == variableType) {
+			final String alias = String.format("NAME_%s", variableId);
+			sql.append(String.format(" AND %s.nval LIKE :%s_text", alias, variableId));
 			return;
 		}
 
