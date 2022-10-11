@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -340,9 +341,17 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				projectVariableIds.contains(column.getId())))
 			.collect(Collectors.toList());
 
+		final List<Integer> namTypeIds = plotDataset.getProperties().stream()
+			.filter(projectProperty -> projectProperty.getTypeId() == null  &&
+				projectProperty.getVariableId() == null  &&
+				projectProperty.getNameType() != null)
+			.map(ProjectProperty::getNameType)
+			.collect(Collectors.toList());
+
 		final List<StockModel> entries = this.daoFactory.getStockDao().getStocksForStudy(studyId);
 		final List<Integer> gids = entries.stream().map(stockModel -> stockModel.getGermplasm().getGid()).collect(toList());
 		final List<Attribute> attributes = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(gids);
+		final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids);
 		if (!CollectionUtils.isEmpty(attributes)) {
 			final VariableFilter variableFilter = new VariableFilter();
 			variableFilter.setProgramUuid(programUUID);
@@ -367,6 +376,15 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			columns.addAll(germplasmAttributeColumns);
 		}
 
+		if (!CollectionUtils.isEmpty(nameTypes)) {
+			final List<StudyEntryColumnDTO> nameColumns =
+				nameTypes.stream()
+					.map(nameType ->
+						new StudyEntryColumnDTO(nameType.getFldno(), nameType.getFcode(), null, null, namTypeIds.contains(nameType.getFldno())))
+					.collect(toList());
+			columns.addAll(nameColumns);
+		}
+
 		return columns;
 	}
 
@@ -382,6 +400,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 					VariableType.GERMPLASM_DESCRIPTOR.getId(),
 					VariableType.ENTRY_DETAIL.getId()));
 		variables.removeIf(variable -> variable.getTermId() == TermId.OBS_UNIT_ID.getId());
+
+		final List<MeasurementVariable> nameTypes = this.datasetService.getNameTypes(studyId, plotDatasetId);
+		variables.addAll(nameTypes);
 		return variables;
 	}
 
