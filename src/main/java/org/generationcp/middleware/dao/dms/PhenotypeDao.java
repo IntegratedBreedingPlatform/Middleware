@@ -1105,10 +1105,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
 		}
 
-		if (requestDTO.getObservationLevel() != null) {
-			queryString.append(" AND dataset_type.name = :datasetType ");
-		}
-
 		if (requestDTO.getObservationTimeStampRangeStart() != null) {
 			queryString.append(" AND exists(SELECT 1 "
 				+ "             FROM phenotype ph "
@@ -1156,16 +1152,16 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append(" AND cvtermSeason.cvterm_id IN (:seasonDbIds) ");
 		}
 
-		if (!CollectionUtils.isEmpty(requestDTO.getObservationLevelRelationships())) {
-			queryString.append(handleObservationLevelRelationshipsFilter(requestDTO));
+		if (!CollectionUtils.isEmpty(requestDTO.getObservationLevels())) {
+			queryString.append(handleObservationLevelsFilter(requestDTO));
 		}
 
 		queryString.append(" ORDER BY nde.nd_experiment_id ");
 	}
 
-	private static StringBuilder handleObservationLevelRelationshipsFilter(final ObservationUnitSearchRequestDTO requestDTO) {
+	private static StringBuilder handleObservationLevelsFilter(final ObservationUnitSearchRequestDTO requestDTO) {
 		final StringBuilder queryString = new StringBuilder();
-		final List<String> observationLevelCodes = requestDTO.getObservationLevelRelationships()
+		final List<String> observationLevelCodes = requestDTO.getObservationLevels()
 			.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelCode()))
 			.map(ObservationLevelRelationship::getLevelCode)
 			.collect(Collectors.toList());
@@ -1176,14 +1172,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 
 		// dataset type name filter from observation level names
-		final Set<String> datasetTypeNames = requestDTO.getObservationLevelRelationships()
+		final Set<String> datasetTypeNames = requestDTO.getObservationLevels()
 			.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelName()))
 			.map(obs -> ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(obs.getLevelName()))
 			.collect(Collectors.toSet());
 
 		if (!CollectionUtils.isEmpty(datasetTypeNames)) {
 			queryString.append(" AND dataset_type.name IN (:datasetTypeNames) ");
-			requestDTO.setDatasetTypeNames(datasetTypeNames);
+			requestDTO.setDatasetTypeNames(new ArrayList<>(datasetTypeNames));
 		}
 
 		return queryString;
@@ -1199,11 +1195,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		if (!CollectionUtils.isEmpty(requestDTO.getStudyDbIds())) {
 			sqlQuery.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
-		}
-
-		if (requestDTO.getObservationLevel() != null) {
-			sqlQuery.setParameter("datasetType",
-				ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(requestDTO.getObservationLevel()));
 		}
 
 		if (requestDTO.getObservationTimeStampRangeStart() != null) {

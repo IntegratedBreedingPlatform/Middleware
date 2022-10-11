@@ -9,6 +9,7 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.List;
 
 @AutoProperty
+@Deprecated
 public class ObservationUnitsSearchRequestDto extends SearchRequestDto {
 
 	private List<String> germplasmDbIds;

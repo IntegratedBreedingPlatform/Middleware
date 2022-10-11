@@ -1,19 +1,18 @@
 package org.generationcp.middleware.service.api.phenotype;
 
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 
 @AutoProperty
-public class ObservationUnitSearchRequestDTO implements Serializable {
+public class ObservationUnitSearchRequestDTO extends SearchRequestDto {
 
 	private List<String> germplasmDbIds;
 	private List<String> locationDbIds;
-	private String observationLevel;
+	private List<ObservationLevelRelationship> observationLevels;
 	private String observationTimeStampRangeStart;
 	private String observationTimeStampRangeEnd;
 	private List<String> observationVariableDbIds;
@@ -31,7 +30,7 @@ public class ObservationUnitSearchRequestDTO implements Serializable {
 
 	// extracted from observation level relationships
 	private List<String> observationLevelCodes;
-	private Set<String> datasetTypeNames;
+	private List<String> datasetTypeNames;
 
 	public List<String> getObservationUnitDbIds() {
 		return this.observationUnitDbIds;
@@ -39,14 +38,6 @@ public class ObservationUnitSearchRequestDTO implements Serializable {
 
 	public void setObservationUnitDbIds(final List<String> observationUnitDbIds) {
 		this.observationUnitDbIds = observationUnitDbIds;
-	}
-
-	public String getObservationLevel() {
-		return this.observationLevel;
-	}
-
-	public void setObservationLevels(final String observationLevel) {
-		this.observationLevel = observationLevel;
 	}
 
 	public List<String> getObservationVariableDbIds() {
@@ -178,12 +169,21 @@ public class ObservationUnitSearchRequestDTO implements Serializable {
 		this.observationLevelCodes = observationLevelCodes;
 	}
 
-	public Set<String> getDatasetTypeNames() {
+	public List<String> getDatasetTypeNames() {
 		return this.datasetTypeNames;
 	}
 
-	public void setDatasetTypeNames(final Set<String> datasetTypeNames) {
+	public void setDatasetTypeNames(final List<String> datasetTypeNames) {
 		this.datasetTypeNames = datasetTypeNames;
+	}
+
+	public List<ObservationLevelRelationship> getObservationLevels() {
+		return this.observationLevels;
+	}
+
+	public void setObservationLevels(
+		final List<ObservationLevelRelationship> observationLevels) {
+		this.observationLevels = observationLevels;
 	}
 
 	@Override

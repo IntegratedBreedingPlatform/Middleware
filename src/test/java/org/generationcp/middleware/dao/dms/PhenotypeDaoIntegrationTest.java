@@ -15,6 +15,7 @@ package org.generationcp.middleware.dao.dms;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
@@ -484,7 +485,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		// Search by Dataset Type, just for current program
 		final ObservationUnitSearchRequestDTO dto6 = new ObservationUnitSearchRequestDTO();
 		dto6.setProgramDbIds(Collections.singletonList(uniqueID));
-		dto6.setObservationLevels(ObservationLevelEnum.PLOT.getLevelName());
+		dto6.setObservationLevels(Arrays.asList(new ObservationLevelRelationship(null, null,
+			ObservationLevelEnum.PLOT.getLevelName(), null)));
 		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countObservationUnits(dto6));
 	}
 
