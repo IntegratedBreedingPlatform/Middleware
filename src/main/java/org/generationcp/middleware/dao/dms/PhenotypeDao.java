@@ -1105,6 +1105,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
 		}
 
+		if (requestDTO.getObservationLevel() != null) {
+			queryString.append(" AND dataset_type.name = :datasetType ");
+		}
+
 		if (requestDTO.getObservationTimeStampRangeStart() != null) {
 			queryString.append(" AND exists(SELECT 1 "
 				+ "             FROM phenotype ph "
@@ -1195,6 +1199,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		if (!CollectionUtils.isEmpty(requestDTO.getStudyDbIds())) {
 			sqlQuery.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
+		}
+
+		if (requestDTO.getObservationLevel() != null) {
+			sqlQuery.setParameter("datasetType",
+				ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(requestDTO.getObservationLevel()));
 		}
 
 		if (requestDTO.getObservationTimeStampRangeStart() != null) {

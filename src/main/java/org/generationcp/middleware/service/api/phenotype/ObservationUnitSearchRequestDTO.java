@@ -1,7 +1,10 @@
 package org.generationcp.middleware.service.api.phenotype;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -13,23 +16,33 @@ public class ObservationUnitSearchRequestDTO extends SearchRequestDto {
 	private List<String> germplasmDbIds;
 	private List<String> locationDbIds;
 	private List<ObservationLevelRelationship> observationLevels;
-	private String observationTimeStampRangeStart;
-	private String observationTimeStampRangeEnd;
 	private List<String> observationVariableDbIds;
 	private Integer page;
 	private Integer pageSize;
 	private List<String> studyDbIds;
 	private List<String> programDbIds;
 	private List<String> trialDbIds;
-	private List<String> seasonDbIds;
 	private List<ObservationLevelRelationship> observationLevelRelationships;
 	private Boolean includeObservations = false;
 	private List<String> observationUnitDbIds;
 	private List<String> externalReferenceIDs;
 	private List<String> externalReferenceSources;
 
+
+	// v1 only fields
+	@JsonIgnore
+	private String observationTimeStampRangeStart;
+	@JsonIgnore
+	private String observationTimeStampRangeEnd;
+	@JsonIgnore
+	private List<String> seasonDbIds;
+	@JsonIgnore
+	private String observationLevel;
+
 	// extracted from observation level relationships
+	@JsonIgnore
 	private List<String> observationLevelCodes;
+	@JsonIgnore
 	private List<String> datasetTypeNames;
 
 	public List<String> getObservationUnitDbIds() {
@@ -184,6 +197,14 @@ public class ObservationUnitSearchRequestDTO extends SearchRequestDto {
 	public void setObservationLevels(
 		final List<ObservationLevelRelationship> observationLevels) {
 		this.observationLevels = observationLevels;
+	}
+
+	public String getObservationLevel() {
+		return this.observationLevel;
+	}
+
+	public void setObservationLevel(final String observationLevel) {
+		this.observationLevel = observationLevel;
 	}
 
 	@Override
