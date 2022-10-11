@@ -1701,4 +1701,18 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 		}
 	}
+
+	@Override
+	public List<MeasurementVariable> getNameTypes(final int studyId, final int datasetId) {
+		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+
+		return plotDataset.getProperties().stream()
+			.filter(projectProperty -> projectProperty.getTypeId() == null  &&
+				projectProperty.getVariableId() == null  &&
+				projectProperty.getNameType() != null)
+			.map(projectProperty -> new MeasurementVariable(projectProperty.getAlias(), projectProperty.getNameType(), null, projectProperty.getAlias()))
+
+			.collect(Collectors.toList());
+
+	}
 }

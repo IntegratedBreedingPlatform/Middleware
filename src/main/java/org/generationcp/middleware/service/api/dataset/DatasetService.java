@@ -432,4 +432,5 @@ public interface DatasetService {
 
 	void updatePlotDatasetProperties(Integer studyId, PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, final String programUUID);
 
+	List<MeasurementVariable> getNameTypes(int studyId, int datasetId);
 }
