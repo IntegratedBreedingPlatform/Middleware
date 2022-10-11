@@ -249,4 +249,16 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		}
 	}
 
+	public List<UserDefinedField> getByFldnos(final Set<String> fldno) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
+			criteria.add(Restrictions.in("fldno", fldno));
+			criteria.addOrder(Order.asc("fname"));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error executing UserDefinedFieldDAO.getByName(fldno={}) : {}";
+			UserDefinedFieldDAO.LOG.error(message, fldno, e.getMessage());
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }
