@@ -279,6 +279,10 @@ public class DatasetServiceImpl implements DatasetService {
 			sortedColumns.add(this.addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR, null, true));
 		}
 
+		final List<MeasurementVariable> nameTypes = this.getNameTypes(studyId, observationSetIdSupplier.get());
+		nameTypes.sort(Comparator.comparing(MeasurementVariable::getName));
+		sortedColumns.addAll(nameTypes);
+
 		passports.sort(Comparator.comparing(MeasurementVariable::getName));
 		sortedColumns.addAll(passports);
 		attributes.sort(Comparator.comparing(MeasurementVariable::getName));
@@ -769,6 +773,16 @@ public class DatasetServiceImpl implements DatasetService {
 				this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(observationSetId,
 					VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId());
 			searchDTO.setPassportAndAttributes(passportAndAttributes);
+
+			final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+
+			searchDTO.setNameTypes(plotDataset.getProperties().stream()
+				.filter(projectProperty -> projectProperty.getTypeId() == null  &&
+					projectProperty.getVariableId() == null  &&
+					projectProperty.getNameType() != null)
+				.map(projectProperty ->
+					new MeasurementVariableDto(projectProperty.getNameType(), projectProperty.getAlias()))
+				.collect(Collectors.toList()));
 		}
 	}
 
