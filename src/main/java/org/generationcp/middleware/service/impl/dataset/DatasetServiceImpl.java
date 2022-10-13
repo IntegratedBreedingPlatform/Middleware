@@ -1710,7 +1710,8 @@ public class DatasetServiceImpl implements DatasetService {
 			.filter(projectProperty -> projectProperty.getTypeId() == null  &&
 				projectProperty.getVariableId() == null  &&
 				projectProperty.getNameType() != null)
-			.map(projectProperty -> new MeasurementVariable(projectProperty.getAlias(), projectProperty.getNameType(), null, projectProperty.getAlias()))
+			.map(projectProperty ->
+				new MeasurementVariable(projectProperty.getAlias(), projectProperty.getNameType(), null, projectProperty.getAlias(), true))
 
 			.collect(Collectors.toList());
 
