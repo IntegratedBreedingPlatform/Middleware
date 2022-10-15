@@ -344,8 +344,8 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final List<Integer> namTypeIds = plotDataset.getProperties().stream()
 			.filter(projectProperty -> projectProperty.getTypeId() == null  &&
 				projectProperty.getVariableId() == null  &&
-				projectProperty.getNameType() != null)
-			.map(ProjectProperty::getNameType)
+				projectProperty.getNameFldno() != null)
+			.map(ProjectProperty::getNameFldno)
 			.collect(Collectors.toList());
 
 		final List<StockModel> entries = this.daoFactory.getStockDao().getStocksForStudy(studyId);
