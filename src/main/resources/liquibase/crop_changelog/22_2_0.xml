@@ -10,9 +10,10 @@
 				<columnExists tableName="projectprop" columnName="nameType"/>
 			</not>
 		</preConditions>
-			<comment>Add 'nameType' column in projectprop</comment>
+			<comment>Add 'name_fldno' column in projectprop</comment>
 			<sql dbms="mysql" splitStatements="true">
-				ALTER TABLE projectprop ADD COLUMN nameType INT(11) NULL AFTER alias;
+				ALTER TABLE projectprop ADD COLUMN name_fldno INT(11) NULL AFTER variable_id,
+				ADD CONSTRAINT fk_projectprop_udflds FOREIGN KEY (name_fldno) REFERENCES udflds (fldno);
 			</sql>
 	</changeSet>
 	<changeSet author="cuenyad" id="v22.2.0-2">
@@ -20,7 +21,7 @@
 			<columnExists tableName="projectprop" columnName="type_id"/>
 			<columnExists tableName="projectprop" columnName="variable_id"/>
 		</preConditions>
-			<comment>make type_id and variable_id columns nullable from projectprop table</comment>
+			<comment>Make type_id and variable_id columns nullable from projectprop table</comment>
 			<sql dbms="mysql" splitStatements="true">
 				ALTER TABLE projectprop
 				CHANGE COLUMN type_id type_id INT(11) NULL,
