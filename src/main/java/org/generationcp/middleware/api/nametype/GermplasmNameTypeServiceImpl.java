@@ -170,4 +170,14 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 		this.daoFactory.getUserDefinedFieldDAO().makeTransient(userDefinedField);
 	}
 
+	@Override
+	public NameTypeMetaData getNameTypeMetaData(final Integer nameTypeId) {
+		final NameTypeMetaData nameTypeMetadata = new NameTypeMetaData();
+
+		nameTypeMetadata.setGermplasm(this.daoFactory.getNameDao().countNameTypeInUse(nameTypeId));
+		nameTypeMetadata.setStudies(this.daoFactory.getProjectPropertyDAO().countNameTypeInUse(nameTypeId));
+		nameTypeMetadata.setGermplasmList(this.daoFactory.getGermplasmListDataViewDAO().countNameTypeInUse(nameTypeId));
+		return nameTypeMetadata;
+	}
+
 }
