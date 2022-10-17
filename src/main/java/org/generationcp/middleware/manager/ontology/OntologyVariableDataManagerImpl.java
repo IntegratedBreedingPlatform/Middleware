@@ -48,6 +48,7 @@ import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.type.BooleanType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -308,6 +309,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 						+ " where l.lotid in (:lotIds) and a.atype = v.cvterm_id) ";
 					listParameters.put(LOT_IDS, lotIds);
 				}
+
+				// check if obsolete variables should be filtered
+				if (!variableFilter.isShowObsoletes()) {
+					filterClause += " and v.is_obsolete = 0 ";
+				}
 			}
 
 			final String selectQueryProgramUUIDDependant;
@@ -326,7 +332,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			// this query will get variables using filter
 			final SQLQuery query = this.getActiveSession()
 				.createSQLQuery(
-					"select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, v.is_system is_system, "
+					"select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, v.is_system is_system,  v.is_obsolete obsolete, "
 						+ selectQueryProgramUUIDDependant
 						+ "from cvterm v "
 						+ "left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
@@ -338,7 +344,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				.addScalar("mn").addScalar("md").addScalar("sid").addScalar("sn").addScalar("sd").addScalar("is_system")
 				.addScalar("p_alias")
 				.addScalar("p_min_value")
-				.addScalar("p_max_value").addScalar("fid");
+				.addScalar("p_max_value").addScalar("fid")
+				.addScalar("obsolete", BooleanType.INSTANCE);
 
 			if (variableFilter.getProgramUuid() != null) {
 				query.setParameter("programUuid", variableFilter.getProgramUuid());
@@ -393,6 +400,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				variable.setMaxValue((StringUtils.isEmpty(pExpMax)) ? null : pExpMax);
 
 				variable.setIsFavorite(items[16] != null);
+				variable.setObsolete((Boolean) items[17]);
 				map.put(variable.getId(), variable);
 			}
 
@@ -519,6 +527,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 			final Variable variable = new Variable(Term.fromCVTerm(term));
 			variable.setIsSystem(term.getIsSystem());
+			variable.setObsolete(term.isObsolete());
 			// load scale, method and property data
 			final List<CVTermRelationship> relationships = this.daoFactory.getCvTermRelationshipDao().getBySubject(term.getCvTermId());
 			for (final CVTermRelationship r : relationships) {
@@ -719,6 +728,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		if (!(variableInfo.getName().equals(term.getName()) && Objects.equals(variableInfo.getDescription(), term.getDefinition()))) {
 			term.setName(variableInfo.getName());
 			term.setDefinition(variableInfo.getDescription());
+			this.daoFactory.getCvTermDao().merge(term);
+		}
+
+		// Updating isObsolete to database
+		if (!(variableInfo.isObsolete().equals(term.isObsolete()))) {
+			term.setIsObsolete(variableInfo.isObsolete());
 			this.daoFactory.getCvTermDao().merge(term);
 		}
 

@@ -145,4 +145,12 @@ public class OntologyVariableInfo {
 	public void setIsFavorite(Boolean isFavorite) {
 		this.isFavorite = isFavorite;
 	}
+
+	public Boolean isObsolete() {
+		return this.term.isObsolete();
+	}
+
+	public void setObsolete(Boolean obsolete) {
+		this.term.setObsolete(obsolete);
+	}
 }
