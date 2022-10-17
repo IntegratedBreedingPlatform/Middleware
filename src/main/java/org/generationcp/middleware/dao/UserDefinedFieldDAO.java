@@ -173,6 +173,35 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		}
 	}
 
+	public List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> getNameTypeFromDataset(final Integer datasetId) {
+		if (datasetId == null) {
+			return Collections.emptyList();
+		}
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery("SELECT " //
+				+ "   u.fcode AS code," //
+				+ "   u.fldno AS id," //
+				+ "   u.fname AS name," //
+				+ "   u.fdesc AS description" //
+				+ " FROM  udflds u inner join projectprop pp on pp.name_fldno = u.fldno" //
+				+ " WHERE u.ftable = '" + UDTableType.NAMES_NAME.getTable() + "'" //
+				+ "   and u.ftype = '" + UDTableType.NAMES_NAME.getType() + "'"
+				+ "   and pp.project_id = :projectId"
+				+ "   group by u.fldno");
+
+			sqlQuery.setParameter("projectId", datasetId);
+			sqlQuery.addScalar("code");
+			sqlQuery.addScalar("id");
+			sqlQuery.addScalar("name");
+			sqlQuery.addScalar("description");
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO.class));
+
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with searchNameTypes(projecId=" + datasetId + "): " + e.getMessage(), e);
+		}
+	}
+
 	public long countSearchNameTypes(final NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest) {
 		final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 		criteria.setProjection(Projections.rowCount());

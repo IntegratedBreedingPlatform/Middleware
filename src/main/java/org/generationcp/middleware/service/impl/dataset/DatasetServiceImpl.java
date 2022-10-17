@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.constant.ColumnLabels;
@@ -279,9 +280,12 @@ public class DatasetServiceImpl implements DatasetService {
 			sortedColumns.add(this.addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR, null, true));
 		}
 
-		final List<MeasurementVariable> nameTypes = this.getNameTypes(studyId, observationSetIdSupplier.get());
-		nameTypes.sort(Comparator.comparing(MeasurementVariable::getName));
-		sortedColumns.addAll(nameTypes);
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.getDatasetNameTypes(observationSetIdSupplier.get());
+		germplasmNameTypeDTOs.sort(Comparator.comparing(GermplasmNameTypeDTO::getCode));
+		sortedColumns.addAll(germplasmNameTypeDTOs.stream().map(germplasmNameTypeDTO ->
+				new MeasurementVariable(germplasmNameTypeDTO.getCode(), germplasmNameTypeDTO.getDescription(), germplasmNameTypeDTO.getId(), null,
+					germplasmNameTypeDTO.getCode(), true)) //
+			.collect(Collectors.toSet()));
 
 		passports.sort(Comparator.comparing(MeasurementVariable::getName));
 		sortedColumns.addAll(passports);
@@ -1717,17 +1721,12 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getNameTypes(final int studyId, final int datasetId) {
-		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+	public List<GermplasmNameTypeDTO> getDatasetNameTypes(final Integer datasetId) {
+		return this.daoFactory.getUserDefinedFieldDAO().getNameTypeFromDataset(datasetId);
+	}
 
-		return plotDataset.getProperties().stream()
-			.filter(projectProperty -> projectProperty.getTypeId() == null  &&
-				projectProperty.getVariableId() == null  &&
-				projectProperty.getNameType() != null)
-			.map(projectProperty ->
-				new MeasurementVariable(projectProperty.getAlias(), projectProperty.getNameType(), null, projectProperty.getAlias(), true))
-
-			.collect(Collectors.toList());
-
+	@Override
+	public void deleteNameTypeFromStudies(final Integer nameTypeId) {
+		this.daoFactory.getProjectPropertyDAO().deleteNameTypeFromStudies(nameTypeId);
 	}
 }

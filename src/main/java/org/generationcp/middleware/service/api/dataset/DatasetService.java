@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.api.dataset;
 
 import com.google.common.collect.Table;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -432,5 +433,7 @@ public interface DatasetService {
 
 	void updatePlotDatasetProperties(Integer studyId, PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, final String programUUID);
 
-	List<MeasurementVariable> getNameTypes(int studyId, int datasetId);
+	List<GermplasmNameTypeDTO> getDatasetNameTypes(Integer datasetId);
+
+	void deleteNameTypeFromStudies(Integer nameTypeId);
 }
