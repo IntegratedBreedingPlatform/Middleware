@@ -387,17 +387,26 @@ public interface DatasetService {
 	 * @param filter    Filter
 	 * @return FilteredPhenotypesInstancesCountDTO
 	 */
-	FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
+	FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndObservationUnits(
 		Integer datasetId, ObservationUnitsSearchDTO filter);
 
 	/**
-	 * Set an specific variable to an specific variable
+	 * Set value to a specific variable
 	 *
 	 * @param datasetId
 	 * @param searchDTO
 	 * @param studyId
 	 */
 	void setValueToVariable(Integer datasetId, ObservationUnitsParamDTO searchDTO, Integer studyId);
+
+	/**
+	 * Delete specific variable value
+	 *
+	 * @param datasetId
+	 * @param searchDTO
+	 * @param studyId
+	 */
+	void deleteVariableValues(Integer studyId, Integer datasetId, ObservationUnitsSearchDTO searchDTO);
 
 	boolean allDatasetIdsBelongToStudy(Integer studyId, List<Integer> datasetIds);
 

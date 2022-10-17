@@ -207,7 +207,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(final Integer datasetId,
+	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndObservationUnits(final Integer datasetId,
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
 
 		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.getFilter();
@@ -237,6 +237,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					+ filterByVariableSQL
 					+ "         and (ph.draft_value is not null "
 					+ "                or ph.draft_cvalue_id is not null)) ");
+			} else if (Boolean.TRUE.equals(filter.getVariableHasValue())) {
+				sql.append(" and exists(select 1"
+					+ "   from phenotype ph"
+					+ "   where ph.nd_experiment_id = nde.nd_experiment_id "
+					+ filterByVariableSQL
+					+ "         and (ph.value is not null "
+					+ "                or ph.cvalue_id is not null)) ");
 			}
 
 			this.addFilters(sql, filter, observationUnitsSearchDTO.getDraftMode());
@@ -736,7 +743,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		if (!CollectionUtils.isEmpty(searchDto.getPassportAndAttributes())) {
-			for (MeasurementVariableDto measurementVariable : searchDto.getPassportAndAttributes()) {
+			for (final MeasurementVariableDto measurementVariable : searchDto.getPassportAndAttributes()) {
 				final String alias = this.formatVariableAlias(measurementVariable.getId());
 				columns.add(String.format("%1$s.aval AS %1$s", alias));
 			}
@@ -1434,7 +1441,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		if (StringUtils.isNotBlank(femaleName) || StringUtils.isNotBlank(femaleGid)) {
-			StringBuilder sql = new StringBuilder("select g.gid from names n \n");//
+			final StringBuilder sql = new StringBuilder("select g.gid from names n \n");//
 			sql.append("   straight_join germplsm female_parent on n.gid = female_parent.gid \n");//
 			sql.append("   straight_join germplsm group_source on female_parent.gid = group_source.gpid1 and group_source.gnpgs > 0 \n");//
 			sql.append("   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n");  //
@@ -1463,7 +1470,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		if (StringUtils.isNotBlank(maleName) || StringUtils.isNotBlank(maleGid)) {
-			StringBuilder sql = new StringBuilder("select g.gid from names n \n");//
+			final StringBuilder sql = new StringBuilder("select g.gid from names n \n");//
 			sql.append("   straight_join germplsm male_parent on n.gid = male_parent.gid \n");//
 			sql.append("   straight_join germplsm group_source on male_parent.gid = group_source.gpid2 and group_source.gnpgs > 0 \n");//
 			sql.append("   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n");  //
