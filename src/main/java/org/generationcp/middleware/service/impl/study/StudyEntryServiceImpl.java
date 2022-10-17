@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -401,8 +402,16 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 					VariableType.ENTRY_DETAIL.getId()));
 		variables.removeIf(variable -> variable.getTermId() == TermId.OBS_UNIT_ID.getId());
 
-		final List<MeasurementVariable> nameTypes = this.datasetService.getNameTypes(studyId, plotDatasetId);
-		variables.addAll(nameTypes);
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.datasetService.getDatasetNameTypes(plotDatasetId);
+		germplasmNameTypeDTOs.sort(Comparator.comparing(GermplasmNameTypeDTO::getCode));
+		variables.addAll(germplasmNameTypeDTOs.stream().map(
+			germplasmNameTypeDTO -> //
+				new MeasurementVariable(germplasmNameTypeDTO.getCode(), //
+					germplasmNameTypeDTO.getDescription(), //
+					germplasmNameTypeDTO.getId(), null, //
+					germplasmNameTypeDTO.getCode(), true)) //
+			.collect(Collectors.toSet()));
+
 		return variables;
 	}
 
