@@ -76,4 +76,6 @@ public enum PermissionsEnum {
 		+ ", 'IMPORT_GERMPLASM')";
 
 	public static final List<String> SITE_ADMIN_PERMISSIONS = Arrays.asList(SITE_ADMIN.name(), ADMINISTRATION.name(), ADMIN.name());
+
+	public static final List<String> MANAGE_STUDIES_PERMISSIONS = Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name());
 }
