@@ -30,7 +30,6 @@ import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -813,11 +812,4 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			.collect(Collectors.toMap(Germplasm::getGid, Function.identity()));
 	}
 
-	@Override
-	public Set<Integer> getVariableIdsByObsoleteFilter(final boolean filterObsolete) {
-
-		final List<CVTerm> variables = this.daoFactory.getCvTermDao()
-			.getAllByCvId(CvId.VARIABLES, filterObsolete);
-		return variables.stream().map(CVTerm::getCvTermId).collect(Collectors.toSet());
-	}
 }
