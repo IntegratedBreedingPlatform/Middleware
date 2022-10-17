@@ -6,7 +6,16 @@
 
 	<changeSet author="cheryleigh" id="v22.2.0-1">
 		<preConditions onFail="MARK_RAN">
-			<indexExists tableName="cvterm" indexName="cvterm_idx1"/>
+			<and>
+				<indexExists tableName="cvterm" indexName="cvterm_idx1"/>
+				<sqlCheck expectedResult="0">
+					select count(1)
+ 					from (select 1
+						from cvterm
+						group by cv_id, name
+						having count(1) > 1) as non_unique;
+				</sqlCheck>
+			</and>
 		</preConditions>
 		<comment>Remove is_obsolete in cvterm unique index</comment>
 		<dropIndex tableName="cvterm" indexName="cvterm_idx1"></dropIndex>
