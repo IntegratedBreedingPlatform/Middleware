@@ -167,4 +167,9 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	public Map<Integer, String> getPreferredNamesByGIDs(final List<Integer> gids) {
 		return this.daoFactory.getNameDao().getPreferredNamesByGIDs(gids);
 	}
+
+	@Override
+	public boolean isNameTypeUsedInStudies(final Integer nameTypeId) {
+		return this.daoFactory.getProjectPropertyDAO().countNameTypeInUse(nameTypeId) > 0;
+	}
 }
