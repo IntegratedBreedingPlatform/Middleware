@@ -779,9 +779,9 @@ public class DatasetServiceImpl implements DatasetService {
 			searchDTO.setNameTypes(plotDataset.getProperties().stream()
 				.filter(projectProperty -> projectProperty.getTypeId() == null  &&
 					projectProperty.getVariableId() == null  &&
-					projectProperty.getNameType() != null)
+					projectProperty.getNameFldno() != null)
 				.map(projectProperty ->
-					new MeasurementVariableDto(projectProperty.getNameType(), projectProperty.getAlias()))
+					new MeasurementVariableDto(projectProperty.getNameFldno(), projectProperty.getAlias()))
 				.collect(Collectors.toList()));
 		}
 	}
@@ -1452,8 +1452,8 @@ public class DatasetServiceImpl implements DatasetService {
 			.stream()
 			.filter(projectProperty -> projectProperty.getTypeId() == null  &&
 				projectProperty.getVariableId() == null  &&
-				projectProperty.getNameType() != null)
-			.map(ProjectProperty::getNameType)
+				projectProperty.getNameFldno() != null)
+			.map(ProjectProperty::getNameFldno)
 			.collect(Collectors.toList());
 
 		final List<Integer> newNameTypeIds = plotDatasetPropertiesDTO.getNameTypeIds().stream()
