@@ -13,7 +13,6 @@ package org.generationcp.middleware.ruleengine.pojo;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.pojos.Method;
@@ -30,7 +29,6 @@ import java.util.Map;
  *
  */
 
-// TODO: create an abstract class which implements an interface -> add originGermplasm
 @Deprecated
 public class AdvancingSource extends AbstractAdvancingSource {
 
@@ -47,9 +45,6 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	private String studyName;
 	private Integer studyId;
 	private Integer environmentDatasetId;
-	// TODO: move to abstract
-	private String season;
-	private String locationAbbreviation;
 	private String rootName;
 	private Method sourceMethod;
 	private int currentMaxSequence;
@@ -57,13 +52,7 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	private String prefix;
 	private String suffix;
 	private Integer rootNameType;
-	// TODO: move to abstract
-	private Integer harvestLocationId;
 	private String plotNumber;
-    private String selectionTraitValue;
-    
-    private String trialInstanceNumber;
-    private String replicationNumber;
 
 	private int maleGid;
 
@@ -71,8 +60,6 @@ public class AdvancingSource extends AbstractAdvancingSource {
 
 	private boolean isForceUniqueNameGeneration;
 
-	//This will be used to store conditions
-	private List<MeasurementVariable> conditions;
 	//This will be used if we have trail
 	private MeasurementRow trailInstanceObservation;
 
@@ -219,34 +206,6 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	}
 
 	/**
-	 * @return the season
-	 */
-	public String getSeason() {
-		return this.season;
-	}
-
-	/**
-	 * @param season the season to set
-	 */
-	public void setSeason(final String season) {
-		this.season = season;
-	}
-
-	/**
-	 * @return the locationAbbreviation
-	 */
-	public String getLocationAbbreviation() {
-		return this.locationAbbreviation;
-	}
-
-	/**
-	 * @param locationAbbreviation the locationAbbreviation to set
-	 */
-	public void setLocationAbbreviation(final String locationAbbreviation) {
-		this.locationAbbreviation = locationAbbreviation;
-	}
-
-	/**
 	 * @return the rootName
 	 */
 	public String getRootName() {
@@ -359,48 +318,7 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
-	public Integer getHarvestLocationId() {
-		return this.harvestLocationId;
-	}
-
-	public void setHarvestLocationId(final Integer harvestLocationId) {
-		this.harvestLocationId = harvestLocationId;
-	}
-
-    public String getSelectionTraitValue() {
-        return selectionTraitValue;
-    }
-
-    public void setSelectionTraitValue(final String selectionTraitValue) {
-        this.selectionTraitValue = selectionTraitValue;
-    }
-
-	public String getTrialInstanceNumber() {
-		return this.trialInstanceNumber;
-	}
-
-	public void setTrialInstanceNumber(final String trialInstanceNumber) {
-		this.trialInstanceNumber = trialInstanceNumber;
-	}
-
-	public String getReplicationNumber() {
-		return this.replicationNumber;
-	}
-
-	public void setReplicationNumber(final String replicationNumber) {
-		this.replicationNumber = replicationNumber;
-	}
-
-	// NOTE: conditions are only being used by BreedersCrossIDExpression
-	public List<MeasurementVariable> getConditions() {
-		return conditions;
-	}
-
-	public void setConditions(final List<MeasurementVariable> conditions) {
-		this.conditions = conditions;
-	}
-
-	public MeasurementRow getTrailInstanceObservation() {
+    public MeasurementRow getTrailInstanceObservation() {
 		return trailInstanceObservation;
 	}
 
@@ -426,8 +344,8 @@ public class AdvancingSource extends AbstractAdvancingSource {
 
 	public AdvancingSource copy() {
         final AdvancingSource source = new AdvancingSource(germplasm, names, plantsSelected, breedingMethod, isCheck, studyName, plotNumber);
-        source.setSeason(this.season);
-        source.setLocationAbbreviation(this.locationAbbreviation);
+        source.setSeason(this.getSeason());
+        source.setLocationAbbreviation(this.getLocationAbbreviation());
         source.setRootName(this.rootName);
         source.setSourceMethod(this.sourceMethod);
         source.setCurrentMaxSequence(this.currentMaxSequence);
@@ -435,10 +353,10 @@ public class AdvancingSource extends AbstractAdvancingSource {
         source.setPrefix(this.prefix);
         source.setSuffix(this.suffix);
         source.setRootNameType(this.rootNameType);
-        source.setHarvestLocationId(this.harvestLocationId);
-        source.setSelectionTraitValue(this.selectionTraitValue);
-        source.setTrialInstanceNumber(this.trialInstanceNumber);
-        source.setReplicationNumber(this.replicationNumber);
+        source.setHarvestLocationId(this.getHarvestLocationId());
+        source.setSelectionTraitValue(this.getSelectionTraitValue());
+        source.setTrialInstanceNumber(this.getTrialInstanceNumber());
+        source.setReplicationNumber(this.getReplicationNumber());
         return source;
     }
 
