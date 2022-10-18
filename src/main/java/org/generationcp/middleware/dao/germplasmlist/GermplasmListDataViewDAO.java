@@ -7,6 +7,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
@@ -107,5 +108,20 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 			LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public void deleteNameTypeFromGermplasmList(final Integer nameTypeId) {
+		try {
+			final String sql = "DELETE FROM list_data_view WHERE name_fldno = :nameTypeId";
+			final Query query =
+				this.getSession().createSQLQuery(sql);
+			query.setParameter("nameTypeId", nameTypeId);
+			query.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error with deleteNameTypeFromGermplasmList(nameTypeId=" + nameTypeId + "): " + e.getMessage();
+			LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
+		}
+
 	}
 }

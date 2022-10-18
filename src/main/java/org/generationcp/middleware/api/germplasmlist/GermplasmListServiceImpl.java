@@ -661,6 +661,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public void deleteNameTypeFromGermplasmList(final Integer nameTypeId) {
+		this.daoFactory.getGermplasmListDataViewDAO().deleteNameTypeFromGermplasmList(nameTypeId);
+	}
+
+	@Override
 	public void deleteGermplasmList(final Integer listId) {
 		final GermplasmList germplasmList = this.getGermplasmListById(listId)
 			.orElseThrow(() -> new MiddlewareRequestException("", LIST_NOT_FOUND));
