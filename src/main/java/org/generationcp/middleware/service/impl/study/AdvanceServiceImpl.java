@@ -51,9 +51,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 	@Resource
 	private DatasetService datasetService;
 
-	//	@Resource
-	//	private ExpressionDataProcessorFactory dataProcessorFactory;
-
 	@Resource
 	private StudyInstanceService studyInstanceService;
 
@@ -184,14 +181,12 @@ public class AdvanceServiceImpl implements AdvanceService {
 			//			advancingSourceCandidate
 			//				.setReplicationNumber(this.getObservationValueByVariableId(row.getVariables().values(), TermId.REP_NO.getId()));
 
+			// TODO: Should be the first thing to do getting the breeding method?
 			final Integer methodId = request.getMethodVariateId() == null ? request.getBreedingMethodId() :
 				this.getBreedingMethodId(request.getMethodVariateId(), row, breedingMethodsByCodes);
 			if (methodId == null) {
 				return;
 			}
-
-			//			dataProcessor
-			//				.processPlotLevelData(advancingSourceCandidate, row, null, locationsByLocationId, plotDataVariablesByTermId);
 
 			// TODO: create naming ->  names
 			// TODO: create the advanced germplasm and save it
