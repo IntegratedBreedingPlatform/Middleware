@@ -278,7 +278,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		}
 	}
 
-	public List<UserDefinedField> getByFldnos(final Set<String> fldno) {
+	public List<UserDefinedField> getByFldnos(final Set<Integer> fldno) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 			criteria.add(Restrictions.in("fldno", fldno));
