@@ -475,11 +475,19 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds) {
 		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
-		this.filterDatasets(datasetDTOList, studyId, datasetTypeIds);
+		this.filterDatasets(datasetDTOList, studyId, datasetTypeIds, false);
 		return datasetDTOList;
 	}
 
-	private void filterDatasets(final List<DatasetDTO> filtered, final Integer parentId, final Set<Integer> datasetTypeIds) {
+	@Override
+	public List<DatasetDTO> getDatasetsWithVariables(final Integer studyId, final Set<Integer> datasetTypeIds) {
+		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
+		this.filterDatasets(datasetDTOList, studyId, datasetTypeIds, true);
+		return datasetDTOList;
+	}
+
+	private void filterDatasets(final List<DatasetDTO> filtered, final Integer parentId, final Set<Integer> datasetTypeIds,
+		final boolean addVariables) {
 
 		final Map<Integer, Long> countOutOfSyncPerDatasetMap =
 			this.daoFactory.getPhenotypeDAO().countOutOfSyncDataOfDatasetsInStudy(parentId);
@@ -492,6 +500,12 @@ public class DatasetServiceImpl implements DatasetService {
 				datasetDTO.setHasOutOfSyncData(
 					countOutOfSyncPerDatasetMap.containsKey(datasetId) ? countOutOfSyncPerDatasetMap.get(datasetDTO.getDatasetId()) > 0 :
 						Boolean.FALSE);
+				if (addVariables) {
+					final List<Integer> variableTypes = this.resolveVariableTypes(datasetDTO.getDatasetTypeId());
+					final List<MeasurementVariable> variables = this.daoFactory.getDmsProjectDAO()
+						.getObservationSetVariables(datasetId, variableTypes);
+					datasetDTO.setVariables(variables);
+				}
 				filtered.add(datasetDTO);
 			}
 		}

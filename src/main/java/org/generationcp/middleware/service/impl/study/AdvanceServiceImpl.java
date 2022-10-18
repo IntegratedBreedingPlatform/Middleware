@@ -73,14 +73,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 			DatasetTypeEnum.SUMMARY_DATA.getId(),
 			DatasetTypeEnum.PLOT_DATA.getId());
 		final Map<Integer, DatasetDTO> datasetsByType =
-			this.datasetService.getDatasets(studyId, new HashSet<>(datasetTypeIds)).stream().collect(Collectors.toMap(
+			this.datasetService.getDatasetsWithVariables(studyId, new HashSet<>(datasetTypeIds)).stream().collect(Collectors.toMap(
 				DatasetDTO::getDatasetTypeId, datasetDTO -> datasetDTO));
 
 		final DatasetDTO plotDataset = datasetsByType.get(DatasetTypeEnum.PLOT_DATA.getId());
-		final List<MeasurementVariable> plotDatasetVariables = this.daoFactory.getDmsProjectDAO()
-			.getObservationSetVariables(plotDataset.getDatasetId(), DatasetServiceImpl.OBSERVATION_DATASET_VARIABLE_TYPES);
-		plotDataset.setVariables(plotDatasetVariables);
-
 		final ObservationUnitsSearchDTO plotDataObservationsSearchDTO = new ObservationUnitsSearchDTO();
 		plotDataObservationsSearchDTO.setInstanceIds(request.getInstanceIds());
 		final List<ObservationUnitRow> observationUnitRows = this.datasetService
@@ -91,10 +87,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 		}
 
 		final DatasetDTO environmentDataset = datasetsByType.get(DatasetTypeEnum.SUMMARY_DATA.getId());
-		final List<MeasurementVariable> environmentDatasetVariables = this.daoFactory.getDmsProjectDAO()
-			.getObservationSetVariables(environmentDataset.getDatasetId(), DatasetTypeEnum.SUMMARY_DATA.getVariableTypes());
-		environmentDataset.setVariables(environmentDatasetVariables);
-
 		final ObservationUnitsSearchDTO trialObservationUnitsSearchDTO = new ObservationUnitsSearchDTO();
 		trialObservationUnitsSearchDTO.setInstanceIds(request.getInstanceIds());
 		trialObservationUnitsSearchDTO.setEnvironmentDatasetId(environmentDataset.getDatasetId());
@@ -127,7 +119,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 				Collectors.toList()));
 
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId =
-			plotDatasetVariables.stream().collect(Collectors.toMap(MeasurementVariable::getTermId, variable -> variable));
+			plotDataset.getVariables().stream().collect(Collectors.toMap(MeasurementVariable::getTermId, variable -> variable));
 
 		final Map<Integer, StudyInstance> studyInstanceMap =
 			this.studyInstanceService.getStudyInstances(studyId).stream()

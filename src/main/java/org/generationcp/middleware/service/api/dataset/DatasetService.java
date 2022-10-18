@@ -138,6 +138,15 @@ public interface DatasetService {
 	List<DatasetDTO> getDatasets(Integer studyId, Set<Integer> datasetTypeIds);
 
 	/**
+	 * Given a list of dataset types and a study, it will retrieve the study datasets with variables and with the specified types
+	 *
+	 * @param studyId        Id of the study
+	 * @param datasetTypeIds List of dataset types
+	 * @return List of datasets
+	 */
+	List<DatasetDTO> getDatasetsWithVariables(Integer studyId, Set<Integer> datasetTypeIds);
+
+	/**
 	 * If the variable is input variable for a formula, update the phenotypes status as "OUT OF SYNC" for given observation unit.
 	 * This will also update the phenotype status of calculated variables in plot observation if the observation unit is a sub-observation.
 	 *
