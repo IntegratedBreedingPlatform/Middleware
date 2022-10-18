@@ -10,13 +10,13 @@ import java.util.Set;
 public class AdvanceStudyRequest {
 
 	private Integer breedingMethodId;
-
 	private List<Integer> instanceIds;
 	private Integer methodVariateId;
 	private Integer linesSelected;
 	private Integer lineVariateId;
 	// TODO: add replications param
 	private Set<String> selectedReplications;
+	private SelectionTraitRequest selectionTraitRequest;
 
 	public Integer getBreedingMethodId() {
 		return breedingMethodId;
@@ -58,6 +58,14 @@ public class AdvanceStudyRequest {
 		this.lineVariateId = lineVariateId;
 	}
 
+	public SelectionTraitRequest getSelectionTraitRequest() {
+		return selectionTraitRequest;
+	}
+
+	public void setSelectionTraitRequest(final SelectionTraitRequest selectionTraitRequest) {
+		this.selectionTraitRequest = selectionTraitRequest;
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
@@ -71,6 +79,29 @@ public class AdvanceStudyRequest {
 	@Override
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
+	}
+
+	@AutoProperty
+	public static class SelectionTraitRequest {
+
+		private Integer datasetId;
+		private Integer variableId;
+
+		public Integer getDatasetId() {
+			return datasetId;
+		}
+
+		public void setDatasetId(final Integer datasetId) {
+			this.datasetId = datasetId;
+		}
+
+		public Integer getVariableId() {
+			return variableId;
+		}
+
+		public void setVariableId(final Integer variableId) {
+			this.variableId = variableId;
+		}
 	}
 
 }

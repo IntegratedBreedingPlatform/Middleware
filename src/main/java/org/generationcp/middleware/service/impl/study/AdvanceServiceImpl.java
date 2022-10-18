@@ -25,7 +25,6 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.api.study.AdvanceService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
-import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -115,7 +114,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		// Getting data related at study level
 		final String seasonStudyLevel = this.seasonDataResolver.resolveStudyLevelData(studyEnvironmentVariables);
 		final String selectionTraitStudyLevel = this.selectionTraitResolver
-			.resolveStudyLevelData(Stream.concat(studyEnvironmentVariables.stream(), studyVariates.stream()).collect(
+			.resolveStudyLevelData(studyId, request.getSelectionTraitRequest(), Stream.concat(studyEnvironmentVariables.stream(), studyVariates.stream()).collect(
 				Collectors.toList()));
 
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId =
