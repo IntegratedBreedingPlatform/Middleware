@@ -294,7 +294,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	}
 
 	public void deleteNameTypeFromStudies(final Integer nameType) {
-		final String sql = "DELETE FROM projectprop WHERE project_id = :projectId and name_fldno = :nameType";
+		final String sql = "DELETE FROM projectprop WHERE name_fldno = :nameType";
 		final Query query =
 			this.getSession().createSQLQuery(sql);
 		query.setParameter("nameType", nameType);
