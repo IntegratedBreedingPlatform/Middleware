@@ -106,7 +106,16 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			.collect(toList());
 
 		final List<Integer> gids = this.daoFactory.getGermplasmListDataDAO().getGidsByListId(listId);
+		final Set<Integer> nameIds = view.stream().filter(germplasmListDataView -> germplasmListDataView.getNameFldno() != null).map(GermplasmListDataView::getNameFldno).collect(toSet());
 		final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids);
+
+		if (!CollectionUtils.isEmpty(nameIds)) {
+			final List<UserDefinedField> existingNameTypes = this.daoFactory.getUserDefinedFieldDAO().getByFldnos(nameIds);
+			columns.addAll(existingNameTypes.stream().map(nameType ->
+					new GermplasmListColumnDTO(nameType.getFldno(), nameType.getFcode(), GermplasmListColumnCategory.NAMES, true))
+				.collect(toList()));
+		}
+
 		if (!CollectionUtils.isEmpty(nameTypes)) {
 			final List<GermplasmListColumnDTO> nameColumns = nameTypes
 				.stream()
