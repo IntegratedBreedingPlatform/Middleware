@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -223,7 +224,19 @@ public class ExperimentBuilder extends Builder {
 		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
 		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
 		experiment.setObsUnitId(experimentModel.getObsUnitId());
+		experiment.setNameValueMap(this.getNameByGid(experimentModel));
 		return experiment;
+	}
+
+	private Map<Integer, String> getNameByGid(final ExperimentModel experimentModel) {
+		final Map nameValueMap = new HashMap<>();
+
+		if(experimentModel.getStock() != null) {
+			experimentModel.getStock().getGermplasm().getNames().forEach(name -> {
+				nameValueMap.put(name.getTypeId(), name.getNval());
+			});
+		}
+		return nameValueMap;
 	}
 
 	private Experiment createExperiment(final ExperimentModel experimentModel, final VariableTypeList variableTypes,
