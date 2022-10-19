@@ -28,7 +28,7 @@
 	<changeSet author="cuenyad" id="v22.2.0-2">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<columnExists tableName="projectprop" columnName="nameType"/>
+				<columnExists tableName="projectprop" columnName="name_fldno"/>
 			</not>
 		</preConditions>
 			<comment>Add 'name_fldno' column in projectprop</comment>
@@ -37,7 +37,7 @@
 				ADD CONSTRAINT fk_projectprop_udflds FOREIGN KEY (name_fldno) REFERENCES udflds (fldno);
 			</sql>
 	</changeSet>
-	<changeSet author="cuenyad" id="v22.2.0-2">
+	<changeSet author="cuenyad" id="v22.2.0-3">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="projectprop" columnName="type_id"/>
 			<columnExists tableName="projectprop" columnName="variable_id"/>
