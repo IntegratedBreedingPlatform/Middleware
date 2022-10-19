@@ -13,6 +13,7 @@ public class VariableFilter {
 	private String programUuid;
 	private boolean fetchAll;
 	private boolean favoritesOnly;
+	private boolean showObsoletes = true;
 
 	private final List<Integer> methodIds = new ArrayList<>();
 	private final List<Integer> propertyIds = new ArrayList<>();
@@ -145,6 +146,14 @@ public class VariableFilter {
 
 	public void addLotId(final Integer lotId) {
 		this.lotIds.add(lotId);
+	}
+
+	public boolean isShowObsoletes() {
+		return this.showObsoletes;
+	}
+
+	public void setShowObsoletes(final boolean showObsoletes) {
+		this.showObsoletes = showObsoletes;
 	}
 
 	@Override

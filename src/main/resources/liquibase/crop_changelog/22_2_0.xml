@@ -4,7 +4,28 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="cuenyad" id="v22.2.0-1">
+	<changeSet author="cheryleigh" id="v22.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<indexExists tableName="cvterm" indexName="cvterm_idx1"/>
+				<sqlCheck expectedResult="0">
+					select count(1)
+ 					from (select 1
+						from cvterm
+						group by cv_id, name
+						having count(1) > 1) as non_unique;
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Remove is_obsolete in cvterm unique index</comment>
+		<dropIndex tableName="cvterm" indexName="cvterm_idx1"></dropIndex>
+		<createIndex indexName="cvterm_idx1" tableName="cvterm" unique="true">
+			<column name="name" type="varchar"/>
+			<column name="cv_id" type="int" />
+		</createIndex>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v22.2.0-2">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="projectprop" columnName="nameType"/>
