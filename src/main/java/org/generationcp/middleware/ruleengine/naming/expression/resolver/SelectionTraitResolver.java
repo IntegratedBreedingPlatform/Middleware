@@ -14,9 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
-// TODO: it doesn't look good overwriting the value of the selection trait value for every declared variable with SELECTION TRAIT PROPERTY as property.
-//  Check if it's better to ask for the user to select which variable with SELECTION TRAIT PROPERTY wants to use.
-//  Otherwise, we need to ensure to keep the same variable order (if it's possible) as the old advance
 public class SelectionTraitResolver {
 
 	public static final String SELECTION_TRAIT_PROPERTY = "Selection Criteria";
@@ -32,6 +29,7 @@ public class SelectionTraitResolver {
 	public String resolveStudyLevelData(
 		final Integer datasetId, final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest,
 		final List<MeasurementVariable> studyVariates) {
+
 		if (!this.shouldResolveLevel(datasetId, selectionTraitRequest)) {
 			return null;
 		}
@@ -67,13 +65,20 @@ public class SelectionTraitResolver {
 	 * @param source
 	 * @param plotDataVariablesByTermId
 	 */
-	public void resolveEnvironmentLevelData(final NewAdvancingSource source,
+	public void resolveEnvironmentLevelData(final Integer datasetId, final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest,
+		final NewAdvancingSource source,
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId) {
+
+		if (!this.shouldResolveLevel(datasetId, selectionTraitRequest)) {
+			return;
+		}
+
 		if (DataResolverHelper.checkHasTrailInstanceObservations(source.getTrailInstanceObservation())) {
+			// In this case, the value of the environment observations corresponds to the id of the categorical reference
 			final BiPredicate<ValueReference, ObservationUnitData> predicate =
 				(valueReference, observationUnitData) -> valueReference.getId().toString().equals(observationUnitData.getValue());
 			this.getTraitSelectionValue(source, source.getTrailInstanceObservation().getEnvironmentVariables().values(),
-				plotDataVariablesByTermId, predicate);
+				plotDataVariablesByTermId, predicate, selectionTraitRequest.getVariableId());
 		}
 	}
 
@@ -84,20 +89,34 @@ public class SelectionTraitResolver {
 	 * @param row
 	 * @param plotDataVariablesByTermId
 	 */
-	public void resolvePlotLevelData(final NewAdvancingSource source, final ObservationUnitRow row,
+	public void resolvePlotLevelData(final Integer datasetId, final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest,
+		final NewAdvancingSource source, final ObservationUnitRow row,
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId) {
+
+		if (!this.shouldResolveLevel(datasetId, selectionTraitRequest)) {
+			return;
+		}
+
+		// In this case, the categorical value id of the plot observations corresponds to the id of the categorical reference
 		final BiPredicate<ValueReference, ObservationUnitData> predicate =
 			(valueReference, observationUnitData) -> valueReference.getId().equals(observationUnitData.getCategoricalValueId());
-		this.getTraitSelectionValue(source, row.getVariables().values(), plotDataVariablesByTermId, predicate);
+		this.getTraitSelectionValue(source, row.getVariables().values(), plotDataVariablesByTermId, predicate,
+			selectionTraitRequest.getVariableId());
 	}
 
 	private void getTraitSelectionValue(final NewAdvancingSource source,
 		final Collection<ObservationUnitData> observationUnitDataCollection,
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId,
-		final BiPredicate<ValueReference, ObservationUnitData> filterPredicate) {
-		observationUnitDataCollection.forEach(observationUnitData -> {
-			final MeasurementVariable variable = plotDataVariablesByTermId.get(observationUnitData.getVariableId());
-			if (variable != null && SELECTION_TRAIT_PROPERTY.equalsIgnoreCase(variable.getProperty())) {
+		final BiPredicate<ValueReference, ObservationUnitData> filterPredicate, final Integer selectedSelectionTraitVariableId) {
+
+		observationUnitDataCollection.stream()
+			.filter(observationUnitData -> {
+				final MeasurementVariable variable = plotDataVariablesByTermId.get(observationUnitData.getVariableId());
+				return variable != null && SELECTION_TRAIT_PROPERTY.equalsIgnoreCase(variable.getProperty())
+					&& variable.getTermId() == selectedSelectionTraitVariableId;
+			}).findFirst()
+			.ifPresent(observationUnitData -> {
+				final MeasurementVariable variable = plotDataVariablesByTermId.get(observationUnitData.getVariableId());
 				if (DataType.CATEGORICAL_VARIABLE.getName().equals(variable.getDataType())) {
 					variable.getPossibleValues().stream()
 						.filter(valueReference -> filterPredicate.test(valueReference, observationUnitData))
@@ -106,8 +125,7 @@ public class SelectionTraitResolver {
 				} else {
 					source.setSelectionTraitValue(observationUnitData.getValue());
 				}
-			}
-		});
+			});
 	}
 
 	boolean shouldResolveLevel(final Integer datasetId, final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest) {

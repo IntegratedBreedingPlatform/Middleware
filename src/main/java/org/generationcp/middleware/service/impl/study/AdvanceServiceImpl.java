@@ -114,8 +114,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 		// Getting data related at study level
 		final String seasonStudyLevel = this.seasonDataResolver.resolveStudyLevelData(studyEnvironmentVariables);
 		final String selectionTraitStudyLevel = this.selectionTraitResolver
-			.resolveStudyLevelData(studyId, request.getSelectionTraitRequest(), Stream.concat(studyEnvironmentVariables.stream(), studyVariates.stream()).collect(
-				Collectors.toList()));
+			.resolveStudyLevelData(studyId, request.getSelectionTraitRequest(),
+				Stream.concat(studyEnvironmentVariables.stream(), studyVariates.stream()).collect(
+					Collectors.toList()));
 
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId =
 			plotDataset.getVariables().stream().collect(Collectors.toMap(MeasurementVariable::getTermId, variable -> variable));
@@ -162,8 +163,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 				advancingSourceCandidate.setTrailInstanceObservation(trialInstanceObservations);
 			}
 
-			// TODO: resolve plot data level
-			this.resolveEnvironmentAndPlotLevelData(advancingSourceCandidate, row, locationsByLocationId, plotDataVariablesByTermId);
+			this.resolveEnvironmentAndPlotLevelData(environmentDataset.getDatasetId(), plotDataset.getDatasetId(),
+				request.getSelectionTraitRequest(), advancingSourceCandidate, row, locationsByLocationId, plotDataVariablesByTermId);
 
 			// Setting conditions for Breeders Cross ID
 			// TODO: we only set conditions for breeders cross id. Find another way to pass conditions to breeders cross id
@@ -287,15 +288,17 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.collect(Collectors.toSet());
 	}
 
-	private void resolveEnvironmentAndPlotLevelData(final NewAdvancingSource source, final ObservationUnitRow row,
+	private void resolveEnvironmentAndPlotLevelData(final Integer environmentDatasetId, final Integer plotDatasetId,
+		final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest,
+		final NewAdvancingSource source, final ObservationUnitRow row,
 		final Map<Integer, Location> locationsByLocationId,
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId) {
 		this.locationDataResolver.resolveEnvironmentLevelData(source, locationsByLocationId);
 		this.seasonDataResolver.resolveEnvironmentLevelData(source, plotDataVariablesByTermId);
-
-		// TODO: check if it's right to first process level plot data and then environment data. Currently it works in this way.
-		this.selectionTraitResolver.resolvePlotLevelData(source, row, plotDataVariablesByTermId);
-		this.selectionTraitResolver.resolveEnvironmentLevelData(source, plotDataVariablesByTermId);
+		this.selectionTraitResolver
+			.resolveEnvironmentLevelData(environmentDatasetId, selectionTraitRequest, source, plotDataVariablesByTermId);
+		this.selectionTraitResolver
+			.resolvePlotLevelData(plotDatasetId, selectionTraitRequest, source, row, plotDataVariablesByTermId);
 	}
 
 }
