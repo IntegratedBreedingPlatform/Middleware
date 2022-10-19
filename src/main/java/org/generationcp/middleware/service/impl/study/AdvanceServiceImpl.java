@@ -68,47 +68,26 @@ public class AdvanceServiceImpl implements AdvanceService {
 	@Override
 	public List<Integer> advanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
 
-		final List<Integer> datasetTypeIds = Arrays.asList(
-			DatasetTypeEnum.SUMMARY_DATA.getId(),
-			DatasetTypeEnum.PLOT_DATA.getId());
-		final Map<Integer, DatasetDTO> datasetsByType =
-			this.datasetService.getDatasetsWithVariables(studyId, new HashSet<>(datasetTypeIds)).stream().collect(Collectors.toMap(
-				DatasetDTO::getDatasetTypeId, datasetDTO -> datasetDTO));
-
+		final Map<Integer, DatasetDTO> datasetsByType = this.getDatasetsByType(studyId);
 		final DatasetDTO plotDataset = datasetsByType.get(DatasetTypeEnum.PLOT_DATA.getId());
-		final ObservationUnitsSearchDTO plotDataObservationsSearchDTO = new ObservationUnitsSearchDTO();
-		plotDataObservationsSearchDTO.setInstanceIds(request.getInstanceIds());
-		final List<ObservationUnitRow> observationUnitRows = this.datasetService
-			.getObservationUnitRows(studyId, plotDataset.getDatasetId(), plotDataObservationsSearchDTO,
-				new PageRequest(0, Integer.MAX_VALUE));
-		if (CollectionUtils.isEmpty(observationUnitRows)) {
+		final DatasetDTO environmentDataset = datasetsByType.get(DatasetTypeEnum.SUMMARY_DATA.getId());
+
+		final List<ObservationUnitRow> plotObservations =
+			this.getPlotObservations(studyId, plotDataset.getDatasetId(), request.getInstanceIds());
+		if (CollectionUtils.isEmpty(plotObservations)) {
 			return new ArrayList<>();
 		}
 
-		final DatasetDTO environmentDataset = datasetsByType.get(DatasetTypeEnum.SUMMARY_DATA.getId());
-		final ObservationUnitsSearchDTO trialObservationUnitsSearchDTO = new ObservationUnitsSearchDTO();
-		trialObservationUnitsSearchDTO.setInstanceIds(request.getInstanceIds());
-		trialObservationUnitsSearchDTO.setEnvironmentDatasetId(environmentDataset.getDatasetId());
-		final List<MeasurementVariableDto> environmentConditions = this.getObservationSetVariables(environmentDataset.getDatasetId(),
-			Lists.newArrayList(VariableType.ENVIRONMENT_CONDITION.getId()));
-		trialObservationUnitsSearchDTO.setEnvironmentConditions(environmentConditions);
-
-		final List<MeasurementVariableDto> environmentDetailsVariables =
-			this.getObservationSetVariables(environmentDataset.getDatasetId(), Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
-		trialObservationUnitsSearchDTO.setEnvironmentDetails(environmentDetailsVariables);
-
 		// TODO: check why is returning 0 for study 42756
-		// TODO: this is not returning values for Selection_trait variable -> it should be fixed now!
-		final List<ObservationUnitRow> trialObservationUnitRows = this.datasetService
-			.getObservationUnitRows(studyId, environmentDataset.getDatasetId(), trialObservationUnitsSearchDTO,
-				new PageRequest(0, Integer.MAX_VALUE));
+		final List<ObservationUnitRow> trialObservations =
+			this.getTrialObservations(studyId, environmentDataset.getDatasetId(), request.getInstanceIds());
 
 		final List<MeasurementVariable> studyVariables =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(studyId, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 		// TODO: review a better way to obtain this variables
 		final List<MeasurementVariable> studyEnvironmentVariables =
 			this.getStudyEnvironmentVariables(studyVariables, environmentDataset.getVariables());
-		//		// TODO: review a better way to obtain this variables
+		// TODO: review a better way to obtain this variables
 		final List<MeasurementVariable> studyVariates = this.getStudyVariates(environmentDataset.getVariables());
 
 		// Getting data related at study level
@@ -121,7 +100,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId =
 			plotDataset.getVariables().stream().collect(Collectors.toMap(MeasurementVariable::getTermId, variable -> variable));
 
-		final Map<Integer, StudyInstance> studyInstanceMap =
+		final Map<Integer, StudyInstance> studyInstancesByInstanceNumber =
 			this.studyInstanceService.getStudyInstances(studyId).stream()
 				.collect(Collectors.toMap(StudyInstance::getInstanceNumber, i -> i));
 
@@ -130,15 +109,11 @@ public class AdvanceServiceImpl implements AdvanceService {
 				.collect(Collectors.toMap(Method::getMcode, method -> method, (method1, method2) -> method1));
 
 		final Map<Integer, Location> locationsByLocationId =
-			this.getLocationsByLocationIdFromTrialObservationUnits(trialObservationUnitRows);
+			this.getLocationsByLocationIdFromTrialObservationUnits(trialObservations);
 
-		final Set<Integer> gids = observationUnitRows.stream()
-			.map(ObservationUnitRow::getGid)
-			.collect(Collectors.toSet());
-		final Map<Integer, Germplasm> originGermplasmsByGid = this.daoFactory.getGermplasmDao().getByGIDList(new ArrayList<>(gids)).stream()
-			.collect(Collectors.toMap(Germplasm::getGid, germplasm -> germplasm));
+		final Map<Integer, Germplasm> originGermplasmsByGid = this.getOriginGermplasmByGid(plotObservations);
 
-		observationUnitRows.forEach(row -> {
+		plotObservations.forEach(row -> {
 			final NewAdvancingSource advancingSourceCandidate =
 				new NewAdvancingSource(seasonStudyLevel, selectionTraitStudyLevel,
 					originGermplasmsByGid.get(row.getGid()));
@@ -146,21 +121,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 			// If study is Trial, then setting data if trial instance is not null
 			if (advancingSourceCandidate.getTrialInstanceNumber() != null) {
-				final Integer trialInstanceNumber = row.getTrialInstance();
-				final ObservationUnitRow trialInstanceObservations = trialObservationUnitRows.stream()
-					.filter(observationUnitRow -> Integer.valueOf(advancingSourceCandidate.getTrialInstanceNumber())
-						.equals(observationUnitRow.getTrialInstance()))
-					.findFirst()
-					.get();
-				if (studyInstanceMap.containsKey(trialInstanceNumber) && trialInstanceObservations != null) {
-					this.getVariableByVariableId(trialInstanceObservations.getEnvironmentVariables().values(), TermId.LOCATION_ID.getId())
-						.ifPresent(
-							observationUnitData -> observationUnitData
-								.setValue(String.valueOf(studyInstanceMap.get(trialInstanceNumber).getLocationId()))
-						);
-				}
-
-				advancingSourceCandidate.setTrailInstanceObservation(trialInstanceObservations);
+				this.setTrialIntanceObservations(trialObservations, row, advancingSourceCandidate, studyInstancesByInstanceNumber);
 			}
 
 			this.resolveEnvironmentAndPlotLevelData(environmentDataset.getDatasetId(), plotDataset.getDatasetId(),
@@ -187,6 +148,42 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 		// TODO: returns the recently created gerplasm::gids
 		return null;
+	}
+
+	private Map<Integer, DatasetDTO> getDatasetsByType(final Integer studyId) {
+		final List<Integer> datasetTypeIds = Arrays.asList(
+			DatasetTypeEnum.SUMMARY_DATA.getId(),
+			DatasetTypeEnum.PLOT_DATA.getId());
+		return this.datasetService.getDatasetsWithVariables(studyId, new HashSet<>(datasetTypeIds)).stream().collect(Collectors.toMap(
+			DatasetDTO::getDatasetTypeId, datasetDTO -> datasetDTO));
+	}
+
+	private List<ObservationUnitRow> getPlotObservations(final Integer studyId, final Integer plotDatasetId,
+		final List<Integer> instancesIds) {
+
+		final ObservationUnitsSearchDTO plotDataObservationsSearchDTO = new ObservationUnitsSearchDTO();
+		plotDataObservationsSearchDTO.setInstanceIds(instancesIds);
+		return this.datasetService
+			.getObservationUnitRows(studyId, plotDatasetId, plotDataObservationsSearchDTO,
+				new PageRequest(0, Integer.MAX_VALUE));
+	}
+
+	private List<ObservationUnitRow> getTrialObservations(final Integer studyId, final Integer environmentDatasetId,
+		final List<Integer> instancesIds) {
+
+		final List<MeasurementVariableDto> environmentConditions = this.getObservationSetVariables(environmentDatasetId,
+			Lists.newArrayList(VariableType.ENVIRONMENT_CONDITION.getId()));
+		final List<MeasurementVariableDto> environmentDetailsVariables =
+			this.getObservationSetVariables(environmentDatasetId, Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
+
+		final ObservationUnitsSearchDTO trialObservationUnitsSearchDTO = new ObservationUnitsSearchDTO();
+		trialObservationUnitsSearchDTO.setInstanceIds(instancesIds);
+		trialObservationUnitsSearchDTO.setEnvironmentDatasetId(environmentDatasetId);
+		trialObservationUnitsSearchDTO.setEnvironmentConditions(environmentConditions);
+		trialObservationUnitsSearchDTO.setEnvironmentDetails(environmentDetailsVariables);
+		return this.datasetService
+			.getObservationUnitRows(studyId, environmentDatasetId, trialObservationUnitsSearchDTO,
+				new PageRequest(0, Integer.MAX_VALUE));
 	}
 
 	// TODO: review a better way to obtain this variables
@@ -230,6 +227,26 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.stream()
 			.map(variable -> new MeasurementVariableDto(variable.getTermId(), variable.getName()))
 			.collect(Collectors.toList());
+	}
+
+	private void setTrialIntanceObservations(final List<ObservationUnitRow> trialObservations, final ObservationUnitRow plotObservation,
+		final NewAdvancingSource advancingSourceCandidate,
+		final Map<Integer, StudyInstance> studyInstancesByInstanceNumber) {
+		final Integer trialInstanceNumber = plotObservation.getTrialInstance();
+		trialObservations.stream()
+			.filter(observationUnitRow -> Integer.valueOf(advancingSourceCandidate.getTrialInstanceNumber())
+				.equals(observationUnitRow.getTrialInstance()))
+			.findFirst()
+			.ifPresent(trialObservation -> {
+				if (studyInstancesByInstanceNumber.containsKey(trialInstanceNumber) && trialObservation != null) {
+					this.getVariableByVariableId(trialObservation.getEnvironmentVariables().values(), TermId.LOCATION_ID.getId())
+						.ifPresent(
+							observationUnitData -> observationUnitData
+								.setValue(String.valueOf(studyInstancesByInstanceNumber.get(trialInstanceNumber).getLocationId()))
+						);
+				}
+				advancingSourceCandidate.setTrailInstanceObservation(trialObservation);
+			});
 	}
 
 	private Integer getBreedingMethodId(final Integer methodVariateId, final ObservationUnitRow row,
@@ -277,6 +294,14 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Set<Integer> locationIds = this.getVariableValuesFromObservations(trialObservationUnitRows, TermId.LOCATION_ID.getId());
 		return this.daoFactory.getLocationDAO().getByIds(new ArrayList<>(locationIds)).stream()
 			.collect(Collectors.toMap(Location::getLocid, location -> location));
+	}
+
+	private Map<Integer, Germplasm> getOriginGermplasmByGid(final List<ObservationUnitRow> plotObservations) {
+		final Set<Integer> gids = plotObservations.stream()
+			.map(ObservationUnitRow::getGid)
+			.collect(Collectors.toSet());
+		return this.daoFactory.getGermplasmDao().getByGIDList(new ArrayList<>(gids)).stream()
+			.collect(Collectors.toMap(Germplasm::getGid, germplasm -> germplasm));
 	}
 
 	private Set<Integer> getVariableValuesFromObservations(final List<ObservationUnitRow> observations, final Integer variableId) {
