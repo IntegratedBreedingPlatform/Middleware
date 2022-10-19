@@ -1287,7 +1287,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final Integer gid = (Integer) row.get(gidColumnName);
 		if (gid != null) {
 			observationUnitRow.setGid(gid);
-			observationVariables.put(gidColumnName, new ObservationUnitData(gid.toString()));
+			observationVariables.put(gidColumnName, new ObservationUnitData(TermId.GID.getId(), gid.toString()));
 		}
 
 
@@ -1295,7 +1295,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final String designation = (String) row.get(designationColumnName);
 		if (designation != null) {
 			observationUnitRow.setDesignation(designation);
-			observationVariables.put(designationColumnName, new ObservationUnitData(designation));
+			observationVariables.put(designationColumnName, new ObservationUnitData(TermId.DESIG.getId(), designation));
 		}
 
 		if (row.containsKey(STOCK_ID)) {
@@ -1309,21 +1309,23 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (NumberUtils.isDigits(trialInstance)) {
 			observationUnitRow.setTrialInstance(Integer.valueOf(trialInstance));
 		}
-		observationVariables.put(trialInstanceColumnName, new ObservationUnitData(trialInstance));
+		observationVariables.put(trialInstanceColumnName, new ObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstance));
 
 		final String entryNoColumnName = standardVariableNameMap.get(TermId.ENTRY_NO.getId());
 		final String entryNumber = (String) row.get(entryNoColumnName);
 		if (NumberUtils.isDigits(entryNumber)) {
 			observationUnitRow.setEntryNumber(Integer.valueOf(entryNumber));
 		}
-		observationVariables.put(entryNoColumnName, new ObservationUnitData(entryNumber));
+		observationVariables.put(entryNoColumnName, new ObservationUnitData(TermId.ENTRY_NO.getId(), entryNumber));
 
-		standardVariableNameMap.values().forEach((column) -> {
+		standardVariableNameMap.entrySet().forEach(entry -> {
+			final String column = entry.getValue();
 			final Object value = row.get(column);
-			observationVariables.put(column, new ObservationUnitData(value != null ? String.valueOf(value) : null));
+			observationVariables.put(column, new ObservationUnitData(entry.getKey(), value != null ? String.valueOf(value) : null));
 		});
 		observationVariables.put(PARENT_OBS_UNIT_ID, new ObservationUnitData((String) row.get(PARENT_OBS_UNIT_ID)));
-		observationVariables.put(observationVariableName, new ObservationUnitData((String) row.get(OBSERVATION_UNIT_NO)));
+		// Avoid overriding PLOT_NO variable if it was already set using standardVariableNameMap iteration
+		observationVariables.putIfAbsent(observationVariableName, new ObservationUnitData((String) row.get(OBSERVATION_UNIT_NO)));
 
 		for (final String gpDesc : searchDto.getGenericGermplasmDescriptors()) {
 			observationVariables.put(gpDesc, new ObservationUnitData((String) row.get(gpDesc)));
@@ -1334,7 +1336,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (!CollectionUtils.isEmpty(searchDto.getPassportAndAttributes())) {
 			searchDto.getPassportAndAttributes().forEach(variable ->
-				observationVariables.put(variable.getName(), new ObservationUnitData((String) row.get(this.formatVariableAlias(variable.getId())))));
+				observationVariables.put(variable.getName(), new ObservationUnitData(variable.getId(), (String) row.get(this.formatVariableAlias(variable.getId())))));
 		}
 
 		// Variables retrieved from Environment Details/Conditions are loaded in a separate Map object to ensure that no duplicate variables are
