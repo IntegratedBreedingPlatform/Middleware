@@ -778,14 +778,11 @@ public class DatasetServiceImpl implements DatasetService {
 					VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId());
 			searchDTO.setPassportAndAttributes(passportAndAttributes);
 
-			final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+			final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.daoFactory.getUserDefinedFieldDAO().getNameTypeFromDataset(datasetId);
 
-			searchDTO.setNameTypes(plotDataset.getProperties().stream()
-				.filter(projectProperty -> projectProperty.getTypeId() == null  &&
-					projectProperty.getVariableId() == null  &&
-					projectProperty.getNameFldno() != null)
-				.map(projectProperty ->
-					new MeasurementVariableDto(projectProperty.getNameFldno(), projectProperty.getAlias()))
+			searchDTO.setNameTypes(germplasmNameTypeDTOs.stream()
+				.map(germplasmNameTypeDTO ->
+					new MeasurementVariableDto(germplasmNameTypeDTO.getId(), germplasmNameTypeDTO.getCode()))
 				.collect(Collectors.toList()));
 		}
 	}
