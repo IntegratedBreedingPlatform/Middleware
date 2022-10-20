@@ -429,7 +429,8 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 
 				final String variableType = filter.getVariableTypeMap().get(variableId);
 
-				if(null == variableType){
+				// Filter by Names
+				if(Integer.valueOf(variableId) > 0 && null == variableType){
 					final String finalId = variableId.replace("-", "");
 					queryParams.put(finalId + "_text", "%" + filteredTextValues.get(variableId) + "%");
 					continue;
@@ -491,7 +492,8 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			return;
 		}
 
-		if (null == variableType) {
+		// Filter by Names
+		if (Integer.valueOf(variableId) > 0 && null == variableType) {
 			final String alias = String.format("NAME_%s", variableId);
 			sql.append(String.format(" AND %s.nval LIKE :%s_text", alias, variableId));
 			return;
