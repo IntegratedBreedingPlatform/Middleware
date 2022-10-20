@@ -165,9 +165,10 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		final DmsProject plotDataDataset = this.getPlotDataset(studyId);
 		final List<Integer> variableIds = plotDataDataset.getProperties().stream()
-			.filter(projectProperty -> VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()) && (
-				!projectProperty.getVariableId().equals(TermId.ENTRY_TYPE.getId()) &&
-					!projectProperty.getVariableId().equals(TermId.ENTRY_NO.getId())))
+			.filter(projectProperty -> projectProperty.getTypeId() != null &&
+				 VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()) &&
+				(!projectProperty.getVariableId().equals(TermId.ENTRY_TYPE.getId()) &&
+				 !projectProperty.getVariableId().equals(TermId.ENTRY_NO.getId())))
 			.map(ProjectProperty::getVariableId)
 			.collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(variableIds)) {
@@ -182,9 +183,10 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		// Filter entry details project variable except ENTRY_TYPE and ENTRY_NO because they are going to be added later
 		final List<ProjectProperty> projectProperties = plotDataDataset.getProperties()
 			.stream()
-			.filter(projectProperty -> projectProperty.getVariableId().equals(TermId.ENTRY_TYPE.getId()) ||
-				projectProperty.getVariableId().equals(TermId.ENTRY_NO.getId()) ||
-				!VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()))
+			.filter(projectProperty -> projectProperty.getVariableId() != null &&
+				(projectProperty.getVariableId().equals(TermId.ENTRY_TYPE.getId()) ||
+				 projectProperty.getVariableId().equals(TermId.ENTRY_NO.getId()) ||
+				 !VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId())))
 			.collect(Collectors.toList());
 
 		this.setStudyGenerationLevel(listId, studyId);
