@@ -719,7 +719,10 @@ public class WorkbookBuilder extends Builder {
 
 			for (final DMSVariableType variable : variables.getFactors().getVariableTypes()) {
 				if (PhenotypicType.TRIAL_DESIGN == variable.getRole() || PhenotypicType.GERMPLASM == variable.getRole()
-					|| PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
+					|| PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()
+					// TODO: remove it if we want to add entry details variable as factors. So, only test entries are gonna be advanced in the actual advance process
+//					|| PhenotypicType.ENTRY_DETAIL == variable.getRole()
+				) {
 
 					factorList.add(variable);
 				}

@@ -9,22 +9,16 @@ import java.util.Set;
 @AutoProperty
 public class AdvanceStudyRequest {
 
-	private Integer breedingMethodId;
+	// Represents the selected instance ids
 	private List<Integer> instanceIds;
-	private Integer methodVariateId;
-	private Integer linesSelected;
-	private Integer lineVariateId;
+
+	private BreedingMethodSelectionRequest breedingMethodSelectionRequest;
+	private LineSelectionRequest lineSelectionRequest;
+
 	// TODO: add replications param
 	private Set<String> selectedReplications;
+
 	private SelectionTraitRequest selectionTraitRequest;
-
-	public Integer getBreedingMethodId() {
-		return breedingMethodId;
-	}
-
-	public void setBreedingMethodId(final Integer breedingMethodId) {
-		this.breedingMethodId = breedingMethodId;
-	}
 
 	public List<Integer> getInstanceIds() {
 		return instanceIds;
@@ -34,28 +28,29 @@ public class AdvanceStudyRequest {
 		this.instanceIds = instanceIds;
 	}
 
-	public Integer getMethodVariateId() {
-		return methodVariateId;
+	public BreedingMethodSelectionRequest getBreedingMethodSelectionRequest() {
+		return breedingMethodSelectionRequest;
 	}
 
-	public void setMethodVariateId(final Integer methodVariateId) {
-		this.methodVariateId = methodVariateId;
+	public void setBreedingMethodSelectionRequest(
+		final BreedingMethodSelectionRequest breedingMethodSelectionRequest) {
+		this.breedingMethodSelectionRequest = breedingMethodSelectionRequest;
 	}
 
-	public Integer getLinesSelected() {
-		return linesSelected;
+	public LineSelectionRequest getLineSelectionRequest() {
+		return lineSelectionRequest;
 	}
 
-	public void setLinesSelected(final Integer linesSelected) {
-		this.linesSelected = linesSelected;
+	public void setLineSelectionRequest(final LineSelectionRequest lineSelectionRequest) {
+		this.lineSelectionRequest = lineSelectionRequest;
 	}
 
-	public Integer getLineVariateId() {
-		return lineVariateId;
+	public Set<String> getSelectedReplications() {
+		return selectedReplications;
 	}
 
-	public void setLineVariateId(final Integer lineVariateId) {
-		this.lineVariateId = lineVariateId;
+	public void setSelectedReplications(final Set<String> selectedReplications) {
+		this.selectedReplications = selectedReplications;
 	}
 
 	public SelectionTraitRequest getSelectionTraitRequest() {
@@ -82,6 +77,124 @@ public class AdvanceStudyRequest {
 	}
 
 	@AutoProperty
+	public static class BreedingMethodSelectionRequest {
+
+		/**
+		 * This is the id of the breeding method if the user has selected advancing using the same breeding method for all lines
+		 */
+		private Integer breedingMethodId;
+
+		/**
+		 * This is the id of the variable if the user has selected advancing using a variate which defines the breeding method for each line
+		 */
+		private Integer methodVariateId;
+
+		/**
+		 * If the breedingMethodId corresponds to a bulking method or if the methodVariateId was selected, then allPlotsSelected or plotVariateId
+		 * must be set
+		 */
+		private Boolean allPlotsSelected;
+		private Integer plotVariateId;
+
+		public Integer getBreedingMethodId() {
+			return breedingMethodId;
+		}
+
+		public void setBreedingMethodId(final Integer breedingMethodId) {
+			this.breedingMethodId = breedingMethodId;
+		}
+
+		public Integer getMethodVariateId() {
+			return methodVariateId;
+		}
+
+		public void setMethodVariateId(final Integer methodVariateId) {
+			this.methodVariateId = methodVariateId;
+		}
+
+		public Boolean getAllPlotsSelected() {
+			return allPlotsSelected;
+		}
+
+		public void setAllPlotsSelected(final Boolean allPlotsSelected) {
+			this.allPlotsSelected = allPlotsSelected;
+		}
+
+		public Integer getPlotVariateId() {
+			return plotVariateId;
+		}
+
+		public void setPlotVariateId(final Integer plotVariateId) {
+			this.plotVariateId = plotVariateId;
+		}
+
+		@Override
+		public int hashCode() {
+			return Pojomatic.hashCode(this);
+		}
+
+		@Override
+		public String toString() {
+			return Pojomatic.toString(this);
+		}
+
+		@Override
+		public boolean equals(final Object o) {
+			return Pojomatic.equals(this, o);
+		}
+
+	}
+
+
+	@AutoProperty
+	public static class LineSelectionRequest {
+
+		/**
+		 * This is the number of the lines selected per plot
+		 */
+		private Integer linesSelected;
+
+		/**
+		 * Otherwise if there is no specific number of lines selected, this is the id of the variable that defines the number of
+		 * lines selected from each plot
+		 */
+		private Integer lineVariateId;
+
+		public Integer getLinesSelected() {
+			return linesSelected;
+		}
+
+		public void setLinesSelected(final Integer linesSelected) {
+			this.linesSelected = linesSelected;
+		}
+
+		public Integer getLineVariateId() {
+			return lineVariateId;
+		}
+
+		public void setLineVariateId(final Integer lineVariateId) {
+			this.lineVariateId = lineVariateId;
+		}
+
+		@Override
+		public int hashCode() {
+			return Pojomatic.hashCode(this);
+		}
+
+		@Override
+		public String toString() {
+			return Pojomatic.toString(this);
+		}
+
+		@Override
+		public boolean equals(final Object o) {
+			return Pojomatic.equals(this, o);
+		}
+
+	}
+
+
+	@AutoProperty
 	public static class SelectionTraitRequest {
 
 		private Integer datasetId;
@@ -101,6 +214,21 @@ public class AdvanceStudyRequest {
 
 		public void setVariableId(final Integer variableId) {
 			this.variableId = variableId;
+		}
+
+		@Override
+		public int hashCode() {
+			return Pojomatic.hashCode(this);
+		}
+
+		@Override
+		public String toString() {
+			return Pojomatic.toString(this);
+		}
+
+		@Override
+		public boolean equals(final Object o) {
+			return Pojomatic.equals(this, o);
 		}
 	}
 

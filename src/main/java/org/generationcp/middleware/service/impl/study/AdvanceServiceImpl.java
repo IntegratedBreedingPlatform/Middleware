@@ -14,6 +14,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.ruleengine.naming.expression.resolver.LocationDataResolver;
 import org.generationcp.middleware.ruleengine.naming.expression.resolver.SeasonDataResolver;
 import org.generationcp.middleware.ruleengine.naming.expression.resolver.SelectionTraitResolver;
@@ -104,47 +105,97 @@ public class AdvanceServiceImpl implements AdvanceService {
 			this.studyInstanceService.getStudyInstances(studyId).stream()
 				.collect(Collectors.toMap(StudyInstance::getInstanceNumber, i -> i));
 
-		final Map<String, Method> breedingMethodsByCodes =
-			this.daoFactory.getMethodDAO().getAllMethod().stream()
+		final List<Method> allMethods = this.daoFactory.getMethodDAO().getAllMethod();
+		final Map<String, Method> breedingMethodsByCode =
+			allMethods.stream()
 				.collect(Collectors.toMap(Method::getMcode, method -> method, (method1, method2) -> method1));
+		final Map<Integer, Method> breedingMethodsById =
+			allMethods.stream()
+				.collect(Collectors.toMap(Method::getMid, method -> method, (method1, method2) -> method1));
 
 		final Map<Integer, Location> locationsByLocationId =
 			this.getLocationsByLocationIdFromTrialObservationUnits(trialObservations);
 
+		// TODO: Considering performance issue due to we will have a lot of objects in the memory... Is really needed to have the germplasm entity??? At least according to to the old advance we need only a few of germplasm properties:
+		//  https://github.com/IntegratedBreedingPlatform/Fieldbook/blob/f242b4219653d926f20a06214c0c8b1083af148e/src/main/java/com/efficio/fieldbook/web/naming/impl/AdvancingSourceListFactory.java#L245
+		//  Besides that part of the code, there are other properties that are required such as mgid, progenitors data, etc. Take a look how many things of germplasm we need in the advance process
 		final Map<Integer, Germplasm> originGermplasmsByGid = this.getOriginGermplasmByGid(plotObservations);
 
+		final Set<Integer> advancingSourceOriginGids = new HashSet<>();
+		final List<NewAdvancingSource> advancingSources = new ArrayList<>();
 		plotObservations.forEach(row -> {
-			final NewAdvancingSource advancingSourceCandidate =
-				new NewAdvancingSource(seasonStudyLevel, selectionTraitStudyLevel,
-					originGermplasmsByGid.get(row.getGid()));
-			advancingSourceCandidate.setTrialInstanceNumber(String.valueOf(row.getTrialInstance()));
-
-			// If study is Trial, then setting data if trial instance is not null
-			if (advancingSourceCandidate.getTrialInstanceNumber() != null) {
-				this.setTrialIntanceObservations(trialObservations, row, advancingSourceCandidate, studyInstancesByInstanceNumber);
-			}
-
-			this.resolveEnvironmentAndPlotLevelData(environmentDataset.getDatasetId(), plotDataset.getDatasetId(),
-				request.getSelectionTraitRequest(), advancingSourceCandidate, row, locationsByLocationId, plotDataVariablesByTermId);
-
-			// Setting conditions for Breeders Cross ID
-			// TODO: we only set conditions for breeders cross id. Find another way to pass conditions to breeders cross id
-			advancingSourceCandidate.setConditions(studyEnvironmentVariables);
-			// TODO: NPE! fix it. (why there are observationUnitDatas without variableId value?? ) -----> It should be FIXED now -> I added 		trialObservationUnitsSearchDTO.setEnvironmentDatasetId(environmentDataset.getDatasetId());
-			//			advancingSourceCandidate
-			//				.setReplicationNumber(this.getObservationValueByVariableId(row.getVariables().values(), TermId.REP_NO.getId()));
-
-			// TODO: Should be the first thing to do getting the breeding method?
-			final Integer methodId = request.getMethodVariateId() == null ? request.getBreedingMethodId() :
-				this.getBreedingMethodId(request.getMethodVariateId(), row, breedingMethodsByCodes);
-			if (methodId == null) {
+			final Method breedingMethod =
+				this.getBreedingMethod(request.getBreedingMethodSelectionRequest(), row.getVariables().values(), breedingMethodsByCode,
+					breedingMethodsById);
+			final Germplasm germplasm = originGermplasmsByGid.get(row.getGid());
+			if (breedingMethod == null || breedingMethod.isBulkingMethod() == null || germplasm == null) {
 				return;
 			}
 
-			// TODO: create naming ->  names
-			// TODO: create the advanced germplasm and save it
+			advancingSourceOriginGids.add(germplasm.getGid());
+			final NewAdvancingSource advancingSource =
+				new NewAdvancingSource(seasonStudyLevel, selectionTraitStudyLevel, germplasm);
+			advancingSource.setTrialInstanceNumber(String.valueOf(row.getTrialInstance()));
 
+			// If study is Trial, then setting data if trial instance is not null
+			if (advancingSource.getTrialInstanceNumber() != null) {
+				this.setTrialIntanceObservations(trialObservations, row, advancingSource, studyInstancesByInstanceNumber);
+			}
+
+			this.resolveEnvironmentAndPlotLevelData(environmentDataset.getDatasetId(), plotDataset.getDatasetId(),
+				request.getSelectionTraitRequest(), advancingSource, row, locationsByLocationId, plotDataVariablesByTermId);
+
+			// Setting conditions for Breeders Cross ID
+			// TODO: we only set conditions for breeders cross id. Find another way to pass conditions to breeders cross id
+			advancingSource.setConditions(studyEnvironmentVariables);
+			advancingSource
+				.setReplicationNumber(this.getObservationValueByVariableId(row.getVariables().values(), TermId.REP_NO.getId()));
+
+			// TODO: Do we need to add logic to check if we are gonna to allow advance test entries???. If it's the case, I guess we need to add this checking after getting the breeding method
+			//			final MeasurementData checkData = row.getMeasurementData(TermId.ENTRY_TYPE.getId());
+			//			String check = null;
+			//			if (checkData != null) {
+			//				check = checkData.getcValueId();
+			//				if (checkData != null && checkData.getMeasurementVariable() != null
+			//					&& checkData.getMeasurementVariable().getPossibleValues() != null && !checkData.getMeasurementVariable()
+			//					.getPossibleValues().isEmpty() && check != null && NumberUtils.isNumber(check)) {
+			//
+			//					for (final ValueReference valref : checkData.getMeasurementVariable().getPossibleValues()) {
+			//						if (valref.getId().equals(Double.valueOf(check).intValue())) {
+			//							check = valref.getName();
+			//							break;
+			//						}
+			//					}
+			//				}
+			//			}
+			//			final boolean isCheck =
+			//				check != null && !"".equals(check) && !AdvancingSourceListFactory.DEFAULT_TEST_VALUE.equalsIgnoreCase(check);
+
+			advancingSource
+				.setPlotNumber(this.getObservationValueByVariableId(row.getVariables().values(), TermId.PLOT_NO.getId()));
+
+			// TODO: implement get plant selection for sample?
+			//			if (advanceInfo.getAdvanceType().equals(AdvanceType.SAMPLE)) {
+			//				if (samplesMap.containsKey(row.getExperimentId())) {
+			//					plantsSelected = samplesMap.get(row.getExperimentId()).size();
+			//					advancingSourceCandidate.setSamples(samplesMap.get(row.getExperimentId()));
+			//				} else {
+			//					continue;
+			//				}
+			//			}
+
+			// TODO: consider that plant selected is also being set also in: com.efficio.fieldbook.web.trial.controller.AdvancingController#updatePlantsSelectedIfNecessary
+			final Integer plantsSelected = this.getPlantSelected(request, breedingMethod.isBulkingMethod(), row);
+			advancingSource.setPlantsSelected(plantsSelected);
+
+			advancingSources.add(advancingSource);
 		});
+
+		if (!CollectionUtils.isEmpty(advancingSources)) {
+			this.addNamesToAdvancingSource(advancingSources, advancingSourceOriginGids);
+		}
+
+		// TODO: create the advanced germplasm and save it
 
 		// TODO: returns the recently created gerplasm::gids
 		return null;
@@ -210,14 +261,15 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.collect(Collectors.toList());
 	}
 
-	private Optional<ObservationUnitData> getVariableByVariableId(final Collection<ObservationUnitData> variables, final int variableId) {
+	private Optional<ObservationUnitData> getVariableById(final Collection<ObservationUnitData> variables,
+		final Integer variableId) {
 		return variables.stream()
-			.filter(variable -> variable.getVariableId() == variableId)
+			.filter(variable -> variableId.equals(variable.getVariableId()))
 			.findFirst();
 	}
 
-	private String getObservationValueByVariableId(final Collection<ObservationUnitData> variables, final int variableId) {
-		return this.getVariableByVariableId(variables, variableId)
+	private String getObservationValueByVariableId(final Collection<ObservationUnitData> variables, final Integer variableId) {
+		return this.getVariableById(variables, variableId)
 			.map(ObservationUnitData::getValue)
 			.orElse(null);
 	}
@@ -239,7 +291,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.findFirst()
 			.ifPresent(trialObservation -> {
 				if (studyInstancesByInstanceNumber.containsKey(trialInstanceNumber) && trialObservation != null) {
-					this.getVariableByVariableId(trialObservation.getEnvironmentVariables().values(), TermId.LOCATION_ID.getId())
+					this.getVariableById(trialObservation.getEnvironmentVariables().values(), TermId.LOCATION_ID.getId())
 						.ifPresent(
 							observationUnitData -> observationUnitData
 								.setValue(String.valueOf(studyInstancesByInstanceNumber.get(trialInstanceNumber).getLocationId()))
@@ -249,14 +301,28 @@ public class AdvanceServiceImpl implements AdvanceService {
 			});
 	}
 
-	private Integer getBreedingMethodId(final Integer methodVariateId, final ObservationUnitRow row,
+	private Method getBreedingMethod(final AdvanceStudyRequest.BreedingMethodSelectionRequest request,
+		final Collection<ObservationUnitData> variables,
+		final Map<String, Method> breedingMethodsByCode,
+		final Map<Integer, Method> breedingMethodsById) {
+		final Integer breedingMethodId = request.getMethodVariateId() == null ? request.getBreedingMethodId() :
+			this.getBreedingMethodId(request.getMethodVariateId(), variables, breedingMethodsByCode);
+		if (breedingMethodId == null) {
+			return null;
+		}
+		return breedingMethodsById.get(breedingMethodId);
+	}
+
+	// TODO: Should this method return the method entity?
+	// TODO: we are asking for BREEDING_METHOD_VARIATE and BREEDING_METHOD_VARIATE_TEXT due to backward compatibility
+	private Integer getBreedingMethodId(final Integer methodVariateId, final Collection<ObservationUnitData> variables,
 		final Map<String, Method> breedingMethodsByCode) {
 		// TODO: the user can select BREEDING_METHOD_VARIATE as variate variable ???
 		if (TermId.BREEDING_METHOD_VARIATE.getId() == methodVariateId) {
-			return this.getIntegerValue(this.getObservationValueByVariableId(row.getVariables().values(), methodVariateId));
+			return this.getIntegerValue(this.getObservationValueByVariableId(variables, methodVariateId));
 		} else if (TermId.BREEDING_METHOD_VARIATE_TEXT.getId() == methodVariateId
 			|| TermId.BREEDING_METHOD_VARIATE_CODE.getId() == methodVariateId) {
-			final String methodName = this.getObservationValueByVariableId(row.getVariables().values(), methodVariateId);
+			final String methodName = this.getObservationValueByVariableId(variables, methodVariateId);
 			if (StringUtils.isEmpty(methodName)) {
 				return null;
 			}
@@ -274,7 +340,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 			}
 		} else {
 			// on load of study, this has been converted to id and not the code.
-			return this.getIntegerValue(this.getObservationValueByVariableId(row.getVariables().values(), methodVariateId));
+			return this.getIntegerValue(this.getObservationValueByVariableId(variables, methodVariateId));
 		}
 		return null;
 	}
@@ -324,6 +390,39 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.resolveEnvironmentLevelData(environmentDatasetId, selectionTraitRequest, source, plotDataVariablesByTermId);
 		this.selectionTraitResolver
 			.resolvePlotLevelData(plotDatasetId, selectionTraitRequest, source, row, plotDataVariablesByTermId);
+	}
+
+	private Integer getPlantSelected(final AdvanceStudyRequest request, final boolean isBulkMethod,
+		final ObservationUnitRow row) {
+		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
+			request.getBreedingMethodSelectionRequest();
+		if (isBulkMethod && (breedingMethodSelectionRequest.getAllPlotsSelected() == null || !breedingMethodSelectionRequest
+			.getAllPlotsSelected())) {
+			final Integer plotVariateId = breedingMethodSelectionRequest.getPlotVariateId();
+			if (plotVariateId != null) {
+				final String plotVariateValue =
+					this.getObservationValueByVariableId(row.getVariables().values(), plotVariateId);
+				return this.getIntegerValue(plotVariateValue);
+			}
+		} else {
+			final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest = request.getLineSelectionRequest();
+			if (lineSelectionRequest.getLineVariateId() != null && lineSelectionRequest.getLinesSelected() == null) {
+				final String lineVariateValue =
+					this.getObservationValueByVariableId(row.getVariables().values(), lineSelectionRequest.getLineVariateId());
+				return this.getIntegerValue(lineVariateValue);
+			}
+		}
+		return null;
+	}
+
+	private void addNamesToAdvancingSource(final List<NewAdvancingSource> advancingSources, final Set<Integer> advancingSourceOriginGids) {
+		final Map<Integer, List<Name>> namesByGids =
+			this.daoFactory.getNameDao().getNamesByGidsInMap(new ArrayList<>(advancingSourceOriginGids));
+
+		advancingSources.forEach(advancingSource -> {
+			final List<Name> names = namesByGids.get(advancingSource.getOriginGermplasm().getGid());
+			advancingSource.setNames(names);
+		});
 	}
 
 }

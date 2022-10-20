@@ -22,6 +22,14 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 		this.setLocationAbbreviation("");
 	}
 
+	public Germplasm getOriginGermplasm() {
+		return originGermplasm;
+	}
+
+	public void setOriginGermplasm(final Germplasm originGermplasm) {
+		this.originGermplasm = originGermplasm;
+	}
+
 	public ObservationUnitRow getTrailInstanceObservation() {
 		return trailInstanceObservation;
 	}

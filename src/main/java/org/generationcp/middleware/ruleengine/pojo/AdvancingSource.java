@@ -33,8 +33,7 @@ import java.util.Map;
 public class AdvancingSource extends AbstractAdvancingSource {
 
 	private ImportedGermplasm germplasm;
-	private List<Name> names;
-	private Integer plantsSelected;
+
 	private Method breedingMethod;
 	/**
 	 * This field is used to temporarily store the breeding method ID until such time as it can be resolved to a proper breeding Method object
@@ -52,7 +51,7 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	private String prefix;
 	private String suffix;
 	private Integer rootNameType;
-	private String plotNumber;
+
 
 	private int maleGid;
 
@@ -73,12 +72,12 @@ public class AdvancingSource extends AbstractAdvancingSource {
 			final String studyName, final String plotNumber) {
 		super();
 		this.germplasm = germplasm;
-		this.names = names;
-		this.plantsSelected = plantsSelected;
+		this.setNames(names);
+		this.setPlantsSelected(plantsSelected);
 		this.breedingMethod = breedingMethod;
 		this.isCheck = isCheck;
 		this.studyName = studyName;
-		this.plotNumber = plotNumber;
+		super.setPlotNumber(plotNumber);
 	}
 
 	public AdvancingSource(final ImportedGermplasm germplasm) {
@@ -102,20 +101,6 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	 */
 	public void setGermplasm(final ImportedGermplasm germplasm) {
 		this.germplasm = germplasm;
-	}
-
-	/**
-	 * @return the plantsSelected
-	 */
-	public Integer getPlantsSelected() {
-		return this.plantsSelected;
-	}
-
-	/**
-	 * @param plantsSelected the plantsSelected to set
-	 */
-	public void setPlantsSelected(final Integer plantsSelected) {
-		this.plantsSelected = plantsSelected;
 	}
 
 	/**
@@ -145,20 +130,6 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	 */
 	public void setBulk(final boolean isBulk) {
 		this.isBulk = isBulk;
-	}
-
-	/**
-	 * @return the names
-	 */
-	public List<Name> getNames() {
-		return this.names;
-	}
-
-	/**
-	 * @param names the names to set
-	 */
-	public void setNames(final List<Name> names) {
-		this.names = names;
 	}
 
 	/**
@@ -305,14 +276,6 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		this.rootNameType = rootNameType;
 	}
 
-	public String getPlotNumber() {
-		return this.plotNumber;
-	}
-
-	public void setPlotNumber(final String plotNumber) {
-		this.plotNumber = plotNumber;
-	}
-
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
@@ -343,7 +306,8 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	}
 
 	public AdvancingSource copy() {
-        final AdvancingSource source = new AdvancingSource(germplasm, names, plantsSelected, breedingMethod, isCheck, studyName, plotNumber);
+        final AdvancingSource source = new AdvancingSource(germplasm, this.getNames(), this.getPlantsSelected(), breedingMethod, isCheck,
+			studyName, this.getPlotNumber());
         source.setSeason(this.getSeason());
         source.setLocationAbbreviation(this.getLocationAbbreviation());
         source.setRootName(this.rootName);
