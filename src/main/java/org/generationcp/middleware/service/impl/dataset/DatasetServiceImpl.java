@@ -778,7 +778,7 @@ public class DatasetServiceImpl implements DatasetService {
 					VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId());
 			searchDTO.setPassportAndAttributes(passportAndAttributes);
 
-			final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.daoFactory.getUserDefinedFieldDAO().getNameTypeFromDataset(datasetId);
+			final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.daoFactory.getUserDefinedFieldDAO().getNameTypeFromDataset(observationSetId);
 
 			searchDTO.setNameTypes(germplasmNameTypeDTOs.stream()
 				.map(germplasmNameTypeDTO ->
