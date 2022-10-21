@@ -245,6 +245,7 @@ public interface FieldbookService {
 	 *            the gids
 	 * @return the germplasms
 	 */
+	@Deprecated
 	List<Germplasm> getGermplasms(List<Integer> gids);
 
 	/**
@@ -483,6 +484,7 @@ public interface FieldbookService {
 	 *            the gids
 	 * @return the names by gids
 	 */
+	@Deprecated
 	Map<Integer, List<Name>> getNamesByGids(List<Integer> gids);
 
 	/**
