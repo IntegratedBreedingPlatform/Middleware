@@ -36,7 +36,7 @@ import org.hibernate.annotations.Type;
  *
  */
 @Entity
-@Table(name = "cvterm", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "cv_id", "is_obsolete"}),
+@Table(name = "cvterm", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "cv_id"}),
 		@UniqueConstraint(columnNames = {"dbxref_id"})})
 @Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="cvterm")
 public class CVTerm implements Serializable {
