@@ -15,10 +15,12 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 	public NewAdvancingSource() {
 	}
 
-	public NewAdvancingSource(final String season, final String selectionTraitValue, final Germplasm originGermplasm) {
+	public NewAdvancingSource(final Germplasm originGermplasm, final String season, final String selectionTraitValue,
+		final Integer plantSelected) {
+		this.originGermplasm = originGermplasm;
 		this.setSeason(season);
 		this.setSelectionTraitValue(selectionTraitValue);
-		this.originGermplasm = originGermplasm;
+		this.setPlantsSelected(plantSelected);
 		this.setLocationAbbreviation("");
 	}
 
