@@ -75,7 +75,7 @@ class ObservationQuery {
 			+ "      isp.stock_id = s.stock_id " //
 			+ "      AND ispcvt.name = 'ENTRY_TYPE') AS ENTRY_TYPE, " //
 			+ "   g.germplsm_uuid AS GERMPLSM_UUID, " //
-			+ "   s.name AS DESIGNATION, " //
+			+ "   name.nval AS DESIGNATION, " //
 			+ "   s.uniquename AS ENTRY_NO, " //
 			+ "   (SELECT isp.value FROM stockprop isp "
 			+ "              INNER JOIN cvterm ispcvt1 ON ispcvt1.cvterm_id = isp.type_id "
@@ -177,6 +177,7 @@ class ObservationQuery {
 			+ "    INNER JOIN germplsm g ON g.gid = s.dbxref_id "
 			+ "	   LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	   LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
+			+ "    LEFT JOIN names name ON name.gid = g.gid and name.nstat = 1 " //
 			+ "    LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = "
 			//
 			+ TermId.RANGE_NO.getId() //
@@ -222,7 +223,7 @@ class ObservationQuery {
 			.append(
 				"    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.cvalue_id WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,  ")
 			.append("    s.dbxref_id AS GID, ")
-			.append("    s.name DESIGNATION, ")
+			.append("    name.nval DESIGNATION, ")
 			.append("    s.uniquename ENTRY_NO, ")
 			.append("    s.value as ENTRY_CODE, ")
 			.append(
@@ -279,6 +280,7 @@ class ObservationQuery {
 			.append("	INNER JOIN stock s ON s.stock_id = nde.stock_id  ")
 			.append("	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id  ")
 			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id  ")
+			.append("	LEFT JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1  ")
 			.append("		WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n");
 
 		return sqlBuilder.toString();
