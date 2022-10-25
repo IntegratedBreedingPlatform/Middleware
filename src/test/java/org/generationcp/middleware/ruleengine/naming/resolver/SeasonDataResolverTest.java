@@ -1,4 +1,4 @@
-package org.generationcp.middleware.ruleengine.naming.expression.resolver;
+package org.generationcp.middleware.ruleengine.naming.resolver;
 
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;

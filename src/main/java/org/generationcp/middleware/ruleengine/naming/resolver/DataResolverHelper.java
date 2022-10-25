@@ -1,4 +1,4 @@
-package org.generationcp.middleware.ruleengine.naming.expression.resolver;
+package org.generationcp.middleware.ruleengine.naming.resolver;
 
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.springframework.util.CollectionUtils;

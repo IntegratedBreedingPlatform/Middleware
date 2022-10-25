@@ -1,4 +1,4 @@
-package org.generationcp.middleware.ruleengine.naming.expression.resolver;
+package org.generationcp.middleware.ruleengine.naming.resolver;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.TermId;

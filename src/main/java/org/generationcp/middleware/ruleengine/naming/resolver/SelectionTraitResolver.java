@@ -1,4 +1,4 @@
-package org.generationcp.middleware.ruleengine.naming.expression.resolver;
+package org.generationcp.middleware.ruleengine.naming.resolver;
 
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.domain.dms.ValueReference;
