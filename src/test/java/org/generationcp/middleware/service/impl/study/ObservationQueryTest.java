@@ -102,7 +102,7 @@ public class ObservationQueryTest {
 			+ "    gl.description AS TRIAL_INSTANCE,\n"
 			+ "    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.cvalue_id WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n"
 			+ "    s.dbxref_id AS GID,\n"
-			+ "    s.name DESIGNATION,\n"
+			+ "    name.nval DESIGNATION,\n"
 			+ "    s.uniquename ENTRY_NO,\n"
 			+ "    s.value as ENTRY_CODE,\n"
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO, \n"
@@ -130,7 +130,8 @@ public class ObservationQueryTest {
 			+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
 			+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
 			+ "        LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n"
-			+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
+			+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
+			+ "        LEFT JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1 "
 			+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
 			+ "		AND gl.nd_geolocation_id = :instanceId \n"
 			+ " GROUP BY nde.nd_experiment_id "
@@ -142,7 +143,7 @@ public class ObservationQueryTest {
 		return "SELECT \n" + "    nde.nd_experiment_id,\n" + "    gl.description AS TRIAL_INSTANCE,\n"
 			+ "    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.cvalue_id WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n"
 			+ "    s.dbxref_id AS GID,\n"
-			+ "    s.name DESIGNATION,\n"
+			+ "    name.nval DESIGNATION,\n"
 			+ "    s.uniquename ENTRY_NO,\n"
 			+ "    s.value as ENTRY_CODE,\n"
 			+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO, \n"
@@ -171,7 +172,8 @@ public class ObservationQueryTest {
 			+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
 			+ "        INNER JOIN stock s ON s.stock_id = nde.stock_id \n"
 			+ "        LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \n"
-			+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id"
+			+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id\n"
+			+ "        LEFT JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1 "
 			+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
 			+ "		AND nde.nd_experiment_id=:experiment_id \n"
 			+ " GROUP BY nde.nd_experiment_id ";
@@ -187,7 +189,7 @@ public class ObservationQueryTest {
 	private String getRowColumnQuery() {
 		return
 			" SELECT    nde.nd_experiment_id,    gl.description AS TRIAL_INSTANCE,    proj.name AS PROJECT_NAME,    gl.nd_geolocation_id,    (SELECT iispcvt.definition  FROM       stockprop isp  INNER JOIN       cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id  INNER JOIN       cvterm iispcvt ON iispcvt.cvterm_id = isp.cvalue_id  WHERE       isp.stock_id = s.stock_id       AND ispcvt.name = 'ENTRY_TYPE') AS ENTRY_TYPE,    g.germplsm_uuid AS GERMPLSM_UUID,    "
-				+ "s.name AS DESIGNATION,    "
+				+ "name.nval AS DESIGNATION,    "
 				+ "s.uniquename AS ENTRY_NO,    "
 				+ "   (SELECT isp.value FROM stockprop isp "
 				+ "              INNER JOIN cvterm ispcvt1 ON ispcvt1.cvterm_id = isp.type_id "
@@ -203,7 +205,7 @@ public class ObservationQueryTest {
 				+ "(SELECT l.lname \tFROM nd_geolocationprop gp \tINNER JOIN location l ON l.locid = gp.value \tWHERE gp.type_id = 8190 AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationName, "
 				+ "(SELECT  gp.value   FROM nd_geolocationprop gp  WHERE gp.type_id = 8189 AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationAbbreviation, "
 				+ "FieldMapCol.value AS FieldMapColumn, "
-				+ "FieldMapRow.value AS FieldMapRow,  1=1  FROM Project p     INNER JOIN project proj ON proj.project_id =  p.study_id     INNER JOIN nd_experiment nde ON nde.project_id = p.project_id     INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id     INNER JOIN stock s ON s.stock_id = nde.stock_id     INNER JOIN germplsm g ON g.gid = s.dbxref_id \t   LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \t   LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id     LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = 8410    LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = 8400 WHERE p.study_id = :projectId AND p.dataset_type_id = 4 \n"
+				+ "FieldMapRow.value AS FieldMapRow,  1=1  FROM Project p     INNER JOIN project proj ON proj.project_id =  p.study_id     INNER JOIN nd_experiment nde ON nde.project_id = p.project_id     INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id     INNER JOIN stock s ON s.stock_id = nde.stock_id     INNER JOIN germplsm g ON g.gid = s.dbxref_id \t   LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id \t   LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id   LEFT JOIN names name ON name.gid = g.gid and name.nstat = 1   LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = 8410    LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = 8400 WHERE p.study_id = :projectId AND p.dataset_type_id = 4 \n"
 				+ " GROUP BY nde.nd_experiment_id ";
 	}
 
