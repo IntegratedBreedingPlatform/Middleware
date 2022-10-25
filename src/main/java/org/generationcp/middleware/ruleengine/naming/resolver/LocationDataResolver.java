@@ -16,8 +16,8 @@ public class LocationDataResolver {
 	 * @param locationsByLocationId
 	 */
 	public void resolveEnvironmentLevelData(final NewAdvancingSource source, final Map<Integer, Location> locationsByLocationId) {
-		if (DataResolverHelper.checkHasTrailInstanceObservations(source.getTrailInstanceObservation())) {
-			source.getTrailInstanceObservation().getEnvironmentVariables().values().stream()
+		if (DataResolverHelper.checkHasTrailInstanceObservations(source.getTrialInstanceObservation())) {
+			source.getTrialInstanceObservation().getEnvironmentVariables().values().stream()
 				.filter(observationUnitData -> TermId.LOCATION_ID.getId() == observationUnitData.getVariableId())
 				.findFirst()
 				.ifPresent(observationUnitData -> {

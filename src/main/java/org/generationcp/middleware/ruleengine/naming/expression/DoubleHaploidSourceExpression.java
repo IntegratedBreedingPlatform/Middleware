@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,6 +13,7 @@ public class DoubleHaploidSourceExpression extends BaseExpression {
 
 	public static final String KEY = "[DHSOURCE]";
 
+	// TODO: it's possible to refactor to avoid hitting the DB for each line
 	@Autowired
 	protected KeySequenceRegisterService keySequenceRegisterService;
 
@@ -28,7 +29,7 @@ public class DoubleHaploidSourceExpression extends BaseExpression {
 	 * @param capturedText
 	 */
 	@Override
-	public void apply(final List<StringBuilder> values, final AdvancingSource source, final String capturedText) {
+	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
 		for (final StringBuilder value : values) {
 			final int checkIndex = value.lastIndexOf("@0");
 			if (checkIndex != -1) {

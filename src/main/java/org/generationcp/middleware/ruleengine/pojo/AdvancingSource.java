@@ -17,11 +17,11 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -34,39 +34,23 @@ public class AdvancingSource extends AbstractAdvancingSource {
 
 	private ImportedGermplasm germplasm;
 
-	private Method breedingMethod;
 	/**
 	 * This field is used to temporarily store the breeding method ID until such time as it can be resolved to a proper breeding Method object
 	 */
 	private Integer breedingMethodId;
 	private boolean isCheck;
-	private boolean isBulk;
 	private String studyName;
-	private Integer studyId;
-	private Integer environmentDatasetId;
-	private String rootName;
 	private Method sourceMethod;
-	private int currentMaxSequence;
 	private AdvanceGermplasmChangeDetail changeDetail;
 	private String prefix;
 	private String suffix;
-	private Integer rootNameType;
-
-
-	private int maleGid;
-
-	private int femaleGid;
-
-	private boolean isForceUniqueNameGeneration;
 
 	//This will be used if we have trail
-	private MeasurementRow trailInstanceObservation;
+	private MeasurementRow trailInstanceObservationMeasurementRow;
 
 	private StudyTypeDto studyType;
 
 	private List<SampleDTO> samples = new ArrayList<>();
-	private Boolean designationIsPreviewOnly;
-	private Map<String, Integer> keySequenceMap = new HashMap<>();
 
 	public AdvancingSource(final ImportedGermplasm germplasm, final List<Name> names, final Integer plantsSelected, final Method breedingMethod, final boolean isCheck,
 			final String studyName, final String plotNumber) {
@@ -74,7 +58,7 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		this.germplasm = germplasm;
 		this.setNames(names);
 		this.setPlantsSelected(plantsSelected);
-		this.breedingMethod = breedingMethod;
+		this.setBreedingMethod(breedingMethod);
 		this.isCheck = isCheck;
 		this.studyName = studyName;
 		super.setPlotNumber(plotNumber);
@@ -120,30 +104,10 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	/**
 	 * @return the isBulk
 	 */
-	public boolean isBulk() {
+	@Override
+	public boolean isBulkingMethod() {
 		final Boolean isBulk = this.getBreedingMethod().isBulkingMethod();
 		return this.getBreedingMethod() != null && isBulk != null ? isBulk : false;
-	}
-
-	/**
-	 * @param isBulk the isBulk to set
-	 */
-	public void setBulk(final boolean isBulk) {
-		this.isBulk = isBulk;
-	}
-
-	/**
-	 * @return the breedingMethod
-	 */
-	public Method getBreedingMethod() {
-		return this.breedingMethod;
-	}
-
-	/**
-	 * @param breedingMethod the breedingMethod to set
-	 */
-	public void setBreedingMethod(final Method breedingMethod) {
-		this.breedingMethod = breedingMethod;
 	}
 
 	/**
@@ -160,39 +124,6 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		this.studyName = studyName;
 	}
 
-	public Integer getStudyId() {
-		return studyId;
-	}
-
-	public void setStudyId(final Integer studyId) {
-		this.studyId = studyId;
-	}
-
-	public Integer getEnvironmentDatasetId() {
-		return this.environmentDatasetId;
-	}
-
-	public void setEnvironmentDatasetId(final Integer environmentDatasetId) {
-		this.environmentDatasetId = environmentDatasetId;
-	}
-
-	/**
-	 * @return the rootName
-	 */
-	public String getRootName() {
-		return this.rootName;
-	}
-
-	/**
-	 * @param rootName the rootName to set
-	 */
-	public void setRootName(final String rootName) {
-		this.rootName = rootName;
-	}
-
-	/**
-	 * @return the sourceMethod
-	 */
 	public Method getSourceMethod() {
 		return this.sourceMethod;
 	}
@@ -202,20 +133,6 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	 */
 	public void setSourceMethod(final Method sourceMethod) {
 		this.sourceMethod = sourceMethod;
-	}
-
-	/**
-	 * @return the currentMaxSequence
-	 */
-	public int getCurrentMaxSequence() {
-		return this.currentMaxSequence;
-	}
-
-	/**
-	 * @param currentMaxSequence the currentMaxSequence to set
-	 */
-	public void setCurrentMaxSequence(final int currentMaxSequence) {
-		this.currentMaxSequence = currentMaxSequence;
 	}
 
 	/**
@@ -260,33 +177,17 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		this.suffix = suffix;
 	}
 
-	public boolean isForceUniqueNameGeneration() {
-		return this.isForceUniqueNameGeneration;
-	}
-
-	public void setForceUniqueNameGeneration(final boolean isForceUniqueNameGeneration) {
-		this.isForceUniqueNameGeneration = isForceUniqueNameGeneration;
-	}
-
-	public Integer getRootNameType() {
-		return this.rootNameType;
-	}
-
-	public void setRootNameType(final Integer rootNameType) {
-		this.rootNameType = rootNameType;
-	}
-
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
-    public MeasurementRow getTrailInstanceObservation() {
-		return trailInstanceObservation;
+	public void setTrailInstanceObservationMeasurementRow(final MeasurementRow trailInstanceObservationMeasurementRow) {
+		this.trailInstanceObservationMeasurementRow = trailInstanceObservationMeasurementRow;
 	}
 
-	public void setTrailInstanceObservation(final MeasurementRow trailInstanceObservation) {
-		this.trailInstanceObservation = trailInstanceObservation;
+	public MeasurementRow getTrailInstanceObservationMeasurementRow() {
+		return trailInstanceObservationMeasurementRow;
 	}
 
 	public StudyTypeDto getStudyType() {
@@ -306,39 +207,23 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	}
 
 	public AdvancingSource copy() {
-        final AdvancingSource source = new AdvancingSource(germplasm, this.getNames(), this.getPlantsSelected(), breedingMethod, isCheck,
+        final AdvancingSource source = new AdvancingSource(germplasm, this.getNames(), this.getPlantsSelected(), this.getBreedingMethod(), isCheck,
 			studyName, this.getPlotNumber());
         source.setSeason(this.getSeason());
         source.setLocationAbbreviation(this.getLocationAbbreviation());
-        source.setRootName(this.rootName);
+        source.setRootName(this.getRootName());
         source.setSourceMethod(this.sourceMethod);
-        source.setCurrentMaxSequence(this.currentMaxSequence);
+        source.setCurrentMaxSequence(this.getCurrentMaxSequence());
         source.setChangeDetail(this.changeDetail);
         source.setPrefix(this.prefix);
         source.setSuffix(this.suffix);
-        source.setRootNameType(this.rootNameType);
+        source.setRootNameType(this.getRootNameType());
         source.setHarvestLocationId(this.getHarvestLocationId());
         source.setSelectionTraitValue(this.getSelectionTraitValue());
         source.setTrialInstanceNumber(this.getTrialInstanceNumber());
         source.setReplicationNumber(this.getReplicationNumber());
         return source;
     }
-
-	public int getMaleGid() {
-		return maleGid;
-	}
-
-	public void setMaleGid(final int maleGid) {
-		this.maleGid = maleGid;
-	}
-
-	public int getFemaleGid() {
-		return femaleGid;
-	}
-
-	public void setFemaleGid(final int femaleGid) {
-		this.femaleGid = femaleGid;
-	}
 
 	public List<SampleDTO> getSamples() {
 		return samples;
@@ -348,19 +233,34 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		this.samples = samples;
 	}
 
-	public Boolean getDesignationIsPreviewOnly() {
-		return designationIsPreviewOnly;
+	@Override
+	public String getOriginGermplasmGid() {
+		return this.germplasm.getGid();
 	}
 
-	public void setDesignationIsPreviewOnly(Boolean designationIsPreviewOnly) {
-		this.designationIsPreviewOnly = designationIsPreviewOnly;
+	@Override
+	public Integer getOriginGermplasmGpid1() {
+		return this.germplasm.getGpid1();
 	}
 
-	public Map<String, Integer> getKeySequenceMap() {
-		return keySequenceMap;
+	@Override
+	public Integer getOriginGermplasmGpid2() {
+		return this.germplasm.getGpid2();
 	}
 
-	public void setKeySequenceMap(Map<String, Integer> keySequenceMap) {
-		this.keySequenceMap = keySequenceMap;
+	@Override
+	public Integer getOriginGermplasmGnpgs() {
+		return this.germplasm.getGnpgs();
 	}
+
+	@Override
+	public String getOriginGermplasmBreedingMethodType() {
+		return (this.sourceMethod == null) ? null : this.sourceMethod.getMtype();
+	}
+
+	@Override
+	public ObservationUnitRow getTrialInstanceObservation() {
+		return ObservationUnitUtils.fromMeasurementRow(this.trailInstanceObservationMeasurementRow);
+	}
+
 }

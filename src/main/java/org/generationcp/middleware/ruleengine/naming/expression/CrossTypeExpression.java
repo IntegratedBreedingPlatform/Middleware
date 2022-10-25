@@ -4,8 +4,7 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
-import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
+import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +24,7 @@ public class CrossTypeExpression extends BaseExpression {
 	public static final String WHEAT = "wheat";
 	public static final String MAIZE = "maize";
 
+	// TODO: refactor. Try to avoid hitting the DB for each line
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
 
@@ -32,7 +32,7 @@ public class CrossTypeExpression extends BaseExpression {
 	}
 
 	@Override
-	public void apply(final List<StringBuilder> values, final AdvancingSource source, final String capturedText) {
+	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
 		String crossTypeAbbreviation = "";
 		final Method breedingMethod = source.getBreedingMethod();
 
@@ -41,7 +41,7 @@ public class CrossTypeExpression extends BaseExpression {
 		} else if (breedingMethod.getMname().equals(DOUBLE_CROSS)) {
 			crossTypeAbbreviation = "D";
 		} else if (breedingMethod.getMname().equals(BACK_CROSS)) {
-			crossTypeAbbreviation = getRecurrentParentType(source.getGermplasm());
+			crossTypeAbbreviation = getRecurrentParentType(source.getOriginGermplasmGid());
 		} else if(this.isTopCrossMethod(breedingMethod)){
 			crossTypeAbbreviation = "T";
 		}
@@ -52,9 +52,9 @@ public class CrossTypeExpression extends BaseExpression {
 		}
 	}
 
-	private String getRecurrentParentType(final ImportedGermplasm importedGermplasm){
+	private String getRecurrentParentType(final String germplasmOriginGid) {
 
-		final Integer gid = Integer.parseInt(importedGermplasm.getGid());
+		final Integer gid = Integer.parseInt(germplasmOriginGid);
 
 		final Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(gid);
 

@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public class NumberExpression extends BaseExpression implements Expression {
 	}
 
 	@Override
-	public void apply(final List<StringBuilder> values, final AdvancingSource source, final String capturedText) {
+	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
 		if (source.isForceUniqueNameGeneration()) {
 			for (final StringBuilder container : values) {
 				this.replaceExpressionWithValue(container, "(" + (source.getCurrentMaxSequence() + 1) + ")");
@@ -27,7 +27,7 @@ public class NumberExpression extends BaseExpression implements Expression {
 			return;
 		}
 
-		if (source.isBulk()) {
+		if (source.isBulkingMethod()) {
 			for (final StringBuilder container : values) {
 				if (source.getPlantsSelected() != null && source.getPlantsSelected() > 1) {
 					final Integer newValue = source.getPlantsSelected();

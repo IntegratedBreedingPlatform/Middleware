@@ -128,7 +128,7 @@ public class SeasonDataResolverTest {
 		observationUnitRow.setEnvironmentVariables(environmentVariables);
 
 		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
-		Mockito.when(source.getTrailInstanceObservation()).thenReturn(observationUnitRow);
+		Mockito.when(source.getTrialInstanceObservation()).thenReturn(observationUnitRow);
 
 		final MeasurementVariable firstInstanceMeasurementVariable = MeasurementVariableTestDataInitializer
 			.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), null);
@@ -157,7 +157,7 @@ public class SeasonDataResolverTest {
 		observationUnitRow.setEnvironmentVariables(environmentVariables);
 
 		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
-		Mockito.when(source.getTrailInstanceObservation()).thenReturn(observationUnitRow);
+		Mockito.when(source.getTrialInstanceObservation()).thenReturn(observationUnitRow);
 
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId = new HashMap<>();
 		plotDataVariablesByTermId.put(measurementVariableTermId.getId(), firstInstanceSeasonMeasurementVariable);

@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,9 +15,9 @@ public class LocationAbbreviationExpression extends BaseExpression {
 	}
 
 	@Override
-	public void apply(List<StringBuilder> values, AdvancingSource source, final String capturedText) {
-		for (StringBuilder container : values) {
-			String newValue = source.getLocationAbbreviation();
+	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+		for (final StringBuilder container : values) {
+			final String newValue = source.getLocationAbbreviation();
 			this.replaceExpressionWithValue(container, newValue);
 		}
 	}

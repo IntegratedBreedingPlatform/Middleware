@@ -8,8 +8,6 @@ import java.util.regex.Pattern;
 @Component
 public class PaddedSequenceExpression extends SequenceExpression {
 
-
-
 	@Override
 	public Integer getNumberOfDigits(final StringBuilder container) {
 		return ExpressionUtils.getNumberOfDigitsFromKey(org.generationcp.middleware.ruleengine.coding.expression.PaddedSequenceExpression.PATTERN, container);

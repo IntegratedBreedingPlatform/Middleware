@@ -9,7 +9,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 public class RootNameExpression implements Expression {
 
 	@Override
-	public void apply(final List<StringBuilder> values, final AdvancingSource source, final String capturedText) {
+	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
 		for (final StringBuilder value : values) {
 			final Integer snametype = source.getBreedingMethod().getSnametype();
 			Name name = null;
@@ -112,7 +112,7 @@ public class RootNameExpression implements Expression {
 	}
 
 	private boolean checkNeighbor(final String name, final int index, final char literal, final int delta, final int stopPoint,
-			final char oppositeLiteral) {
+		final char oppositeLiteral) {
 		int oppositeCount = 0;
 		for (int i = index + delta; i != stopPoint + delta; i = i + delta) {
 			if (name.charAt(i) == literal) {

@@ -127,15 +127,20 @@ public class AdvanceServiceImpl implements AdvanceService {
 			final Method breedingMethod =
 				this.getBreedingMethod(request.getBreedingMethodSelectionRequest(), row.getVariables().values(), breedingMethodsByCode,
 					breedingMethodsById);
+			if (breedingMethod == null) {
+				return;
+			}
+
 			final Germplasm germplasm = originGermplasmsByGid.get(row.getGid());
 			final Integer plantsSelected =
 				this.getPlantSelected(request, row.getVariables().values(), breedingMethodsByCode, breedingMethod.isBulkingMethod());
-			if (breedingMethod == null || breedingMethod.isBulkingMethod() == null || germplasm == null || plantsSelected == null) {
+			if (breedingMethod.isBulkingMethod() == null || germplasm == null || plantsSelected == null) {
 				return;
 			}
 
 			final NewAdvancingSource advancingSource =
-				new NewAdvancingSource(germplasm, seasonStudyLevel, selectionTraitStudyLevel, plantsSelected);
+				new NewAdvancingSource(germplasm, breedingMethod, studyId, environmentDataset.getDatasetId(), seasonStudyLevel,
+					selectionTraitStudyLevel, plantsSelected);
 			advancingSource.setTrialInstanceNumber(String.valueOf(row.getTrialInstance()));
 
 			advancingSourceOriginGids.add(germplasm.getGid());
@@ -153,26 +158,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 			advancingSource.setConditions(studyEnvironmentVariables);
 			advancingSource
 				.setReplicationNumber(this.getObservationValueByVariableId(row.getVariables().values(), TermId.REP_NO.getId()));
-
-			// TODO: Do we need to add logic to check if we are gonna to allow advance test entries???. If it's the case, I guess we need to add this checking after getting the breeding method
-			//			final MeasurementData checkData = row.getMeasurementData(TermId.ENTRY_TYPE.getId());
-			//			String check = null;
-			//			if (checkData != null) {
-			//				check = checkData.getcValueId();
-			//				if (checkData != null && checkData.getMeasurementVariable() != null
-			//					&& checkData.getMeasurementVariable().getPossibleValues() != null && !checkData.getMeasurementVariable()
-			//					.getPossibleValues().isEmpty() && check != null && NumberUtils.isNumber(check)) {
-			//
-			//					for (final ValueReference valref : checkData.getMeasurementVariable().getPossibleValues()) {
-			//						if (valref.getId().equals(Double.valueOf(check).intValue())) {
-			//							check = valref.getName();
-			//							break;
-			//						}
-			//					}
-			//				}
-			//			}
-			//			final boolean isCheck =
-			//				check != null && !"".equals(check) && !AdvancingSourceListFactory.DEFAULT_TEST_VALUE.equalsIgnoreCase(check);
 
 			advancingSource
 				.setPlotNumber(this.getObservationValueByVariableId(row.getVariables().values(), TermId.PLOT_NO.getId()));
@@ -296,7 +281,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 								.setValue(String.valueOf(studyInstancesByInstanceNumber.get(trialInstanceNumber).getLocationId()))
 						);
 				}
-				advancingSourceCandidate.setTrailInstanceObservation(trialObservation);
+				advancingSourceCandidate.setTrialInstanceObservation(trialObservation);
 			});
 	}
 

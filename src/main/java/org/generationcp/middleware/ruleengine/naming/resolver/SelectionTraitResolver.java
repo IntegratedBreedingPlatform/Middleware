@@ -73,11 +73,11 @@ public class SelectionTraitResolver {
 			return;
 		}
 
-		if (DataResolverHelper.checkHasTrailInstanceObservations(source.getTrailInstanceObservation())) {
+		if (DataResolverHelper.checkHasTrailInstanceObservations(source.getTrialInstanceObservation())) {
 			// In this case, the value of the environment observations corresponds to the id of the categorical reference
 			final BiPredicate<ValueReference, ObservationUnitData> predicate =
 				(valueReference, observationUnitData) -> valueReference.getId().toString().equals(observationUnitData.getValue());
-			this.getTraitSelectionValue(source, source.getTrailInstanceObservation().getEnvironmentVariables().values(),
+			this.getTraitSelectionValue(source, source.getTrialInstanceObservation().getEnvironmentVariables().values(),
 				plotDataVariablesByTermId, predicate, selectionTraitRequest.getVariableId());
 		}
 	}

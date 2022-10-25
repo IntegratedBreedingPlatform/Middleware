@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,17 +16,18 @@ public class AttributeMaleParentExpression extends AttributeExpression {
 	public static final String ATTRIBUTE_KEY = "ATTRMP";
 	public static final String PATTERN_KEY = "\\[" + ATTRIBUTE_KEY + "\\.([^\\.]*)\\]";
 
+	// TODO: refactor. Try to avoid hitting the DB for each line
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
 
 	@Override
-	public void apply(final List<StringBuilder> values, final AdvancingSource source, final String capturedText) {
+	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
 
 		final Method breedingMethod = source.getBreedingMethod();
 		Integer gpid2 = null;
 		if (METHOD_TYPE_GEN.equals(breedingMethod.getMtype())) {
 			// If the method is Generative, GPID2 refers to male parent of the cross
-			gpid2 = Integer.valueOf(source.getMaleGid());
+			gpid2 = source.getMaleGid();
 		} else if (METHOD_TYPE_DER.equals(breedingMethod.getMtype()) || METHOD_TYPE_MAN.equals(breedingMethod.getMtype())) {
 
 			// If the method is Derivative or Maintenance, GPID2 refers to the male parent of the group source

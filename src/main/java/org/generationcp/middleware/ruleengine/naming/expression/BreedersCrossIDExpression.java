@@ -1,13 +1,11 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.ruleengine.generator.BreedersCrossIDGenerator;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
-import static org.generationcp.middleware.service.api.dataset.ObservationUnitUtils.fromMeasurementRow;
 
 @Component
 public class BreedersCrossIDExpression extends BaseExpression {
@@ -21,7 +19,7 @@ public class BreedersCrossIDExpression extends BaseExpression {
 	}
 
 	@Override
-	public void apply(final List<StringBuilder> values, final AdvancingSource source, final String capturedText) {
+	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
 
 		/**
 		 * Refer NamingConventionServiceImpl.addImportedGermplasmToList method
@@ -31,7 +29,7 @@ public class BreedersCrossIDExpression extends BaseExpression {
 		for (final StringBuilder container : values) {
 			final String newValue = this.breedersCrossIDGenerator
 				.generateBreedersCrossID(source.getStudyId(), source.getEnvironmentDatasetId(), source.getConditions(),
-					fromMeasurementRow(source.getTrailInstanceObservation()));
+					source.getTrialInstanceObservation());
 			this.replaceExpressionWithValue(container, newValue);
 		}
 	}
@@ -40,4 +38,5 @@ public class BreedersCrossIDExpression extends BaseExpression {
 	public String getExpressionKey() {
 		return BreedersCrossIDExpression.KEY;
 	}
+
 }

@@ -2,7 +2,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class GroupCountExpression extends BaseExpression {
 	public static final int CAPTURED_FINAL_EXPRESSION_GROUP = 1;
 
 	@Override
-	public void apply(final List<StringBuilder> values, final AdvancingSource source, final String capturedText) {
+	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
 		for (final StringBuilder value : values) {
 			String currentValue = value.toString();
 
@@ -37,7 +37,7 @@ public class GroupCountExpression extends BaseExpression {
 			int generatedCountValue = result.getCount();
 
 			// if the method is a bulking method, we're expected to increment the count
-			if (source.getBreedingMethod().isBulkingMethod()) {
+			if (Boolean.TRUE.equals(source.getBreedingMethod().isBulkingMethod())) {
 				generatedCountValue = result.getCount() + 1;
 			}
 
@@ -46,7 +46,7 @@ public class GroupCountExpression extends BaseExpression {
 
 			if (generatedCountValue >= MINIMUM_BULK_COUNT) {
 
-				currentValue = currentValue + targetCountExpression + "*" + String.valueOf(generatedCountValue);
+				currentValue = currentValue + targetCountExpression + "*" + generatedCountValue;
 				value.delete(0, value.length());
 				value.append(currentValue);
 			} else {
@@ -69,7 +69,7 @@ public class GroupCountExpression extends BaseExpression {
 		}
 	}
 
-	protected String removeMetaCharacters(final String value, final String countPrefix, final AdvancingSource source) {
+	protected <T extends AbstractAdvancingSource> String removeMetaCharacters(final String value, final String countPrefix, final T source) {
 		// we strip the B*[COUNT] or #*COUNT from the name being processed
 		String valueWithoutProcessCode = value.replace(countPrefix + this.getExpressionKey(), "");
 
@@ -137,7 +137,7 @@ public class GroupCountExpression extends BaseExpression {
 		return GroupCountExpression.KEY;
 	}
 
-	class CountResultBean {
+	static class CountResultBean {
 
 		private final int count;
 		private final int start;

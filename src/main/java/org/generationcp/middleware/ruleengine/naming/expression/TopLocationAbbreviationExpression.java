@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,11 +15,11 @@ public class TopLocationAbbreviationExpression extends BaseExpression {
 	}
 
 	@Override
-	public void apply(List<StringBuilder> values, AdvancingSource source, final String capturedText) {
-		for (StringBuilder container : values) {
-			String rootName = source.getRootName();
-			String labbr = source.getLocationAbbreviation() != null ? source.getLocationAbbreviation() : "";
-			if (rootName != null && rootName.toString().endsWith("T")) {
+	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+		for (final StringBuilder container : values) {
+			final String rootName = source.getRootName();
+			final String labbr = source.getLocationAbbreviation() != null ? source.getLocationAbbreviation() : "";
+			if (rootName != null && rootName.endsWith("T")) {
                 this.replaceExpressionWithValue(container, "TOP" + labbr);
 			} else {
 				this.replaceExpressionWithValue(container, labbr);

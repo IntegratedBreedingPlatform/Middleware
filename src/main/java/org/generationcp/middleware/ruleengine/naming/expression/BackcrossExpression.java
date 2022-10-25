@@ -2,7 +2,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +15,12 @@ public class BackcrossExpression extends BaseExpression {
 	static final String MALE_RECURRENT_SUFFIX = "M";
 	static final String FEMALE_RECURRENT_SUFFIX = "F";
 
+	// TODO: refactor. Try to avoid hitting the DB for each line
 	@Autowired
 	private PedigreeDataManager pedigreeDataManager;
 
 	@Override
-	public void apply(final List<StringBuilder> values, final AdvancingSource source, final String capturedText) {
+	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
 
 		String output = "";
 
@@ -31,10 +32,8 @@ public class BackcrossExpression extends BaseExpression {
 			output += MALE_RECURRENT_SUFFIX;
 		}
 
-		for (StringBuilder value : values) {
-
+		for (final StringBuilder value : values) {
 			this.replaceExpressionWithValue(value, output);
-
 		}
 
 	}

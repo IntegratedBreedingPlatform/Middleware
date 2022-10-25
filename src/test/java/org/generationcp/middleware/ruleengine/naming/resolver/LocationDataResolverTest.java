@@ -43,7 +43,7 @@ public class LocationDataResolverTest {
 		Mockito.when(row.getEnvironmentVariables()).thenReturn(environmentVariables);
 
 		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
-		Mockito.when(source.getTrailInstanceObservation()).thenReturn(row);
+		Mockito.when(source.getTrialInstanceObservation()).thenReturn(row);
 
 		final Location location = Mockito.mock(Location.class);
 		Mockito.when(location.getLabbr()).thenReturn(LOCATION_ABBR);
@@ -69,7 +69,7 @@ public class LocationDataResolverTest {
 		Mockito.when(row.getEnvironmentVariables()).thenReturn(environmentVariables);
 
 		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
-		Mockito.when(source.getTrailInstanceObservation()).thenReturn(row);
+		Mockito.when(source.getTrialInstanceObservation()).thenReturn(row);
 
 		locationDataResolver.resolveEnvironmentLevelData(source, new HashMap<>());
 
@@ -90,7 +90,7 @@ public class LocationDataResolverTest {
 		Mockito.when(row.getEnvironmentVariables()).thenReturn(environmentVariables);
 
 		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
-		Mockito.when(source.getTrailInstanceObservation()).thenReturn(row);
+		Mockito.when(source.getTrialInstanceObservation()).thenReturn(row);
 
 		locationDataResolver.resolveEnvironmentLevelData(source, null);
 

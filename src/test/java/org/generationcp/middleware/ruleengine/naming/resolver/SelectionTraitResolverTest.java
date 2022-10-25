@@ -149,7 +149,7 @@ public class SelectionTraitResolverTest {
 		observationUnitRow.setEnvironmentVariables(environmentVariables);
 
 		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
-		Mockito.when(source.getTrailInstanceObservation()).thenReturn(observationUnitRow);
+		Mockito.when(source.getTrialInstanceObservation()).thenReturn(observationUnitRow);
 
 		this.selectionTraitResolver.resolveEnvironmentLevelData(DATASET_ID, selectionTraitRequest, source, plotDataVariablesByTermId);
 
@@ -175,7 +175,7 @@ public class SelectionTraitResolverTest {
 		observationUnitRow.setEnvironmentVariables(environmentVariables);
 
 		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
-		Mockito.when(source.getTrailInstanceObservation()).thenReturn(observationUnitRow);
+		Mockito.when(source.getTrialInstanceObservation()).thenReturn(observationUnitRow);
 
 		this.selectionTraitResolver.resolveEnvironmentLevelData(DATASET_ID, selectionTraitRequest, source, plotDataVariablesByTermId);
 

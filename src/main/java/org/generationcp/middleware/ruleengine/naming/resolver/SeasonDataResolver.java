@@ -35,9 +35,9 @@ public class SeasonDataResolver {
 	public void resolveEnvironmentLevelData(final NewAdvancingSource source,
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId) {
 		if (StringUtils.isBlank(source.getSeason()) && DataResolverHelper
-			.checkHasTrailInstanceObservations(source.getTrailInstanceObservation())) {
+			.checkHasTrailInstanceObservations(source.getTrialInstanceObservation())) {
 			final Map<Integer, String> measurementVariablesValues = new HashMap<>();
-			source.getTrailInstanceObservation().getEnvironmentVariables().values().forEach(observationUnitData -> {
+			source.getTrialInstanceObservation().getEnvironmentVariables().values().forEach(observationUnitData -> {
 				final int termId = observationUnitData.getVariableId();
 				final MeasurementVariable measurementVariable = plotDataVariablesByTermId.get(termId);
 				if (measurementVariable != null) {
