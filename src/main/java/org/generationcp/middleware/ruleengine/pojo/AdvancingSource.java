@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.ruleengine.pojo;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.sample.SampleDTO;
@@ -234,8 +235,8 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	}
 
 	@Override
-	public String getOriginGermplasmGid() {
-		return this.germplasm.getGid();
+	public Integer getOriginGermplasmGid() {
+		return NumberUtils.isNumber(this.germplasm.getGid()) ? Integer.valueOf(this.germplasm.getGid()) : null;
 	}
 
 	@Override

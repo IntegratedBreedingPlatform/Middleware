@@ -4,8 +4,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 
 public interface AdvancingSourceAdapter {
 
-	// TODO: why the gid is a string?
-	String getOriginGermplasmGid();
+	Integer getOriginGermplasmGid();
 
 	Integer getOriginGermplasmGpid1();
 

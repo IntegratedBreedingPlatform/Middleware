@@ -28,7 +28,7 @@ public class ChangeLocationExpression extends BaseExpression {
 
             try {
                 // TODO: change it!! this won't perform well
-                final Germplasm originalGermplasm = germplasmDataManager.getGermplasmByGID(Integer.valueOf(source.getOriginGermplasmGid()));
+                final Germplasm originalGermplasm = germplasmDataManager.getGermplasmByGID(source.getOriginGermplasmGid());
                 String suffixValue = "";
                 if (source.getHarvestLocationId() != null && !originalGermplasm.getLocationId().equals(source.getHarvestLocationId())) {
                     suffixValue = source.getLocationAbbreviation();

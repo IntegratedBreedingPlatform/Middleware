@@ -52,9 +52,7 @@ public class CrossTypeExpression extends BaseExpression {
 		}
 	}
 
-	private String getRecurrentParentType(final String germplasmOriginGid) {
-
-		final Integer gid = Integer.parseInt(germplasmOriginGid);
+	private String getRecurrentParentType(final Integer gid) {
 
 		final Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(gid);
 

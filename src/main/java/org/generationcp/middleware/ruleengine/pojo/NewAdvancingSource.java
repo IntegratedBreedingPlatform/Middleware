@@ -57,8 +57,8 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 	}
 
 	@Override
-	public String getOriginGermplasmGid() {
-		return String.valueOf(this.originGermplasm.getGid());
+	public Integer getOriginGermplasmGid() {
+		return this.originGermplasm.getGid();
 	}
 
 	@Override

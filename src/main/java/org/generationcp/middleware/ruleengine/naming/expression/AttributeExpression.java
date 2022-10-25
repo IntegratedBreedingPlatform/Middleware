@@ -19,7 +19,7 @@ public abstract class AttributeExpression implements Expression {
 			.equals(0))
 			&& (sourceGpid2 != null && sourceGpid2.equals(0))) {
 			// If the source germplasm is a new CROSS, then the group source is the cross itself
-			return Integer.valueOf(source.getOriginGermplasmGid());
+			return source.getOriginGermplasmGid();
 		} else {
 			// Else group source gid is always the female parent of the source germplasm.
 			return source.getOriginGermplasmGpid1();

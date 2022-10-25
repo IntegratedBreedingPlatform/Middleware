@@ -24,7 +24,7 @@ public class AttributeSourceExpression extends AttributeExpression {
 			final Integer variableId = Integer.valueOf(capturedText.substring(1, capturedText.length() - 1).split("\\.")[1]);
 			if (METHOD_TYPE_DER.equals(source.getBreedingMethod().getMtype())
 				|| METHOD_TYPE_MAN.equals(source.getBreedingMethod().getMtype())) {
-				newValue = germplasmDataManager.getAttributeValue(Integer.parseInt(source.getOriginGermplasmGid()), variableId);
+				newValue = germplasmDataManager.getAttributeValue(source.getOriginGermplasmGid(), variableId);
 			}
 			this.replaceAttributeExpressionWithValue(value, ATTRIBUTE_KEY, variableId, newValue);
 		}
