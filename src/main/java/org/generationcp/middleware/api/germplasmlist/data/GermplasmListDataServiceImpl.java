@@ -117,8 +117,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		}
 
 		if (!CollectionUtils.isEmpty(nameTypes)) {
-			final List<GermplasmListColumnDTO> nameColumns = nameTypes
-				.stream()
+			final List<GermplasmListColumnDTO> nameColumns = nameTypes.stream().filter((nameType) -> !nameIds.contains(nameType.getFldno()))
 				.map(nameType -> new GermplasmListColumnDTO(nameType.getFldno(), nameType.getFcode(), GermplasmListColumnCategory.NAMES,
 					selectedColumnIds.contains(nameType.getFldno())))
 				.collect(toList());
