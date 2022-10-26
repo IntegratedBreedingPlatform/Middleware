@@ -13,15 +13,19 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 	//This will be used if we have trail
 	private ObservationUnitRow trialInstanceObservation;
 
+	private ObservationUnitRow plotObservation;
+
 	public NewAdvancingSource() {
 	}
 
 	// TODO: create builder. Move all setters of the constructor arguments from the abstract class to AdvancingSource
-	public NewAdvancingSource(final Germplasm originGermplasm, final Method breedingMethod, final Integer studyId,
+	public NewAdvancingSource(final ObservationUnitRow plotObservation, final Germplasm originGermplasm, final Method breedingMethod,
+		final Integer studyId,
 		final Integer environmentDatasetId, final String season,
 		final String selectionTraitValue,
 		final Integer plantSelected) {
 
+		this.plotObservation = plotObservation;
 		this.originGermplasm = originGermplasm;
 		this.setBreedingMethod(this.originGermplasm.getMethod());
 
@@ -37,6 +41,14 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 		this.setLocationAbbreviation("");
 		this.setCurrentMaxSequence(0);
 		this.setDesignationIsPreviewOnly(false);
+	}
+
+	public ObservationUnitRow getPlotObservation() {
+		return plotObservation;
+	}
+
+	public void setPlotObservation(final ObservationUnitRow plotObservation) {
+		this.plotObservation = plotObservation;
 	}
 
 	public Germplasm getOriginGermplasm() {

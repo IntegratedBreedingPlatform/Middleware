@@ -27,12 +27,6 @@ public abstract class AbstractAdvancingSource implements AdvancingSourceAdapter 
 	private Integer harvestLocationId;
 	private String selectionTraitValue;
 
-	// These properties values are set by data from the observation
-	private String trialInstanceNumber;
-	private String replicationNumber;
-	// TODO: move to AdvancingSource
-	private String plotNumber;
-
 	private List<Name> names;
 
 	private Integer plantsSelected;
@@ -131,30 +125,6 @@ public abstract class AbstractAdvancingSource implements AdvancingSourceAdapter 
 
 	public void setSelectionTraitValue(final String selectionTraitValue) {
 		this.selectionTraitValue = selectionTraitValue;
-	}
-
-	public String getTrialInstanceNumber() {
-		return trialInstanceNumber;
-	}
-
-	public void setTrialInstanceNumber(final String trialInstanceNumber) {
-		this.trialInstanceNumber = trialInstanceNumber;
-	}
-
-	public String getReplicationNumber() {
-		return replicationNumber;
-	}
-
-	public void setReplicationNumber(final String replicationNumber) {
-		this.replicationNumber = replicationNumber;
-	}
-
-	public String getPlotNumber() {
-		return plotNumber;
-	}
-
-	public void setPlotNumber(final String plotNumber) {
-		this.plotNumber = plotNumber;
 	}
 
 	public List<Name> getNames() {

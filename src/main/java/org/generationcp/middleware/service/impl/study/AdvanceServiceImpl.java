@@ -1,20 +1,28 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.ruleengine.generator.SeedSourceGenerator;
 import org.generationcp.middleware.ruleengine.naming.resolver.LocationDataResolver;
 import org.generationcp.middleware.ruleengine.naming.resolver.SeasonDataResolver;
 import org.generationcp.middleware.ruleengine.naming.resolver.SelectionTraitResolver;
@@ -30,17 +38,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,11 +59,29 @@ import java.util.stream.Stream;
 @Transactional
 public class AdvanceServiceImpl implements AdvanceService {
 
+	// TODO: move to common constants
+	private static final String DATE_TIME_FORMAT = "yyyyMMdd";
+	private static final String PLOT_NUMBER_VARIABLE_NAME = "PLOT_NUMBER_AP_text";
+	private static final String TRIAL_INSTANCE_VARIABLE_NAME = "INSTANCE_NUMBER_AP_text";
+	private static final String REP_NUMBER_VARIABLE_NAME = "REP_NUMBER_AP_text";
+	private static final String PLANT_NUMBER_VARIABLE_NAME = "PLANT_NUMBER_AP_text";
+
+	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+
 	@Resource
 	private DatasetService datasetService;
 
 	@Resource
 	private StudyInstanceService studyInstanceService;
+
+	@Resource
+	private SeedSourceGenerator seedSourceGenerator;
+
+	@Resource
+	private GermplasmService germplasmService;
+
+	@Resource
+	private OntologyDataManager ontologyDataManager;
 
 	private final DaoFactory daoFactory;
 	private final SeasonDataResolver seasonDataResolver;
@@ -105,16 +134,18 @@ public class AdvanceServiceImpl implements AdvanceService {
 			this.studyInstanceService.getStudyInstances(studyId).stream()
 				.collect(Collectors.toMap(StudyInstance::getInstanceNumber, i -> i));
 
-		final List<Method> allMethods = this.daoFactory.getMethodDAO().getAllMethod();
-		final Map<String, Method> breedingMethodsByCode =
-			allMethods.stream()
-				.collect(Collectors.toMap(Method::getMcode, method -> method, (method1, method2) -> method1));
-		final Map<Integer, Method> breedingMethodsById =
-			allMethods.stream()
-				.collect(Collectors.toMap(Method::getMid, method -> method, (method1, method2) -> method1));
+		final Map<String, Method> breedingMethodsByCode = new HashMap<>();
+		final Map<Integer, Method> breedingMethodsById = new HashMap<>();
+		this.daoFactory.getMethodDAO().getAllMethod().forEach(method -> {
+			breedingMethodsByCode.put(method.getMcode(), method);
+			breedingMethodsById.put(method.getMid(), method);
+		});
 
+		final List<Location> locations = this.getLocationsFromTrialObservationUnits(trialObservations);
 		final Map<Integer, Location> locationsByLocationId =
-			this.getLocationsByLocationIdFromTrialObservationUnits(trialObservations);
+			locations.stream().collect(Collectors.toMap(Location::getLocid, location -> location));
+		final Map<String, String> locationNameByIds =
+			locations.stream().collect(Collectors.toMap(location -> String.valueOf(location.getLocid()), Location::getLname));
 
 		// TODO: Considering performance issue due to we will have a lot of objects in the memory... Is really needed to have the germplasm entity??? At least according to to the old advance we need only a few of germplasm properties:
 		//  https://github.com/IntegratedBreedingPlatform/Fieldbook/blob/f242b4219653d926f20a06214c0c8b1083af148e/src/main/java/com/efficio/fieldbook/web/naming/impl/AdvancingSourceListFactory.java#L245
@@ -127,27 +158,30 @@ public class AdvanceServiceImpl implements AdvanceService {
 			final Method breedingMethod =
 				this.getBreedingMethod(request.getBreedingMethodSelectionRequest(), row.getVariables().values(), breedingMethodsByCode,
 					breedingMethodsById);
-			if (breedingMethod == null) {
+			if (breedingMethod == null || breedingMethod.isBulkingMethod() == null) {
 				return;
 			}
 
-			final Germplasm germplasm = originGermplasmsByGid.get(row.getGid());
+			final Germplasm originGermplasm = originGermplasmsByGid.get(row.getGid());
 			final Integer plantsSelected =
 				this.getPlantSelected(request, row.getVariables().values(), breedingMethodsByCode, breedingMethod.isBulkingMethod());
-			if (breedingMethod.isBulkingMethod() == null || germplasm == null || plantsSelected == null) {
+			if (originGermplasm == null || plantsSelected == null || plantsSelected <= 0) {
 				return;
 			}
 
 			final NewAdvancingSource advancingSource =
-				new NewAdvancingSource(germplasm, breedingMethod, studyId, environmentDataset.getDatasetId(), seasonStudyLevel,
+				new NewAdvancingSource(row, originGermplasm, breedingMethod, studyId, environmentDataset.getDatasetId(), seasonStudyLevel,
 					selectionTraitStudyLevel, plantsSelected);
-			advancingSource.setTrialInstanceNumber(String.valueOf(row.getTrialInstance()));
 
-			advancingSourceOriginGids.add(germplasm.getGid());
+			advancingSourceOriginGids.add(originGermplasm.getGid());
 
+			// TODO: add the following properties in the constructor
 			// If study is Trial, then setting data if trial instance is not null
-			if (advancingSource.getTrialInstanceNumber() != null) {
-				this.setTrialIntanceObservations(trialObservations, row, advancingSource, studyInstancesByInstanceNumber);
+			final Integer trialInstanceNumber = row.getTrialInstance();
+			if (trialInstanceNumber != null) {
+				final ObservationUnitRow observationUnitRow =
+					this.setTrialInstanceObservations(trialInstanceNumber, trialObservations, studyInstancesByInstanceNumber);
+				advancingSource.setTrialInstanceObservation(observationUnitRow);
 			}
 
 			this.resolveEnvironmentAndPlotLevelData(environmentDataset.getDatasetId(), plotDataset.getDatasetId(),
@@ -156,13 +190,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 			// Setting conditions for Breeders Cross ID
 			// TODO: we only set conditions for breeders cross id. Find another way to pass conditions to breeders cross id
 			advancingSource.setConditions(studyEnvironmentVariables);
-			advancingSource
-				.setReplicationNumber(this.getObservationValueByVariableId(row.getVariables().values(), TermId.REP_NO.getId()));
 
-			advancingSource
-				.setPlotNumber(this.getObservationValueByVariableId(row.getVariables().values(), TermId.PLOT_NO.getId()));
-
-			// TODO: implement get plant selection for sample?
+			// TODO: implement get plant selection for samples
 			//			if (advanceInfo.getAdvanceType().equals(AdvanceType.SAMPLE)) {
 			//				if (samplesMap.containsKey(row.getExperimentId())) {
 			//					plantsSelected = samplesMap.get(row.getExperimentId()).size();
@@ -176,10 +205,19 @@ public class AdvanceServiceImpl implements AdvanceService {
 		});
 
 		if (!CollectionUtils.isEmpty(advancingSources)) {
-			this.addNamesToAdvancingSource(advancingSources, advancingSourceOriginGids);
-		}
+			// From a performance point of view, it's better to get all the names at once instead of getting the name from the germplasm
+			// for each line doing germplasm::getNames
+			final Map<Integer, List<Name>> namesByGids =
+				this.daoFactory.getNameDao().getNamesByGidsInMap(new ArrayList<>(advancingSourceOriginGids));
+			final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 
-		// TODO: create the advanced germplasm and save it
+			this.createAdvancedGermplasm(study.getName(), advancingSources, request.getBreedingMethodSelectionRequest(),
+				studyEnvironmentVariables,
+				environmentDataset.getVariables(), locationNameByIds, studyInstancesByInstanceNumber, namesByGids);
+
+			// TODO: this.namingConventionService.generateAdvanceListNames
+			// TODO: persists germplasm
+		}
 
 		// TODO: returns the recently created gerplasm::gids
 		return null;
@@ -265,24 +303,25 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.collect(Collectors.toList());
 	}
 
-	private void setTrialIntanceObservations(final List<ObservationUnitRow> trialObservations, final ObservationUnitRow plotObservation,
-		final NewAdvancingSource advancingSourceCandidate,
+	private ObservationUnitRow setTrialInstanceObservations(final Integer trialInstanceNumber,
+		final List<ObservationUnitRow> trialObservations,
 		final Map<Integer, StudyInstance> studyInstancesByInstanceNumber) {
-		final Integer trialInstanceNumber = plotObservation.getTrialInstance();
-		trialObservations.stream()
-			.filter(observationUnitRow -> Integer.valueOf(advancingSourceCandidate.getTrialInstanceNumber())
-				.equals(observationUnitRow.getTrialInstance()))
-			.findFirst()
-			.ifPresent(trialObservation -> {
-				if (studyInstancesByInstanceNumber.containsKey(trialInstanceNumber) && trialObservation != null) {
-					this.getVariableById(trialObservation.getEnvironmentVariables().values(), TermId.LOCATION_ID.getId())
-						.ifPresent(
-							observationUnitData -> observationUnitData
-								.setValue(String.valueOf(studyInstancesByInstanceNumber.get(trialInstanceNumber).getLocationId()))
-						);
-				}
-				advancingSourceCandidate.setTrialInstanceObservation(trialObservation);
-			});
+
+		final Optional<ObservationUnitRow> optionalTrialObservation = trialObservations.stream()
+			.filter(observationUnitRow -> trialInstanceNumber.equals(observationUnitRow.getTrialInstance()))
+			.findFirst();
+		if (optionalTrialObservation.isPresent()) {
+			final ObservationUnitRow trialObservation = optionalTrialObservation.get();
+			if (studyInstancesByInstanceNumber.containsKey(trialInstanceNumber)) {
+				this.getVariableById(trialObservation.getEnvironmentVariables().values(), TermId.LOCATION_ID.getId())
+					.ifPresent(
+						observationUnitData -> observationUnitData
+							.setValue(String.valueOf(studyInstancesByInstanceNumber.get(trialInstanceNumber).getLocationId()))
+					);
+			}
+			return trialObservation;
+		}
+		return null;
 	}
 
 	// TODO: move getBreedingMethod to another class
@@ -340,11 +379,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 		return integerValue;
 	}
 
-	private Map<Integer, Location> getLocationsByLocationIdFromTrialObservationUnits(
+	private List<Location> getLocationsFromTrialObservationUnits(
 		final List<ObservationUnitRow> trialObservationUnitRows) {
 		final Set<Integer> locationIds = this.getVariableValuesFromObservations(trialObservationUnitRows, TermId.LOCATION_ID.getId());
-		return this.daoFactory.getLocationDAO().getByIds(new ArrayList<>(locationIds)).stream()
-			.collect(Collectors.toMap(Location::getLocid, location -> location));
+		return this.daoFactory.getLocationDAO().getByIds(new ArrayList<>(locationIds));
 	}
 
 	private Map<Integer, Germplasm> getOriginGermplasmByGid(final List<ObservationUnitRow> plotObservations) {
@@ -436,16 +474,151 @@ public class AdvanceServiceImpl implements AdvanceService {
 		}
 	}
 
-	// TODO: at this point we have the names in the origin germplasm. Measure what will perform better of: getting all the names using a map (getNamesByGidsInMap)
-	//  or getting the name from the germplasm (this will do a query to obtain the names for each germplasm)
-	private void addNamesToAdvancingSource(final List<NewAdvancingSource> advancingSources, final Set<Integer> advancingSourceOriginGids) {
-		final Map<Integer, List<Name>> namesByGids =
-			this.daoFactory.getNameDao().getNamesByGidsInMap(new ArrayList<>(advancingSourceOriginGids));
+	private void createAdvancedGermplasm(final String studyName, final List<NewAdvancingSource> advancingSources,
+		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest,
+		final List<MeasurementVariable> studyEnvironmentVariables, final List<MeasurementVariable> environmentVariables,
+		final Map<String, String> locationNameByIds,
+		final Map<Integer, StudyInstance> studyInstancesByInstanceNumber,
+		final Map<Integer, List<Name>> namesByGids) {
+
+		final Integer plotCodeVariableId = this.germplasmService.getPlotCodeField().getId();
+		final Integer plotNumberVariableId = this.getVariableId(PLOT_NUMBER_VARIABLE_NAME);
+		final Integer repNumberVariableId = this.getVariableId(REP_NUMBER_VARIABLE_NAME);
+		final Integer trialInstanceVariableId = this.getVariableId(TRIAL_INSTANCE_VARIABLE_NAME);
+		final Integer plantNumberVariableId = this.getVariableId(PLANT_NUMBER_VARIABLE_NAME);
 
 		advancingSources.forEach(advancingSource -> {
-			final List<Name> names = namesByGids.get(advancingSource.getOriginGermplasm().getGid());
-			advancingSource.setNames(names);
+
+			final Method breedingMethod = advancingSource.getBreedingMethod();
+			final AtomicInteger selectionNumber = new AtomicInteger(1);
+			final int iterationCount = Boolean.TRUE.equals(breedingMethod.isBulkingMethod()) ? 1 : advancingSource.getPlantsSelected();
+			for (int i = 0; i < iterationCount; i++) {
+
+				// TODO: implement it for samples
+				final String plantNumber = null;
+				//				final Iterator<SampleDTO> sampleIterator = row.getSamples().iterator();
+				//				if (sampleIterator.hasNext()) {
+				//					plantNumber = String.valueOf(sampleIterator.next().getSampleNumber());
+				//				}
+
+				final ObservationUnitRow plotObservation = advancingSource.getPlotObservation();
+				final String plotNumber =
+					this.getObservationValueByVariableId(plotObservation.getVariables().values(), TermId.PLOT_NO.getId());
+				final String seedSource = this.generateSeedSource(studyName, selectionNumber.get(), plotNumber,
+					breedingMethod.isBulkingMethod(), breedingMethodSelectionRequest.getAllPlotsSelected(),
+					advancingSource.getPlantsSelected(), plotObservation,
+					studyEnvironmentVariables, locationNameByIds, studyInstancesByInstanceNumber, environmentVariables);
+
+				final Germplasm originGermplasm = advancingSource.getOriginGermplasm();
+				final Germplasm advancedGermplasm = new Germplasm();
+				if (originGermplasm.getGpid1() == 0 || originGermplasm.getMethod().isDerivative()) {
+					advancedGermplasm.setGpid1(originGermplasm.getGid());
+				} else {
+					advancedGermplasm.setGpid1(originGermplasm.getGpid1());
+				}
+
+				advancedGermplasm.setGpid2(-1);
+				advancedGermplasm.setGnpgs(-1);
+				advancedGermplasm.setLgid(0);
+
+				final Integer locationId = advancingSource.getHarvestLocationId();
+				advancedGermplasm.setLocationId(locationId);
+
+				final Integer date = Integer.valueOf(LocalDate.now().format(DATE_TIME_FORMATTER));
+				advancedGermplasm.setGdate(date);
+
+				advancedGermplasm.setReferenceId(0);
+				advancedGermplasm.setGrplce(0);
+
+				// check to see if a group ID (MGID) exists in the parent for this Germplasm, and set newly created germplasm if part of a
+				// group ( > 0 )
+				if (originGermplasm.getMgid() != null && originGermplasm.getMgid() > 0) {
+					advancedGermplasm.setMgid(originGermplasm.getMgid());
+				} else {
+					advancedGermplasm.setMgid(0);
+				}
+
+				final List<Name> names = namesByGids.get(advancingSource.getOriginGermplasm().getGid());
+				advancedGermplasm.setNames(names);
+				// TODO: add names
+				names.forEach(name -> {
+					name.setLocationId(locationId);
+					name.setNdate(date);
+					name.setReferenceId(0);
+				});
+
+				advancedGermplasm.setMethod(breedingMethod);
+
+				// TODO: add attributes
+				final Attribute plotCodeAttribute = this.createGermplasmAttribute(seedSource, plotCodeVariableId, locationId, date);
+				if (plotNumberVariableId != null) {
+					final Attribute plotNumberAttribute = this.createGermplasmAttribute(plotNumber, plotNumberVariableId, locationId, date);
+				}
+
+				final String replicationNumber = this.getObservationValueByVariableId(plotObservation.getVariables().values(), TermId.REP_NO
+					.getId());
+				if (repNumberVariableId != null) {
+					final Attribute replicationNumberAttribute =
+						this.createGermplasmAttribute(replicationNumber, repNumberVariableId, locationId, date);
+				}
+
+				if (!StringUtils.isEmpty(plantNumber)) {
+					final Attribute plantNumberAttribute =
+						this.createGermplasmAttribute(plantNumber, plantNumberVariableId, locationId, date);
+				}
+
+				selectionNumber.incrementAndGet();
+			}
 		});
+	}
+
+	private String generateSeedSource(final String studyName, final int selectionNumber, final String plotNumber,
+		final Boolean isBulkingMethod,
+		final Boolean allPlotsSelected,
+		final Integer plantsSelected,
+		final ObservationUnitRow row,
+		final List<MeasurementVariable> studyEnvironmentVariables, final Map<String, String> locationNameByIds,
+		final Map<Integer, StudyInstance> studyInstancesByInstanceNumber, final List<MeasurementVariable> environmentVariables) {
+		// TODO: implement this code for samples
+		final String sampleNo = null;
+		//				final Iterator<SampleDTO> sampleIterator = row.getSamples().iterator();
+		//				if (sampleIterator.hasNext()) {
+		//					sampleNo = String.valueOf(sampleIterator.next().getSampleNumber());
+		//				}
+
+		final String seedSourceSelectionNumber;
+		if (Boolean.TRUE.equals(isBulkingMethod)) {
+			if (Boolean.TRUE.equals(allPlotsSelected)) {
+				seedSourceSelectionNumber = null;
+			} else {
+				seedSourceSelectionNumber = String.valueOf(plantsSelected);
+			}
+		} else {
+			seedSourceSelectionNumber = String.valueOf(selectionNumber);
+		}
+
+		return this.seedSourceGenerator
+			.generateSeedSource(row, studyEnvironmentVariables, seedSourceSelectionNumber, plotNumber,
+				studyName, sampleNo, locationNameByIds, studyInstancesByInstanceNumber,
+				environmentVariables);
+	}
+
+	private Attribute createGermplasmAttribute(final String value, final Integer typeId,
+		final Integer locationId, final Integer date) {
+		final Attribute attribute = new Attribute();
+		attribute.setAval(value);
+		attribute.setTypeId(typeId);
+		attribute.setAdate(date);
+		attribute.setLocationId(locationId);
+		return attribute;
+	}
+
+	private Integer getVariableId(final String name) {
+		final Term term = this.ontologyDataManager.findTermByName(name, CvId.VARIABLES.getId());
+		if (term == null) {
+			return null;
+		}
+		return term.getId();
 	}
 
 }

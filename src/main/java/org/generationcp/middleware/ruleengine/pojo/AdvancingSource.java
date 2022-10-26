@@ -45,6 +45,9 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	private AdvanceGermplasmChangeDetail changeDetail;
 	private String prefix;
 	private String suffix;
+	private String plotNumber;
+	private String trialInstanceNumber;
+	private String replicationNumber;
 
 	//This will be used if we have trail
 	private MeasurementRow trailInstanceObservationMeasurementRow;
@@ -62,7 +65,7 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		this.setBreedingMethod(breedingMethod);
 		this.isCheck = isCheck;
 		this.studyName = studyName;
-		super.setPlotNumber(plotNumber);
+		this.plotNumber = plotNumber;
 	}
 
 	public AdvancingSource(final ImportedGermplasm germplasm) {
@@ -178,9 +181,33 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		this.suffix = suffix;
 	}
 
+	public String getPlotNumber() {
+		return this.plotNumber;
+	}
+
+	public void setPlotNumber(final String plotNumber) {
+		this.plotNumber = plotNumber;
+	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+
+	public String getTrialInstanceNumber() {
+		return this.trialInstanceNumber;
+	}
+
+	public void setTrialInstanceNumber(final String trialInstanceNumber) {
+		this.trialInstanceNumber = trialInstanceNumber;
+	}
+
+	public String getReplicationNumber() {
+		return replicationNumber;
+	}
+
+	public void setReplicationNumber(final String replicationNumber) {
+		this.replicationNumber = replicationNumber;
 	}
 
 	public void setTrailInstanceObservationMeasurementRow(final MeasurementRow trailInstanceObservationMeasurementRow) {
@@ -221,8 +248,8 @@ public class AdvancingSource extends AbstractAdvancingSource {
         source.setRootNameType(this.getRootNameType());
         source.setHarvestLocationId(this.getHarvestLocationId());
         source.setSelectionTraitValue(this.getSelectionTraitValue());
-        source.setTrialInstanceNumber(this.getTrialInstanceNumber());
-        source.setReplicationNumber(this.getReplicationNumber());
+        source.setTrialInstanceNumber(this.trialInstanceNumber);
+        source.setReplicationNumber(this.replicationNumber);
         return source;
     }
 
