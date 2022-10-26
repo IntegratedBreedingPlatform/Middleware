@@ -3,7 +3,6 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeServiceImpl;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Before;
@@ -40,8 +39,8 @@ public class SuffixRuleTest extends BaseNamingRuleTest {
 
 		try {
 			input = (List<String>) this.rule.runRule(this.createExecutionContext(input));
-		} catch (RuleException re) {
-			Assert.fail("Rule failed to run for Prefix" + this.row.getBreedingMethod().getSuffix());
+		} catch (org.generationcp.middleware.ruleengine.RuleException e) {
+			e.printStackTrace();
 		}
 
 		Assert.assertEquals(1, input.size());

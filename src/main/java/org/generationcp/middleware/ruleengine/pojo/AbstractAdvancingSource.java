@@ -33,11 +33,13 @@ public abstract class AbstractAdvancingSource implements AdvancingSourceAdapter 
 
 	private Map<String, Integer> keySequenceMap = new HashMap<>();
 
-	// These are only used by crosses generation process
+	// TODO: we can implement a visitor to check the type of class extending from AbstractAdvancingSource and move these to AdvancingSource
+	// These are only used by crosses generation process. Remove them once cross process will be redo it
 	private int maleGid;
 	private int femaleGid;
 	private boolean isForceUniqueNameGeneration;
 	private int currentMaxSequence;
+	private AdvanceGermplasmChangeDetail changeDetail;
 
 	public Integer getStudyId() {
 		return studyId;
@@ -181,5 +183,13 @@ public abstract class AbstractAdvancingSource implements AdvancingSourceAdapter 
 
 	public void setCurrentMaxSequence(final int currentMaxSequence) {
 		this.currentMaxSequence = currentMaxSequence;
+	}
+
+	public AdvanceGermplasmChangeDetail getChangeDetail() {
+		return changeDetail;
+	}
+
+	public void setChangeDetail(final AdvanceGermplasmChangeDetail changeDetail) {
+		this.changeDetail = changeDetail;
 	}
 }

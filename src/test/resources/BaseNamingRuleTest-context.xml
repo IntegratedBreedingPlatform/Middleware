@@ -57,93 +57,9 @@
     <bean id="breedersCrossIDGenerator" class="org.generationcp.middleware.ruleengine.generator.BreedersCrossIDGenerator">
 	</bean>
 
-<!--	<bean id="workbenchHibernateSessionProvider"-->
-<!--		  class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider"-->
-<!--		  scope="request" destroy-method="close">-->
-<!--		<property name="sessionFactory" ref="WORKBENCH_SessionFactory" />-->
-
-<!--		&lt;!&ndash; JDK Standard Proxy around this request scoped bean, so we can use-->
-<!--			it on longer scoped beans &ndash;&gt;-->
-<!--		<aop:scoped-proxy proxy-target-class="false" />-->
-<!--	</bean>-->
-
-<!--	<bean id="roleService"-->
-<!--		  class="org.generationcp.middleware.api.role.RoleServiceImpl"-->
-<!--		  destroy-method="close">-->
-<!--		<constructor-arg ref="workbenchHibernateSessionProvider" />-->
-<!--	</bean>-->
-
-<!--	<bean id="permissionService"-->
-<!--		  class="org.generationcp.middleware.service.api.permission.PermissionServiceImpl"-->
-<!--		  destroy-method="close">-->
-<!--		<constructor-arg ref="workbenchHibernateSessionProvider" />-->
-<!--	</bean>-->
-
-<!--	<bean id="programServiceMw"-->
-<!--			  class="org.generationcp.middleware.api.program.ProgramServiceImpl">-->
-<!--        <constructor-arg ref="workbenchHibernateSessionProvider"/>-->
-<!--    </bean>-->
-
-<!--	<bean id="managerFactoryProvider"-->
-<!--		  class="org.generationcp.commons.hibernate.DynamicManagerFactoryProviderConcurrency">-->
-<!--		<constructor-arg ref="programServiceMw" />-->
-<!--		<property name="pedigreeProfile" value="${pedigree.profile}"/>-->
-<!--	</bean>-->
-
-<!--	<bean id="managerFactory" name="managerFactory" factory-bean="managerFactoryProvider"-->
-<!--		factory-method="createInstance" scope="request">-->
-<!--		<aop:scoped-proxy />-->
-<!--	</bean>-->
-
-<!--	<bean id="ontologyVariableManager" factory-bean="managerFactory"-->
-<!--		  factory-method="getOntologyVariableDataManager" scope="request">-->
-<!--		<aop:scoped-proxy />-->
-<!--	</bean>-->
-
-<!--	<bean id="studyDataManager" factory-bean="managerFactory"-->
-<!--		  factory-method="getNewStudyDataManager" scope="request">-->
-<!--		<aop:scoped-proxy />-->
-<!--	</bean>-->
-
-<!--	<bean id="germplasmDataManager" factory-bean="managerFactory"-->
-<!--		  factory-method="getGermplasmDataManager" scope="request">-->
-<!--		<aop:scoped-proxy />-->
-<!--	</bean>-->
-
-<!--    <bean id="keySequenceRegisterService" factory-bean="managerFactory"-->
-<!--		  factory-method="getKeySequenceRegisterService" scope="request">-->
-<!--        <aop:scoped-proxy />-->
-<!--    </bean>-->
-
-<!--	<bean id="pedigreeDataManager" factory-bean="managerFactory"-->
-<!--		  factory-method="getPedigreeDataManager" scope="request">-->
-<!--		<aop:scoped-proxy />-->
-<!--	</bean>-->
-
-<!--	<bean id="contextUtil" class="org.generationcp.commons.spring.util.ContextUtil"-->
-<!--		  scope="request">-->
-<!--		<aop:scoped-proxy />-->
-<!--	</bean>-->
-
-<!--	<bean id="datasetService" factory-bean="managerFactory"-->
-<!--		  factory-method="getDatasetMiddlewareService" scope="request">-->
-<!--		<aop:scoped-proxy proxy-target-class="false" />-->
-<!--	</bean>-->
-
-
-<!--	<bean id="studyInstanceService" factory-bean="managerFactory" factory-method="studyInstanceMiddlewareService"-->
-<!--		  scope="request">-->
-<!--		<aop:scoped-proxy/>-->
-<!--	</bean>-->
-
-<!--	<bean id="experimentModelGenerator" factory-bean="managerFactory" factory-method="getExperimentModelGenerator"-->
-<!--		  scope="request">-->
-<!--		<aop:scoped-proxy/>-->
-<!--	</bean>-->
-
-<!--	<bean id="experimentDesignService" factory-bean="managerFactory" factory-method="getExperimentDesignService"-->
-<!--		  scope="request">-->
-<!--		<aop:scoped-proxy/>-->
-<!--	</bean>-->
+	<bean id="messageSource"
+			  class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="Messages" />
+    </bean>
 
 </beans>

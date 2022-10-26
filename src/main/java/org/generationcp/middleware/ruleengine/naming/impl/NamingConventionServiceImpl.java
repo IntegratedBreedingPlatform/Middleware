@@ -16,10 +16,12 @@ import org.generationcp.middleware.ruleengine.naming.rules.EnforceUniqueNameRule
 import org.generationcp.middleware.ruleengine.naming.rules.NamingRuleExecutionContext;
 import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
+import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSourceList;
 import org.generationcp.middleware.ruleengine.pojo.ImportedCross;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
+import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
 import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.TimerWatch;
@@ -34,7 +36,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 @Service
@@ -68,7 +69,6 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 		final List<ImportedGermplasm> germplasmList) throws MiddlewareQueryException, RuleException {
 
 		final TimerWatch timer = new TimerWatch("advance");
-		final Locale locale = LocaleContextHolder.getLocale();
 
 		Map<String, Integer> keySequenceMap = new HashMap<>();
 		final Iterator<ImportedGermplasm> germplasmIterator = germplasmList.iterator();
@@ -96,6 +96,13 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 			}
 		}
 		timer.stop();
+	}
+
+	@Override
+	public List<String> generateAdvanceListNames(final NewAdvancingSource advancingSource) throws RuleException {
+		final RuleExecutionContext namingExecutionContext =
+			this.setupNamingRuleExecutionContext(advancingSource, false);
+		return (List<String>) this.rulesService.runRules(namingExecutionContext);
 	}
 
 	@Deprecated
@@ -178,7 +185,7 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 		return importedCrosses;
 	}
 
-	protected RuleExecutionContext setupNamingRuleExecutionContext(final AdvancingSource row, final boolean checkForDuplicateName) {
+	protected <T extends AbstractAdvancingSource> RuleExecutionContext setupNamingRuleExecutionContext(final T row, final boolean checkForDuplicateName) {
 		List<String> sequenceList = Arrays.asList(this.ruleFactory.getRuleSequenceForNamespace("naming"));
 
 		if (checkForDuplicateName) {

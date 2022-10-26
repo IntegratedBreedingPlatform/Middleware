@@ -18,6 +18,7 @@ import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSourceList;
 import org.generationcp.middleware.ruleengine.pojo.ImportedCross;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
+import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
 
 import java.util.List;
 
@@ -28,8 +29,11 @@ import java.util.List;
  */
 public interface NamingConventionService {
 
+	@Deprecated
 	void generateAdvanceListNames(List<AdvancingSource> advancingSourceItems, boolean checkForDuplicateName, List<ImportedGermplasm> germplasmList) throws
 		MiddlewareQueryException, RuleException;
+
+	List<String> generateAdvanceListNames(NewAdvancingSource advancingSource) throws RuleException;
 
 	/*
 	* Generated the names for the list of crosses based on on rules setup for the breeding methods

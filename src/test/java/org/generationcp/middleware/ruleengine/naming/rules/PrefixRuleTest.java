@@ -3,7 +3,6 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,8 +37,8 @@ public class PrefixRuleTest extends BaseNamingRuleTest {
 
 		try {
 			input = (List<String>) this.rule.runRule(this.createExecutionContext(input));
-		} catch (RuleException re) {
-			Assert.fail("Rule failed to run for Prefix" + this.row.getBreedingMethod().getSeparator());
+		} catch (org.generationcp.middleware.ruleengine.RuleException e) {
+			e.printStackTrace();
 		}
 		System.out.println(input.get(0));
 		Assert.assertEquals(1, input.size());
@@ -55,8 +54,8 @@ public class PrefixRuleTest extends BaseNamingRuleTest {
 		input.add(this.testGermplasmName);
 		try {
 			input = (List<String>) this.rule.runRule(this.createExecutionContext(input));
-		} catch (RuleException re) {
-			Assert.fail("Rule failed to run for Prefix" + this.row.getBreedingMethod().getSeparator());
+		} catch (org.generationcp.middleware.ruleengine.RuleException e) {
+			e.printStackTrace();
 		}
 		System.out.println(input.get(0));
 		Assert.assertEquals(1, input.size());

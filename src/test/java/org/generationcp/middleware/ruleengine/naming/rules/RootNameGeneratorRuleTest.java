@@ -3,7 +3,6 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,8 +47,8 @@ public class RootNameGeneratorRuleTest extends BaseNamingRuleTest {
 
 		try {
 			input = (List<String>) this.rootNameGeneratorRule.runRule(this.createExecutionContext(input));
-		} catch (RuleException re) {
-			Assert.fail("Should return the correct root name if the methd snametype is equal to the names' type id");
+		} catch (org.generationcp.middleware.ruleengine.RuleException e) {
+			e.printStackTrace();
 		}
 
 		Assert.assertEquals(1, input.size());

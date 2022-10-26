@@ -4,7 +4,7 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,17 +17,17 @@ public class CountRule extends OrderedRule<NamingRuleExecutionContext> {
 	public static final String DEFAULT_COUNT = "[NUMBER]";
 
 	@Override
-	public Object runRule(NamingRuleExecutionContext context) throws RuleException {
+	public Object runRule(final NamingRuleExecutionContext context) throws RuleException {
 		// create counts first - we need a list in case we have a sequence
 
-		ProcessCodeService service = context.getProcessCodeService();
-		AdvancingSource source = context.getAdvancingSource();
+		final ProcessCodeService service = context.getProcessCodeService();
+		final AbstractAdvancingSource source = context.getAdvancingSource();
 
-		List<String> input = context.getCurrentData();
+		final List<String> input = context.getCurrentData();
 
-		List<String> counts = new ArrayList<>();
+		final List<String> counts = new ArrayList<>();
 
-		for (String currentInput : input) {
+		for (final String currentInput : input) {
 			counts.addAll(service.applyProcessCode(currentInput, source.getBreedingMethod().getCount(), source));
 		}
 

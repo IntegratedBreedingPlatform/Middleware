@@ -10,14 +10,14 @@ import java.util.List;
 public abstract class OrderedRule<T extends OrderedRuleExecutionContext> implements Rule<T> {
 
 	@Override
-	public String getNextRuleStepKey(T context) {
-		List<String> sequenceOrder = context.getExecutionOrder();
+	public String getNextRuleStepKey(final T context) {
+		final List<String> sequenceOrder = context.getExecutionOrder();
 		int executionIndex = context.getCurrentExecutionIndex();
 
 		// increment to the next rule in the sequence
 		executionIndex++;
 		if (executionIndex < sequenceOrder.size()) {
-			String nextKey = sequenceOrder.get(executionIndex);
+			final String nextKey = sequenceOrder.get(executionIndex);
 			context.setCurrentExecutionIndex(executionIndex);
 			return nextKey;
 		} else {

@@ -42,7 +42,6 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	private boolean isCheck;
 	private String studyName;
 	private Method sourceMethod;
-	private AdvanceGermplasmChangeDetail changeDetail;
 	private String prefix;
 	private String suffix;
 	private String plotNumber;
@@ -140,20 +139,6 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	}
 
 	/**
-	 * @return the changeDetail
-	 */
-	public AdvanceGermplasmChangeDetail getChangeDetail() {
-		return this.changeDetail;
-	}
-
-	/**
-	 * @param changeDetail the changeDetail to set
-	 */
-	public void setChangeDetail(final AdvanceGermplasmChangeDetail changeDetail) {
-		this.changeDetail = changeDetail;
-	}
-
-	/**
 	 * @return the prefix
 	 */
 	public String getPrefix() {
@@ -242,7 +227,7 @@ public class AdvancingSource extends AbstractAdvancingSource {
         source.setRootName(this.getRootName());
         source.setSourceMethod(this.sourceMethod);
         source.setCurrentMaxSequence(this.getCurrentMaxSequence());
-        source.setChangeDetail(this.changeDetail);
+        source.setChangeDetail(this.getChangeDetail());
         source.setPrefix(this.prefix);
         source.setSuffix(this.suffix);
         source.setRootNameType(this.getRootNameType());

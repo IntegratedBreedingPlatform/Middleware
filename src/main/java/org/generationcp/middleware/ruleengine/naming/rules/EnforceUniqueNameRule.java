@@ -5,8 +5,8 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.ruleengine.BranchingRule;
 import org.generationcp.middleware.ruleengine.RuleException;
+import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.AdvanceGermplasmChangeDetail;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +27,7 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 
 		final List<String> currentData = context.getCurrentData();
 		final GermplasmDataManager germplasmDataManager = context.getGermplasmDataManager();
-		final AdvancingSource source = context.getAdvancingSource();
+		final AbstractAdvancingSource source = context.getAdvancingSource();
 
 		// as per agreement, unique name checking can be limited to only the first entry for the germplasm
 		final String nameForChecking = currentData.get(0);
@@ -42,7 +42,7 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 				this.processNonUniqueName(context, source);
 			}
 
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			throw new RuleException(e.getMessage(), e);
 		}
 
@@ -50,7 +50,7 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 		return null;
 	}
 
-	protected void processNonUniqueName(final NamingRuleExecutionContext context, final AdvancingSource source) {
+	protected void processNonUniqueName(final NamingRuleExecutionContext context, final AbstractAdvancingSource source) {
 		// if a duplicate is found, initialize an AdvanceGermplasmChangeDetail object containing the original duplicate, for confirmation
 		// later on with the user
 		this.initializeChangeDetailForAdvancingSource(context);
@@ -77,7 +77,7 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 
 	@Override
 	public String getNextRuleStepKey(final NamingRuleExecutionContext context) {
-		final AdvancingSource source = context.getAdvancingSource();
+		final AbstractAdvancingSource source = context.getAdvancingSource();
 
 		final AdvanceGermplasmChangeDetail changeDetailObject = source.getChangeDetail();
 
