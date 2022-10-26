@@ -155,6 +155,9 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	@Column(name = "cdate")
 	private Integer cdate;
 
+	@Column(name = "multi_factor_authentication")
+	private boolean multiFactorAuthenticationEnabled;
+
 	@Fetch(FetchMode.SUBSELECT)
 	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -321,6 +324,14 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		this.roles = roles;
 	}
 
+	public boolean isMultiFactorAuthenticationEnabled() {
+		return this.multiFactorAuthenticationEnabled;
+	}
+
+	public void setMultiFactorAuthenticationEnabled(final boolean multiFactorAuthenticationEnabled) {
+		this.multiFactorAuthenticationEnabled = multiFactorAuthenticationEnabled;
+	}
+
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(this.userid).hashCode();
@@ -372,6 +383,8 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		builder.append(this.active);
 		builder.append(", isEnabled=");
 		builder.append(this.enabled);
+		builder.append(", multiFactorAuthenticationEnabled=");
+		builder.append(this.multiFactorAuthenticationEnabled);
 
 		builder.append("]");
 		return builder.toString();

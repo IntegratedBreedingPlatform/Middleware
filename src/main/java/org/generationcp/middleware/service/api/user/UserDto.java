@@ -31,6 +31,7 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 	private String password;
 	private Set<CropDto> crops;
 	private Set<String> authorities;
+	private boolean multiFactorAuthenticationEnabled;
 
 	public UserDto() {
 		this.userId = 0;
@@ -75,6 +76,7 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		}
 		this.setStatus(workbenchUser.getStatus());
 		this.setUsername(workbenchUser.getName());
+		this.setMultiFactorAuthenticationEnabled(workbenchUser.isMultiFactorAuthenticationEnabled());
 	}
 
 	public Integer getUserId() {
@@ -200,4 +202,11 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.userRoles = userRoles;
 	}
 
+	public boolean isMultiFactorAuthenticationEnabled() {
+		return multiFactorAuthenticationEnabled;
+	}
+
+	public void setMultiFactorAuthenticationEnabled(boolean multiFactorAuthenticationEnabled) {
+		this.multiFactorAuthenticationEnabled = multiFactorAuthenticationEnabled;
+	}
 }

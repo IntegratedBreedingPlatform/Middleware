@@ -41,4 +41,15 @@
 		  );
 		</sql>
 	</changeSet>
+	<changeSet author="aldrin" id="v22.3.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="users" columnName="multi_factor_authentication"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE `workbench`.`users`
+				ADD COLUMN `multi_factor_authentication` TINYINT NULL DEFAULT 0 AFTER `cdate`;
+		</sql>
+	</changeSet>
 </databaseChangeLog>
