@@ -1,13 +1,9 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
+import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 
 public abstract class AttributeExpression implements Expression {
-
-	// TODO: move to a global app constants
-	protected static String METHOD_TYPE_GEN = "GEN";
-	protected static String METHOD_TYPE_DER = "DER";
-	protected static String METHOD_TYPE_MAN = "MAN";
 
 	protected <T extends AbstractAdvancingSource> Integer getGroupSourceGID(final T source) {
 
@@ -15,7 +11,7 @@ public abstract class AttributeExpression implements Expression {
 		final Integer sourceGpid2 = source.getOriginGermplasmGpid2();
 		final String sourceMethodType = source.getOriginGermplasmBreedingMethodType();
 
-		if (METHOD_TYPE_GEN.equals(sourceMethodType) || source.getOriginGermplasmGnpgs() < 0 && (sourceGpid1 != null && sourceGpid1
+		if (MethodType.isGenerative(sourceMethodType) || source.getOriginGermplasmGnpgs() < 0 && (sourceGpid1 != null && sourceGpid1
 			.equals(0))
 			&& (sourceGpid2 != null && sourceGpid2.equals(0))) {
 			// If the source germplasm is a new CROSS, then the group source is the cross itself

@@ -3,6 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,10 +26,10 @@ public class AttributeFemaleParentExpression extends AttributeExpression {
 
 		final Method breedingMethod = source.getBreedingMethod();
 		Integer gpid1 = null;
-		if (METHOD_TYPE_GEN.equals(breedingMethod.getMtype())) {
+		if (breedingMethod.isGenerative()) {
 			// If the method is Generative, GPID1 refers to the GID of the female parent
 			gpid1 = source.getFemaleGid();
-		} else if (METHOD_TYPE_DER.equals(breedingMethod.getMtype()) || METHOD_TYPE_MAN.equals(breedingMethod.getMtype())) {
+		} else if (breedingMethod.isDerivativeOrMaintenance()) {
 
 			// if the method is Derivative or Maintenance, GPID1 refers to the female parent of the group source
 			final Integer groupSourceGID = getGroupSourceGID(source);

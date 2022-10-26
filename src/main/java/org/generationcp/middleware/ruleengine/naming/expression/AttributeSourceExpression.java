@@ -1,6 +1,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,8 +23,7 @@ public class AttributeSourceExpression extends AttributeExpression {
 		for (final StringBuilder value : values) {
 			String newValue = "";
 			final Integer variableId = Integer.valueOf(capturedText.substring(1, capturedText.length() - 1).split("\\.")[1]);
-			if (METHOD_TYPE_DER.equals(source.getBreedingMethod().getMtype())
-				|| METHOD_TYPE_MAN.equals(source.getBreedingMethod().getMtype())) {
+			if (source.getBreedingMethod().isDerivativeOrMaintenance()) {
 				newValue = germplasmDataManager.getAttributeValue(source.getOriginGermplasmGid(), variableId);
 			}
 			this.replaceAttributeExpressionWithValue(value, ATTRIBUTE_KEY, variableId, newValue);
