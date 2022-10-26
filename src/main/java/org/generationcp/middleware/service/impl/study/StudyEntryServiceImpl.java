@@ -380,7 +380,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		}
 
 		final List<GermplasmNameTypeDTO> existingNameTypes = this.datasetService.getDatasetNameTypes(plotDataset.getProjectId());
-		final List<StudyEntryColumnDTO> nameColumns = new ArrayList<>();
 		if(!CollectionUtils.isEmpty(existingNameTypes)){
 			columns.addAll(existingNameTypes.stream().map(nameType ->
 					new StudyEntryColumnDTO(nameType.getId(), nameType.getCode(), null, null, true))
