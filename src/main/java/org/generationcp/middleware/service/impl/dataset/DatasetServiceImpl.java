@@ -1394,10 +1394,9 @@ public class DatasetServiceImpl implements DatasetService {
 		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
 		final List<Integer> descriptorPropertyIds = plotDataset.getProperties()
 			.stream()
-			.filter(projectProperty -> TermId.OBS_UNIT_ID.getId() != projectProperty.getVariableId() &&
-				(VariableType.GERMPLASM_DESCRIPTOR.getId().equals(projectProperty.getTypeId()) ||
+			.filter(projectProperty -> VariableType.GERMPLASM_DESCRIPTOR.getId().equals(projectProperty.getTypeId()) ||
 					VariableType.GERMPLASM_ATTRIBUTE.getId().equals(projectProperty.getTypeId()) ||
-					VariableType.GERMPLASM_PASSPORT.getId().equals(projectProperty.getTypeId())))
+					VariableType.GERMPLASM_PASSPORT.getId().equals(projectProperty.getTypeId()))
 			.map(ProjectProperty::getVariableId)
 			.collect(Collectors.toList());
 
