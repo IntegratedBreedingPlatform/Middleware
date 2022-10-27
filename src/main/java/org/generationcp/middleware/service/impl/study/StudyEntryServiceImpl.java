@@ -381,7 +381,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 					VariableType.GERMPLASM_PASSPORT.getId(),
 					VariableType.GERMPLASM_DESCRIPTOR.getId(),
 					VariableType.ENTRY_DETAIL.getId()));
-		variables.removeIf(variable -> variable.getTermId() == TermId.OBS_UNIT_ID.getId());
 		return variables;
 	}
 
