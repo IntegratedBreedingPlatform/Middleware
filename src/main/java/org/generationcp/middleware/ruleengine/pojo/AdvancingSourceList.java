@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.ruleengine.pojo;
 
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
-
 import java.util.List;
 
 /**
@@ -20,7 +18,6 @@ import java.util.List;
  * The POJO for the Germplasm List when Advancing a Nursery.
  *
  */
-@Deprecated
 public class AdvancingSourceList {
 
 	private List<AdvancingSource> rows;
