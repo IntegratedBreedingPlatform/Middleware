@@ -33,7 +33,7 @@ public interface NamingConventionService {
 	void generateAdvanceListNames(List<AdvancingSource> advancingSourceItems, boolean checkForDuplicateName, List<ImportedGermplasm> germplasmList) throws
 		MiddlewareQueryException, RuleException;
 
-	List<String> generateAdvanceListNames(NewAdvancingSource advancingSource) throws RuleException;
+	String generateAdvanceListName(NewAdvancingSource advancingSource) throws RuleException;
 
 	/*
 	* Generated the names for the list of crosses based on on rules setup for the breeding methods

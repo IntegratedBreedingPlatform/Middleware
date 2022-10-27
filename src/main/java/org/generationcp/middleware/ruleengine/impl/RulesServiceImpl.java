@@ -28,13 +28,13 @@ public class RulesServiceImpl implements RulesService {
 
 	// FIXME : catch RuleExceptions here?
 	@Override
-	public Object runRules(RuleExecutionContext context) throws RuleException {
+	public Object runRules(final RuleExecutionContext context) throws RuleException {
 
-		Monitor monitor = MonitorFactory.start(this.getClass().getName() + ".runRules");
+		final Monitor monitor = MonitorFactory.start(this.getClass().getName() + ".runRules");
 		
 		try{
-		
-  		List<String> sequenceOrder = context.getExecutionOrder();
+
+  		final List<String> sequenceOrder = context.getExecutionOrder();
   
   		assert !sequenceOrder.isEmpty();
   		Rule rule = this.ruleFactory.getRule(sequenceOrder.get(0));
@@ -51,7 +51,7 @@ public class RulesServiceImpl implements RulesService {
 
 	}
 
-	public void setRuleFactory(RuleFactory ruleFactory) {
+	public void setRuleFactory(final RuleFactory ruleFactory) {
 		this.ruleFactory = ruleFactory;
 	}
 }

@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -22,10 +23,12 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.generator.SeedSourceGenerator;
 import org.generationcp.middleware.ruleengine.naming.resolver.LocationDataResolver;
 import org.generationcp.middleware.ruleengine.naming.resolver.SeasonDataResolver;
 import org.generationcp.middleware.ruleengine.naming.resolver.SelectionTraitResolver;
+import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
 import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
@@ -82,6 +85,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
+
+	@Resource
+	private NamingConventionService namingConventionService;
 
 	private final DaoFactory daoFactory;
 	private final SeasonDataResolver seasonDataResolver;
@@ -215,7 +221,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 				studyEnvironmentVariables,
 				environmentDataset.getVariables(), locationNameByIds, studyInstancesByInstanceNumber, namesByGids);
 
-			// TODO: this.namingConventionService.generateAdvanceListNames
 			// TODO: persists germplasm
 		}
 
@@ -487,8 +492,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Integer trialInstanceVariableId = this.getVariableId(TRIAL_INSTANCE_VARIABLE_NAME);
 		final Integer plantNumberVariableId = this.getVariableId(PLANT_NUMBER_VARIABLE_NAME);
 
-		advancingSources.forEach(advancingSource -> {
+		Map<String, Integer> keySequenceMap = new HashMap<>();
 
+		for (final NewAdvancingSource advancingSource : advancingSources) {
 			final Method breedingMethod = advancingSource.getBreedingMethod();
 			final AtomicInteger selectionNumber = new AtomicInteger(1);
 			final int iterationCount = Boolean.TRUE.equals(breedingMethod.isBulkingMethod()) ? 1 : advancingSource.getPlantsSelected();
@@ -538,21 +544,26 @@ public class AdvanceServiceImpl implements AdvanceService {
 					advancedGermplasm.setMgid(0);
 				}
 
-				final List<Name> names = namesByGids.get(advancingSource.getOriginGermplasm().getGid());
-				advancedGermplasm.setNames(names);
-				// TODO: add names
-				names.forEach(name -> {
-					name.setLocationId(locationId);
-					name.setNdate(date);
-					name.setReferenceId(0);
-				});
+				// TODO: add names???
+//				final List<Name> names = namesByGids.get(advancingSource.getOriginGermplasm().getGid());
+//				advancedGermplasm.setNames(names);
+//				// TODO: add names
+//				names.forEach(name -> {
+//					name.setLocationId(locationId);
+//					name.setNdate(date);
+//					name.setReferenceId(0);
+//				});
 
 				advancedGermplasm.setMethod(breedingMethod);
 
 				// TODO: add attributes
+				final List<Attribute> attributes = new ArrayList<>();
 				final Attribute plotCodeAttribute = this.createGermplasmAttribute(seedSource, plotCodeVariableId, locationId, date);
+				attributes.add(plotCodeAttribute);
+
 				if (plotNumberVariableId != null) {
 					final Attribute plotNumberAttribute = this.createGermplasmAttribute(plotNumber, plotNumberVariableId, locationId, date);
+					attributes.add(plotNumberAttribute);
 				}
 
 				final String replicationNumber = this.getObservationValueByVariableId(plotObservation.getVariables().values(), TermId.REP_NO
@@ -560,16 +571,40 @@ public class AdvanceServiceImpl implements AdvanceService {
 				if (repNumberVariableId != null) {
 					final Attribute replicationNumberAttribute =
 						this.createGermplasmAttribute(replicationNumber, repNumberVariableId, locationId, date);
+					attributes.add(replicationNumberAttribute);
 				}
 
-				if (!StringUtils.isEmpty(plantNumber)) {
+				if (!StringUtils.isEmpty(plantNumber) && plantNumberVariableId != null) {
 					final Attribute plantNumberAttribute =
 						this.createGermplasmAttribute(plantNumber, plantNumberVariableId, locationId, date);
+					attributes.add(plantNumberAttribute);
+				}
+
+				if (trialInstanceVariableId != null) {
+					final Attribute trialInstanceNumberAttribute =
+						this.createGermplasmAttribute(plotObservation.getTrialInstance().toString(), trialInstanceVariableId, locationId,
+							date);
+					attributes.add(trialInstanceNumberAttribute);
+				}
+
+				// TODO: handle exception properly
+				try {
+					advancingSource.setKeySequenceMap(keySequenceMap);
+					final String generatedName = this.namingConventionService.generateAdvanceListName(advancingSource);
+
+					final Name derivativeName = this.createDerivativeName(generatedName);
+					advancedGermplasm.setNames(Arrays.asList(derivativeName));
+
+					// Pass the key sequence map to the next line to process
+					keySequenceMap = advancingSource.getKeySequenceMap();
+
+				} catch (final RuleException e) {
+					e.printStackTrace();
 				}
 
 				selectionNumber.incrementAndGet();
 			}
-		});
+		}
 	}
 
 	private String generateSeedSource(final String studyName, final int selectionNumber, final String plotNumber,
@@ -619,6 +654,14 @@ public class AdvanceServiceImpl implements AdvanceService {
 			return null;
 		}
 		return term.getId();
+	}
+
+	protected Name createDerivativeName(final String designation) {
+		final Name name = new Name();
+		name.setTypeId(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID());
+		name.setNval(designation);
+		name.setNstat(1);
+		return name;
 	}
 
 }

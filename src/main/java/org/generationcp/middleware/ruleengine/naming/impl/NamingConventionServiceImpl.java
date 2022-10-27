@@ -42,6 +42,7 @@ import java.util.Map;
 @Transactional
 public class NamingConventionServiceImpl implements NamingConventionService {
 
+	// TODO: move to common constants
 	public static final int NAME_MAX_LENGTH = 5000;
 
 	@Resource
@@ -99,10 +100,14 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 	}
 
 	@Override
-	public List<String> generateAdvanceListNames(final NewAdvancingSource advancingSource) throws RuleException {
+	public String generateAdvanceListName(final NewAdvancingSource advancingSource) throws RuleException {
 		final RuleExecutionContext namingExecutionContext =
 			this.setupNamingRuleExecutionContext(advancingSource, false);
-		return (List<String>) this.rulesService.runRules(namingExecutionContext);
+		final String generatedName = ((List<String>) this.rulesService.runRules(namingExecutionContext)).get(0);
+		if (generatedName.length() > NAME_MAX_LENGTH) {
+			throw new MiddlewareQueryException("error.save.resulting.name.exceeds.limit");
+		}
+		return generatedName;
 	}
 
 	@Deprecated
