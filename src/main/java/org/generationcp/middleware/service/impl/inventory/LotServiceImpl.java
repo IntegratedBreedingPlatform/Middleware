@@ -255,12 +255,17 @@ public class LotServiceImpl implements LotService {
 						attribute.setcValueId(cValueId);
 						this.daoFactory.getLotAttributeDAO().update(attribute);
 					} else {
-						// create new attribute for the variable and data input
-						final LotAttribute attribute =
-							new LotAttribute(null, lot.getId(), variable.getId(), value, cValueId,
-								lot.getLocationId(),
-								0, Util.getCurrentDateAsIntegerValue());
-						this.daoFactory.getLotAttributeDAO().save(attribute);
+						if (variable.isObsolete()) {
+							conflictErrors.put("lot.update.obsolete.attributes", new String[] {
+								variableNameOrAlias, String.valueOf(lot.getId())});
+						} else {
+							// create new attribute for the variable and data input
+							final LotAttribute attribute =
+								new LotAttribute(null, lot.getId(), variable.getId(), value, cValueId,
+									lot.getLocationId(),
+									0, Util.getCurrentDateAsIntegerValue());
+							this.daoFactory.getLotAttributeDAO().save(attribute);
+						}
 					}
 				}
 			}
