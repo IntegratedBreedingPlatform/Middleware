@@ -1722,8 +1722,4 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getUserDefinedFieldDAO().getNameTypeFromDataset(datasetId);
 	}
 
-	@Override
-	public void deleteNameTypeFromStudies(final Integer nameTypeId) {
-		this.daoFactory.getProjectPropertyDAO().deleteNameTypeFromStudies(nameTypeId);
-	}
 }

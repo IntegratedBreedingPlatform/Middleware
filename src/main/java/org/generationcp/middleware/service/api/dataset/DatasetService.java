@@ -435,5 +435,4 @@ public interface DatasetService {
 
 	List<GermplasmNameTypeDTO> getDatasetNameTypes(Integer datasetId);
 
-	void deleteNameTypeFromStudies(Integer nameTypeId);
 }
