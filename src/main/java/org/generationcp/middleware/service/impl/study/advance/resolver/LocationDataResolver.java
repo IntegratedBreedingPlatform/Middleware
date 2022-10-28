@@ -1,4 +1,4 @@
-package org.generationcp.middleware.ruleengine.naming.resolver;
+package org.generationcp.middleware.service.impl.study.advance.resolver;
 
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Location;
