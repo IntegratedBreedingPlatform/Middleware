@@ -1,4 +1,4 @@
-package org.generationcp.middleware.service.api.study;
+package org.generationcp.middleware.service.api.study.advance;
 
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 

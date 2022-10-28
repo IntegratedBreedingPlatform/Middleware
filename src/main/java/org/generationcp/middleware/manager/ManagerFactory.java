@@ -84,7 +84,7 @@ import org.generationcp.middleware.service.api.gdms.DatasetService;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactoryImpl;
-import org.generationcp.middleware.service.api.study.AdvanceService;
+import org.generationcp.middleware.service.api.study.advance.AdvanceService;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -98,7 +98,7 @@ import org.generationcp.middleware.service.impl.derived_variables.DerivedVariabl
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.service.impl.gdms.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.inventory.LotServiceImpl;
-import org.generationcp.middleware.service.impl.study.AdvanceServiceImpl;
+import org.generationcp.middleware.service.impl.study.advance.AdvanceServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyEntryServiceImpl;

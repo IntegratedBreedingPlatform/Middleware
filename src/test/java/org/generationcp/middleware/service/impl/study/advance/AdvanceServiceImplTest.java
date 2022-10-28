@@ -1,15 +1,15 @@
-package org.generationcp.middleware.service.impl.study;
+package org.generationcp.middleware.service.impl.study.advance;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
+import org.generationcp.middleware.service.impl.study.advance.AdvanceServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.verification.VerificationMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
