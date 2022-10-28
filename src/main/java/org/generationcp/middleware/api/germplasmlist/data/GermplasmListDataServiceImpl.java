@@ -291,6 +291,11 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			});
 	}
 
+	@Override
+	public void deleteNameTypeFromGermplasmList(final Integer nameTypeId) {
+		this.daoFactory.getGermplasmListDataViewDAO().deleteNameTypeFromGermplasmList(nameTypeId);
+	}
+
 	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<GermplasmListDataSearchResponse> response) {
 
 		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());

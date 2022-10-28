@@ -34,4 +34,6 @@ public interface GermplasmListDataService {
 
 	void saveDefaultView(GermplasmList list);
 
+	void deleteNameTypeFromGermplasmList(Integer nameTypeId);
+
 }
