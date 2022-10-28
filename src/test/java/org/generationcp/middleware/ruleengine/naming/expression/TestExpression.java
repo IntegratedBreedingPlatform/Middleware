@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.domain.oms.TermId;
@@ -33,14 +32,15 @@ public class TestExpression {
 		return result;
 	}
 
-	public AdvancingSource createAdvancingSourceTestData(final Method method,final ImportedGermplasm germplasm, final String name, final String season,
+	public AdvancingSource createAdvancingSourceTestData(final Method method, final ImportedGermplasm germplasm, final String name,
+		final String season,
 		final String studyName) {
 		final List<Name> names = new ArrayList<>();
 		names.add(new Name(1, new Germplasm(1), 3, 0, name + "_three", 0, 0, 0));
 		names.add(new Name(1, new Germplasm(1), 5, 0, name + "_five", 0, 0, 0));
 		names.add(new Name(1, new Germplasm(1), 2, 1, name + "_two", 0, 0, 0));
 
-		final AdvancingSource source = new AdvancingSource(germplasm, names, 2, method, false, studyName, "1");
+		final AdvancingSource source = new AdvancingSource(germplasm, names, 2, method, studyName, "1");
 		source.setRootName(name);
 		source.setSeason(season);
 		return source;
@@ -48,7 +48,7 @@ public class TestExpression {
 	}
 
 	public AdvancingSource createAdvancingSourceTestData(String name, String separator, String prefix, String count, String suffix,
-			boolean isBulking) {
+		boolean isBulking) {
 
 		final Method method = new Method();
 		method.setSeparator(separator);
@@ -68,7 +68,7 @@ public class TestExpression {
 		names.add(new Name(1, new Germplasm(1), 5, 0, name + "_five", 0, 0, 0));
 		names.add(new Name(1, new Germplasm(1), 2, 1, name + "_two", 0, 0, 0));
 
-		final AdvancingSource source = new AdvancingSource(germplasm, names, 2, method, false, "MNL", "1");
+		final AdvancingSource source = new AdvancingSource(germplasm, names, 2, method, "MNL", "1");
 		source.setRootName(name);
 		source.setSeason("Dry");
 		source.setStudyName("NurseryTest");
@@ -80,16 +80,17 @@ public class TestExpression {
 
 		final StringBuilder builder = new StringBuilder();
 		builder.append(source.getGermplasm().getDesig()).append(this.getNonNullValue(source.getBreedingMethod().getSeparator()))
-		.append(this.getNonNullValue(source.getBreedingMethod().getPrefix()))
-		.append(this.getNonNullValue(source.getBreedingMethod().getCount()))
-		.append(this.getNonNullValue(source.getBreedingMethod().getSuffix()));
+			.append(this.getNonNullValue(source.getBreedingMethod().getPrefix()))
+			.append(this.getNonNullValue(source.getBreedingMethod().getCount()))
+			.append(this.getNonNullValue(source.getBreedingMethod().getSuffix()));
 		builders.add(builder);
 
 		return builders;
 	}
 
-	public ImportedGermplasm createImportedGermplasm(final Integer entryNumber, final String designation, final String gid, final Integer gpid1, final Integer gpid2,
-													 final Integer gnpgs, final Integer mid) {
+	public ImportedGermplasm createImportedGermplasm(final Integer entryNumber, final String designation, final String gid,
+		final Integer gpid1, final Integer gpid2,
+		final Integer gnpgs, final Integer mid) {
 		final ImportedGermplasm germplasm = new ImportedGermplasm();
 		germplasm.setEntryNumber(entryNumber);
 		germplasm.setDesig(designation);
@@ -101,12 +102,14 @@ public class TestExpression {
 		return germplasm;
 	}
 
-	public Method createDerivativeMethod(final String prefix, final String count, final String suffix, final String separator, final boolean isBulking) {
+	public Method createDerivativeMethod(final String prefix, final String count, final String suffix, final String separator,
+		final boolean isBulking) {
 		return createBreedingMethod(prefix, count, suffix, "DER", 323, "G", "UDM", "Unknown derivative method",
 			"Unknown derivative method in self fertilising species: for storing historic pedigrees", separator, isBulking);
 	}
 
-	public Method createGenerativeMethod(final String prefix, final String count, final String suffix, final String separator, final boolean isBulking) {
+	public Method createGenerativeMethod(final String prefix, final String count, final String suffix, final String separator,
+		final boolean isBulking) {
 		return createBreedingMethod(prefix, count, suffix, "GEN", 1, "G", "UGM", "Unknown generative method",
 			"Unknown generative method for storing historic pedigrees for self fertilizing species.", separator, isBulking);
 	}

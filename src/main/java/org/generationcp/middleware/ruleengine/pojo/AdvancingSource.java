@@ -25,9 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * The POJO containing information needed for Advancing.
- *
  */
 
 @Deprecated
@@ -39,7 +37,6 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	 * This field is used to temporarily store the breeding method ID until such time as it can be resolved to a proper breeding Method object
 	 */
 	private Integer breedingMethodId;
-	private boolean isCheck;
 	private String studyName;
 	private Method sourceMethod;
 	private String prefix;
@@ -55,14 +52,14 @@ public class AdvancingSource extends AbstractAdvancingSource {
 
 	private List<SampleDTO> samples = new ArrayList<>();
 
-	public AdvancingSource(final ImportedGermplasm germplasm, final List<Name> names, final Integer plantsSelected, final Method breedingMethod, final boolean isCheck,
-			final String studyName, final String plotNumber) {
+	public AdvancingSource(final ImportedGermplasm germplasm, final List<Name> names, final Integer plantsSelected,
+		final Method breedingMethod,
+		final String studyName, final String plotNumber) {
 		super();
 		this.germplasm = germplasm;
 		this.setNames(names);
 		this.setPlantsSelected(plantsSelected);
 		this.setBreedingMethod(breedingMethod);
-		this.isCheck = isCheck;
 		this.studyName = studyName;
 		this.plotNumber = plotNumber;
 	}
@@ -72,7 +69,7 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		this.germplasm = germplasm;
 	}
 
-    public AdvancingSource() {
+	public AdvancingSource() {
 		super();
 	}
 
@@ -88,20 +85,6 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	 */
 	public void setGermplasm(final ImportedGermplasm germplasm) {
 		this.germplasm = germplasm;
-	}
-
-	/**
-	 * @return the isCheck
-	 */
-	public boolean isCheck() {
-		return this.isCheck;
-	}
-
-	/**
-	 * @param isCheck the isCheck to set
-	 */
-	public void setCheck(final boolean isCheck) {
-		this.isCheck = isCheck;
 	}
 
 	/**
@@ -220,23 +203,23 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	}
 
 	public AdvancingSource copy() {
-        final AdvancingSource source = new AdvancingSource(germplasm, this.getNames(), this.getPlantsSelected(), this.getBreedingMethod(), isCheck,
+		final AdvancingSource source = new AdvancingSource(germplasm, this.getNames(), this.getPlantsSelected(), this.getBreedingMethod(),
 			studyName, this.getPlotNumber());
-        source.setSeason(this.getSeason());
-        source.setLocationAbbreviation(this.getLocationAbbreviation());
-        source.setRootName(this.getRootName());
-        source.setSourceMethod(this.sourceMethod);
-        source.setCurrentMaxSequence(this.getCurrentMaxSequence());
-        source.setChangeDetail(this.getChangeDetail());
-        source.setPrefix(this.prefix);
-        source.setSuffix(this.suffix);
-        source.setRootNameType(this.getRootNameType());
-        source.setHarvestLocationId(this.getHarvestLocationId());
-        source.setSelectionTraitValue(this.getSelectionTraitValue());
-        source.setTrialInstanceNumber(this.trialInstanceNumber);
-        source.setReplicationNumber(this.replicationNumber);
-        return source;
-    }
+		source.setSeason(this.getSeason());
+		source.setLocationAbbreviation(this.getLocationAbbreviation());
+		source.setRootName(this.getRootName());
+		source.setSourceMethod(this.sourceMethod);
+		source.setCurrentMaxSequence(this.getCurrentMaxSequence());
+		source.setChangeDetail(this.getChangeDetail());
+		source.setPrefix(this.prefix);
+		source.setSuffix(this.suffix);
+		source.setRootNameType(this.getRootNameType());
+		source.setHarvestLocationId(this.getHarvestLocationId());
+		source.setSelectionTraitValue(this.getSelectionTraitValue());
+		source.setTrialInstanceNumber(this.trialInstanceNumber);
+		source.setReplicationNumber(this.replicationNumber);
+		return source;
+	}
 
 	public List<SampleDTO> getSamples() {
 		return samples;
