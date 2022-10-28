@@ -3,17 +3,14 @@ package org.generationcp.middleware.service.impl.study.advance;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
-import org.generationcp.middleware.service.impl.study.advance.AdvanceServiceImpl;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -48,7 +45,8 @@ public class AdvanceServiceImplTest {
 				null, null);
 
 		final Integer plantSelected =
-			this.advanceService.getPlantSelected(advanceStudyRequest, new ArrayList<>(), new HashMap<>(), isBulkMethod);
+			this.advanceService
+				.getPlantSelected(advanceStudyRequest, Mockito.mock(ObservationUnitRow.class), new HashMap<>(), isBulkMethod);
 		assertThat(plantSelected, is(givenLinesSelected));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -76,11 +74,11 @@ public class AdvanceServiceImplTest {
 		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(selectedBreedingMethodId, null, null, null,
 			lineVariateId, null);
 
-		final List<ObservationUnitData> observationVariables = new ArrayList();
-		observationVariables.add(this.mockObservationUnitData(lineVariateId, expectedLinesSelected.toString()));
+		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
+		Mockito.when(observationUnitRow.getVariableValueByVariableId(lineVariateId)).thenReturn(expectedLinesSelected.toString());
 
 		final Integer plantSelected =
-			this.advanceService.getPlantSelected(advanceStudyRequest, observationVariables, new HashMap<>(), isBulkMethod);
+			this.advanceService.getPlantSelected(advanceStudyRequest, observationUnitRow, new HashMap<>(), isBulkMethod);
 		assertThat(plantSelected, is(expectedLinesSelected));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -109,7 +107,7 @@ public class AdvanceServiceImplTest {
 			null, allPlotsSelected);
 
 		final Integer plantSelected =
-			this.advanceService.getPlantSelected(advanceStudyRequest, new ArrayList<>(), new HashMap<>(), isBulkMethod);
+			this.advanceService.getPlantSelected(advanceStudyRequest, new ObservationUnitRow(), new HashMap<>(), isBulkMethod);
 		assertThat(plantSelected, is(1));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -140,11 +138,11 @@ public class AdvanceServiceImplTest {
 			this.createMockAdvanceStudyRequest(selectedBreedingMethodId, null, plotVariateId, null,
 				null, allPlotsSelected);
 
-		final List<ObservationUnitData> observationVariables = new ArrayList();
-		observationVariables.add(this.mockObservationUnitData(plotVariateId, expectedLinesSelected.toString()));
+		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
+		Mockito.when(observationUnitRow.getVariableValueByVariableId(plotVariateId)).thenReturn(expectedLinesSelected.toString());
 
 		final Integer plantSelected =
-			this.advanceService.getPlantSelected(advanceStudyRequest, observationVariables, new HashMap<>(), isBulkMethod);
+			this.advanceService.getPlantSelected(advanceStudyRequest, observationUnitRow, new HashMap<>(), isBulkMethod);
 		assertThat(plantSelected, is(expectedLinesSelected));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -171,10 +169,12 @@ public class AdvanceServiceImplTest {
 			this.createMockAdvanceStudyRequest(null, methodVariateId, null, null,
 				null, null);
 
-		final List<ObservationUnitData> observationVariables = new ArrayList();
+		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
+		Mockito.when(observationUnitRow.getVariableValueByVariableId(methodVariateId)).thenReturn(null);
+
 		final Map<String, Method> breedingMethodsByCode = new HashMap<>();
 		final Integer plantSelected =
-			this.advanceService.getPlantSelected(advanceStudyRequest, observationVariables, breedingMethodsByCode, isBulkMethod);
+			this.advanceService.getPlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
 		assertNull(plantSelected);
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -204,8 +204,8 @@ public class AdvanceServiceImplTest {
 			this.createMockAdvanceStudyRequest(null, methodVariateId, null, expectedLinesSelected,
 				null, null);
 
-		final List<ObservationUnitData> observationVariables = new ArrayList();
-		observationVariables.add(this.mockObservationUnitData(methodVariateId, plotBreedingMethodCode));
+		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
+		Mockito.when(observationUnitRow.getVariableValueByVariableId(methodVariateId)).thenReturn(plotBreedingMethodCode);
 
 		final Method breedingMethod = Mockito.mock(Method.class);
 		Mockito.when(breedingMethod.isBulkingMethod()).thenReturn(isBulkMethod);
@@ -213,7 +213,7 @@ public class AdvanceServiceImplTest {
 		breedingMethodsByCode.put(plotBreedingMethodCode, breedingMethod);
 
 		final Integer plantSelected =
-			this.advanceService.getPlantSelected(advanceStudyRequest, observationVariables, breedingMethodsByCode, isBulkMethod);
+			this.advanceService.getPlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
 		assertThat(plantSelected, is(expectedLinesSelected));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -242,9 +242,9 @@ public class AdvanceServiceImplTest {
 		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(null, methodVariateId, null, null,
 			lineVariateId, null);
 
-		final List<ObservationUnitData> observationVariables = new ArrayList();
-		observationVariables.add(this.mockObservationUnitData(methodVariateId, plotBreedingMethodCode));
-		observationVariables.add(this.mockObservationUnitData(lineVariateId, expectedLinesSelected.toString()));
+		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
+		Mockito.when(observationUnitRow.getVariableValueByVariableId(methodVariateId)).thenReturn(plotBreedingMethodCode);
+		Mockito.when(observationUnitRow.getVariableValueByVariableId(lineVariateId)).thenReturn(expectedLinesSelected.toString());
 
 		final Method breedingMethod = Mockito.mock(Method.class);
 		Mockito.when(breedingMethod.isBulkingMethod()).thenReturn(isBulkMethod);
@@ -252,7 +252,7 @@ public class AdvanceServiceImplTest {
 		breedingMethodsByCode.put(plotBreedingMethodCode, breedingMethod);
 
 		final Integer plantSelected =
-			this.advanceService.getPlantSelected(advanceStudyRequest, observationVariables, breedingMethodsByCode, isBulkMethod);
+			this.advanceService.getPlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
 		assertThat(plantSelected, is(expectedLinesSelected));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -281,9 +281,9 @@ public class AdvanceServiceImplTest {
 		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(null, methodVariateId, plotVariateId, null,
 			null, allPlotsSelected);
 
-		final List<ObservationUnitData> observationVariables = new ArrayList();
-		observationVariables.add(this.mockObservationUnitData(methodVariateId, plotBreedingMethodCode));
-		observationVariables.add(this.mockObservationUnitData(plotVariateId, plotBreedingMethodCode));
+		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
+		Mockito.when(observationUnitRow.getVariableValueByVariableId(methodVariateId)).thenReturn(plotBreedingMethodCode);
+		Mockito.when(observationUnitRow.getVariableValueByVariableId(plotVariateId)).thenReturn(plotBreedingMethodCode);
 
 		final Method breedingMethod = Mockito.mock(Method.class);
 		Mockito.when(breedingMethod.isBulkingMethod()).thenReturn(isBulkMethod);
@@ -291,7 +291,7 @@ public class AdvanceServiceImplTest {
 		breedingMethodsByCode.put(plotBreedingMethodCode, breedingMethod);
 
 		final Integer plantSelected =
-			this.advanceService.getPlantSelected(advanceStudyRequest, observationVariables, breedingMethodsByCode, isBulkMethod);
+			this.advanceService.getPlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
 		assertThat(plantSelected, is(1));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -322,9 +322,9 @@ public class AdvanceServiceImplTest {
 		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(null, methodVariateId, plotVariateId, null,
 			null, allPlotsSelected);
 
-		final List<ObservationUnitData> observationVariables = new ArrayList();
-		observationVariables.add(this.mockObservationUnitData(methodVariateId, plotBreedingMethodCode));
-		observationVariables.add(this.mockObservationUnitData(plotVariateId, expectedLinesSelected.toString()));
+		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
+		Mockito.when(observationUnitRow.getVariableValueByVariableId(methodVariateId)).thenReturn(plotBreedingMethodCode);
+		Mockito.when(observationUnitRow.getVariableValueByVariableId(plotVariateId)).thenReturn(expectedLinesSelected.toString());
 
 		final Method breedingMethod = Mockito.mock(Method.class);
 		Mockito.when(breedingMethod.isBulkingMethod()).thenReturn(isBulkMethod);
@@ -332,7 +332,7 @@ public class AdvanceServiceImplTest {
 		breedingMethodsByCode.put(plotBreedingMethodCode, breedingMethod);
 
 		final Integer plantSelected =
-			this.advanceService.getPlantSelected(advanceStudyRequest, observationVariables, breedingMethodsByCode, isBulkMethod);
+			this.advanceService.getPlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
 		assertThat(plantSelected, is(expectedLinesSelected));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -365,13 +365,6 @@ public class AdvanceServiceImplTest {
 		Mockito.when(advanceStudyRequest.getLineSelectionRequest()).thenReturn(lineSelectionRequest);
 
 		return advanceStudyRequest;
-	}
-
-	private ObservationUnitData mockObservationUnitData(final Integer variableId, final String value) {
-		final ObservationUnitData observationUnitData = Mockito.mock(ObservationUnitData.class);
-		Mockito.when(observationUnitData.getVariableId()).thenReturn(variableId);
-		Mockito.when(observationUnitData.getValue()).thenReturn(value);
-		return observationUnitData;
 	}
 
 }

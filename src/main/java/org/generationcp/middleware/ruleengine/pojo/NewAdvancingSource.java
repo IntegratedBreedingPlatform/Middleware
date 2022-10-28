@@ -4,6 +4,9 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // TODO: please, change this name
 public class NewAdvancingSource extends AbstractAdvancingSource {
 
@@ -14,6 +17,8 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 	private ObservationUnitRow trialInstanceObservation;
 
 	private ObservationUnitRow plotObservation;
+
+	private List<Germplasm> advancedGermplasm = new ArrayList<>();
 
 	public NewAdvancingSource() {
 	}

@@ -25,19 +25,18 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.generator.SeedSourceGenerator;
-import org.generationcp.middleware.service.impl.study.advance.resolver.LocationDataResolver;
-import org.generationcp.middleware.service.impl.study.advance.resolver.SeasonDataResolver;
-import org.generationcp.middleware.service.impl.study.advance.resolver.SelectionTraitDataResolver;
 import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
 import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
-import org.generationcp.middleware.service.api.study.advance.AdvanceService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
+import org.generationcp.middleware.service.api.study.advance.AdvanceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.generationcp.middleware.service.impl.study.advance.resolver.LocationDataResolver;
+import org.generationcp.middleware.service.impl.study.advance.resolver.SeasonDataResolver;
+import org.generationcp.middleware.service.impl.study.advance.resolver.SelectionTraitDataResolver;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -163,7 +162,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final List<NewAdvancingSource> advancingSources = new ArrayList<>();
 		plotObservations.forEach(row -> {
 			final Method breedingMethod =
-				this.getBreedingMethod(request.getBreedingMethodSelectionRequest(), row.getVariables().values(), breedingMethodsByCode,
+				this.getBreedingMethod(request.getBreedingMethodSelectionRequest(), row, breedingMethodsByCode,
 					breedingMethodsById);
 			if (breedingMethod == null || breedingMethod.isBulkingMethod() == null) {
 				return;
@@ -171,7 +170,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 			final Germplasm originGermplasm = originGermplasmsByGid.get(row.getGid());
 			final Integer plantsSelected =
-				this.getPlantSelected(request, row.getVariables().values(), breedingMethodsByCode, breedingMethod.isBulkingMethod());
+				this.getPlantSelected(request, row, breedingMethodsByCode, breedingMethod.isBulkingMethod());
 			if (originGermplasm == null || plantsSelected == null || plantsSelected <= 0) {
 				return;
 			}
@@ -289,19 +288,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.collect(Collectors.toList());
 	}
 
-	private Optional<ObservationUnitData> getVariableById(final Collection<ObservationUnitData> variables,
-		final Integer variableId) {
-		return variables.stream()
-			.filter(variable -> variableId.equals(variable.getVariableId()))
-			.findFirst();
-	}
-
-	private String getObservationValueByVariableId(final Collection<ObservationUnitData> variables, final Integer variableId) {
-		return this.getVariableById(variables, variableId)
-			.map(ObservationUnitData::getValue)
-			.orElse(null);
-	}
-
 	private List<MeasurementVariableDto> getObservationSetVariables(final Integer datasetId, final List<Integer> variableTypes) {
 		return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, variableTypes)
 			.stream()
@@ -319,7 +305,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		if (optionalTrialObservation.isPresent()) {
 			final ObservationUnitRow trialObservation = optionalTrialObservation.get();
 			if (studyInstancesByInstanceNumber.containsKey(trialInstanceNumber)) {
-				this.getVariableById(trialObservation.getEnvironmentVariables().values(), TermId.LOCATION_ID.getId())
+				trialObservation.getVariableById(trialObservation.getEnvironmentVariables().values(), TermId.LOCATION_ID.getId())
 					.ifPresent(
 						observationUnitData -> observationUnitData
 							.setValue(String.valueOf(studyInstancesByInstanceNumber.get(trialInstanceNumber).getLocationId()))
@@ -332,11 +318,11 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	// TODO: move getBreedingMethod to another class
 	private Method getBreedingMethod(final AdvanceStudyRequest.BreedingMethodSelectionRequest request,
-		final Collection<ObservationUnitData> observationVariables,
-		final Map<String, Method> breedingMethodsByCode,
+		final ObservationUnitRow plotObservation, final Map<String, Method> breedingMethodsByCode,
 		final Map<Integer, Method> breedingMethodsById) {
+
 		final Integer breedingMethodId = request.getMethodVariateId() == null ? request.getBreedingMethodId() :
-			this.getBreedingMethodId(request.getMethodVariateId(), observationVariables, breedingMethodsByCode);
+			this.getBreedingMethodId(request.getMethodVariateId(), plotObservation, breedingMethodsByCode);
 		if (breedingMethodId == null) {
 			return null;
 		}
@@ -345,14 +331,14 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	// TODO: move getBreedingMethod to another class
 	// TODO: we are asking for BREEDING_METHOD_VARIATE and BREEDING_METHOD_VARIATE_TEXT due to backward compatibility
-	private Integer getBreedingMethodId(final Integer methodVariateId, final Collection<ObservationUnitData> variables,
+	private Integer getBreedingMethodId(final Integer methodVariateId, final ObservationUnitRow plotObservation,
 		final Map<String, Method> breedingMethodsByCode) {
 		// TODO: the user can select BREEDING_METHOD_VARIATE as variate variable ???
 		if (TermId.BREEDING_METHOD_VARIATE.getId() == methodVariateId) {
-			return this.getIntegerValue(this.getObservationValueByVariableId(variables, methodVariateId));
+			return this.getIntegerValue(plotObservation.getVariableValueByVariableId(methodVariateId));
 		} else if (TermId.BREEDING_METHOD_VARIATE_TEXT.getId() == methodVariateId
 			|| TermId.BREEDING_METHOD_VARIATE_CODE.getId() == methodVariateId) {
-			final String methodName = this.getObservationValueByVariableId(variables, methodVariateId);
+			final String methodName = plotObservation.getVariableValueByVariableId(methodVariateId);
 			if (StringUtils.isEmpty(methodName)) {
 				return null;
 			}
@@ -370,7 +356,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 			}
 		} else {
 			// on load of study, this has been converted to id and not the code.
-			return this.getIntegerValue(this.getObservationValueByVariableId(variables, methodVariateId));
+			return this.getIntegerValue(plotObservation.getVariableValueByVariableId(methodVariateId));
 		}
 		return null;
 	}
@@ -422,23 +408,23 @@ public class AdvanceServiceImpl implements AdvanceService {
 	}
 
 	// TODO: move plant selection code to another class
-	Integer getPlantSelected(final AdvanceStudyRequest request, final Collection<ObservationUnitData> observationVariables,
+	Integer getPlantSelected(final AdvanceStudyRequest request, final ObservationUnitRow plotObservation,
 		final Map<String, Method> breedingMethodsByCode, final boolean isBulkMethod) {
 
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			request.getBreedingMethodSelectionRequest();
 		if (breedingMethodSelectionRequest.getBreedingMethodId() != null) {
 			// User has selected the same Breeding Method for each advance
-			return this.getLineSelectedForBreedingMethodVariable(request, isBulkMethod, observationVariables);
+			return this.getLineSelectedForBreedingMethodVariable(request, isBulkMethod, plotObservation);
 		}
 
 		if (breedingMethodSelectionRequest.getMethodVariateId() != null) {
 			// User has selected a variate that defines the breeding method for each advance
 			final String rowBreedingMethodCode =
-				this.getObservationValueByVariableId(observationVariables, breedingMethodSelectionRequest.getMethodVariateId());
+				plotObservation.getVariableValueByVariableId(breedingMethodSelectionRequest.getMethodVariateId());
 			if (!StringUtils.isEmpty(rowBreedingMethodCode) && breedingMethodsByCode.containsKey(rowBreedingMethodCode)) {
 				final Method method = breedingMethodsByCode.get(rowBreedingMethodCode);
-				return this.getLineSelectedForBreedingMethodVariable(request, method.isBulkingMethod(), observationVariables);
+				return this.getLineSelectedForBreedingMethodVariable(request, method.isBulkingMethod(), plotObservation);
 			}
 
 			return null;
@@ -449,7 +435,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	// TODO: move plant selection code to another class
 	private Integer getLineSelectedForBreedingMethodVariable(final AdvanceStudyRequest request, final Boolean isBulkMethod,
-		final Collection<ObservationUnitData> observationVariables) {
+		final ObservationUnitRow plotObservation) {
 		if (isBulkMethod == null) {
 			return null;
 		}
@@ -462,7 +448,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 			if (breedingMethodSelectionRequest.getAllPlotsSelected() == null || !breedingMethodSelectionRequest.getAllPlotsSelected()) {
 				// User has selected a variate that defines the number of lines selected from each plot
 				final String plotVariateValue =
-					this.getObservationValueByVariableId(observationVariables, breedingMethodSelectionRequest.getPlotVariateId());
+					plotObservation.getVariableValueByVariableId(breedingMethodSelectionRequest.getPlotVariateId());
 				return this.getIntegerValue(plotVariateValue);
 			} else {
 				return 1;
@@ -471,7 +457,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 			// User has selected the same number of lines for each plot
 			if (lineSelectionRequest.getLinesSelected() == null) {
 				final String lineVariateValue =
-					this.getObservationValueByVariableId(observationVariables, lineSelectionRequest.getLineVariateId());
+					plotObservation.getVariableValueByVariableId(lineSelectionRequest.getLineVariateId());
 				return this.getIntegerValue(lineVariateValue);
 			} else {
 				// User has selected the same number of lines for each plot
@@ -498,7 +484,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 		for (final NewAdvancingSource advancingSource : advancingSources) {
 			final Method breedingMethod = advancingSource.getBreedingMethod();
 			final AtomicInteger selectionNumber = new AtomicInteger(1);
-			final int iterationCount = Boolean.TRUE.equals(breedingMethod.isBulkingMethod()) ? 1 : advancingSource.getPlantsSelected();
+//			final int iterationCount = Boolean.TRUE.equals(breedingMethod.isBulkingMethod()) ? 1 : advancingSource.getPlantsSelected();
+			final int iterationCount = advancingSource.getPlantsSelected();
 			for (int i = 0; i < iterationCount; i++) {
 
 				// TODO: implement it for samples
@@ -509,8 +496,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 				//				}
 
 				final ObservationUnitRow plotObservation = advancingSource.getPlotObservation();
-				final String plotNumber =
-					this.getObservationValueByVariableId(plotObservation.getVariables().values(), TermId.PLOT_NO.getId());
+				final String plotNumber = plotObservation.getVariableValueByVariableId(TermId.PLOT_NO.getId());
 				final String seedSource = this.generateSeedSource(studyName, selectionNumber.get(), plotNumber,
 					breedingMethod.isBulkingMethod(), breedingMethodSelectionRequest.getAllPlotsSelected(),
 					advancingSource.getPlantsSelected(), plotObservation,
@@ -546,14 +532,14 @@ public class AdvanceServiceImpl implements AdvanceService {
 				}
 
 				// TODO: add names???
-//				final List<Name> names = namesByGids.get(advancingSource.getOriginGermplasm().getGid());
-//				advancedGermplasm.setNames(names);
-//				// TODO: add names
-//				names.forEach(name -> {
-//					name.setLocationId(locationId);
-//					name.setNdate(date);
-//					name.setReferenceId(0);
-//				});
+				//				final List<Name> names = namesByGids.get(advancingSource.getOriginGermplasm().getGid());
+				//				advancedGermplasm.setNames(names);
+				//				// TODO: add names
+				//				names.forEach(name -> {
+				//					name.setLocationId(locationId);
+				//					name.setNdate(date);
+				//					name.setReferenceId(0);
+				//				});
 
 				advancedGermplasm.setMethod(breedingMethod);
 
@@ -567,8 +553,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 					attributes.add(plotNumberAttribute);
 				}
 
-				final String replicationNumber = this.getObservationValueByVariableId(plotObservation.getVariables().values(), TermId.REP_NO
-					.getId());
+				final String replicationNumber = plotObservation.getVariableValueByVariableId(TermId.REP_NO.getId());
 				if (repNumberVariableId != null) {
 					final Attribute replicationNumberAttribute =
 						this.createGermplasmAttribute(replicationNumber, repNumberVariableId, locationId, date);
