@@ -446,10 +446,11 @@ public class AdvanceServiceImpl implements AdvanceService {
 			request.getLineSelectionRequest();
 		if (isBulkMethod) {
 			if (breedingMethodSelectionRequest.getAllPlotsSelected() == null || !breedingMethodSelectionRequest.getAllPlotsSelected()) {
-				// User has selected a variate that defines the number of lines selected from each plot
+				// User has selected a variable that defines the number of lines selected from each plot. However, this is tricky because
+				// the variable works as a boolean. It return 1 if there is a value present, otherwise it returns zero.
 				final String plotVariateValue =
 					plotObservation.getVariableValueByVariableId(breedingMethodSelectionRequest.getPlotVariateId());
-				return this.getIntegerValue(plotVariateValue);
+				return StringUtils.isEmpty(plotVariateValue) ? 0 : 1;
 			} else {
 				return 1;
 			}
@@ -484,7 +485,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 		for (final NewAdvancingSource advancingSource : advancingSources) {
 			final Method breedingMethod = advancingSource.getBreedingMethod();
 			final AtomicInteger selectionNumber = new AtomicInteger(1);
-//			final int iterationCount = Boolean.TRUE.equals(breedingMethod.isBulkingMethod()) ? 1 : advancingSource.getPlantsSelected();
 			final int iterationCount = advancingSource.getPlantsSelected();
 			for (int i = 0; i < iterationCount; i++) {
 
