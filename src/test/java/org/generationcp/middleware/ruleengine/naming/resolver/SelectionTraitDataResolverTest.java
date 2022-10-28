@@ -26,14 +26,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class SelectionTraitResolverTest {
+public class SelectionTraitDataResolverTest {
 
 	private static final Integer DATASET_ID = new Random().nextInt(Integer.MAX_VALUE);
 	private static final Integer SELECTION_TRAIT_VARIABLE_ID = new Random().nextInt(Integer.MAX_VALUE);
 	private static final String SELECTION_TRAIT_VALUE = RandomStringUtils.random(10);
 
 	@InjectMocks
-	private SelectionTraitResolver selectionTraitResolver;
+	private SelectionTraitDataResolver selectionTraitDataResolver;
 
 	@Before
 	public void setUp() throws Exception {
@@ -43,24 +43,24 @@ public class SelectionTraitResolverTest {
 	@Test
 	public void shouldResolveLevel_OK() {
 		final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest = this.mockSelectionTraitRequest();
-		assertTrue(this.selectionTraitResolver.shouldResolveLevel(DATASET_ID, selectionTraitRequest));
+		assertTrue(this.selectionTraitDataResolver.shouldResolveLevel(DATASET_ID, selectionTraitRequest));
 	}
 
 	@Test
 	public void shouldResolveLevel_notResolve() {
-		assertFalse(this.selectionTraitResolver.shouldResolveLevel(DATASET_ID, null));
+		assertFalse(this.selectionTraitDataResolver.shouldResolveLevel(DATASET_ID, null));
 
 		final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest =
 			Mockito.mock(AdvanceStudyRequest.SelectionTraitRequest.class);
-		assertFalse(this.selectionTraitResolver.shouldResolveLevel(DATASET_ID, selectionTraitRequest));
+		assertFalse(this.selectionTraitDataResolver.shouldResolveLevel(DATASET_ID, selectionTraitRequest));
 
 		Mockito.when(selectionTraitRequest.getDatasetId()).thenReturn(new Random().nextInt());
 		Mockito.when(selectionTraitRequest.getVariableId()).thenReturn(SELECTION_TRAIT_VARIABLE_ID);
-		assertFalse(this.selectionTraitResolver.shouldResolveLevel(DATASET_ID, selectionTraitRequest));
+		assertFalse(this.selectionTraitDataResolver.shouldResolveLevel(DATASET_ID, selectionTraitRequest));
 
 		Mockito.when(selectionTraitRequest.getDatasetId()).thenReturn(DATASET_ID);
 		Mockito.when(selectionTraitRequest.getVariableId()).thenReturn(null);
-		assertFalse(this.selectionTraitResolver.shouldResolveLevel(DATASET_ID, selectionTraitRequest));
+		assertFalse(this.selectionTraitDataResolver.shouldResolveLevel(DATASET_ID, selectionTraitRequest));
 	}
 
 	@Test
@@ -70,10 +70,10 @@ public class SelectionTraitResolverTest {
 
 		// Set a random variable Id to force not finding the selected selection trait variable
 		final MeasurementVariable selectionTraitVariable = this.mockMeasurementVariable(new Random().nextInt(),
-			measurementVariableValue.toString(), SelectionTraitResolver.SELECTION_TRAIT_PROPERTY, DataType.CATEGORICAL_VARIABLE.getName());
+			measurementVariableValue.toString(), SelectionTraitDataResolver.SELECTION_TRAIT_PROPERTY, DataType.CATEGORICAL_VARIABLE.getName());
 
 		final String expectedSelectionTrait =
-			this.selectionTraitResolver.resolveStudyLevelData(DATASET_ID, selectionTraitRequest, Arrays.asList(selectionTraitVariable));
+			this.selectionTraitDataResolver.resolveStudyLevelData(DATASET_ID, selectionTraitRequest, Arrays.asList(selectionTraitVariable));
 		assertNull(expectedSelectionTrait);
 
 		Mockito.verify(selectionTraitVariable, Mockito.never()).getDataType();
@@ -87,11 +87,11 @@ public class SelectionTraitResolverTest {
 		// Set a random value reference Id to force not finding the categorical value
 		final ValueReference valueReference = this.mockValueReference(new Random().nextInt(), RandomStringUtils.random(10));
 		final MeasurementVariable selectionTraitVariable = this.mockMeasurementVariable(SELECTION_TRAIT_VARIABLE_ID,
-			measurementVariableValue.toString(), SelectionTraitResolver.SELECTION_TRAIT_PROPERTY, DataType.CATEGORICAL_VARIABLE.getName(),
+			measurementVariableValue.toString(), SelectionTraitDataResolver.SELECTION_TRAIT_PROPERTY, DataType.CATEGORICAL_VARIABLE.getName(),
 			Arrays.asList(valueReference));
 
 		final String expectedSelectionTrait =
-			this.selectionTraitResolver.resolveStudyLevelData(DATASET_ID, selectionTraitRequest, Arrays.asList(selectionTraitVariable));
+			this.selectionTraitDataResolver.resolveStudyLevelData(DATASET_ID, selectionTraitRequest, Arrays.asList(selectionTraitVariable));
 		assertNull(expectedSelectionTrait);
 
 		Mockito.verify(valueReference, Mockito.never()).getName();
@@ -104,11 +104,11 @@ public class SelectionTraitResolverTest {
 
 		final ValueReference valueReference = this.mockValueReference(measurementVariableValue, SELECTION_TRAIT_VALUE);
 		final MeasurementVariable selectionTraitVariable = this.mockMeasurementVariable(SELECTION_TRAIT_VARIABLE_ID,
-			measurementVariableValue.toString(), SelectionTraitResolver.SELECTION_TRAIT_PROPERTY, DataType.CATEGORICAL_VARIABLE.getName(),
+			measurementVariableValue.toString(), SelectionTraitDataResolver.SELECTION_TRAIT_PROPERTY, DataType.CATEGORICAL_VARIABLE.getName(),
 			Arrays.asList(valueReference));
 
 		final String expectedSelectionTrait =
-			this.selectionTraitResolver.resolveStudyLevelData(DATASET_ID, selectionTraitRequest, Arrays.asList(selectionTraitVariable));
+			this.selectionTraitDataResolver.resolveStudyLevelData(DATASET_ID, selectionTraitRequest, Arrays.asList(selectionTraitVariable));
 		assertThat(expectedSelectionTrait, is(SELECTION_TRAIT_VALUE));
 
 		Mockito.verify(valueReference).getName();
@@ -119,10 +119,10 @@ public class SelectionTraitResolverTest {
 		final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest = this.mockSelectionTraitRequest();
 
 		final MeasurementVariable selectionTraitVariable = this.mockMeasurementVariable(SELECTION_TRAIT_VARIABLE_ID,
-			SELECTION_TRAIT_VALUE, SelectionTraitResolver.SELECTION_TRAIT_PROPERTY, DataType.NUMERIC_VARIABLE.getName());
+			SELECTION_TRAIT_VALUE, SelectionTraitDataResolver.SELECTION_TRAIT_PROPERTY, DataType.NUMERIC_VARIABLE.getName());
 
 		final String expectedSelectionTrait =
-			this.selectionTraitResolver.resolveStudyLevelData(DATASET_ID, selectionTraitRequest, Arrays.asList(selectionTraitVariable));
+			this.selectionTraitDataResolver.resolveStudyLevelData(DATASET_ID, selectionTraitRequest, Arrays.asList(selectionTraitVariable));
 		assertThat(expectedSelectionTrait, is(SELECTION_TRAIT_VALUE));
 
 		Mockito.verify(selectionTraitVariable).getValue();
@@ -134,7 +134,7 @@ public class SelectionTraitResolverTest {
 
 		final ValueReference valueReference = this.mockValueReference(SELECTION_TRAIT_VARIABLE_ID, SELECTION_TRAIT_VALUE);
 		final MeasurementVariable selectionTraitVariable = this.mockMeasurementVariable(SELECTION_TRAIT_VARIABLE_ID,
-			null, SelectionTraitResolver.SELECTION_TRAIT_PROPERTY, DataType.CATEGORICAL_VARIABLE.getName(),
+			null, SelectionTraitDataResolver.SELECTION_TRAIT_PROPERTY, DataType.CATEGORICAL_VARIABLE.getName(),
 			Arrays.asList(valueReference));
 
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId = new HashMap<>();
@@ -151,7 +151,7 @@ public class SelectionTraitResolverTest {
 		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
 		Mockito.when(source.getTrialInstanceObservation()).thenReturn(observationUnitRow);
 
-		this.selectionTraitResolver.resolveEnvironmentLevelData(DATASET_ID, selectionTraitRequest, source, plotDataVariablesByTermId);
+		this.selectionTraitDataResolver.resolveEnvironmentLevelData(DATASET_ID, selectionTraitRequest, source, plotDataVariablesByTermId);
 
 		Mockito.verify(selectionTraitVariable).getPossibleValues();
 		Mockito.verify(source).setSelectionTraitValue(SELECTION_TRAIT_VALUE);
@@ -162,7 +162,7 @@ public class SelectionTraitResolverTest {
 		final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest = this.mockSelectionTraitRequest();
 
 		final MeasurementVariable selectionTraitVariable = this.mockMeasurementVariable(SELECTION_TRAIT_VARIABLE_ID,
-			null, SelectionTraitResolver.SELECTION_TRAIT_PROPERTY, DataType.NUMERIC_VARIABLE.getName());
+			null, SelectionTraitDataResolver.SELECTION_TRAIT_PROPERTY, DataType.NUMERIC_VARIABLE.getName());
 
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId = new HashMap<>();
 		plotDataVariablesByTermId.put(SELECTION_TRAIT_VARIABLE_ID, selectionTraitVariable);
@@ -177,7 +177,7 @@ public class SelectionTraitResolverTest {
 		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
 		Mockito.when(source.getTrialInstanceObservation()).thenReturn(observationUnitRow);
 
-		this.selectionTraitResolver.resolveEnvironmentLevelData(DATASET_ID, selectionTraitRequest, source, plotDataVariablesByTermId);
+		this.selectionTraitDataResolver.resolveEnvironmentLevelData(DATASET_ID, selectionTraitRequest, source, plotDataVariablesByTermId);
 
 		Mockito.verify(selectionTraitVariable, Mockito.never()).getPossibleValues();
 		Mockito.verify(source).setSelectionTraitValue(SELECTION_TRAIT_VALUE);
@@ -189,7 +189,7 @@ public class SelectionTraitResolverTest {
 
 		final ValueReference valueReference = this.mockValueReference(SELECTION_TRAIT_VARIABLE_ID, SELECTION_TRAIT_VALUE);
 		final MeasurementVariable selectionTraitVariable = this.mockMeasurementVariable(SELECTION_TRAIT_VARIABLE_ID,
-			null, SelectionTraitResolver.SELECTION_TRAIT_PROPERTY, DataType.CATEGORICAL_VARIABLE.getName(),
+			null, SelectionTraitDataResolver.SELECTION_TRAIT_PROPERTY, DataType.CATEGORICAL_VARIABLE.getName(),
 			Arrays.asList(valueReference));
 
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId = new HashMap<>();
@@ -207,7 +207,7 @@ public class SelectionTraitResolverTest {
 
 		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
 
-		this.selectionTraitResolver
+		this.selectionTraitDataResolver
 			.resolvePlotLevelData(DATASET_ID, selectionTraitRequest, source, observationUnitRow, plotDataVariablesByTermId);
 
 		Mockito.verify(selectionTraitVariable).getPossibleValues();
@@ -219,7 +219,7 @@ public class SelectionTraitResolverTest {
 		final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest = this.mockSelectionTraitRequest();
 
 		final MeasurementVariable selectionTraitVariable = this.mockMeasurementVariable(SELECTION_TRAIT_VARIABLE_ID,
-			null, SelectionTraitResolver.SELECTION_TRAIT_PROPERTY, DataType.NUMERIC_VARIABLE.getName());
+			null, SelectionTraitDataResolver.SELECTION_TRAIT_PROPERTY, DataType.NUMERIC_VARIABLE.getName());
 
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId = new HashMap<>();
 		plotDataVariablesByTermId.put(SELECTION_TRAIT_VARIABLE_ID, selectionTraitVariable);
@@ -233,7 +233,7 @@ public class SelectionTraitResolverTest {
 
 		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
 
-		this.selectionTraitResolver
+		this.selectionTraitDataResolver
 			.resolvePlotLevelData(DATASET_ID, selectionTraitRequest, source, observationUnitRow, plotDataVariablesByTermId);
 
 		Mockito.verify(selectionTraitVariable, Mockito.never()).getPossibleValues();

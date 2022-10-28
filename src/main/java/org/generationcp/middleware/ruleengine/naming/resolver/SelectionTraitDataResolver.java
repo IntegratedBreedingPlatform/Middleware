@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
-public class SelectionTraitResolver {
+public class SelectionTraitDataResolver {
 
 	public static final String SELECTION_TRAIT_PROPERTY = "Selection Criteria";
 

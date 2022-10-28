@@ -27,7 +27,7 @@ import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.generator.SeedSourceGenerator;
 import org.generationcp.middleware.ruleengine.naming.resolver.LocationDataResolver;
 import org.generationcp.middleware.ruleengine.naming.resolver.SeasonDataResolver;
-import org.generationcp.middleware.ruleengine.naming.resolver.SelectionTraitResolver;
+import org.generationcp.middleware.ruleengine.naming.resolver.SelectionTraitDataResolver;
 import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
 import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -91,13 +91,13 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	private final DaoFactory daoFactory;
 	private final SeasonDataResolver seasonDataResolver;
-	private final SelectionTraitResolver selectionTraitResolver;
+	private final SelectionTraitDataResolver selectionTraitDataResolver;
 	private final LocationDataResolver locationDataResolver;
 
 	public AdvanceServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.seasonDataResolver = new SeasonDataResolver();
-		this.selectionTraitResolver = new SelectionTraitResolver();
+		this.selectionTraitDataResolver = new SelectionTraitDataResolver();
 		this.locationDataResolver = new LocationDataResolver();
 	}
 
@@ -128,7 +128,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 		// Getting data related at study level
 		final String seasonStudyLevel = this.seasonDataResolver.resolveStudyLevelData(studyEnvironmentVariables);
-		final String selectionTraitStudyLevel = this.selectionTraitResolver
+		final String selectionTraitStudyLevel = this.selectionTraitDataResolver
 			.resolveStudyLevelData(studyId, request.getSelectionTraitRequest(),
 				Stream.concat(studyEnvironmentVariables.stream(), studyVariates.stream()).collect(
 					Collectors.toList()));
@@ -414,9 +414,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId) {
 		this.locationDataResolver.resolveEnvironmentLevelData(source, locationsByLocationId);
 		this.seasonDataResolver.resolveEnvironmentLevelData(source, plotDataVariablesByTermId);
-		this.selectionTraitResolver
+		this.selectionTraitDataResolver
 			.resolveEnvironmentLevelData(environmentDatasetId, selectionTraitRequest, source, plotDataVariablesByTermId);
-		this.selectionTraitResolver
+		this.selectionTraitDataResolver
 			.resolvePlotLevelData(plotDatasetId, selectionTraitRequest, source, row, plotDataVariablesByTermId);
 	}
 
