@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 @Service
 @Transactional
@@ -88,7 +89,8 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 						throw new MiddlewareQueryException("error.save.resulting.name.exceeds.limit");
 					}
 					germplasm.setDesig(name);
-					this.assignNames(germplasm);
+					final Name derivativeName = this.createDerivativeName(name);
+					germplasm.setNames(Arrays.asList(derivativeName));
 				}
 
 				// Pass the key sequence map to the next entry to process
@@ -99,27 +101,37 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 	}
 
 	@Override
-	public String generateAdvanceListName(final NewAdvancingSource advancingSource) throws RuleException {
-		final RuleExecutionContext namingExecutionContext =
-			this.setupNamingRuleExecutionContext(advancingSource, false);
-		final String generatedName = ((List<String>) this.rulesService.runRules(namingExecutionContext)).get(0);
-		if (generatedName.length() > NAME_MAX_LENGTH) {
-			throw new MiddlewareQueryException("error.save.resulting.name.exceeds.limit");
+	public void generateAdvanceListName(final List<NewAdvancingSource> advancingSources) throws RuleException {
+
+		Map<String, Integer> keySequenceMap = new HashMap<>();
+		for(final NewAdvancingSource advancingSource : advancingSources) {
+
+			advancingSource.setKeySequenceMap(keySequenceMap);
+
+			final RuleExecutionContext namingExecutionContext =
+				this.setupNamingRuleExecutionContext(advancingSource, false);
+			final List<String> generatedNames = (List<String>) this.rulesService.runRules(namingExecutionContext);
+			IntStream.range(0, generatedNames.size()).forEach(i -> {
+				final String generatedName = generatedNames.get(i);
+				if (generatedName.length() > NAME_MAX_LENGTH) {
+					throw new MiddlewareQueryException("error.save.resulting.name.exceeds.limit");
+				}
+				final Name derivativeName = this.createDerivativeName(generatedName);
+				advancingSource.getAdvancedGermplasms().get(i).setNames(Arrays.asList(derivativeName));
+			});
+
+			// Pass the key sequence map to the next entry to process
+			keySequenceMap = advancingSource.getKeySequenceMap();
 		}
-		return generatedName;
 	}
 
-	@Deprecated
-	protected void assignNames(final ImportedGermplasm germplasm) {
-		final List<Name> names = new ArrayList<>();
-
+	protected Name createDerivativeName(final String value) {
 		final Name name = new Name();
 		name.setTypeId(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID());
-		name.setNval(germplasm.getDesig());
+		name.setNval(value);
 		name.setNstat(1);
-		names.add(name);
 
-		germplasm.setNames(names);
+		return name;
 	}
 
 	@Override

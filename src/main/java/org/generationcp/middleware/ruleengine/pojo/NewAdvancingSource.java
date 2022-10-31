@@ -18,7 +18,7 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 
 	private ObservationUnitRow plotObservation;
 
-	private List<Germplasm> advancedGermplasm = new ArrayList<>();
+	private List<Germplasm> advancedGermplasms = new ArrayList<>();
 
 	public NewAdvancingSource() {
 	}
@@ -101,6 +101,14 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 	@Override
 	public boolean isBulkingMethod() {
 		return this.getBreedingMethod().isBulkingMethod();
+	}
+
+	public List<Germplasm> getAdvancedGermplasms() {
+		return advancedGermplasms;
+	}
+
+	public void addAdvancedGermplasm(final Germplasm advancedGermplasm) {
+		this.advancedGermplasms.add(advancedGermplasm);
 	}
 
 }
