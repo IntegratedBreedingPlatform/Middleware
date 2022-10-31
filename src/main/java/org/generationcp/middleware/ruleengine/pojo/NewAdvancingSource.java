@@ -1,5 +1,6 @@
 package org.generationcp.middleware.ruleengine.pojo;
 
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -23,54 +24,45 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 	public NewAdvancingSource() {
 	}
 
-	// TODO: create builder. Move all setters of the constructor arguments from the abstract class to AdvancingSource
-	public NewAdvancingSource(final ObservationUnitRow plotObservation, final Germplasm originGermplasm, final Method breedingMethod,
-		final Integer studyId,
-		final Integer environmentDatasetId, final String season,
-		final String selectionTraitValue,
+	// TODO: create builder.
+	public NewAdvancingSource(final Germplasm originGermplasm, final ObservationUnitRow plotObservation,
+		final ObservationUnitRow trialInstanceObservation,
+		final List<MeasurementVariable> studyEnvironmentVariables,
+		final Method breedingMethod,
+		final Integer studyId, final Integer environmentDatasetId, final String season, final String selectionTraitValue,
 		final Integer plantSelected) {
 
-		this.plotObservation = plotObservation;
 		this.originGermplasm = originGermplasm;
-		this.setBreedingMethod(this.originGermplasm.getMethod());
+		this.plotObservation = plotObservation;
+		this.trialInstanceObservation = trialInstanceObservation;
+		this.conditions = studyEnvironmentVariables;
+		this.breedingMethod = this.originGermplasm.getMethod();
 
-		this.setStudyId(studyId);
-		this.setEnvironmentDatasetId(environmentDatasetId);
+		this.studyId = studyId;
+		this.environmentDatasetId = environmentDatasetId;
 
-		this.setBreedingMethod(breedingMethod);
-		this.setSeason(season);
-		this.setSelectionTraitValue(selectionTraitValue);
-		this.setPlantsSelected(plantSelected);
+		this.breedingMethod = breedingMethod;
+		this.season = season;
+		this.selectionTraitValue = selectionTraitValue;
+		this.plantsSelected = plantSelected;
 
 		// We are setting this properties due to keep backward compatibility with the AdvancingSource of the old advance process
-		this.setLocationAbbreviation("");
-		this.setCurrentMaxSequence(0);
-		this.setDesignationIsPreviewOnly(false);
+		this.locationAbbreviation = "";
+		this.currentMaxSequence = 0;
+		this.designationIsPreviewOnly = false;
 	}
 
 	public ObservationUnitRow getPlotObservation() {
 		return plotObservation;
 	}
 
-	public void setPlotObservation(final ObservationUnitRow plotObservation) {
-		this.plotObservation = plotObservation;
-	}
-
 	public Germplasm getOriginGermplasm() {
 		return originGermplasm;
-	}
-
-	public void setOriginGermplasm(final Germplasm originGermplasm) {
-		this.originGermplasm = originGermplasm;
 	}
 
 	@Override
 	public ObservationUnitRow getTrialInstanceObservation() {
 		return trialInstanceObservation;
-	}
-
-	public void setTrialInstanceObservation(final ObservationUnitRow trialInstanceObservation) {
-		this.trialInstanceObservation = trialInstanceObservation;
 	}
 
 	@Override

@@ -11,74 +11,55 @@ import java.util.Map;
 public abstract class AbstractAdvancingSource implements AdvancingSourceAdapter {
 
 	// TODO: these properties should be passed by a context or whatever
-	private Integer studyId;
-	private Integer environmentDatasetId;
-	private List<MeasurementVariable> conditions;
-	private Boolean designationIsPreviewOnly;
+	protected Integer studyId;
+	protected Integer environmentDatasetId;
+	// Setting conditions for Breeders Cross ID
+	protected List<MeasurementVariable> conditions;
+	protected Boolean designationIsPreviewOnly;
 
-	private Method breedingMethod;
+	protected Method breedingMethod;
 
-	private String rootName;
-	private Integer rootNameType;
+	protected String rootName;
+	protected Integer rootNameType;
 
 	// These properties values are being set by data resolvers
-	private String season;
-	private String locationAbbreviation;
-	private Integer harvestLocationId;
-	private String selectionTraitValue;
+	protected String season;
+	protected String locationAbbreviation;
+	protected Integer harvestLocationId;
+	protected String selectionTraitValue;
 
-	private List<Name> names;
+	protected List<Name> names;
 
-	private Integer plantsSelected;
+	protected Integer plantsSelected;
 
-	private Map<String, Integer> keySequenceMap = new HashMap<>();
+	protected Map<String, Integer> keySequenceMap = new HashMap<>();
 
 	// TODO: we can implement a visitor to check the type of class extending from AbstractAdvancingSource and move these to AdvancingSource
 	// These are only used by crosses generation process. Remove them once cross process will be redo it
-	private int maleGid;
-	private int femaleGid;
-	private boolean isForceUniqueNameGeneration;
-	private int currentMaxSequence;
-	private AdvanceGermplasmChangeDetail changeDetail;
+	protected int maleGid;
+	protected int femaleGid;
+	protected boolean isForceUniqueNameGeneration;
+	protected int currentMaxSequence;
+	protected AdvanceGermplasmChangeDetail changeDetail;
 
 	public Integer getStudyId() {
 		return studyId;
-	}
-
-	public void setStudyId(final Integer studyId) {
-		this.studyId = studyId;
 	}
 
 	public Integer getEnvironmentDatasetId() {
 		return environmentDatasetId;
 	}
 
-	public void setEnvironmentDatasetId(final Integer environmentDatasetId) {
-		this.environmentDatasetId = environmentDatasetId;
-	}
-
 	public List<MeasurementVariable> getConditions() {
 		return conditions;
-	}
-
-	public void setConditions(final List<MeasurementVariable> conditions) {
-		this.conditions = conditions;
 	}
 
 	public Boolean getDesignationIsPreviewOnly() {
 		return designationIsPreviewOnly;
 	}
 
-	public void setDesignationIsPreviewOnly(final Boolean designationIsPreviewOnly) {
-		this.designationIsPreviewOnly = designationIsPreviewOnly;
-	}
-
 	public Method getBreedingMethod() {
 		return breedingMethod;
-	}
-
-	public void setBreedingMethod(final Method breedingMethod) {
-		this.breedingMethod = breedingMethod;
 	}
 
 	public String getRootName() {
@@ -141,10 +122,6 @@ public abstract class AbstractAdvancingSource implements AdvancingSourceAdapter 
 		return plantsSelected;
 	}
 
-	public void setPlantsSelected(final Integer plantsSelected) {
-		this.plantsSelected = plantsSelected;
-	}
-
 	public Map<String, Integer> getKeySequenceMap() {
 		return keySequenceMap;
 	}
@@ -157,16 +134,8 @@ public abstract class AbstractAdvancingSource implements AdvancingSourceAdapter 
 		return maleGid;
 	}
 
-	public void setMaleGid(final int maleGid) {
-		this.maleGid = maleGid;
-	}
-
 	public int getFemaleGid() {
 		return femaleGid;
-	}
-
-	public void setFemaleGid(final int femaleGid) {
-		this.femaleGid = femaleGid;
 	}
 
 	public boolean isForceUniqueNameGeneration() {

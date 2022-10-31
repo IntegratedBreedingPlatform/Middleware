@@ -14,6 +14,7 @@ package org.generationcp.middleware.ruleengine.pojo;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.pojos.Method;
@@ -57,9 +58,9 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		final String studyName, final String plotNumber) {
 		super();
 		this.germplasm = germplasm;
-		this.setNames(names);
-		this.setPlantsSelected(plantsSelected);
-		this.setBreedingMethod(breedingMethod);
+		this.names = names;
+		this.plantsSelected = plantsSelected;
+		this.breedingMethod = breedingMethod;
 		this.studyName = studyName;
 		this.plotNumber = plotNumber;
 	}
@@ -88,12 +89,26 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	}
 
 	/**
+	 * @param plantsSelected the plantsSelected to set
+	 */
+	public void setPlantsSelected(final Integer plantsSelected) {
+		this.plantsSelected = plantsSelected;
+	}
+
+	/**
 	 * @return the isBulk
 	 */
 	@Override
 	public boolean isBulkingMethod() {
 		final Boolean isBulk = this.getBreedingMethod().isBulkingMethod();
 		return this.getBreedingMethod() != null && isBulk != null ? isBulk : false;
+	}
+
+	/**
+	 * @param breedingMethod the breedingMethod to set
+	 */
+	public void setBreedingMethod(final Method breedingMethod) {
+		this.breedingMethod = breedingMethod;
 	}
 
 	/**
@@ -108,6 +123,14 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	 */
 	public void setStudyName(final String studyName) {
 		this.studyName = studyName;
+	}
+
+	public void setStudyId(final Integer studyId) {
+		this.studyId = studyId;
+	}
+
+	public void setEnvironmentDatasetId(final Integer environmentDatasetId) {
+		this.environmentDatasetId = environmentDatasetId;
 	}
 
 	public Method getSourceMethod() {
@@ -178,6 +201,10 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		this.replicationNumber = replicationNumber;
 	}
 
+	public void setConditions(final List<MeasurementVariable> conditions) {
+		this.conditions = conditions;
+	}
+
 	public void setTrailInstanceObservationMeasurementRow(final MeasurementRow trailInstanceObservationMeasurementRow) {
 		this.trailInstanceObservationMeasurementRow = trailInstanceObservationMeasurementRow;
 	}
@@ -203,22 +230,30 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	}
 
 	public AdvancingSource copy() {
-		final AdvancingSource source = new AdvancingSource(germplasm, this.getNames(), this.getPlantsSelected(), this.getBreedingMethod(),
-			studyName, this.getPlotNumber());
-		source.setSeason(this.getSeason());
-		source.setLocationAbbreviation(this.getLocationAbbreviation());
-		source.setRootName(this.getRootName());
+		final AdvancingSource source = new AdvancingSource(germplasm, this.names, this.plantsSelected, this.breedingMethod,
+			studyName, this.plotNumber);
+		source.setSeason(this.season);
+		source.setLocationAbbreviation(this.locationAbbreviation);
+		source.setRootName(this.rootName);
 		source.setSourceMethod(this.sourceMethod);
-		source.setCurrentMaxSequence(this.getCurrentMaxSequence());
-		source.setChangeDetail(this.getChangeDetail());
+		source.setCurrentMaxSequence(this.currentMaxSequence);
+		source.setChangeDetail(this.changeDetail);
 		source.setPrefix(this.prefix);
 		source.setSuffix(this.suffix);
-		source.setRootNameType(this.getRootNameType());
-		source.setHarvestLocationId(this.getHarvestLocationId());
-		source.setSelectionTraitValue(this.getSelectionTraitValue());
+		source.setRootNameType(this.rootNameType);
+		source.setHarvestLocationId(this.harvestLocationId);
+		source.setSelectionTraitValue(this.selectionTraitValue);
 		source.setTrialInstanceNumber(this.trialInstanceNumber);
 		source.setReplicationNumber(this.replicationNumber);
 		return source;
+	}
+
+	public void setMaleGid(final int maleGid) {
+		this.maleGid = maleGid;
+	}
+
+	public void setFemaleGid(final int femaleGid) {
+		this.femaleGid = femaleGid;
 	}
 
 	public List<SampleDTO> getSamples() {
@@ -227,6 +262,10 @@ public class AdvancingSource extends AbstractAdvancingSource {
 
 	public void setSamples(final List<SampleDTO> samples) {
 		this.samples = samples;
+	}
+
+	public void setDesignationIsPreviewOnly(final Boolean designationIsPreviewOnly) {
+		this.designationIsPreviewOnly = designationIsPreviewOnly;
 	}
 
 	@Override

@@ -180,26 +180,18 @@ public class AdvanceServiceImpl implements AdvanceService {
 				return;
 			}
 
-			// TODO: try to set all required parameters in constructor
-			final NewAdvancingSource advancingSource =
-				new NewAdvancingSource(row, originGermplasm, breedingMethod, studyId, environmentDataset.getDatasetId(), seasonStudyLevel,
-					selectionTraitStudyLevel, plantsSelected);
-
-			// TODO: add the following properties in the constructor
 			// If study is Trial, then setting data if trial instance is not null
 			final Integer trialInstanceNumber = row.getTrialInstance();
-			if (trialInstanceNumber != null) {
-				final ObservationUnitRow observationUnitRow =
-					this.setTrialInstanceObservations(trialInstanceNumber, trialObservations, studyInstancesByInstanceNumber);
-				advancingSource.setTrialInstanceObservation(observationUnitRow);
-			}
+			final ObservationUnitRow trialInstanceObservation = (trialInstanceNumber != null) ?
+				this.setTrialInstanceObservations(trialInstanceNumber, trialObservations, studyInstancesByInstanceNumber) : null;
+
+			final NewAdvancingSource advancingSource =
+				new NewAdvancingSource(originGermplasm, row, trialInstanceObservation, studyEnvironmentVariables, breedingMethod,
+					studyId, environmentDataset.getDatasetId(),
+					seasonStudyLevel, selectionTraitStudyLevel, plantsSelected);
 
 			this.resolveEnvironmentAndPlotLevelData(environmentDataset.getDatasetId(), plotDataset.getDatasetId(),
 				request.getSelectionTraitRequest(), advancingSource, row, locationsByLocationId, plotDataVariablesByTermId);
-
-			// Setting conditions for Breeders Cross ID
-			// TODO: we only set conditions for breeders cross id. Find another way to pass conditions to breeders cross id
-			advancingSource.setConditions(studyEnvironmentVariables);
 
 			// TODO: implement get plant selection for samples
 			//			if (advanceInfo.getAdvanceType().equals(AdvanceType.SAMPLE)) {
@@ -218,6 +210,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 		final List<Integer> advancedGermplasmGids = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(advancingSources)) {
+			// TODO: add names to advance sources?? It's being used by RootNameExpression
+
 			try {
 				this.namingConventionService.generateAdvanceListName(advancingSources);
 			} catch (final RuleException e) {
