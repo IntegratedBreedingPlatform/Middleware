@@ -169,13 +169,13 @@ public class DatasetServiceImplTest {
 		this.germplasmDescriptorsMap.put(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name());
 		this.germplasmDescriptorsMap.put(TermId.ENTRY_TYPE.getId(), TermId.ENTRY_TYPE.name());
 		this.germplasmDescriptorsMap.put(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.name());
+		this.germplasmDescriptorsMap.put(TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name());
 		this.germplasmDescriptorsMap.put(TermId.STOCK_ID.getId(), DatasetServiceImplTest.STOCK_ID);
 
 		this.designFactorsMap = Maps.newHashMap();
 		this.designFactorsMap.put(TermId.REP_NO.getId(), TermId.REP_NO.name());
 		this.designFactorsMap.put(TermId.PLOT_NO.getId(), TermId.PLOT_NO.name());
 		this.designFactorsMap.put(TermId.BLOCK_ID.getId(), DatasetServiceImplTest.FACT1);
-		this.designFactorsMap.put(TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name());
 
 		this.datasetService.setDaoFactory(this.daoFactory);
 		this.datasetService.setStudyService(this.studyService);
