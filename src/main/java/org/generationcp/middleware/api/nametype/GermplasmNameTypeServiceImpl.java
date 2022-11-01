@@ -171,7 +171,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
-	public NameTypeMetadata getNameTypeMetaData(final Integer nameTypeId) {
+	public NameTypeMetadata getNameTypeMetadata(final Integer nameTypeId) {
 		final NameTypeMetadata nameTypeMetadata = new NameTypeMetadata();
 
 		nameTypeMetadata.setGermplasmCount(this.daoFactory.getNameDao().countNameTypeInUse(nameTypeId));
