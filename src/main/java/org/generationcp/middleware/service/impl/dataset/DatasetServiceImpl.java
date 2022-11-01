@@ -1478,11 +1478,11 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(plotDataset.getProjectId(), removeVariableIds);
 		}
 
-		final List<Integer> removeNameTypeIds = namTypeIds.stream()
+		final List<Integer> nameTypeIdsToRemove = namTypeIds.stream()
 			.filter(nameTypeId -> !plotDatasetPropertiesDTO.getNameTypeIds().contains(nameTypeId)).collect(Collectors.toList());
 
-		if (!CollectionUtils.isEmpty(removeNameTypeIds)) {
-			this.daoFactory.getProjectPropertyDAO().deleteProjectNameTypes(plotDataset.getProjectId(), removeNameTypeIds);
+		if (!CollectionUtils.isEmpty(nameTypeIdsToRemove)) {
+			this.daoFactory.getProjectPropertyDAO().deleteProjectNameTypes(plotDataset.getProjectId(), nameTypeIdsToRemove);
 		}
 	}
 
