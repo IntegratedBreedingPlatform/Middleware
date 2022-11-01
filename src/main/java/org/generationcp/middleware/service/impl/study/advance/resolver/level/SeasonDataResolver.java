@@ -1,4 +1,4 @@
-package org.generationcp.middleware.service.impl.study.advance.resolver;
+package org.generationcp.middleware.service.impl.study.advance.resolver.level;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;

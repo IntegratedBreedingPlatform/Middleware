@@ -1,4 +1,4 @@
-package org.generationcp.middleware.service.impl.study.advance.resolver;
+package org.generationcp.middleware.service.impl.study.advance.resolver.level;
 
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Location;

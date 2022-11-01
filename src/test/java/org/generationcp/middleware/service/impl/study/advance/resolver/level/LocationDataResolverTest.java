@@ -1,4 +1,4 @@
-package org.generationcp.middleware.service.impl.study.advance.resolver;
+package org.generationcp.middleware.service.impl.study.advance.resolver.level;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -6,6 +6,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.impl.study.advance.resolver.level.LocationDataResolver;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;

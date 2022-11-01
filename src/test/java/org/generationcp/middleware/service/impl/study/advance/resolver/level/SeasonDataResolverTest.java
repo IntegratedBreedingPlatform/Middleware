@@ -1,4 +1,4 @@
-package org.generationcp.middleware.service.impl.study.advance.resolver;
+package org.generationcp.middleware.service.impl.study.advance.resolver.level;
 
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.generationcp.middleware.service.impl.study.advance.resolver.level.SeasonDataResolver;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
