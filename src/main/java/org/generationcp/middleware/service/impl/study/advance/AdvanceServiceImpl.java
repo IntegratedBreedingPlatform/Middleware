@@ -2,7 +2,6 @@ package org.generationcp.middleware.service.impl.study.advance;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
@@ -38,6 +37,7 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.advance.AdvanceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.generationcp.middleware.service.impl.study.advance.resolver.BreedingMethodResolver;
 import org.generationcp.middleware.service.impl.study.advance.resolver.LocationDataResolver;
 import org.generationcp.middleware.service.impl.study.advance.resolver.SeasonDataResolver;
 import org.generationcp.middleware.service.impl.study.advance.resolver.SelectionTraitDataResolver;
@@ -101,12 +101,14 @@ public class AdvanceServiceImpl implements AdvanceService {
 	private final SeasonDataResolver seasonDataResolver;
 	private final SelectionTraitDataResolver selectionTraitDataResolver;
 	private final LocationDataResolver locationDataResolver;
+	private final BreedingMethodResolver breedingMethodResolver;
 
 	public AdvanceServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.seasonDataResolver = new SeasonDataResolver();
 		this.selectionTraitDataResolver = new SelectionTraitDataResolver();
 		this.locationDataResolver = new LocationDataResolver();
+		this.breedingMethodResolver = new BreedingMethodResolver();
 	}
 
 	@Override
@@ -176,7 +178,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		plotObservations.forEach(row -> {
 			final Germplasm originGermplasm = originGermplasmsByGid.get(row.getGid());
 			final Method breedingMethod =
-				this.getBreedingMethod(request.getBreedingMethodSelectionRequest(), row, breedingMethodsByCode,
+				this.breedingMethodResolver.resolveBreedingMethod(request.getBreedingMethodSelectionRequest(), row, breedingMethodsByCode,
 					breedingMethodsById);
 			if (originGermplasm == null || breedingMethod == null || breedingMethod.isBulkingMethod() == null) {
 				return;
@@ -346,61 +348,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 		return null;
 	}
 
-	// TODO: move getBreedingMethod to another class
-	private Method getBreedingMethod(final AdvanceStudyRequest.BreedingMethodSelectionRequest request,
-		final ObservationUnitRow plotObservation, final Map<String, Method> breedingMethodsByCode,
-		final Map<Integer, Method> breedingMethodsById) {
-
-		final Integer breedingMethodId = request.getMethodVariateId() == null ? request.getBreedingMethodId() :
-			this.getBreedingMethodId(request.getMethodVariateId(), plotObservation, breedingMethodsByCode);
-		if (breedingMethodId == null) {
-			return null;
-		}
-		return breedingMethodsById.get(breedingMethodId);
-	}
-
-	// TODO: move getBreedingMethod to another class
-	// TODO: we are asking for BREEDING_METHOD_VARIATE and BREEDING_METHOD_VARIATE_TEXT due to backward compatibility
-	private Integer getBreedingMethodId(final Integer methodVariateId, final ObservationUnitRow plotObservation,
-		final Map<String, Method> breedingMethodsByCode) {
-		// TODO: the user can select BREEDING_METHOD_VARIATE as variate variable ???
-		if (TermId.BREEDING_METHOD_VARIATE.getId() == methodVariateId) {
-			return this.getIntegerValue(plotObservation.getVariableValueByVariableId(methodVariateId));
-		} else if (TermId.BREEDING_METHOD_VARIATE_TEXT.getId() == methodVariateId
-			|| TermId.BREEDING_METHOD_VARIATE_CODE.getId() == methodVariateId) {
-			final String methodName = plotObservation.getVariableValueByVariableId(methodVariateId);
-			if (StringUtils.isEmpty(methodName)) {
-				return null;
-			}
-			if (NumberUtils.isNumber(methodName)) {
-				return Double.valueOf(methodName).intValue();
-			}
-
-			// coming from old fb or other sources
-			final Method method = breedingMethodsByCode.get(methodName);
-			if (method != null && (
-				(methodVariateId == TermId.BREEDING_METHOD_VARIATE_TEXT.getId() && methodName.equalsIgnoreCase(method.getMname())) ||
-					(methodVariateId == TermId.BREEDING_METHOD_VARIATE_CODE.getId() && methodName
-						.equalsIgnoreCase(method.getMcode())))) {
-				return method.getMid();
-			}
-		} else {
-			// on load of study, this has been converted to id and not the code.
-			return this.getIntegerValue(plotObservation.getVariableValueByVariableId(methodVariateId));
-		}
-		return null;
-	}
-
-	private Integer getIntegerValue(final String value) {
-		Integer integerValue = null;
-
-		if (NumberUtils.isNumber(value)) {
-			integerValue = Double.valueOf(value).intValue();
-		}
-
-		return integerValue;
-	}
-
 	private List<Location> getLocationsFromTrialObservationUnits(
 		final List<ObservationUnitRow> trialObservationUnitRows) {
 		final Set<Integer> locationIds = this.getVariableValuesFromObservations(trialObservationUnitRows, TermId.LOCATION_ID.getId());
@@ -412,7 +359,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.map(row -> row.getEnvironmentVariables().values())
 			.flatMap(Collection::stream)
 			.filter(observationUnitData -> observationUnitData.getVariableId().equals(variableId))
-			.map(observationUnitData -> this.getIntegerValue(observationUnitData.getValue()))
+			.map(observationUnitData -> AdvanceUtils.getIntegerValue(observationUnitData.getValue()))
 			.collect(Collectors.toSet());
 	}
 
@@ -481,7 +428,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 			if (lineSelectionRequest.getLinesSelected() == null) {
 				final String lineVariateValue =
 					plotObservation.getVariableValueByVariableId(lineSelectionRequest.getLineVariateId());
-				return this.getIntegerValue(lineVariateValue);
+				return AdvanceUtils.getIntegerValue(lineVariateValue);
 			} else {
 				// User has selected the same number of lines for each plot
 				return lineSelectionRequest.getLinesSelected();
