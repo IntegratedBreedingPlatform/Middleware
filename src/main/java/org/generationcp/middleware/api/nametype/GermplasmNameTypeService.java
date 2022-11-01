@@ -30,7 +30,7 @@ public interface GermplasmNameTypeService {
 
 	void deleteNameType(Integer nameTypeId);
 
-	NameTypeMetaData getNameTypeMetaData(Integer nameTypeId);
+	NameTypeMetadata getNameTypeMetaData(Integer nameTypeId);
 
 	boolean isNameTypeUsedInStudies(Integer nameTypeId);
 
