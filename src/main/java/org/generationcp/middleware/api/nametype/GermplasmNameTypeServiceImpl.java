@@ -180,4 +180,14 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 		return nameTypeMetadata;
 	}
 
+	@Override
+	public boolean isNameTypeUsedInStudies(final Integer nameTypeId) {
+		return this.daoFactory.getProjectPropertyDAO().countNameTypeInUse(nameTypeId) > 0;
+	}
+
+	@Override
+	public boolean isNameTypeUsedInGermplasmList(final Integer nameTypeId) {
+		return this.daoFactory.getGermplasmListDataViewDAO().countNameTypeInUse(nameTypeId) > 0;
+	}
+
 }

@@ -168,13 +168,4 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		return this.daoFactory.getNameDao().getPreferredNamesByGIDs(gids);
 	}
 
-	@Override
-	public boolean isNameTypeUsedInStudies(final Integer nameTypeId) {
-		return this.daoFactory.getProjectPropertyDAO().countNameTypeInUse(nameTypeId) > 0;
-	}
-
-	@Override
-	public boolean isNameTypeUsedInGermplasmList(final Integer nameTypeId) {
-		return this.daoFactory.getGermplasmListDataViewDAO().countNameTypeInUse(nameTypeId) > 0;
-	}
 }
