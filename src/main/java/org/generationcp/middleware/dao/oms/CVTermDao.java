@@ -1458,11 +1458,19 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	public List<CVTerm> getByNamesAndCvId(final Set<String> termNames, final CvId cvId) {
+		return this.getByNamesAndCvId(termNames, cvId, false);
+	}
+
+	public List<CVTerm> getByNamesAndCvId(final Set<String> termNames, final CvId cvId,
+		final boolean showObsoletes) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.in("name", termNames));
 			criteria.add(Restrictions.eq("cvId", cvId.getId()));
-			criteria.add(Restrictions.eq("isObsolete", 0));
+			if(!showObsoletes) {
+				criteria.add(Restrictions.eq("isObsolete", 0));
+			}
+
 			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error at getByNamesAndCvId=" + termNames + "," + cvId + " query on CVTermDao", e);

@@ -114,7 +114,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 				.collect(Collectors.toSet());
 		final Map<String, CVTerm> analysisSummaryVariablesMap =
 			new CaseInsensitiveMap(
-				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisSummaryVariableNames, CvId.VARIABLES).stream()
+				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisSummaryVariableNames, CvId.VARIABLES, true).stream()
 					.collect(Collectors.toMap(
 						CVTerm::getName, Function.identity())));
 
