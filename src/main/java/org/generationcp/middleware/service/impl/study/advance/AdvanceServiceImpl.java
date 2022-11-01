@@ -42,6 +42,7 @@ import org.generationcp.middleware.service.impl.study.advance.resolver.LocationD
 import org.generationcp.middleware.service.impl.study.advance.resolver.PlantSelectedResolver;
 import org.generationcp.middleware.service.impl.study.advance.resolver.SeasonDataResolver;
 import org.generationcp.middleware.service.impl.study.advance.resolver.SelectionTraitDataResolver;
+import org.generationcp.middleware.service.impl.study.advance.resolver.TrialInstanceObservationsResolver;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +59,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -104,6 +104,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 	private final LocationDataResolver locationDataResolver;
 	private final BreedingMethodResolver breedingMethodResolver;
 	private final PlantSelectedResolver plantSelectedResolver;
+	private final TrialInstanceObservationsResolver trialInstanceObservationsResolver;
 
 	public AdvanceServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -112,6 +113,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		this.locationDataResolver = new LocationDataResolver();
 		this.breedingMethodResolver = new BreedingMethodResolver();
 		this.plantSelectedResolver = new PlantSelectedResolver();
+		this.trialInstanceObservationsResolver = new TrialInstanceObservationsResolver();
 	}
 
 	@Override
@@ -196,7 +198,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 			// If study is Trial, then setting data if trial instance is not null
 			final Integer trialInstanceNumber = row.getTrialInstance();
 			final ObservationUnitRow trialInstanceObservation = (trialInstanceNumber != null) ?
-				this.setTrialInstanceObservations(trialInstanceNumber, trialObservations, studyInstancesByInstanceNumber) : null;
+				this.trialInstanceObservationsResolver
+					.setTrialInstanceObservations(trialInstanceNumber, trialObservations, studyInstancesByInstanceNumber) : null;
 
 			final NewAdvancingSource advancingSource =
 				new NewAdvancingSource(originGermplasm, namesByGids.get(row.getGid()), row, trialInstanceObservation,
@@ -328,27 +331,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.stream()
 			.map(variable -> new MeasurementVariableDto(variable.getTermId(), variable.getName()))
 			.collect(Collectors.toList());
-	}
-
-	private ObservationUnitRow setTrialInstanceObservations(final Integer trialInstanceNumber,
-		final List<ObservationUnitRow> trialObservations,
-		final Map<Integer, StudyInstance> studyInstancesByInstanceNumber) {
-
-		final Optional<ObservationUnitRow> optionalTrialObservation = trialObservations.stream()
-			.filter(observationUnitRow -> trialInstanceNumber.equals(observationUnitRow.getTrialInstance()))
-			.findFirst();
-		if (optionalTrialObservation.isPresent()) {
-			final ObservationUnitRow trialObservation = optionalTrialObservation.get();
-			if (studyInstancesByInstanceNumber.containsKey(trialInstanceNumber)) {
-				trialObservation.getVariableById(trialObservation.getEnvironmentVariables().values(), TermId.LOCATION_ID.getId())
-					.ifPresent(
-						observationUnitData -> observationUnitData
-							.setValue(String.valueOf(studyInstancesByInstanceNumber.get(trialInstanceNumber).getLocationId()))
-					);
-			}
-			return trialObservation;
-		}
-		return null;
 	}
 
 	private List<Location> getLocationsFromTrialObservationUnits(
