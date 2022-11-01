@@ -12,6 +12,16 @@ import java.util.Map;
 
 public class BreedingMethodResolver {
 
+	/**
+	 *  Returns the breeding method. This could be the one provided by using the same for each advance or choosing a variate that defines
+	 *  the breeding method for each advance
+	 *
+	 * @param request
+	 * @param plotObservation
+	 * @param breedingMethodsByCode
+	 * @param breedingMethodsById
+	 * @return
+	 */
 	public Method resolveBreedingMethod(final AdvanceStudyRequest.BreedingMethodSelectionRequest request,
 		final ObservationUnitRow plotObservation, final Map<String, Method> breedingMethodsByCode,
 		final Map<Integer, Method> breedingMethodsById) {

@@ -10,6 +10,16 @@ import java.util.Map;
 
 public class PlantSelectedResolver {
 
+	/**
+	 * Returns the number of lines for each plot. This could be the same number of lines selected by the user or choosing a variate that defines
+	 * the number of lines selected from each plot
+	 *
+	 * @param request
+	 * @param plotObservation
+	 * @param breedingMethodsByCode
+	 * @param isBulkMethod
+	 * @return
+	 */
 	public Integer resolvePlantSelected(final AdvanceStudyRequest request, final ObservationUnitRow plotObservation,
 		final Map<String, Method> breedingMethodsByCode, final boolean isBulkMethod) {
 

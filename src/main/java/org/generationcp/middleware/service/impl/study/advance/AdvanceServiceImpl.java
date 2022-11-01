@@ -186,6 +186,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Set<Integer> originGermplasmParentGids = new HashSet<>();
 		plotObservations.forEach(row -> {
 			final Germplasm originGermplasm = originGermplasmsByGid.get(row.getGid());
+			// Get the selected breeding method
 			final Method breedingMethod =
 				this.breedingMethodResolver.resolveBreedingMethod(request.getBreedingMethodSelectionRequest(), row, breedingMethodsByCode,
 					breedingMethodsById);
