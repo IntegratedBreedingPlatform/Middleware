@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.NameTypeMetadataFilterRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.UDTableType;
@@ -146,7 +147,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		return returnList;
 	}
 
-	public List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(final String query) {
+	public List<GermplasmNameTypeDTO> searchNameTypes(final String query) {
 		if (StringUtils.isBlank(query)) {
 			return Collections.emptyList();
 		}
@@ -165,7 +166,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			sqlQuery.addScalar("code");
 			sqlQuery.addScalar("id");
 			sqlQuery.addScalar("name");
-			sqlQuery.setResultTransformer(Transformers.aliasToBean(org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO.class));
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(GermplasmNameTypeDTO.class));
 
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
@@ -173,7 +174,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		}
 	}
 
-	public List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> getDatasetNameTypes(final Integer datasetId) {
+	public List<GermplasmNameTypeDTO> getDatasetNameTypes(final Integer datasetId) {
 		if (datasetId == null) {
 			return Collections.emptyList();
 		}
@@ -194,7 +195,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			sqlQuery.addScalar("id");
 			sqlQuery.addScalar("name");
 			sqlQuery.addScalar("description");
-			sqlQuery.setResultTransformer(Transformers.aliasToBean(org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO.class));
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(GermplasmNameTypeDTO.class));
 
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
