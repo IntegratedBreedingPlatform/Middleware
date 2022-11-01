@@ -114,10 +114,6 @@ public abstract class AbstractAdvancingSource implements AdvancingSourceAdapter 
 		return names;
 	}
 
-	public void setNames(final List<Name> names) {
-		this.names = names;
-	}
-
 	public Integer getPlantsSelected() {
 		return plantsSelected;
 	}

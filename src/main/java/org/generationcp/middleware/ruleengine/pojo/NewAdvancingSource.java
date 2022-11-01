@@ -3,6 +3,7 @@ package org.generationcp.middleware.ruleengine.pojo;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 
 import java.util.ArrayList;
@@ -25,7 +26,8 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 	}
 
 	// TODO: create builder.
-	public NewAdvancingSource(final Germplasm originGermplasm, final ObservationUnitRow plotObservation,
+	public NewAdvancingSource(final Germplasm originGermplasm, final List<Name> names,
+		final ObservationUnitRow plotObservation,
 		final ObservationUnitRow trialInstanceObservation,
 		final List<MeasurementVariable> studyEnvironmentVariables,
 		final Method breedingMethod,
@@ -33,6 +35,7 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 		final Integer plantSelected) {
 
 		this.originGermplasm = originGermplasm;
+		this.names = names;
 		this.plotObservation = plotObservation;
 		this.trialInstanceObservation = trialInstanceObservation;
 		this.conditions = studyEnvironmentVariables;

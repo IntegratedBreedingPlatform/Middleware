@@ -24,6 +24,7 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.ruleengine.RuleException;
@@ -158,11 +159,18 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Map<Integer, Location> locationsByLocationId =
 			locations.stream().collect(Collectors.toMap(Location::getLocid, location -> location));
 
+		final Set<Integer> gids = plotObservations.stream()
+			.map(ObservationUnitRow::getGid)
+			.collect(Collectors.toSet());
+
+		final Map<Integer, List<Name>> namesByGids =
+			this.daoFactory.getNameDao().getNamesByGidsInMap(new ArrayList<>(gids));
+
 		// TODO: Considering performance issue due to we will have a lot of objects in the memory... Is really needed to have the germplasm entity??? At least according to to the old advance we need only a few of germplasm properties:
 		//  https://github.com/IntegratedBreedingPlatform/Fieldbook/blob/f242b4219653d926f20a06214c0c8b1083af148e/src/main/java/com/efficio/fieldbook/web/naming/impl/AdvancingSourceListFactory.java#L245
 		//  Besides that part of the code, there are other properties that are required such as mgid, progenitors data, etc. Take a look how many things of germplasm we need in the advance process
-		final Map<Integer, Germplasm> originGermplasmsByGid = this.getOriginGermplasmByGid(plotObservations);
-
+		final Map<Integer, Germplasm> originGermplasmsByGid = this.daoFactory.getGermplasmDao().getByGIDList(new ArrayList<>(gids)).stream()
+			.collect(Collectors.toMap(Germplasm::getGid, germplasm -> germplasm));
 		final CropType cropType = this.cropService.getCropTypeByName(ContextHolder.getCurrentCrop());
 		final List<NewAdvancingSource> advancingSources = new ArrayList<>();
 		plotObservations.forEach(row -> {
@@ -186,9 +194,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 				this.setTrialInstanceObservations(trialInstanceNumber, trialObservations, studyInstancesByInstanceNumber) : null;
 
 			final NewAdvancingSource advancingSource =
-				new NewAdvancingSource(originGermplasm, row, trialInstanceObservation, studyEnvironmentVariables, breedingMethod,
-					studyId, environmentDataset.getDatasetId(),
-					seasonStudyLevel, selectionTraitStudyLevel, plantsSelected);
+				new NewAdvancingSource(originGermplasm, namesByGids.get(row.getGid()), row, trialInstanceObservation,
+					studyEnvironmentVariables,
+					breedingMethod, studyId,
+					environmentDataset.getDatasetId(), seasonStudyLevel, selectionTraitStudyLevel, plantsSelected);
 
 			this.resolveEnvironmentAndPlotLevelData(environmentDataset.getDatasetId(), plotDataset.getDatasetId(),
 				request.getSelectionTraitRequest(), advancingSource, row, locationsByLocationId, plotDataVariablesByTermId);
@@ -210,8 +219,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 		final List<Integer> advancedGermplasmGids = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(advancingSources)) {
-			// TODO: add names to advance sources?? It's being used by RootNameExpression
-
 			try {
 				this.namingConventionService.generateAdvanceListName(advancingSources);
 			} catch (final RuleException e) {
@@ -398,14 +405,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final List<ObservationUnitRow> trialObservationUnitRows) {
 		final Set<Integer> locationIds = this.getVariableValuesFromObservations(trialObservationUnitRows, TermId.LOCATION_ID.getId());
 		return this.daoFactory.getLocationDAO().getByIds(new ArrayList<>(locationIds));
-	}
-
-	private Map<Integer, Germplasm> getOriginGermplasmByGid(final List<ObservationUnitRow> plotObservations) {
-		final Set<Integer> gids = plotObservations.stream()
-			.map(ObservationUnitRow::getGid)
-			.collect(Collectors.toSet());
-		return this.daoFactory.getGermplasmDao().getByGIDList(new ArrayList<>(gids)).stream()
-			.collect(Collectors.toMap(Germplasm::getGid, germplasm -> germplasm));
 	}
 
 	private Set<Integer> getVariableValuesFromObservations(final List<ObservationUnitRow> observations, final Integer variableId) {

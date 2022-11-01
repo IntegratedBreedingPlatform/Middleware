@@ -105,6 +105,13 @@ public class AdvancingSource extends AbstractAdvancingSource {
 	}
 
 	/**
+	 * @param names the names to set
+	 */
+	public void setNames(final List<Name> names) {
+		this.names = names;
+	}
+
+	/**
 	 * @param breedingMethod the breedingMethod to set
 	 */
 	public void setBreedingMethod(final Method breedingMethod) {
