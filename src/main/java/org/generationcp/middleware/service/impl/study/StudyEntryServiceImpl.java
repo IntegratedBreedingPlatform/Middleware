@@ -344,7 +344,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				projectVariableIds.contains(column.getId())))
 			.collect(Collectors.toList());
 
-		final List<Integer> namTypeIds = plotDataset.getProperties().stream()
+		final List<Integer> nameTypeIds = plotDataset.getProperties().stream()
 			.filter(projectProperty -> projectProperty.getTypeId() == null  &&
 				projectProperty.getVariableId() == null  &&
 				projectProperty.getNameFldno() != null)
@@ -388,9 +388,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		if (!CollectionUtils.isEmpty(nameTypes)) {
 			columns.addAll(
-				nameTypes.stream().filter((nameType) -> !namTypeIds.contains(nameType.getFldno()))
+				nameTypes.stream().filter((nameType) -> !nameTypeIds.contains(nameType.getFldno()))
 					.map(nameType ->
-						new StudyEntryColumnDTO(nameType.getFldno(), nameType.getFcode(), null, null, namTypeIds.contains(nameType.getFldno())))
+						new StudyEntryColumnDTO(nameType.getFldno(), nameType.getFcode(), null, null, nameTypeIds.contains(nameType.getFldno())))
 					.collect(toList()));
 		}
 
