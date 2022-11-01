@@ -21,6 +21,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmStudySourceType;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -37,6 +38,8 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.advance.AdvanceService;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceInput;
+import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.service.impl.study.advance.resolver.BreedingMethodResolver;
 import org.generationcp.middleware.service.impl.study.advance.resolver.PlantSelectedResolver;
@@ -101,6 +104,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	@Resource
 	private GermplasmGroupingService germplasmGroupingService;
+
+	@Resource
+	private GermplasmStudySourceService germplasmStudySourceService;
 
 	private final DaoFactory daoFactory;
 	private final SeasonDataResolver seasonDataResolver;
@@ -231,7 +237,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 			// Creates the lines that are advanced
 			this.createAdvancedGermplasm(cropType, advancingSource);
 
-			// Getting the gid  that later will be used to obtain the 'selection history at fixation' and code names of the parents
+			// Getting the gids that later will be used to obtain the 'selection history at fixation' and code names from the parents
 			if (originGermplasm.getMgid() > 0 && originGermplasm.getGpid2() > 0) {
 				originGermplasmParentGids.add(originGermplasm.getGpid2());
 			}
@@ -272,7 +278,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 						this.germplasmGroupingService.copyCodedNames(germplasm, parent);
 					}
 
-					// TODO: Check If another property of germplasm is being updated
 					// Finally, persisting the new advanced line with its derivative name. Also, it has the selection history at fixation and
 					// code name of the parent if it corresponds.
 					this.daoFactory.getGermplasmDao().save(germplasm);
@@ -284,6 +289,11 @@ public class AdvanceServiceImpl implements AdvanceService {
 						plotNumberVariableId, repNumberVariableId, trialInstanceVariableId, plantNumberVariableId,
 						studyEnvironmentVariables, environmentDataset.getVariables(), locationNameByIds,
 						studyInstancesByInstanceNumber);
+
+					final GermplasmStudySourceInput germplasmStudySourceInput = new GermplasmStudySourceInput(germplasm.getGid(), studyId,
+						advancingSource.getPlotObservation().getObservationUnitId(),
+						GermplasmStudySourceType.ADVANCE);
+					this.germplasmStudySourceService.saveGermplasmStudySources(Arrays.asList(germplasmStudySourceInput));
 
 					selectionNumber.incrementAndGet();
 				});
