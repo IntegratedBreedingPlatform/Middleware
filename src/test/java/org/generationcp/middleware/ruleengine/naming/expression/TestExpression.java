@@ -40,7 +40,7 @@ public class TestExpression {
 		names.add(new Name(1, new Germplasm(1), 5, 0, name + "_five", 0, 0, 0));
 		names.add(new Name(1, new Germplasm(1), 2, 1, name + "_two", 0, 0, 0));
 
-		final AdvancingSource source = new AdvancingSource(germplasm, names, 2, method, false, studyName, "1");
+		final AdvancingSource source = new AdvancingSource(germplasm, names, 2, method, studyName, "1");
 		source.setRootName(name);
 		source.setSeason(season);
 		return source;
@@ -68,7 +68,7 @@ public class TestExpression {
 		names.add(new Name(1, new Germplasm(1), 5, 0, name + "_five", 0, 0, 0));
 		names.add(new Name(1, new Germplasm(1), 2, 1, name + "_two", 0, 0, 0));
 
-		final AdvancingSource source = new AdvancingSource(germplasm, names, 2, method, false, "MNL", "1");
+		final AdvancingSource source = new AdvancingSource(germplasm, names, 2, method, "MNL", "1");
 		source.setRootName(name);
 		source.setSeason("Dry");
 		source.setStudyName("NurseryTest");
