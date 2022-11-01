@@ -173,7 +173,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		}
 	}
 
-	public List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> getNameTypeFromDataset(final Integer datasetId) {
+	public List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> getDatasetNameTypes(final Integer datasetId) {
 		if (datasetId == null) {
 			return Collections.emptyList();
 		}
