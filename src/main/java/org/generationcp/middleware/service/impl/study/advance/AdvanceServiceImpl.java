@@ -39,6 +39,7 @@ import org.generationcp.middleware.service.api.study.advance.AdvanceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.service.impl.study.advance.resolver.BreedingMethodResolver;
 import org.generationcp.middleware.service.impl.study.advance.resolver.LocationDataResolver;
+import org.generationcp.middleware.service.impl.study.advance.resolver.PlantSelectedResolver;
 import org.generationcp.middleware.service.impl.study.advance.resolver.SeasonDataResolver;
 import org.generationcp.middleware.service.impl.study.advance.resolver.SelectionTraitDataResolver;
 import org.springframework.data.domain.PageRequest;
@@ -102,6 +103,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 	private final SelectionTraitDataResolver selectionTraitDataResolver;
 	private final LocationDataResolver locationDataResolver;
 	private final BreedingMethodResolver breedingMethodResolver;
+	private final PlantSelectedResolver plantSelectedResolver;
 
 	public AdvanceServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -109,6 +111,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		this.selectionTraitDataResolver = new SelectionTraitDataResolver();
 		this.locationDataResolver = new LocationDataResolver();
 		this.breedingMethodResolver = new BreedingMethodResolver();
+		this.plantSelectedResolver = new PlantSelectedResolver();
 	}
 
 	@Override
@@ -185,7 +188,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 			}
 
 			final Integer plantsSelected =
-				this.getPlantSelected(request, row, breedingMethodsByCode, breedingMethod.isBulkingMethod());
+				this.plantSelectedResolver.resolvePlantSelected(request, row, breedingMethodsByCode, breedingMethod.isBulkingMethod());
 			if (plantsSelected == null || plantsSelected <= 0) {
 				return;
 			}
@@ -374,66 +377,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.resolveEnvironmentLevelData(environmentDatasetId, selectionTraitRequest, source, plotDataVariablesByTermId);
 		this.selectionTraitDataResolver
 			.resolvePlotLevelData(plotDatasetId, selectionTraitRequest, source, row, plotDataVariablesByTermId);
-	}
-
-	// TODO: move plant selection code to another class
-	Integer getPlantSelected(final AdvanceStudyRequest request, final ObservationUnitRow plotObservation,
-		final Map<String, Method> breedingMethodsByCode, final boolean isBulkMethod) {
-
-		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
-			request.getBreedingMethodSelectionRequest();
-		if (breedingMethodSelectionRequest.getBreedingMethodId() != null) {
-			// User has selected the same Breeding Method for each advance
-			return this.getLineSelectedForBreedingMethodVariable(request, isBulkMethod, plotObservation);
-		}
-
-		if (breedingMethodSelectionRequest.getMethodVariateId() != null) {
-			// User has selected a variate that defines the breeding method for each advance
-			final String rowBreedingMethodCode =
-				plotObservation.getVariableValueByVariableId(breedingMethodSelectionRequest.getMethodVariateId());
-			if (!StringUtils.isEmpty(rowBreedingMethodCode) && breedingMethodsByCode.containsKey(rowBreedingMethodCode)) {
-				final Method method = breedingMethodsByCode.get(rowBreedingMethodCode);
-				return this.getLineSelectedForBreedingMethodVariable(request, method.isBulkingMethod(), plotObservation);
-			}
-
-			return null;
-		}
-
-		return null;
-	}
-
-	// TODO: move plant selection code to another class
-	private Integer getLineSelectedForBreedingMethodVariable(final AdvanceStudyRequest request, final Boolean isBulkMethod,
-		final ObservationUnitRow plotObservation) {
-		if (isBulkMethod == null) {
-			return null;
-		}
-
-		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
-			request.getBreedingMethodSelectionRequest();
-		final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest =
-			request.getLineSelectionRequest();
-		if (isBulkMethod) {
-			if (breedingMethodSelectionRequest.getAllPlotsSelected() == null || !breedingMethodSelectionRequest.getAllPlotsSelected()) {
-				// User has selected a variable that defines the number of lines selected from each plot. However, this is tricky because
-				// the variable works as a boolean. It return 1 if there is a value present, otherwise it returns zero.
-				final String plotVariateValue =
-					plotObservation.getVariableValueByVariableId(breedingMethodSelectionRequest.getPlotVariateId());
-				return StringUtils.isEmpty(plotVariateValue) ? 0 : 1;
-			} else {
-				return 1;
-			}
-		} else {
-			// User has selected the same number of lines for each plot
-			if (lineSelectionRequest.getLinesSelected() == null) {
-				final String lineVariateValue =
-					plotObservation.getVariableValueByVariableId(lineSelectionRequest.getLineVariateId());
-				return AdvanceUtils.getIntegerValue(lineVariateValue);
-			} else {
-				// User has selected the same number of lines for each plot
-				return lineSelectionRequest.getLinesSelected();
-			}
-		}
 	}
 
 	private void createAdvancedGermplasm(final CropType cropType, final NewAdvancingSource advancingSource) {
