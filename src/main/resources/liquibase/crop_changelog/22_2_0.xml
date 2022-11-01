@@ -37,16 +37,27 @@
 				ADD CONSTRAINT fk_projectprop_udflds FOREIGN KEY (name_fldno) REFERENCES udflds (fldno);
 			</sql>
 	</changeSet>
+
 	<changeSet author="cuenyad" id="v22.2.0-3">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="projectprop" columnName="type_id"/>
-			<columnExists tableName="projectprop" columnName="variable_id"/>
 		</preConditions>
-			<comment>Make type_id and variable_id columns nullable from projectprop table</comment>
+			<comment>Make type_id column nullable from projectprop table</comment>
 			<sql dbms="mysql" splitStatements="true">
 				ALTER TABLE projectprop
-				CHANGE COLUMN type_id type_id INT(11) NULL,
-				CHANGE COLUMN variable_id variable_id INT(11) NULL;
+					CHANGE COLUMN type_id type_id INT(11) NULL
 			</sql>
 	</changeSet>
+
+	<changeSet author="cuenyad" id="v22.2.0-4">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="projectprop" columnName="variable_id"/>
+		</preConditions>
+			<comment>Make variable_id column nullable from projectprop table</comment>
+			<sql dbms="mysql" splitStatements="true">
+				ALTER TABLE projectprop
+					CHANGE COLUMN variable_id variable_id INT(11) NULL;
+			</sql>
+	</changeSet>
+
 </databaseChangeLog>
