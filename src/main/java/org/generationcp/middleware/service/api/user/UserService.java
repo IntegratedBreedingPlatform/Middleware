@@ -223,4 +223,6 @@ public interface UserService {
 
 	long countProgramMembersEligibleUsers(String programUUID, ProgramEligibleUsersSearchRequest searchRequest);
 
+	long countAllActiveUsers();
+
 }
