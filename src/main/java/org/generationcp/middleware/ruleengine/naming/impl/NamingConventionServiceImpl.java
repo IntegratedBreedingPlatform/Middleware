@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.ruleengine.RuleException;
@@ -117,7 +118,9 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 					throw new MiddlewareQueryException("error.save.resulting.name.exceeds.limit");
 				}
 				final Name derivativeName = this.createDerivativeName(generatedName);
-				advancingSource.getAdvancedGermplasms().get(i).setNames(Arrays.asList(derivativeName));
+				final Germplasm germplasm = advancingSource.getAdvancedGermplasms().get(i);
+				germplasm.getNames().add(derivativeName);
+				derivativeName.setGermplasm(germplasm);
 			});
 
 			// Pass the key sequence map to the next entry to process
@@ -130,7 +133,6 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 		name.setTypeId(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID());
 		name.setNval(value);
 		name.setNstat(1);
-
 		return name;
 	}
 
