@@ -218,7 +218,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with searchNameTypes(projecId=" + datasetId + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getDatasetNameTypes(projecId=" + datasetId + "): " + e.getMessage(), e);
 		}
 	}
 
