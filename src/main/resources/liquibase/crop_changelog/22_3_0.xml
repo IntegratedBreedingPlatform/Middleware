@@ -1,0 +1,65 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="clarysabel" id="v22.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="listdata" columnName="entrycd_bkp"/>
+		</preConditions>
+		<comment>Drop column listdata.entrycd_bkp</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE listdata DROP COLUMN entrycd_bkp;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v22.3.0-2">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="stock" columnName="value_bkp"/>
+		</preConditions>
+		<comment>Drop column stock.value_bkp</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE stock DROP COLUMN value_bkp;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v22.3.0-3">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="stock" columnName="type_id_bkp"/>
+		</preConditions>
+		<comment>Drop column stock.type_id_bkp</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE stock DROP COLUMN type_id_bkp;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v22.3.0-4">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<columnExists tableName="program_location_default" columnName="breeding_location_id"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM program_location_default
+					WHERE breeding_location_id is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'program_location_default'
+					AND COLUMN_NAME = 'breeding_location_id'
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Set program_location_default.breeding_location_id as not nullable
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE program_location_default
+				MODIFY COLUMN breeding_location_id INT(11) NOT NULL;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
