@@ -25,7 +25,7 @@ public class VariableInfoBuilder {
 	public Set<VariableInfo> create(final List<ProjectProperty> properties) {
 		final Set<VariableInfo> variableDefs = new HashSet<>();
 		for (final ProjectProperty property : properties) {
-			// TODO: workaround to avoid load Names as Variables
+			// TODO: workaround to avoid loading Names as Variables
 			if (property.getTypeId() == null) {
 				continue;
 			}
