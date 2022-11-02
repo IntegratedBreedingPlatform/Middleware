@@ -17,30 +17,28 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PrefixRuleTest {
+public class CodingCountRuleTest {
 
 	@Mock
 	private CodingExpressionResolver codingExpressionResolver;
 
 	@InjectMocks
-	private PrefixRule prefixRule;
+	private CodingCountRule codingCountRule;
 
 	@Test
 	public void testRunRule() throws RuleException {
 
-		final String prefix = "CML";
-
 		final List<String> sequenceOrder = new ArrayList<>();
 		final NamingConfiguration namingConfiguration = new NamingConfiguration();
-
-		namingConfiguration.setPrefix(prefix);
+		namingConfiguration.setCount("[SEQUENCE]");
 		final CodingRuleExecutionContext context = new CodingRuleExecutionContext(sequenceOrder, namingConfiguration);
-		context.setCurrentData("");
+		context.setCurrentData("CML");
 
-		Mockito.when(codingExpressionResolver.resolve(context.getCurrentData(), namingConfiguration.getPrefix(), namingConfiguration))
-				.thenReturn(Arrays.asList(prefix));
+		final String resolvedValue = "CML1";
+		Mockito.when(codingExpressionResolver.resolve(context.getCurrentData(), namingConfiguration.getCount(), namingConfiguration))
+				.thenReturn(Arrays.asList(resolvedValue));
 
-		assertEquals(prefix, this.prefixRule.runRule(context));
+		assertEquals(resolvedValue, this.codingCountRule.runRule(context));
 	}
 
 }

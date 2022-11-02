@@ -10,17 +10,17 @@ public class PaddedSequenceExpression extends SequenceExpression {
 
 	@Override
 	public Integer getNumberOfDigits(final StringBuilder container) {
-		return ExpressionUtils.getNumberOfDigitsFromKey(org.generationcp.middleware.ruleengine.coding.expression.PaddedSequenceExpression.PATTERN, container);
+		return ExpressionUtils.getNumberOfDigitsFromKey(org.generationcp.middleware.ruleengine.coding.expression.CodingPaddedSequenceExpression.PATTERN, container);
 	}
 
 	@Override
 	public String getExpressionKey() {
-		return org.generationcp.middleware.ruleengine.coding.expression.PaddedSequenceExpression.PATTERN_KEY;
+		return org.generationcp.middleware.ruleengine.coding.expression.CodingPaddedSequenceExpression.PATTERN_KEY;
 	}
 
 	@Override
 	public Pattern getPattern() {
-		return org.generationcp.middleware.ruleengine.coding.expression.PaddedSequenceExpression.PATTERN;
+		return org.generationcp.middleware.ruleengine.coding.expression.CodingPaddedSequenceExpression.PATTERN;
 	}
 
 

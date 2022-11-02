@@ -10,7 +10,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PrefixRuleTest extends BaseNamingRuleTest {
+public class CodingPrefixRuleTest extends BaseNamingRuleTest {
 
 	private PrefixRule rule;
 	private Method breedingMethod;

@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @Component
-public class SequenceExpression extends BaseCodingExpression {
+public class CodingSequenceExpression extends BaseCodingExpression {
 
 	// Insert double black slash since we're replacing by regular expressions
 	private static final String KEY = "\\[SEQUENCE\\]";
-	private static final Pattern PATTERN = Pattern.compile(SequenceExpression.KEY);
+	private static final Pattern PATTERN = Pattern.compile(CodingSequenceExpression.KEY);
 
 	@Autowired
 	protected GermplasmNamingService germplasmNamingService;
@@ -36,12 +36,12 @@ public class SequenceExpression extends BaseCodingExpression {
 
 	@Override
 	public String getExpressionKey() {
-		return SequenceExpression.KEY;
+		return CodingSequenceExpression.KEY;
 	}
 
 	@Override
 	public Pattern getPattern() {
-		return SequenceExpression.PATTERN;
+		return CodingSequenceExpression.PATTERN;
 	}
 
 	public Integer getNumberOfDigits(final StringBuilder container) {
