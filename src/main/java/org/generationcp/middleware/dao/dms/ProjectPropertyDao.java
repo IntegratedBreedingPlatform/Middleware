@@ -285,20 +285,29 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	}
 
 	public void deleteProjectNameTypes(final Integer projectId, final List<Integer> nameTypes) {
-		final String sql = "DELETE FROM projectprop WHERE project_id = :projectId and name_fldno IN (:nameTypes)";
-		final Query query =
-			this.getSession().createSQLQuery(sql);
-		query.setParameter("projectId", projectId);
-		query.setParameterList("nameTypes", nameTypes);
-		query.executeUpdate();
+		try {
+			final String sql = "DELETE FROM projectprop WHERE project_id = :projectId and name_fldno IN (:nameTypes)";
+			final Query query = this.getSession().createSQLQuery(sql);
+			query.setParameter("projectId", projectId);
+			query.setParameterList("nameTypes", nameTypes);
+			query.executeUpdate();
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with deleteProjectNameTypes() query from projectId: " + projectId + " nameTypes:" + nameTypes;
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 
 	public void deleteNameTypeFromStudies(final Integer nameType) {
-		final String sql = "DELETE FROM projectprop WHERE name_fldno = :nameType";
-		final Query query =
-			this.getSession().createSQLQuery(sql);
-		query.setParameter("nameType", nameType);
-		query.executeUpdate();
+		try {
+			final String sql = "DELETE FROM projectprop WHERE name_fldno = :nameType";
+			final Query query =
+				this.getSession().createSQLQuery(sql);
+			query.setParameter("nameType", nameType);
+			query.executeUpdate();
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with deleteNameTypeFromStudies() query from nameType: " + nameType;
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 
 	public void deleteDatasetVariablesByVariableTypes(final Integer projectId, final List<Integer> variableTypeIds) {
