@@ -364,6 +364,12 @@
 			<version>2.0</version>
 		</dependency>
 
+		<dependency><groupId>eu.bitwalker</groupId>
+			<artifactId>UserAgentUtils</artifactId>
+			<version>1.21</version>
+		</dependency><dependency><groupId>com.opera</groupId><artifactId>operadriver</artifactId><version>1.5</version><scope>compile</scope></dependency><dependency><groupId>com.opera</groupId><artifactId>operadriver</artifactId><version>1.5</version><scope>compile</scope></dependency>
+
+
 	</dependencies>
 
 	<build>

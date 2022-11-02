@@ -25,7 +25,8 @@ public class UserDeviceMetaDataServiceImpl implements UserDeviceMetaDataService 
 	@Override
 	public Optional<UserDeviceMetaDataDto> findExistingDevice(final Integer userId, final String deviceDetails, final String location) {
 
-		final List<UserDeviceMetaData> knownDevices = this.workbenchDaoFactory.getUserDeviceMetaDataDAO().findByUserId(userId);
+		final List<UserDeviceMetaData> knownDevices =
+			this.workbenchDaoFactory.getUserDeviceMetaDataDAO().findByUserIdDeviceAndLocation(userId, deviceDetails, location);
 
 		for (final UserDeviceMetaData existingDevice : knownDevices) {
 			if (existingDevice.getDeviceDetails().equals(deviceDetails)

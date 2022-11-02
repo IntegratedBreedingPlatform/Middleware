@@ -13,7 +13,15 @@ public class UserDeviceMetaDataDAO extends GenericDAO<UserDeviceMetaData, Intege
 		super(session);
 	}
 
-	public List<UserDeviceMetaData> findByUserId(final Integer userId) {
+	public List<UserDeviceMetaData> findByUserIdDeviceAndLocation(final Integer userId, final String deviceDetails, final String location) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("userId", userId));
+		criteria.add(Restrictions.eq("deviceDetails", deviceDetails));
+		criteria.add(Restrictions.eq("location", location));
+		return criteria.list();
+	}
+
+	public List<UserDeviceMetaData> getAllByUserId(final Integer userId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("userId", userId));
 		return criteria.list();
