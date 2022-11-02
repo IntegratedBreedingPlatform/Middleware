@@ -147,6 +147,25 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		return returnList;
 	}
 
+	public List<UserDefinedField> getNameTypesByNameTypeListIds(final Set<Integer> nameTypeIds) {
+		List<UserDefinedField> returnList = new ArrayList<>();
+		if (nameTypeIds != null && !nameTypeIds.isEmpty()) {
+			try {
+
+				final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
+				criteria.add(Restrictions.eq("ftable", UDTableType.NAMES_NAME.getTable()));
+				criteria.add(Restrictions.eq("ftype", UDTableType.NAMES_NAME.getType()));
+				criteria.add(Restrictions.in("fldno", nameTypeIds));
+				return criteria.list();
+
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException("Error with getNameTypesByNameTypeListIds(listIds=" + nameTypeIds + "): " + e.getMessage(),
+					e);
+			}
+		}
+		return returnList;
+	}
+
 	public List<GermplasmNameTypeDTO> searchNameTypes(final String query) {
 		if (StringUtils.isBlank(query)) {
 			return Collections.emptyList();

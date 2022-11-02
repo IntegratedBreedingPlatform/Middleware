@@ -59,6 +59,16 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
+	public Optional<List<GermplasmNameTypeDTO>> getNameTypesByNameTypeListIds(final Set<Integer> nameTypeIds) {
+		final List<UserDefinedField> nameTypeList = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByNameTypeListIds(nameTypeIds);
+		if (nameTypeList != null && !nameTypeList.isEmpty()) {
+			return Optional.of(nameTypeList.stream().map(nameType -> new  GermplasmNameTypeDTO(nameType.getFldno(), nameType.getFcode(), nameType.getFname())).collect(
+				Collectors.toList()));
+		}
+		return Optional.empty();
+	}
+
+	@Override
 	public Integer createNameType(final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
 		final String fDesc =
 			StringUtils.isBlank(germplasmNameTypeRequestDTO.getDescription()) ? GermplasmNameTypeServiceImpl.DEFAULT_FIELD :
