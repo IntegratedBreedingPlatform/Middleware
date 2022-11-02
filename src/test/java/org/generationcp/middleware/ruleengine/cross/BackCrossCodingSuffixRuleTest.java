@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class BackCrossSuffixRuleTest {
+public class BackCrossCodingSuffixRuleTest {
 
 	private static final String TEST_BASE_CROSS_NAME = "Cross";
 	private static final int MALE_GID = 100;
