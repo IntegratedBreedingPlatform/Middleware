@@ -39,7 +39,6 @@ public class AdvancingSource {
 	 * This field is used to temporarily store the breeding method ID until such time as it can be resolved to a proper breeding Method object
 	 */
 	private Integer breedingMethodId;
-	private boolean isCheck;
 	private boolean isBulk;
 	private String studyName;
 	private Integer studyId;
@@ -77,14 +76,14 @@ public class AdvancingSource {
 	private Boolean designationIsPreviewOnly;
 	private Map<String, Integer> keySequenceMap = new HashMap<>();
 
-	public AdvancingSource(final ImportedGermplasm germplasm, final List<Name> names, final Integer plantsSelected, final Method breedingMethod, final boolean isCheck,
-			final String studyName, final String plotNumber) {
+	public AdvancingSource(final ImportedGermplasm germplasm, final List<Name> names, final Integer plantsSelected,
+		final Method breedingMethod,
+		final String studyName, final String plotNumber) {
 		super();
 		this.germplasm = germplasm;
 		this.names = names;
 		this.plantsSelected = plantsSelected;
 		this.breedingMethod = breedingMethod;
-		this.isCheck = isCheck;
 		this.studyName = studyName;
 		this.plotNumber = plotNumber;
 	}
@@ -124,20 +123,6 @@ public class AdvancingSource {
 	 */
 	public void setPlantsSelected(final Integer plantsSelected) {
 		this.plantsSelected = plantsSelected;
-	}
-
-	/**
-	 * @return the isCheck
-	 */
-	public boolean isCheck() {
-		return this.isCheck;
-	}
-
-	/**
-	 * @param isCheck the isCheck to set
-	 */
-	public void setCheck(final boolean isCheck) {
-		this.isCheck = isCheck;
 	}
 
 	/**
@@ -419,7 +404,7 @@ public class AdvancingSource {
 	}
 
 	public AdvancingSource copy() {
-        final AdvancingSource source = new AdvancingSource(germplasm, names, plantsSelected, breedingMethod, isCheck, studyName, plotNumber);
+        final AdvancingSource source = new AdvancingSource(germplasm, names, plantsSelected, breedingMethod, studyName, plotNumber);
         source.setSeason(this.season);
         source.setLocationAbbreviation(this.locationAbbreviation);
         source.setRootName(this.rootName);
