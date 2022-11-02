@@ -1676,6 +1676,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	public void appendVariableSeachFilters(final StringBuilder stringBuilder, final VariableSearchRequestDTO requestDTO) {
+		if (requestDTO.isFilterObsoletes()) {
+			stringBuilder.append(" AND variable.is_obsolete = 0 ");
+		}
+
 		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
 			stringBuilder.append(" AND dataType.cvterm_id IN (:dataTypeIds)");
 		}
