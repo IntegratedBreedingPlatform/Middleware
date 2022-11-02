@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+		<changeSet author="rowena" id="v22.3.0-1">
+			<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">SELECT CASE WHEN 'ibdbv2_maize_merged' = DATABASE() THEN 1 ELSE 0 END FROM DUAL;</sqlCheck>
+			</preConditions>
+			<comment>Update MPGRN for methods </comment>
+			<sql dbms="mysql" splitStatements="true">
+				UPDATE methods 
+					SET mprgn = 2
+					WHERE MID  = 1:
+
+				UPDATE methods 
+					SET mprgn = 0
+					WHERE MID IN (157,1002);
+			</sql>
+		</changeSet>
+
+		<changeSet author="rowena" id="v22.3.0-2">
+			<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">SELECT COUNT(*)>1 FROM cvterm where cvterm_id = 8255</sqlCheck>
+			</preConditions>
+			<comment>Update definition of entry_type</comment>
+			<sql dbms="mysql" splitStatements="true">
+				UPDATE cvterm 
+					SET definition="A role class assigned to each germplasm used in a study, determined by study objectives. Test (T), Check (C), etc." 
+					WHERE cvterm_id=8255;
+			</sql>
+		</changeSet>
+
+
+</databaseChangeLog>
