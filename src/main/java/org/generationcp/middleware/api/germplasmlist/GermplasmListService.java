@@ -98,5 +98,4 @@ public interface GermplasmListService {
 
 	Map<Integer, Map<Integer, String>> getObservationValuesByListAndVariableIds(Integer listId, Set<Integer> variableIds);
 
-	void deleteNameTypeFromGermplasmList(Integer nameTypeId);
 }
