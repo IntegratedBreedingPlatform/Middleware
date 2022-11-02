@@ -175,19 +175,19 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 		final NameTypeMetadata nameTypeMetadata = new NameTypeMetadata();
 
 		nameTypeMetadata.setGermplasmCount(this.daoFactory.getNameDao().countNameTypeInUse(nameTypeId));
-		nameTypeMetadata.setStudiesCount(this.daoFactory.getProjectPropertyDAO().countNameTypeInUse(nameTypeId));
-		nameTypeMetadata.setGermplasmListCount(this.daoFactory.getGermplasmListDataViewDAO().countNameTypeInUse(nameTypeId));
+		nameTypeMetadata.setStudiesCount(this.daoFactory.getProjectPropertyDAO().countStudiesWithNameType(nameTypeId));
+		nameTypeMetadata.setGermplasmListCount(this.daoFactory.getGermplasmListDataViewDAO().countGermplasmListWithNameType(nameTypeId));
 		return nameTypeMetadata;
 	}
 
 	@Override
 	public boolean isNameTypeUsedInStudies(final Integer nameTypeId) {
-		return this.daoFactory.getProjectPropertyDAO().countNameTypeInUse(nameTypeId) > 0;
+		return this.daoFactory.getProjectPropertyDAO().countStudiesWithNameType(nameTypeId) > 0;
 	}
 
 	@Override
 	public boolean isNameTypeUsedInGermplasmList(final Integer nameTypeId) {
-		return this.daoFactory.getGermplasmListDataViewDAO().countNameTypeInUse(nameTypeId) > 0;
+		return this.daoFactory.getGermplasmListDataViewDAO().countGermplasmListWithNameType(nameTypeId) > 0;
 	}
 
 }

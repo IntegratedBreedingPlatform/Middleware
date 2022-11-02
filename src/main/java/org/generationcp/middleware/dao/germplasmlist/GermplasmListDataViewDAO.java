@@ -1,7 +1,6 @@
 package org.generationcp.middleware.dao.germplasmlist;
 
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
@@ -97,14 +96,14 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 		}
 	}
 
-	public long countNameTypeInUse(final Integer nameTypeId) {
+	public long countGermplasmListWithNameType(final Integer nameTypeId) {
 		try {
 			final String sql = "SELECT count(1) FROM list_data_view WHERE name_fldno = :nameType";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameter("nameType", nameTypeId);
 			return ((BigInteger) query.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
-			final String message = "Error with countNameTypeUse(nameTypeId=" + nameTypeId + "): " + e.getMessage();
+			final String message = "Error with countGermplasmListWithNameType(nameTypeId=" + nameTypeId + "): " + e.getMessage();
 			LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}

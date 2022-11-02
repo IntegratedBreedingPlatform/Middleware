@@ -430,14 +430,14 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return Collections.unmodifiableList(Collections.<MeasurementVariableDto>emptyList());
 	}
 
-	public long countNameTypeInUse(final Integer nameTypeId) {
+	public long countStudiesWithNameType(final Integer nameTypeId) {
 		try {
 			final String sql = "SELECT count(1) FROM projectprop where name_fldno = :nameTypeId";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameter("nameTypeId", nameTypeId);
 			return ((BigInteger) query.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
-			final String message = "Error with isNameTypeUsedInStudies(nameTypeId=" + nameTypeId + "): " + e.getMessage();
+			final String message = "Error with countStudiesWithNameType(nameTypeId=" + nameTypeId + "): " + e.getMessage();
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
