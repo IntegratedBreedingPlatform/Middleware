@@ -829,8 +829,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLES);
 			programFavorite.setUniqueID(variableInfo.getProgramUuid());
 			this.daoFactory.getProgramFavoriteDao().save(programFavorite);
-		} else if (!isFavorite && programFavoriteOptional.isPresent()) {
+		} else if (!term.isObsolete() && !isFavorite && programFavoriteOptional.isPresent()) {
 			this.daoFactory.getProgramFavoriteDao().makeTransient(programFavoriteOptional.get());
+		} else if (term.isObsolete() && !isFavorite && programFavoriteOptional.isPresent()) {
+			this.daoFactory.getProgramFavoriteDao().deleteProgramFavorites(ProgramFavorite.FavoriteType.VARIABLES,
+				Collections.singleton(term.getCvTermId()));
 		}
 
 		this.daoFactory
