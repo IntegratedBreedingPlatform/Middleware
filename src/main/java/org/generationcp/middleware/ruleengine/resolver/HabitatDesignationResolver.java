@@ -17,10 +17,10 @@ public class HabitatDesignationResolver extends CategoricalKeyCodeResolverBase {
 	private static final Logger LOG = LoggerFactory.getLogger(HabitatDesignationResolver.class);
 
 	public HabitatDesignationResolver(final OntologyVariableDataManager ontologyVariableDataManager,
-		final List<MeasurementVariable> conditions, final Collection<ObservationUnitData> observations,
+		final List<MeasurementVariable> studyEnvironmentVariables, final Collection<ObservationUnitData> observations,
 		final Map<Integer, MeasurementVariable> measurementVariableByTermId) {
 
-		super(ontologyVariableDataManager, conditions, observations, measurementVariableByTermId);
+		super(ontologyVariableDataManager, studyEnvironmentVariables, observations, measurementVariableByTermId);
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class HabitatDesignationResolver extends CategoricalKeyCodeResolverBase {
 	}
 
 	@Override
-	protected String getValueFromTrialConditions(final MeasurementVariable trialCondition) {
-		return trialCondition.getValue();
+	protected String getValueFromStudyEnvironmentVariable(final MeasurementVariable studyEnvironmentVariable) {
+		return studyEnvironmentVariable.getValue();
 	}
 }

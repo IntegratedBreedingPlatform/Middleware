@@ -23,10 +23,10 @@ public class SeasonResolver extends CategoricalKeyCodeResolverBase {
 	private static final Logger LOG = LoggerFactory.getLogger(SeasonResolver.class);
 
 	public SeasonResolver(final OntologyVariableDataManager ontologyVariableDataManager,
-		final List<MeasurementVariable> conditions, final Collection<ObservationUnitData> observations,
+		final List<MeasurementVariable> studyEnvironmentVariables, final Collection<ObservationUnitData> observations,
 		final Map<Integer, MeasurementVariable> environmentVariablesByTermId) {
 
-		super(ontologyVariableDataManager, conditions, observations, environmentVariablesByTermId);
+		super(ontologyVariableDataManager, studyEnvironmentVariables, observations, environmentVariablesByTermId);
 	}
 
 	@Override
@@ -72,9 +72,9 @@ public class SeasonResolver extends CategoricalKeyCodeResolverBase {
 	}
 
 	@Override
-	protected String getValueFromTrialConditions(final MeasurementVariable variable) {
-		if (TermId.SEASON_VAR.getId() == variable.getTermId()) {
-			return this.getValue(variable.getValue(), variable.getPossibleValues());
+	protected String getValueFromStudyEnvironmentVariable(final MeasurementVariable studyEnvironmentVariable) {
+		if (TermId.SEASON_VAR.getId() == studyEnvironmentVariable.getTermId()) {
+			return this.getValue(studyEnvironmentVariable.getValue(), studyEnvironmentVariable.getPossibleValues());
 		}
 		return "";
 	}

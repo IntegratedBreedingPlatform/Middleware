@@ -19,18 +19,18 @@ public abstract class CategoricalKeyCodeResolverBase implements KeyComponentValu
 
 	protected OntologyVariableDataManager ontologyVariableDataManager;
 
-	protected final List<MeasurementVariable> conditions;
+	protected final List<MeasurementVariable> studyEnvironmentVariables;
 	protected final Collection<ObservationUnitData> observations;
 	protected final Map<Integer, MeasurementVariable> environmentVariablesByTermId;
 
 	public CategoricalKeyCodeResolverBase(final OntologyVariableDataManager ontologyVariableDataManager,
-		final List<MeasurementVariable> conditions, final Collection<ObservationUnitData> observations,
+		final List<MeasurementVariable> studyEnvironmentVariables, final Collection<ObservationUnitData> observations,
 		final Map<Integer, MeasurementVariable> environmentVariablesByTermId) {
 
 		this.ontologyVariableDataManager = ontologyVariableDataManager;
 		this.observations = observations;
 		this.environmentVariablesByTermId = environmentVariablesByTermId;
-		this.conditions = conditions;
+		this.studyEnvironmentVariables = studyEnvironmentVariables;
 	}
 
 	protected abstract TermId getKeyCodeId();
@@ -41,7 +41,7 @@ public abstract class CategoricalKeyCodeResolverBase implements KeyComponentValu
 
 	protected abstract String getValueFromObservationUnitData(ObservationUnitData observationUnitData);
 
-	protected abstract String getValueFromTrialConditions(MeasurementVariable trialCondition);
+	protected abstract String getValueFromStudyEnvironmentVariable(MeasurementVariable studyEnvironmentVariable);
 
 	@Override
 	public String resolve() {
@@ -49,8 +49,8 @@ public abstract class CategoricalKeyCodeResolverBase implements KeyComponentValu
 
 		MeasurementVariable measurementVariable = null;
 
-		if (this.conditions != null) {
-			for (final MeasurementVariable mv : this.conditions) {
+		if (this.studyEnvironmentVariables != null) {
+			for (final MeasurementVariable mv : this.studyEnvironmentVariables) {
 				if (mv.getTermId() == this.getKeyCodeId().getId()) {
 					measurementVariable = mv;
 				}
@@ -80,10 +80,10 @@ public abstract class CategoricalKeyCodeResolverBase implements KeyComponentValu
 				}
 			}
 		}
-		if (StringUtils.isBlank(resolvedValue) && this.conditions != null) {
-			for (final MeasurementVariable trialCondition : this.conditions) {
-				if (trialCondition.getTermId() == this.getKeyCodeId().getId()) {
-					resolvedValue = this.getValueFromTrialConditions(trialCondition);
+		if (StringUtils.isBlank(resolvedValue) && this.studyEnvironmentVariables != null) {
+			for (final MeasurementVariable studyEnvironmentVariable : this.studyEnvironmentVariables) {
+				if (studyEnvironmentVariable.getTermId() == this.getKeyCodeId().getId()) {
+					resolvedValue = this.getValueFromStudyEnvironmentVariable(studyEnvironmentVariable);
 					break;
 				}
 			}

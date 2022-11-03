@@ -43,7 +43,7 @@ public class SeedSourceGenerator {
 	}
 
 	public String generateSeedSource(final Collection<ObservationUnitData> observations,
-		final List<MeasurementVariable> conditions, final String selectionNumber,
+		final List<MeasurementVariable> studyEnvironmentVariables, final String selectionNumber,
 		final String plotNumber, final String studyName, final String plantNumber, final Map<String, String> locationIdNameMap,
 		final Map<Integer, StudyInstance> studyInstanceMap,
 		final List<MeasurementVariable> environmentVariables) {
@@ -117,11 +117,11 @@ public class SeedSourceGenerator {
 		keyComponentValueResolvers.put(KeyComponent.SELECTION_NUMBER, selectionNumberResolver);
 		keyComponentValueResolvers.put(KeyComponent.PLANT_NO, plantNumberResolver);
 		keyComponentValueResolvers.put(KeyComponent.LOCATION,
-			new LocationResolver(conditions, observations, locationIdNameMap));
+			new LocationResolver(studyEnvironmentVariables, observations, locationIdNameMap));
 		keyComponentValueResolvers.put(KeyComponent.LABBR,
 			new LocationAbbreviationResolver(observations, studyInstanceMap));
 		keyComponentValueResolvers.put(KeyComponent.SEASON,
-			new SeasonResolver(this.ontologyVariableDataManager, conditions, observations,
+			new SeasonResolver(this.ontologyVariableDataManager, studyEnvironmentVariables, observations,
 				environmentVariablesByTermId));
 
 		return service.generateKey(new SeedSourceTemplateProvider(this.germplasmNamingProperties,

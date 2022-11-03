@@ -21,17 +21,17 @@ import java.util.stream.Collectors;
  */
 public class LocationResolver implements KeyComponentValueResolver {
 
-	protected final List<MeasurementVariable> conditions;
+	protected final List<MeasurementVariable> studyEnvironmentVariables;
 	protected final Collection<ObservationUnitData> observations;
 	protected final Map<String, String> locationIdNameMap;
 
 	private static final Logger LOG = LoggerFactory.getLogger(LocationResolver.class);
 
-	public LocationResolver(final List<MeasurementVariable> conditions, final Collection<ObservationUnitData> observations,
+	public LocationResolver(final List<MeasurementVariable> studyEnvironmentVariables, final Collection<ObservationUnitData> observations,
 		final Map<String, String> locationIdNameMap) {
 
 		this.observations = observations;
-		this.conditions = conditions;
+		this.studyEnvironmentVariables = studyEnvironmentVariables;
 		this.locationIdNameMap = locationIdNameMap;
 	}
 
@@ -39,25 +39,19 @@ public class LocationResolver implements KeyComponentValueResolver {
 	public String resolve() {
 		String location = "";
 
-		ImmutableMap<Integer, MeasurementVariable> conditionsMap = null;
-		if (this.conditions != null) {
-			conditionsMap = Maps.uniqueIndex(this.conditions, new Function<MeasurementVariable, Integer>() {
-
-				@Override
-				public Integer apply(final MeasurementVariable measurementVariable) {
-					return measurementVariable.getTermId();
-				}
-			});
+		ImmutableMap<Integer, MeasurementVariable> studyEnvironmentVariablesByTermId = null;
+		if (this.studyEnvironmentVariables != null) {
+			studyEnvironmentVariablesByTermId = Maps.uniqueIndex(this.studyEnvironmentVariables, MeasurementVariable::getTermId);
 		}
 
-		if (conditionsMap != null) {
+		if (studyEnvironmentVariablesByTermId != null) {
 			// FIXME See IBP-2575
-			if (conditionsMap.containsKey(TermId.LOCATION_ABBR.getId())) {
-				location = conditionsMap.get(TermId.LOCATION_ABBR.getId()).getValue();
-			} else if (conditionsMap.containsKey(TermId.TRIAL_LOCATION.getId())) {
-				location = conditionsMap.get(TermId.TRIAL_LOCATION.getId()).getValue();
+			if (studyEnvironmentVariablesByTermId.containsKey(TermId.LOCATION_ABBR.getId())) {
+				location = studyEnvironmentVariablesByTermId.get(TermId.LOCATION_ABBR.getId()).getValue();
+			} else if (studyEnvironmentVariablesByTermId.containsKey(TermId.TRIAL_LOCATION.getId())) {
+				location = studyEnvironmentVariablesByTermId.get(TermId.TRIAL_LOCATION.getId()).getValue();
 			} else {
-				location = conditionsMap.get(TermId.TRIAL_INSTANCE_FACTOR.getId()).getValue();
+				location = studyEnvironmentVariablesByTermId.get(TermId.TRIAL_INSTANCE_FACTOR.getId()).getValue();
 			}
 		}
 
@@ -68,8 +62,8 @@ public class LocationResolver implements KeyComponentValueResolver {
 
 			if (dataListMap.containsKey(TermId.LOCATION_ABBR.getId())) {
 				location = dataListMap.get(TermId.LOCATION_ABBR.getId()).getValue();
-			} else if (conditionsMap != null && conditionsMap.containsKey(TermId.LOCATION_ABBR.getId())) {
-				location = conditionsMap.get(TermId.LOCATION_ABBR.getId()).getValue();
+			} else if (studyEnvironmentVariablesByTermId != null && studyEnvironmentVariablesByTermId.containsKey(TermId.LOCATION_ABBR.getId())) {
+				location = studyEnvironmentVariablesByTermId.get(TermId.LOCATION_ABBR.getId()).getValue();
 			} else if (dataListMap.containsKey(TermId.LOCATION_ID.getId())) {
 				final String locationId = dataListMap.get(TermId.LOCATION_ID.getId()).getValue();
 				location = this.locationIdNameMap.get(locationId);
