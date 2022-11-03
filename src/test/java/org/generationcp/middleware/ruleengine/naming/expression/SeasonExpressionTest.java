@@ -2,7 +2,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import junit.framework.Assert;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ public class SeasonExpressionTest extends TestExpression {
 	public void testSeasonAsPrefix() throws Exception {
 		LOG.debug("Testing Season As Prefix");
 		SeasonExpression expression = new SeasonExpression();
-		AdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", null, "[SEASON]", null, null, true);
+		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", null, "[SEASON]", null, null, true);
 		List<StringBuilder> values = this.createInitialValues(source);
 		expression.apply(values, source, null);
 		this.printResult(values, source);
@@ -30,7 +30,7 @@ public class SeasonExpressionTest extends TestExpression {
 	public void testSeasonAsSuffix() throws Exception {
 		LOG.debug("Testing Season As Suffix");
 		SeasonExpression expression = new SeasonExpression();
-		AdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", ":", null, null, "[SEASON]", true);
+		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", ":", null, null, "[SEASON]", true);
 		List<StringBuilder> values = this.createInitialValues(source);
 		expression.apply(values, source, null);
 		this.printResult(values, source);
@@ -43,7 +43,7 @@ public class SeasonExpressionTest extends TestExpression {
 		String defSeason = f.format(new Date());
 		LOG.debug("Testing No Season");
 		SeasonExpression expression = new SeasonExpression();
-		AdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", "-", null, null, "[SEASON]", true);
+		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", "-", null, null, "[SEASON]", true);
 		source.setSeason(null);
 		List<StringBuilder> values = this.createInitialValues(source);
 		expression.apply(values, source, null);
@@ -54,7 +54,7 @@ public class SeasonExpressionTest extends TestExpression {
 	@Test
 	public void testCaseSensitive() throws Exception {
 		SeasonExpression expression = new SeasonExpression();
-		AdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", null, "[seasOn]", null, null, true);
+		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", null, "[seasOn]", null, null, true);
 		List<StringBuilder> values = this.createInitialValues(source);
 		expression.apply(values, source, null);
 		LOG.debug("Testing process code is in lower case");

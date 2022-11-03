@@ -28,9 +28,8 @@ import java.util.List;
 /**
  * The POJO containing information needed for Advancing.
  */
-
 @Deprecated
-public class AdvancingSource extends AbstractAdvancingSource {
+public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 
 	private ImportedGermplasm germplasm;
 
@@ -53,7 +52,7 @@ public class AdvancingSource extends AbstractAdvancingSource {
 
 	private List<SampleDTO> samples = new ArrayList<>();
 
-	public AdvancingSource(final ImportedGermplasm germplasm, final List<Name> names, final Integer plantsSelected,
+	public DeprecatedAdvancingSource(final ImportedGermplasm germplasm, final List<Name> names, final Integer plantsSelected,
 		final Method breedingMethod,
 		final String studyName, final String plotNumber) {
 		super();
@@ -65,12 +64,12 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		this.plotNumber = plotNumber;
 	}
 
-	public AdvancingSource(final ImportedGermplasm germplasm) {
+	public DeprecatedAdvancingSource(final ImportedGermplasm germplasm) {
 		super();
 		this.germplasm = germplasm;
 	}
 
-	public AdvancingSource() {
+    public DeprecatedAdvancingSource() {
 		super();
 	}
 
@@ -236,9 +235,9 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		this.breedingMethodId = breedingMethodId;
 	}
 
-	public AdvancingSource copy() {
-		final AdvancingSource source = new AdvancingSource(germplasm, this.names, this.plantsSelected, this.breedingMethod,
-			studyName, this.plotNumber);
+	public DeprecatedAdvancingSource copy() {
+        final DeprecatedAdvancingSource
+			source = new DeprecatedAdvancingSource(germplasm, this.names, this.plantsSelected, this.breedingMethod, this.studyName, this.plotNumber);
 		source.setSeason(this.season);
 		source.setLocationAbbreviation(this.locationAbbreviation);
 		source.setRootName(this.rootName);

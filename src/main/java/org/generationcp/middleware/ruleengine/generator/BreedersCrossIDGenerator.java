@@ -15,12 +15,14 @@ import org.generationcp.middleware.ruleengine.resolver.ProjectPrefixResolver;
 import org.generationcp.middleware.ruleengine.resolver.SeasonResolver;
 import org.generationcp.middleware.ruleengine.service.GermplasmNamingProperties;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,20 +69,21 @@ public class BreedersCrossIDGenerator {
 					}
 				});
 
+		final Collection<ObservationUnitData> observations = observationUnitRow.getVariables().values();
 		final Map<KeyComponent, KeyComponentValueResolver> keyComponentValueResolvers = new HashMap<>();
 		keyComponentValueResolvers.put(KeyComponent.PROJECT_PREFIX,
-			new ProjectPrefixResolver(this.ontologyVariableDataManager, conditions, observationUnitRow,
+			new ProjectPrefixResolver(this.ontologyVariableDataManager, conditions, observations,
 				environmentVariablesByTermId));
 		keyComponentValueResolvers.put(KeyComponent.HABITAT_DESIGNATION,
-			new HabitatDesignationResolver(this.ontologyVariableDataManager, conditions, observationUnitRow,
+			new HabitatDesignationResolver(this.ontologyVariableDataManager, conditions, observations,
 				environmentVariablesByTermId));
 		keyComponentValueResolvers.put(KeyComponent.SEASON,
-			new SeasonResolver(this.ontologyVariableDataManager, conditions, observationUnitRow,
+			new SeasonResolver(this.ontologyVariableDataManager, conditions, observations,
 				environmentVariablesByTermId));
 		keyComponentValueResolvers.put(KeyComponent.LOCATION,
-				new LocationResolver(conditions, observationUnitRow, locationIdNameMap));
+				new LocationResolver(conditions, observations, locationIdNameMap));
 		keyComponentValueResolvers.put(KeyComponent.LABBR,
-			new LocationAbbreviationResolver(observationUnitRow, studyInstanceMap));
+			new LocationAbbreviationResolver(observations, studyInstanceMap));
 		return service
 				.generateKey(new BreedersCrossIDTemplateProvider(this.germplasmNamingProperties), keyComponentValueResolvers);
 	}

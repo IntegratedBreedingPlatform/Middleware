@@ -33,6 +33,7 @@ import org.generationcp.middleware.ruleengine.naming.service.NamingConventionSer
 import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -63,6 +64,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -539,8 +541,13 @@ public class AdvanceServiceImpl implements AdvanceService {
 			seedSourceSelectionNumber = String.valueOf(selectionNumber);
 		}
 
+		// To prevent a NPE, filter the observations variables that they don't have a variableId assigned, like PARENT_OBS_UNIT_ID
+		final List<ObservationUnitData> plotObservations =
+			row.getVariables().values().stream().filter(observationUnitData -> Objects.nonNull(observationUnitData.getVariableId()))
+				.collect(
+					Collectors.toList());
 		return this.seedSourceGenerator
-			.generateSeedSource(row, studyEnvironmentVariables, seedSourceSelectionNumber, plotNumber,
+			.generateSeedSource(plotObservations, studyEnvironmentVariables, seedSourceSelectionNumber, plotNumber,
 				studyName, sampleNo, locationNameByIds, studyInstancesByInstanceNumber,
 				environmentVariables);
 	}

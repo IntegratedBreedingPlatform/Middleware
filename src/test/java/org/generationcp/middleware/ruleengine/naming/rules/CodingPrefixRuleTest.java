@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ public class CodingPrefixRuleTest extends BaseNamingRuleTest {
 		this.breedingMethodSnameType = 5;
 		this.breedingMethod = new Method();
 		this.breedingMethod.setSnametype(this.breedingMethodSnameType);
-		this.row = new AdvancingSource();
+		this.row = new DeprecatedAdvancingSource();
 		this.row.setBreedingMethod(this.breedingMethod);
 		this.testGermplasmName = "CMT1234-";
 		this.rule = new PrefixRule();

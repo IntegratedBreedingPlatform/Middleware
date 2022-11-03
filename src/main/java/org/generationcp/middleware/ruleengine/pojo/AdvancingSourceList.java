@@ -19,7 +19,7 @@ import java.util.List;
 @Deprecated
 public class AdvancingSourceList {
 
-	private List<AdvancingSource> rows;
+	private List<DeprecatedAdvancingSource> rows;
 
 	public AdvancingSourceList() {
 	}
@@ -27,14 +27,14 @@ public class AdvancingSourceList {
 	/**
 	 * @return the rows
 	 */
-	public List<AdvancingSource> getRows() {
+	public List<DeprecatedAdvancingSource> getRows() {
 		return this.rows;
 	}
 
 	/**
 	 * @param rows the rows to set
 	 */
-	public void setRows(List<AdvancingSource> rows) {
+	public void setRows(List<DeprecatedAdvancingSource> rows) {
 		this.rows = rows;
 	}
 
