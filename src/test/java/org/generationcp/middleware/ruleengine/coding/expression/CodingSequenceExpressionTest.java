@@ -14,13 +14,13 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class SequenceExpressionTest {
+public class CodingSequenceExpressionTest {
 
 	private static final Integer NEXT_NUMBER_FROM_DB = 22;
 	private static final String PREFIX = "XYZ";
 	private static final String SEQUENCE = "[SEQUENCE]";
 	private static final String SUFFIX = "T";
-	private final SequenceExpression sequenceExpression = new SequenceExpression();
+	private final CodingSequenceExpression codingSequenceExpression = new CodingSequenceExpression();
 	private final NamingConfiguration namingConfiguration = new NamingConfiguration();
 
 	@Mock
@@ -29,7 +29,7 @@ public class SequenceExpressionTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		this.sequenceExpression.setGermplasmNamingService(this.germplasmNamingService);
+		this.codingSequenceExpression.setGermplasmNamingService(this.germplasmNamingService);
 
 		this.namingConfiguration.setPrefix(PREFIX);
 		this.namingConfiguration.setCount(SEQUENCE);
@@ -47,7 +47,7 @@ public class SequenceExpressionTest {
 		final Integer count = 1;
 		final List<StringBuilder> values = this.createInitialValues(this.namingConfiguration, count);
 
-		this.sequenceExpression.apply(values, "", this.namingConfiguration);
+		this.codingSequenceExpression.apply(values, "", this.namingConfiguration);
 		assertEquals(count.intValue(), values.size());
 		assertEquals(PREFIX + NEXT_NUMBER_FROM_DB + SUFFIX, values.get(0).toString());
 	}
@@ -57,7 +57,7 @@ public class SequenceExpressionTest {
 		final Integer count = 3;
 		final List<StringBuilder> values = this.createInitialValues(this.namingConfiguration, count);
 
-		this.sequenceExpression.apply(values, "", this.namingConfiguration);
+		this.codingSequenceExpression.apply(values, "", this.namingConfiguration);
 		assertEquals(count.intValue(), values.size());
 		assertEquals(PREFIX + NEXT_NUMBER_FROM_DB + SUFFIX, values.get(0).toString());
 		assertEquals(PREFIX + (NEXT_NUMBER_FROM_DB + 1) + SUFFIX, values.get(1).toString());
