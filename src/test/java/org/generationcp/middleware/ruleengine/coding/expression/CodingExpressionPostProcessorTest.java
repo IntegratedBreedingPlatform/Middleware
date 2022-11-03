@@ -23,7 +23,7 @@ public class CodingExpressionPostProcessorTest {
 
 	@Test
 	public void testPostProcessAfterInitialization() {
-		BaseCodingExpression expression = new SequenceExpression();
+		BaseCodingExpression expression = new CodingSequenceExpression();
 		codingExpressionPostProcessor.postProcessAfterInitialization(expression, null);
 		verify(codingExpressionFactory).addExpression(expression);
 

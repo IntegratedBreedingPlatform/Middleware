@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class SequenceExpressionTest extends TestExpression {
+public class CodingSequenceExpressionTest extends TestExpression {
 
 	private static final String ROOT_NAME = "GERMPLASM_TEST";
 	private static final String SEPARATOR = "-";

@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class PaddedSequenceExpressionTest extends TestExpression {
+public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 
 	private static final String ROOT_NAME = "TESTING";
 	private static final String SEPARATOR = "-";
@@ -49,7 +49,7 @@ public class PaddedSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testExpressionRegex() {
-		Assert.assertTrue(PaddedSequenceExpressionTest.PADSEQ.matches(this.expression.getExpressionKey()));
+		Assert.assertTrue(CodingPaddedCodingSequenceExpressionTest.PADSEQ.matches(this.expression.getExpressionKey()));
 		Assert.assertTrue("[PADSEQ.2]".matches(this.expression.getExpressionKey()));
 		Assert.assertTrue("[PADSEQ.23]".matches(this.expression.getExpressionKey()));
 		Assert.assertFalse("[PADSEQ.AB2]".matches(this.expression.getExpressionKey()));
@@ -132,7 +132,7 @@ public class PaddedSequenceExpressionTest extends TestExpression {
 	@Test
 	public void testApplyWithNumberOfDigitsSpecified() {
 		final Integer numberofDigits = 5;
-		final String processCode = String.format(PaddedSequenceExpressionTest.PADSEQ_WITH_NUMBER, numberofDigits);
+		final String processCode = String.format(CodingPaddedCodingSequenceExpressionTest.PADSEQ_WITH_NUMBER, numberofDigits);
 		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, processCode, SUFFIX, false);
 		source.setPlantsSelected(PLANTS_SELECTED);
 

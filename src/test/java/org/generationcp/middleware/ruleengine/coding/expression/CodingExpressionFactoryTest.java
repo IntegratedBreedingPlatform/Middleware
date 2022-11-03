@@ -14,7 +14,7 @@ public class CodingExpressionFactoryTest {
 	public void init() {
 
 		this.factory.init();
-		this.factory.addExpression(new SequenceExpression());
+		this.factory.addExpression(new CodingSequenceExpression());
 	}
 
 	@Test

@@ -17,28 +17,30 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CountRuleTest {
+public class CodingSuffixRuleTest {
 
 	@Mock
 	private CodingExpressionResolver codingExpressionResolver;
 
 	@InjectMocks
-	private CountRule countRule;
+	private CodingSuffixRule codingSuffixRule;
 
 	@Test
 	public void testRunRule() throws RuleException {
 
+		final String suffix = "XYZ";
+
 		final List<String> sequenceOrder = new ArrayList<>();
 		final NamingConfiguration namingConfiguration = new NamingConfiguration();
-		namingConfiguration.setCount("[SEQUENCE]");
+
+		namingConfiguration.setSuffix(suffix);
 		final CodingRuleExecutionContext context = new CodingRuleExecutionContext(sequenceOrder, namingConfiguration);
-		context.setCurrentData("CML");
+		context.setCurrentData("");
 
-		final String resolvedValue = "CML1";
-		Mockito.when(codingExpressionResolver.resolve(context.getCurrentData(), namingConfiguration.getCount(), namingConfiguration))
-				.thenReturn(Arrays.asList(resolvedValue));
+		Mockito.when(codingExpressionResolver.resolve(context.getCurrentData(), namingConfiguration.getSuffix(), namingConfiguration))
+				.thenReturn(Arrays.asList(suffix));
 
-		assertEquals(resolvedValue, this.countRule.runRule(context));
+		assertEquals(suffix, this.codingSuffixRule.runRule(context));
 	}
 
 }

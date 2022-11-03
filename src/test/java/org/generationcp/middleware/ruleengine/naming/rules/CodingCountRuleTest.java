@@ -14,7 +14,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CountRuleTest extends BaseNamingRuleTest {
+public class CodingCountRuleTest extends BaseNamingRuleTest {
 
 	private Rule rule;
 	private Method breedingMethod;
