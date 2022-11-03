@@ -237,12 +237,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.PLOT_DATA.getId()).stream()
 				.collect(Collectors.toMap(plotDataset -> plotDataset.getStudy().getProjectId(), Function.identity()));
 		// TODO: Adding OBS_UNIT_ID if it does not exist in projectprop.
-		this.checkIfExistsObsUniIdVariable(trialIdPlotDatasetMap);
+		this.addObsUnitIdVariableIfNotPresent(trialIdPlotDatasetMap);
 		final Map<Integer, DmsProject> trialIdMeansDatasetMap =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.MEANS_DATA.getId()).stream()
 				.collect(Collectors.toMap(plotDataset -> plotDataset.getStudy().getProjectId(), Function.identity()));
 		// TODO: Adding OBS_UNIT_ID if it does not exist in projectprop.
-		this.checkIfExistsObsUniIdVariable(trialIdMeansDatasetMap);
+		this.addObsUnitIdVariableIfNotPresent(trialIdMeansDatasetMap);
 		final Map<Integer, List<Integer>> plotExperimentVariablesMap = this.populatePlotExperimentVariablesMap(trialIdPlotDatasetMap);
 
 		final Map<String, MeasurementVariable> variableNamesMap =
@@ -321,7 +321,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		return observationUnitDbIds;
 	}
 
-	private void checkIfExistsObsUniIdVariable(final Map<Integer, DmsProject> plotDatasetMap) {
+	private void addObsUnitIdVariableIfNotPresent(final Map<Integer, DmsProject> plotDatasetMap) {
 		for (final Map.Entry<Integer, DmsProject> plotDatasetEntry : plotDatasetMap.entrySet()) {
 			final DmsProject plotDataset = plotDatasetEntry.getValue();
 			if (!plotDataset.getProperties().stream() //
