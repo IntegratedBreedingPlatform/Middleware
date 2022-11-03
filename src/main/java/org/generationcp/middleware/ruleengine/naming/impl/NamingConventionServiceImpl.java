@@ -90,8 +90,7 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 						throw new MiddlewareQueryException("error.save.resulting.name.exceeds.limit");
 					}
 					germplasm.setDesig(name);
-					final Name derivativeName = this.createDerivativeName(name);
-					germplasm.setNames(Arrays.asList(derivativeName));
+					this.assignNames(germplasm);
 				}
 
 				// Pass the key sequence map to the next entry to process
@@ -101,11 +100,24 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 		timer.stop();
 	}
 
+	@Deprecated
+	protected void assignNames(final ImportedGermplasm germplasm) {
+		final List<Name> names = new ArrayList<>();
+
+		final Name name = new Name();
+		name.setTypeId(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID());
+		name.setNval(germplasm.getDesig());
+		name.setNstat(1);
+		names.add(name);
+
+		germplasm.setNames(names);
+	}
+
 	@Override
 	public void generateAdvanceListName(final List<NewAdvancingSource> advancingSources) throws RuleException {
 
 		Map<String, Integer> keySequenceMap = new HashMap<>();
-		for(final NewAdvancingSource advancingSource : advancingSources) {
+		for (final NewAdvancingSource advancingSource : advancingSources) {
 
 			advancingSource.setKeySequenceMap(keySequenceMap);
 
@@ -117,23 +129,17 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 				if (generatedName.length() > NAME_MAX_LENGTH) {
 					throw new MiddlewareQueryException("error.save.resulting.name.exceeds.limit");
 				}
-				final Name derivativeName = this.createDerivativeName(generatedName);
 				final Germplasm germplasm = advancingSource.getAdvancedGermplasms().get(i);
+				final Name derivativeName =
+					new Name(null, germplasm, GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), 1, generatedName,
+						germplasm.getLocationId(), germplasm.getGdate(), 0);
+
 				germplasm.getNames().add(derivativeName);
-				derivativeName.setGermplasm(germplasm);
 			});
 
 			// Pass the key sequence map to the next entry to process
 			keySequenceMap = advancingSource.getKeySequenceMap();
 		}
-	}
-
-	protected Name createDerivativeName(final String value) {
-		final Name name = new Name();
-		name.setTypeId(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID());
-		name.setNval(value);
-		name.setNstat(1);
-		return name;
 	}
 
 	@Override
