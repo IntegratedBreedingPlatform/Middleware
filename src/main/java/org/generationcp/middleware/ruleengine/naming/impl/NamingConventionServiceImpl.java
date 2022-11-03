@@ -159,14 +159,14 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 		// The [SEQUENCE] code does not read this number but instead queries from the DB the next available number
 		int previousMaxSequence = 0;
 		Map<String, Integer> keySequenceMap = new HashMap<>();
-		for (final DeprecatedAdvancingSource deprecatedAdvancingSource : rows.getRows()) {
+		for (final DeprecatedAdvancingSource advancingSource : rows.getRows()) {
 
 			final ImportedCross importedCross = importedCrosses.get(index++);
 			final List<String> names;
-			deprecatedAdvancingSource.setCurrentMaxSequence(previousMaxSequence);
-			deprecatedAdvancingSource.setKeySequenceMap(keySequenceMap);
+			advancingSource.setCurrentMaxSequence(previousMaxSequence);
+			advancingSource.setKeySequenceMap(keySequenceMap);
 
-			final Integer breedingMethodId = deprecatedAdvancingSource.getBreedingMethodId();
+			final Integer breedingMethodId = advancingSource.getBreedingMethodId();
 			final Method selectedMethod = breedingMethodMap.get(breedingMethodId);
 
 			if (!this.germplasmDataManager.isMethodNamingConfigurationValid(selectedMethod)) {
@@ -182,28 +182,28 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 			}
 
 			// here, we resolve the breeding method ID stored in the advancing source object into a proper breeding Method object
-			deprecatedAdvancingSource.setBreedingMethod(selectedMethod);
+			advancingSource.setBreedingMethod(selectedMethod);
 			//default plants selected value to 1 for list of crosses because sequence is not working if plants selected value is not set
-			deprecatedAdvancingSource.setPlantsSelected(1);
+			advancingSource.setPlantsSelected(1);
 
 			// pass the parent gids (female and male) of the imported cross, this is required to properly resolve the Backcross process codes.
-			deprecatedAdvancingSource
+			advancingSource
 				.setFemaleGid(StringUtils.isNumeric(importedCross.getFemaleGid()) ? Integer.valueOf(importedCross.getFemaleGid()) : 0);
 			// Always gets the first male parent, ie. GPID2
 			final String firstMaleGid = importedCross.getMaleGids().get(0).toString();
-			deprecatedAdvancingSource.setMaleGid(StringUtils.isNumeric(firstMaleGid) ? Integer.valueOf(firstMaleGid) : 0);
+			advancingSource.setMaleGid(StringUtils.isNumeric(firstMaleGid) ? Integer.valueOf(firstMaleGid) : 0);
 
 			final RuleExecutionContext namingExecutionContext =
-				this.setupNamingRuleExecutionContext(deprecatedAdvancingSource, checkForDuplicateName);
+				this.setupNamingRuleExecutionContext(advancingSource, checkForDuplicateName);
 			names = (List<String>) this.rulesService.runRules(namingExecutionContext);
 
 			// Save away the current max sequence once rules have been run for this entry.
-			previousMaxSequence = deprecatedAdvancingSource.getCurrentMaxSequence() + 1;
+			previousMaxSequence = advancingSource.getCurrentMaxSequence() + 1;
 			for (final String name : names) {
 				importedCross.setDesig(name);
 			}
 			// Pass the key sequence map to the next entry to process
-			keySequenceMap = deprecatedAdvancingSource.getKeySequenceMap();
+			keySequenceMap = advancingSource.getKeySequenceMap();
 		}
 		timer.stop();
 		return importedCrosses;
