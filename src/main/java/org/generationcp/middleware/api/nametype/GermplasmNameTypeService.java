@@ -14,7 +14,7 @@ public interface GermplasmNameTypeService {
 
 	Optional<GermplasmNameTypeDTO> getNameTypeById(Integer id);
 
-	Optional<List<GermplasmNameTypeDTO>> getNameTypesByNameTypeListIds(Set<Integer> ids);
+	List<GermplasmNameTypeDTO> getNameTypesByNameTypeListIds(Set<Integer> ids);
 
 	Integer createNameType(GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO);
 
