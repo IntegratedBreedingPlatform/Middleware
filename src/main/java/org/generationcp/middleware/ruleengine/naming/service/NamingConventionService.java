@@ -28,7 +28,7 @@ import java.util.List;
  */
 public interface NamingConventionService {
 
-	void generateAdvanceListNames(List<DeprecatedAdvancingSource> deprecatedAdvancingSourceItems, boolean checkForDuplicateName, List<ImportedGermplasm> germplasmList) throws
+	void generateAdvanceListNames(List<DeprecatedAdvancingSource> advancingSourceItems, boolean checkForDuplicateName, List<ImportedGermplasm> germplasmList) throws
 		MiddlewareQueryException, RuleException;
 
 	/*
