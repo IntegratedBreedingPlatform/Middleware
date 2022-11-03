@@ -12,7 +12,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SuffixRuleTest extends BaseNamingRuleTest {
+public class CodingSuffixRuleTest extends BaseNamingRuleTest {
 
 	private SuffixRule rule;
 	private Method breedingMethod;

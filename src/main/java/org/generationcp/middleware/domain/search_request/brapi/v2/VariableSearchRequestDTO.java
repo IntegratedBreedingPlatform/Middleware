@@ -22,6 +22,7 @@ public class VariableSearchRequestDTO extends SearchRequestDto {
     private List<String> studyDbId;
     private List<String> traitClasses;
     private List<String> traitDbIds;
+    private Boolean filterObsoletes = false;
 
     public VariableSearchRequestDTO() {
 
@@ -145,6 +146,14 @@ public class VariableSearchRequestDTO extends SearchRequestDto {
 
     public void setTraitDbIds(final List<String> traitDbIds) {
         this.traitDbIds = traitDbIds;
+    }
+
+    public Boolean isFilterObsoletes() {
+        return this.filterObsoletes;
+    }
+
+    public void setFilterObsoletes(final Boolean filterObsoletes) {
+        this.filterObsoletes = filterObsoletes;
     }
 
     @Override
