@@ -16,7 +16,7 @@ import org.generationcp.middleware.ruleengine.naming.rules.EnforceUniqueNameRule
 import org.generationcp.middleware.ruleengine.naming.rules.NamingRuleExecutionContext;
 import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSourceList;
 import org.generationcp.middleware.ruleengine.pojo.ImportedCross;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
@@ -64,7 +64,7 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 	@SuppressWarnings("unchecked")
 	@Deprecated
 	@Override
-	public void generateAdvanceListNames(final List<AdvancingSource> advancingSourceItems, final boolean checkForDuplicateName,
+	public void generateAdvanceListNames(final List<DeprecatedAdvancingSource> deprecatedAdvancingSourceItems, final boolean checkForDuplicateName,
 		final List<ImportedGermplasm> germplasmList) throws MiddlewareQueryException, RuleException {
 
 		final TimerWatch timer = new TimerWatch("advance");
@@ -72,7 +72,7 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 
 		Map<String, Integer> keySequenceMap = new HashMap<>();
 		final Iterator<ImportedGermplasm> germplasmIterator = germplasmList.iterator();
-		for (final AdvancingSource row : advancingSourceItems) {
+		for (final DeprecatedAdvancingSource row : deprecatedAdvancingSourceItems) {
 			if (row.getGermplasm() != null && row.getPlantsSelected() != null && row.getBreedingMethod() != null
 				&& row.getPlantsSelected() > 0 && row.getBreedingMethod().isBulkingMethod() != null) {
 				row.setKeySequenceMap(keySequenceMap);
@@ -128,7 +128,7 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 		// The [SEQUENCE] code does not read this number but instead queries from the DB the next available number
 		int previousMaxSequence = 0;
 		Map<String, Integer> keySequenceMap = new HashMap<>();
-		for (final AdvancingSource advancingSource : rows.getRows()) {
+		for (final DeprecatedAdvancingSource advancingSource : rows.getRows()) {
 
 			final ImportedCross importedCross = importedCrosses.get(index++);
 			final List<String> names;
@@ -178,7 +178,7 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 		return importedCrosses;
 	}
 
-	protected RuleExecutionContext setupNamingRuleExecutionContext(final AdvancingSource row, final boolean checkForDuplicateName) {
+	protected RuleExecutionContext setupNamingRuleExecutionContext(final DeprecatedAdvancingSource row, final boolean checkForDuplicateName) {
 		List<String> sequenceList = Arrays.asList(this.ruleFactory.getRuleSequenceForNamespace("naming"));
 
 		if (checkForDuplicateName) {

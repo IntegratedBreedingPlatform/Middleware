@@ -6,7 +6,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.pojo.AdvanceGermplasmChangeDetail;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +36,7 @@ public class EnforceUniqueNameRuleTest {
 	private GermplasmDataManager germplasmDataManager;
 
 	@Mock
-	private AdvancingSource source;
+	private DeprecatedAdvancingSource source;
 
 	@Mock
 	private Method breedingMethod;

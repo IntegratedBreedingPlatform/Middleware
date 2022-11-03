@@ -2,7 +2,7 @@
 package org.generationcp.middleware.ruleengine.naming.rules;
 
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -20,7 +20,7 @@ public abstract class BaseNamingRuleTest {
 	@Resource
 	protected ProcessCodeService processCodeService;
 
-	protected AdvancingSource row;
+	protected DeprecatedAdvancingSource row;
 
 	protected NamingRuleExecutionContext createExecutionContext(List<String> input) {
 		return new NamingRuleExecutionContext(null, this.processCodeService, this.row, null, input);

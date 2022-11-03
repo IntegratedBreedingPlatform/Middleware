@@ -4,7 +4,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import org.apache.commons.lang3.BooleanUtils;
 import org.generationcp.middleware.ruleengine.ExpressionUtils;
 import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +33,7 @@ public class SequenceExpression extends BaseExpression implements Expression {
 	}
 
 	@Override
-	public void apply(final List<StringBuilder> values, final AdvancingSource source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final DeprecatedAdvancingSource source, final String capturedText) {
 
 		final List<StringBuilder> newNames = new ArrayList<>();
 

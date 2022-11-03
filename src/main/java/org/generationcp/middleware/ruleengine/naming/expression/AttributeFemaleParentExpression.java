@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ public class AttributeFemaleParentExpression extends AttributeExpression {
 	private GermplasmDataManager germplasmDataManager;
 
 	@Override
-	public void apply(final List<StringBuilder> values, final AdvancingSource source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final DeprecatedAdvancingSource source, final String capturedText) {
 
 		final Method breedingMethod = source.getBreedingMethod();
 		Integer gpid1 = null;

@@ -2,7 +2,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +28,8 @@ public class DoubleHaploidSourceExpressionTest extends TestExpression {
 	 */
     @Test
     public void testDesignationValueWithLastUsedSequenceNumberForDoubleHaploid() throws MiddlewareException {
-		AdvancingSource source = this.createAdvancingSourceTestData("(CML454 X CML451)-B-3-1-1@0", null, null, null, "[DHSOURCE]", false);
+		DeprecatedAdvancingSource
+			source = this.createAdvancingSourceTestData("(CML454 X CML451)-B-3-1-1@0", null, null, null, "[DHSOURCE]", false);
 
 		List<StringBuilder> values = this.createInitialValues(source);
 
@@ -45,7 +46,8 @@ public class DoubleHaploidSourceExpressionTest extends TestExpression {
 	 */
 	@Test
 	public void testDesignationValueWithoutLastUsedSequenceNumberForDoubleHaploid() throws MiddlewareException {
-		AdvancingSource source = this.createAdvancingSourceTestData("(CML454 X CML451)-B-3-1-1", "-", "DH", null, "[DHSOURCE]", false);
+		DeprecatedAdvancingSource
+			source = this.createAdvancingSourceTestData("(CML454 X CML451)-B-3-1-1", "-", "DH", null, "[DHSOURCE]", false);
 
 		List<StringBuilder> values = this.createInitialValues(source);
 

@@ -5,7 +5,7 @@ import junit.framework.Assert;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeServiceImpl;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,7 +26,7 @@ public class CodingSuffixRuleTest extends BaseNamingRuleTest {
 		this.breedingMethod = new Method();
 		this.breedingMethod.setSnametype(this.breedingMethodSnameType);
 		this.breedingMethod.setSuffix("test-suffix");
-		this.row = new AdvancingSource();
+		this.row = new DeprecatedAdvancingSource();
 		this.row.setBreedingMethod(this.breedingMethod);
 		this.testGermplasmName = "CMT1234-B-3-";
 		this.rule = new SuffixRule();

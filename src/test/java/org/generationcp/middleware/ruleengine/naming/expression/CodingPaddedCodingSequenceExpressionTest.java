@@ -2,7 +2,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.ruleengine.ExpressionUtils;
 import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +58,7 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testWithNegativeNumberPlantsSelected() {
-		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ, SUFFIX, true);
+		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ, SUFFIX, true);
 		source.setPlantsSelected(-2);
 		final List<StringBuilder> values = this.createInitialValues(source);
 
@@ -70,7 +70,8 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testCaseSensitiveKey() {
-		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ.toLowerCase(), SUFFIX, true);
+		final DeprecatedAdvancingSource
+			source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ.toLowerCase(), SUFFIX, true);
 		source.setPlantsSelected(PLANTS_SELECTED);
 		final List<StringBuilder> values = this.createInitialValues(source);
 
@@ -81,7 +82,7 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 	@Test
 	public void testWithNullPlantsSelected() {
 		// final false refers to nonBulking
-		final AdvancingSource source =
+		final DeprecatedAdvancingSource source =
 			this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ.toLowerCase(), SUFFIX, false);
 		source.setPlantsSelected(null);
 		final int currentMaxSequence = 10;
@@ -96,7 +97,7 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testBulkingWithPlantsSelected() {
-		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ, SUFFIX, true);
+		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ, SUFFIX, true);
 		source.setPlantsSelected(PLANTS_SELECTED);
 		final List<StringBuilder> values = this.createInitialValues(source);
 
@@ -108,7 +109,7 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 	@Test
 	public void testNonBulkingWithPlantsSelected() {
 		// final false refers to nonBulking
-		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ, SUFFIX, false);
+		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ, SUFFIX, false);
 		source.setPlantsSelected(PLANTS_SELECTED);
 		final int currentMaxSequence = 13;
 		source.setCurrentMaxSequence(currentMaxSequence);
@@ -133,7 +134,7 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 	public void testApplyWithNumberOfDigitsSpecified() {
 		final Integer numberofDigits = 5;
 		final String processCode = String.format(CodingPaddedCodingSequenceExpressionTest.PADSEQ_WITH_NUMBER, numberofDigits);
-		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, processCode, SUFFIX, false);
+		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, processCode, SUFFIX, false);
 		source.setPlantsSelected(PLANTS_SELECTED);
 
 		final List<StringBuilder> values = this.createInitialValues(source);
