@@ -7,28 +7,30 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Revolves Location value for Nurseries and Trials.
  */
 public class LocationResolver implements KeyComponentValueResolver {
 
-	protected List<MeasurementVariable> conditions;
-	protected ObservationUnitRow observationUnitRow;
-	protected Map<String, String> locationIdNameMap;
+	protected final List<MeasurementVariable> conditions;
+	protected final Collection<ObservationUnitData> observations;
+	protected final Map<String, String> locationIdNameMap;
 
 	private static final Logger LOG = LoggerFactory.getLogger(LocationResolver.class);
 
-	public LocationResolver(final List<MeasurementVariable> conditions, final ObservationUnitRow observationUnitRow,
+	public LocationResolver(final List<MeasurementVariable> conditions, final Collection<ObservationUnitData> observations,
 		final Map<String, String> locationIdNameMap) {
 
-		this.observationUnitRow = observationUnitRow;
+		this.observations = observations;
 		this.conditions = conditions;
 		this.locationIdNameMap = locationIdNameMap;
 	}
@@ -59,15 +61,10 @@ public class LocationResolver implements KeyComponentValueResolver {
 			}
 		}
 
-		if (this.observationUnitRow != null) {
-			final ImmutableMap<Integer, ObservationUnitData> dataListMap =
-					Maps.uniqueIndex(this.observationUnitRow.getVariables().values(), new Function<ObservationUnitData, Integer>() {
-
-						@Override
-						public Integer apply(final ObservationUnitData observationUnitData) {
-							return observationUnitData.getVariableId();
-						}
-					});
+		if (!CollectionUtils.isEmpty(this.observations)) {
+			final Map<Integer, ObservationUnitData> dataListMap =
+				this.observations.stream()
+					.collect(Collectors.toMap(ObservationUnitData::getVariableId, observationUnitData -> observationUnitData));
 
 			if (dataListMap.containsKey(TermId.LOCATION_ABBR.getId())) {
 				location = dataListMap.get(TermId.LOCATION_ABBR.getId()).getValue();

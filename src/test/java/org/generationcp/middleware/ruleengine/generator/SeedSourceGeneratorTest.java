@@ -119,34 +119,34 @@ public class SeedSourceGeneratorTest {
 
 		setCurrentCrop("rice");
 		String seedSource = this.seedSourceGenerator
-			.generateSeedSource(ObservationUnitUtils.fromMeasurementRow(workbook.getTrialObservationByTrialInstanceNo(1)), null, "2", "3",
+			.generateSeedSource(ObservationUnitUtils.fromMeasurementRow(workbook.getTrialObservationByTrialInstanceNo(1)).getVariables().values(), null, "2", "3",
 				studyDetails.getStudyName(), null, null, null, instance1Measurements.getMeasurementVariables());
 		Assert.assertEquals("TestStudy:IND:Dry season:3:", seedSource);
 
 		// with Plant Number
-		seedSource = this.seedSourceGenerator.generateSeedSource(ObservationUnitUtils.fromMeasurementRow(workbook.getTrialObservationByTrialInstanceNo(1)), null, "2", "3",
+		seedSource = this.seedSourceGenerator.generateSeedSource(ObservationUnitUtils.fromMeasurementRow(workbook.getTrialObservationByTrialInstanceNo(1)).getVariables().values(), null, "2", "3",
 			studyDetails.getStudyName(), "4", null, null, instance1Measurements.getMeasurementVariables());
 		Assert.assertEquals("TestStudy:IND:Dry season:3:4", seedSource);
 
 		setCurrentCrop("wheat");
-		seedSource = this.seedSourceGenerator.generateSeedSource(ObservationUnitUtils.fromMeasurementRow(workbook.getTrialObservationByTrialInstanceNo(1)), null, "2", "3",
+		seedSource = this.seedSourceGenerator.generateSeedSource(ObservationUnitUtils.fromMeasurementRow(workbook.getTrialObservationByTrialInstanceNo(1)).getVariables().values(), null, "2", "3",
 			studyDetails.getStudyName(), null, null, null, instance1Measurements.getMeasurementVariables());
 		Assert.assertEquals("IND\\Dry season\\TestStudy\\3", seedSource);
 
 		setCurrentCrop("maize");
 		// with selection number
-		seedSource = this.seedSourceGenerator.generateSeedSource(ObservationUnitUtils.fromMeasurementRow(workbook.getTrialObservationByTrialInstanceNo(1)), null, "2", "3",
+		seedSource = this.seedSourceGenerator.generateSeedSource(ObservationUnitUtils.fromMeasurementRow(workbook.getTrialObservationByTrialInstanceNo(1)).getVariables().values(), null, "2", "3",
 			studyDetails.getStudyName(), null, null, null, instance1Measurements.getMeasurementVariables());
 		Assert.assertEquals("INDDry season-TestStudy-3-2", seedSource);
 		// without selection number
-		seedSource = this.seedSourceGenerator.generateSeedSource(ObservationUnitUtils.fromMeasurementRow(workbook.getTrialObservationByTrialInstanceNo(1)), null, null, "3",
+		seedSource = this.seedSourceGenerator.generateSeedSource(ObservationUnitUtils.fromMeasurementRow(workbook.getTrialObservationByTrialInstanceNo(1)).getVariables().values(), null, null, "3",
 			studyDetails.getStudyName(), null, null, null, instance1Measurements.getMeasurementVariables());
 		Assert.assertEquals("INDDry season-TestStudy-3", seedSource);
 	}
 	
 	@Test
 	public void testGenerateSeedSourceForUnknownPlot() {
-		Assert.assertEquals(Name.UNKNOWN, this.seedSourceGenerator.generateSeedSource(new ObservationUnitRow(),
+		Assert.assertEquals(Name.UNKNOWN, this.seedSourceGenerator.generateSeedSource(new ArrayList<>(),
 			null, RandomStringUtils.randomNumeric(2), "0", RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomNumeric(2), null,
 			null, null));
 	}
