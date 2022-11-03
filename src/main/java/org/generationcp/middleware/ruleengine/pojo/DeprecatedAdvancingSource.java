@@ -29,7 +29,7 @@ import java.util.Map;
  * The POJO containing information needed for Advancing.
  *
  */
-public class AdvancingSource {
+public class DeprecatedAdvancingSource {
 
 	private ImportedGermplasm germplasm;
 	private List<Name> names;
@@ -76,7 +76,7 @@ public class AdvancingSource {
 	private Boolean designationIsPreviewOnly;
 	private Map<String, Integer> keySequenceMap = new HashMap<>();
 
-	public AdvancingSource(final ImportedGermplasm germplasm, final List<Name> names, final Integer plantsSelected,
+	public DeprecatedAdvancingSource(final ImportedGermplasm germplasm, final List<Name> names, final Integer plantsSelected,
 		final Method breedingMethod,
 		final String studyName, final String plotNumber) {
 		super();
@@ -88,12 +88,12 @@ public class AdvancingSource {
 		this.plotNumber = plotNumber;
 	}
 
-	public AdvancingSource(final ImportedGermplasm germplasm) {
+	public DeprecatedAdvancingSource(final ImportedGermplasm germplasm) {
 		super();
 		this.germplasm = germplasm;
 	}
 
-    public AdvancingSource() {
+    public DeprecatedAdvancingSource() {
 		super();
 	}
 
@@ -403,8 +403,9 @@ public class AdvancingSource {
 		this.breedingMethodId = breedingMethodId;
 	}
 
-	public AdvancingSource copy() {
-        final AdvancingSource source = new AdvancingSource(germplasm, names, plantsSelected, breedingMethod, studyName, plotNumber);
+	public DeprecatedAdvancingSource copy() {
+        final DeprecatedAdvancingSource
+			source = new DeprecatedAdvancingSource(germplasm, names, plantsSelected, breedingMethod, studyName, plotNumber);
         source.setSeason(this.season);
         source.setLocationAbbreviation(this.locationAbbreviation);
         source.setRootName(this.rootName);

@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,7 +46,7 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
 		final ImportedGermplasm importedGermplasm =
 				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 104, 105, -1, derivativeMethod.getMid());
-		final AdvancingSource source =
+		final DeprecatedAdvancingSource source =
 				this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
 		final List<StringBuilder> values = this.createInitialValues(source);
 
@@ -68,7 +68,7 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
 		final ImportedGermplasm importedGermplasm =
 				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 104, 105, -1, derivativeMethod.getMid());
-		final AdvancingSource source =
+		final DeprecatedAdvancingSource source =
 				this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
 		final List<StringBuilder> values = this.createInitialValues(source);
 
@@ -89,7 +89,8 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
 		final ImportedGermplasm importedGermplasm = this.createImportedGermplasm(1, "(AA/ABC)", "0", 0, 0, -1, derivativeMethod.getMid());
-		AdvancingSource source = this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
+		DeprecatedAdvancingSource
+			source = this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
 		List<StringBuilder> values = this.createInitialValues(source);
 		expression.apply(values, source, PREFIX);
 
@@ -107,7 +108,8 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
 		final ImportedGermplasm importedGermplasm = this.createImportedGermplasm(1, "(AA/ABC)", "0", 0, 0, -1, derivativeMethod.getMid());
-		AdvancingSource source = this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
+		DeprecatedAdvancingSource
+			source = this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
 		List<StringBuilder> values = this.createInitialValues(source);
 		expression.apply(values, source, PREFIX);
 
@@ -127,7 +129,8 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
 		final ImportedGermplasm importedGermplasm =
 				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 0, 0, -1, derivativeMethod.getMid());
-		AdvancingSource source = this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
+		DeprecatedAdvancingSource
+			source = this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
 		List<StringBuilder> values = this.createInitialValues(source);
 		expression.apply(values, source, PREFIX);
 
@@ -147,7 +150,8 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
 		final ImportedGermplasm importedGermplasm =
 				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 0, 0, -1, derivativeMethod.getMid());
-		AdvancingSource source = this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
+		DeprecatedAdvancingSource
+			source = this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
 		source.setSourceMethod(this.createGenerativeMethod(PREFIX, COUNT, null, "-", true));
 		List<StringBuilder> values = this.createInitialValues(source);
 		expression.apply(values, source, PREFIX);
@@ -161,7 +165,7 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 		final Method generativeMethod = this.createGenerativeMethod(PREFIX, COUNT, null, "-", true);
 		final ImportedGermplasm importedGermplasm =
 				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 104, 105, -1, generativeMethod.getMid());
-		final AdvancingSource source =
+		final DeprecatedAdvancingSource source =
 				this.createAdvancingSourceTestData(generativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
 
 		source.setMaleGid(105);
@@ -179,7 +183,7 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 		final Method generativeMethod = this.createGenerativeMethod(PREFIX, COUNT, null, "-", true);
 		final ImportedGermplasm importedGermplasm =
 				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 104, 105, -1, generativeMethod.getMid());
-		final AdvancingSource source =
+		final DeprecatedAdvancingSource source =
 				this.createAdvancingSourceTestData(generativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
 
 		source.setMaleGid(105);
@@ -198,7 +202,8 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 		final Method generativeMethod = this.createGenerativeMethod(PREFIX, COUNT, null, "-", true);
 		final ImportedGermplasm importedGermplasm =
 				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 0, 0, -1, generativeMethod.getMid());
-		AdvancingSource source = this.createAdvancingSourceTestData(generativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
+		DeprecatedAdvancingSource
+			source = this.createAdvancingSourceTestData(generativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
 
 		source.setMaleGid(0);
 

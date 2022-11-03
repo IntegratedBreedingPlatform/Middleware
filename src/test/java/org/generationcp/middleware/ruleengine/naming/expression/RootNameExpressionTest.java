@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import junit.framework.Assert;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +33,7 @@ public class RootNameExpressionTest extends TestExpression {
 						"((CML146/CLQ-6203)/CML147)", "((CLQ-6203/CML150)/CML144)", "((L-133/LSA-297)/PA-1)",
 						"(((P 47/MPSWCB 4) 11//(MPSWCB)", "(a//b)", "(a/b/c/d)");
 
-		final AdvancingSource source = this.createAdvancingSourceTestData("Germplasm", null, null, null, null, true);
+		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("Germplasm", null, null, null, null, true);
 		int i = 0;
 		final Name name = new Name();
 		name.setTypeId(10);
@@ -57,7 +57,7 @@ public class RootNameExpressionTest extends TestExpression {
 				"(CML146/CLQ-6203)/CML147", "(CLQ-6203/CML150)/CML144", "(L-133/LSA-297)/PA-1", "((P 47/MPSWCB 4) 11//(MPSWCB", "(a//b)",
 				"(a/b/c/d)");
 
-		final AdvancingSource source = this.createAdvancingSourceTestData("Germplasm", null, null, null, null, true);
+		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("Germplasm", null, null, null, null, true);
 		final Name name = new Name();
 		name.setTypeId(11);
 		name.setNstat(2);
@@ -81,7 +81,7 @@ public class RootNameExpressionTest extends TestExpression {
 		final String lineNameValue = "DESIGNATION1";
 		final String derivativeNameValue = "DERIVATIVE NAME1";
 
-		final AdvancingSource source = this.createAdvancingSourceTestData("Germplasm", null, null, null, null, true);
+		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("Germplasm", null, null, null, null, true);
 
 		// Create lineName Name and set is as preferred
 		final Name lineName = new Name();

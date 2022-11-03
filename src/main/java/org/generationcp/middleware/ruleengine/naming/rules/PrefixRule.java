@@ -4,7 +4,7 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -30,15 +30,15 @@ public class PrefixRule extends OrderedRule<NamingRuleExecutionContext> {
 		List<String> input = context.getCurrentData();
 
 		ProcessCodeService processCodeService = context.getProcessCodeService();
-		AdvancingSource advancingSource = context.getAdvancingSource();
-		String prefix = advancingSource.getBreedingMethod().getPrefix();
+		DeprecatedAdvancingSource deprecatedAdvancingSource = context.getAdvancingSource();
+		String prefix = deprecatedAdvancingSource.getBreedingMethod().getPrefix();
 
 		if (prefix == null) {
 			prefix = "";
 		}
 
 		for (int i = 0; i < input.size(); i++) {
-			input.set(i, processCodeService.applyProcessCode(input.get(i), prefix, advancingSource).get(0));
+			input.set(i, processCodeService.applyProcessCode(input.get(i), prefix, deprecatedAdvancingSource).get(0));
 		}
 
 		context.setCurrentData(input);

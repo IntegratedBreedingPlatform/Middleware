@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,7 +15,7 @@ public class TopLocationAbbreviationExpression extends BaseExpression {
 	}
 
 	@Override
-	public void apply(List<StringBuilder> values, AdvancingSource source, final String capturedText) {
+	public void apply(List<StringBuilder> values, DeprecatedAdvancingSource source, final String capturedText) {
 		for (StringBuilder container : values) {
 			String rootName = source.getRootName();
 			String labbr = source.getLocationAbbreviation() != null ? source.getLocationAbbreviation() : "";

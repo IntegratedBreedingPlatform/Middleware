@@ -16,7 +16,7 @@ import org.generationcp.middleware.ruleengine.naming.rules.EnforceUniqueNameRule
 import org.generationcp.middleware.ruleengine.naming.rules.NamingRuleExecutionContext;
 import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSourceList;
 import org.generationcp.middleware.ruleengine.pojo.ImportedCross;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
@@ -64,7 +64,7 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 	@SuppressWarnings("unchecked")
 	@Deprecated
 	@Override
-	public void generateAdvanceListNames(final List<AdvancingSource> advancingSourceItems, final boolean checkForDuplicateName,
+	public void generateAdvanceListNames(final List<DeprecatedAdvancingSource> deprecatedAdvancingSourceItems, final boolean checkForDuplicateName,
 		final List<ImportedGermplasm> germplasmList) throws MiddlewareQueryException, RuleException {
 
 		final TimerWatch timer = new TimerWatch("advance");
@@ -72,7 +72,7 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 
 		Map<String, Integer> keySequenceMap = new HashMap<>();
 		final Iterator<ImportedGermplasm> germplasmIterator = germplasmList.iterator();
-		for (final AdvancingSource row : advancingSourceItems) {
+		for (final DeprecatedAdvancingSource row : deprecatedAdvancingSourceItems) {
 			if (row.getGermplasm() != null && row.getPlantsSelected() != null && row.getBreedingMethod() != null
 				&& row.getPlantsSelected() > 0 && row.getBreedingMethod().isBulkingMethod() != null) {
 				row.setKeySequenceMap(keySequenceMap);
@@ -128,14 +128,14 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 		// The [SEQUENCE] code does not read this number but instead queries from the DB the next available number
 		int previousMaxSequence = 0;
 		Map<String, Integer> keySequenceMap = new HashMap<>();
-		for (final AdvancingSource advancingSource : rows.getRows()) {
+		for (final DeprecatedAdvancingSource deprecatedAdvancingSource : rows.getRows()) {
 
 			final ImportedCross importedCross = importedCrosses.get(index++);
 			final List<String> names;
-			advancingSource.setCurrentMaxSequence(previousMaxSequence);
-			advancingSource.setKeySequenceMap(keySequenceMap);
+			deprecatedAdvancingSource.setCurrentMaxSequence(previousMaxSequence);
+			deprecatedAdvancingSource.setKeySequenceMap(keySequenceMap);
 
-			final Integer breedingMethodId = advancingSource.getBreedingMethodId();
+			final Integer breedingMethodId = deprecatedAdvancingSource.getBreedingMethodId();
 			final Method selectedMethod = breedingMethodMap.get(breedingMethodId);
 
 			if (!this.germplasmDataManager.isMethodNamingConfigurationValid(selectedMethod)) {
@@ -151,34 +151,34 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 			}
 
 			// here, we resolve the breeding method ID stored in the advancing source object into a proper breeding Method object
-			advancingSource.setBreedingMethod(selectedMethod);
+			deprecatedAdvancingSource.setBreedingMethod(selectedMethod);
 			//default plants selected value to 1 for list of crosses because sequence is not working if plants selected value is not set
-			advancingSource.setPlantsSelected(1);
+			deprecatedAdvancingSource.setPlantsSelected(1);
 
 			// pass the parent gids (female and male) of the imported cross, this is required to properly resolve the Backcross process codes.
-			advancingSource
+			deprecatedAdvancingSource
 				.setFemaleGid(StringUtils.isNumeric(importedCross.getFemaleGid()) ? Integer.valueOf(importedCross.getFemaleGid()) : 0);
 			// Always gets the first male parent, ie. GPID2
 			final String firstMaleGid = importedCross.getMaleGids().get(0).toString();
-			advancingSource.setMaleGid(StringUtils.isNumeric(firstMaleGid) ? Integer.valueOf(firstMaleGid) : 0);
+			deprecatedAdvancingSource.setMaleGid(StringUtils.isNumeric(firstMaleGid) ? Integer.valueOf(firstMaleGid) : 0);
 
 			final RuleExecutionContext namingExecutionContext =
-				this.setupNamingRuleExecutionContext(advancingSource, checkForDuplicateName);
+				this.setupNamingRuleExecutionContext(deprecatedAdvancingSource, checkForDuplicateName);
 			names = (List<String>) this.rulesService.runRules(namingExecutionContext);
 
 			// Save away the current max sequence once rules have been run for this entry.
-			previousMaxSequence = advancingSource.getCurrentMaxSequence() + 1;
+			previousMaxSequence = deprecatedAdvancingSource.getCurrentMaxSequence() + 1;
 			for (final String name : names) {
 				importedCross.setDesig(name);
 			}
 			// Pass the key sequence map to the next entry to process
-			keySequenceMap = advancingSource.getKeySequenceMap();
+			keySequenceMap = deprecatedAdvancingSource.getKeySequenceMap();
 		}
 		timer.stop();
 		return importedCrosses;
 	}
 
-	protected RuleExecutionContext setupNamingRuleExecutionContext(final AdvancingSource row, final boolean checkForDuplicateName) {
+	protected RuleExecutionContext setupNamingRuleExecutionContext(final DeprecatedAdvancingSource row, final boolean checkForDuplicateName) {
 		List<String> sequenceList = Arrays.asList(this.ruleFactory.getRuleSequenceForNamespace("naming"));
 
 		if (checkForDuplicateName) {

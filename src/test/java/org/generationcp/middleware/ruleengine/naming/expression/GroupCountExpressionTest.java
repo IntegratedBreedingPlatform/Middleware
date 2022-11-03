@@ -1,6 +1,6 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ public class GroupCountExpressionTest extends TestExpression {
     }
 
     protected void testCountExpression(final String sourceName, final String countExpression, final String expectedValue) {
-        final AdvancingSource source = this.createAdvancingSourceTestData(sourceName, "-", null, null, null, true);
+        final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(sourceName, "-", null, null, null, true);
         final List<StringBuilder> values = new ArrayList<>();
         values.add(new StringBuilder(source.getRootName() + countExpression));
 
