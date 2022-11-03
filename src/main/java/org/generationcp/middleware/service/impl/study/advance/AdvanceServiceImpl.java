@@ -286,11 +286,12 @@ public class AdvanceServiceImpl implements AdvanceService {
 					advancedGermplasmGids.add(germplasm.getGid());
 
 					// Adding attributes to the advanced germplasm
-					this.createGermplasmAttributes(study.getName(), request.getBreedingMethodSelectionRequest(), advancingSource,
-						selectionNumber.get(), germplasm.getLocationId(), germplasm.getGdate(), plotCodeVariableId,
-						plotNumberVariableId, repNumberVariableId, trialInstanceVariableId, plantNumberVariableId,
-						studyEnvironmentVariables, environmentDataset.getVariables(), locationNameByIds,
-						studyInstancesByInstanceNumber);
+					this.createGermplasmAttributes(study.getName(), advancingSource,
+						request.getBreedingMethodSelectionRequest().getAllPlotsSelected(), germplasm.getGid(),
+						selectionNumber.get(), germplasm.getLocationId(), germplasm.getGdate(),
+						plotCodeVariableId, plotNumberVariableId, repNumberVariableId, trialInstanceVariableId,
+						plantNumberVariableId, studyEnvironmentVariables, environmentDataset.getVariables(),
+						locationNameByIds, studyInstancesByInstanceNumber);
 
 					final GermplasmStudySourceInput germplasmStudySourceInput = new GermplasmStudySourceInput(germplasm.getGid(), studyId,
 						advancingSource.getPlotObservation().getObservationUnitId(),
@@ -457,8 +458,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 	}
 
 	private void createGermplasmAttributes(final String studyName,
-		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest, final NewAdvancingSource advancingSource,
-		final Integer selectionNumber,
+		final NewAdvancingSource advancingSource, final Boolean allPlotsSelected,
+		final Integer advancedGermplasmGid, final Integer selectionNumber,
 		final Integer locationId, final Integer date, final Integer plotCodeVariableId, final Integer plotNumberVariableId,
 		final Integer repNumberVariableId,
 		final Integer trialInstanceVariableId, final Integer plantNumberVariableId,
@@ -483,35 +484,35 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final ObservationUnitRow plotObservation = advancingSource.getPlotObservation();
 		final String plotNumber = plotObservation.getVariableValueByVariableId(TermId.PLOT_NO.getId());
 		final String seedSource = this.generateSeedSource(studyName, selectionNumber, plotNumber,
-			advancingSource.getBreedingMethod().isBulkingMethod(), breedingMethodSelectionRequest.getAllPlotsSelected(),
+			advancingSource.getBreedingMethod().isBulkingMethod(), allPlotsSelected,
 			advancingSource.getPlantsSelected(), plotObservation,
 			studyEnvironmentVariables, locationNameByIds, studyInstancesByInstanceNumber, environmentVariables);
 
-		final Attribute plotCodeAttribute = this.createGermplasmAttribute(seedSource, plotCodeVariableId, locationId, date);
+		final Attribute plotCodeAttribute = this.createGermplasmAttribute(advancedGermplasmGid, seedSource, plotCodeVariableId, locationId, date);
 		this.daoFactory.getAttributeDAO().save(plotCodeAttribute);
 
 		if (plotNumberVariableId != null) {
-			final Attribute plotNumberAttribute = this.createGermplasmAttribute(plotNumber, plotNumberVariableId, locationId, date);
+			final Attribute plotNumberAttribute = this.createGermplasmAttribute(advancedGermplasmGid, plotNumber, plotNumberVariableId, locationId, date);
 			this.daoFactory.getAttributeDAO().save(plotNumberAttribute);
 		}
 
 		final String replicationNumber = plotObservation.getVariableValueByVariableId(TermId.REP_NO.getId());
-		if (repNumberVariableId != null) {
+		if (repNumberVariableId != null && !StringUtils.isEmpty(replicationNumber)) {
 			final Attribute replicationNumberAttribute =
-				this.createGermplasmAttribute(replicationNumber, repNumberVariableId, locationId, date);
+				this.createGermplasmAttribute(advancedGermplasmGid, replicationNumber, repNumberVariableId, locationId, date);
 			this.daoFactory.getAttributeDAO().save(replicationNumberAttribute);
 		}
 
 		if (!StringUtils.isEmpty(plantNumber) && plantNumberVariableId != null) {
 			final Attribute plantNumberAttribute =
-				this.createGermplasmAttribute(plantNumber, plantNumberVariableId, locationId, date);
+				this.createGermplasmAttribute(advancedGermplasmGid, plantNumber, plantNumberVariableId, locationId, date);
 			this.daoFactory.getAttributeDAO().save(plantNumberAttribute);
 		}
 
 		if (trialInstanceVariableId != null) {
 			final Attribute trialInstanceNumberAttribute =
-				this.createGermplasmAttribute(plotObservation.getTrialInstance().toString(), trialInstanceVariableId, locationId,
-					date);
+				this.createGermplasmAttribute(advancedGermplasmGid, plotObservation.getTrialInstance().toString(), trialInstanceVariableId,
+					locationId, date);
 			this.daoFactory.getAttributeDAO().save(trialInstanceNumberAttribute);
 		}
 	}
@@ -552,9 +553,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 				environmentVariables);
 	}
 
-	private Attribute createGermplasmAttribute(final String value, final Integer typeId,
+	private Attribute createGermplasmAttribute(final Integer germplasmId, final String value, final Integer typeId,
 		final Integer locationId, final Integer date) {
 		final Attribute attribute = new Attribute();
+		attribute.setGermplasmId(germplasmId);
 		attribute.setAval(value);
 		attribute.setTypeId(typeId);
 		attribute.setAdate(date);
