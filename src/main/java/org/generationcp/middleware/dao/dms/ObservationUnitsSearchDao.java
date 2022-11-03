@@ -1301,7 +1301,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (row.containsKey(STOCK_ID)) {
 			final String stockId = (String) row.get(STOCK_ID);
 			observationUnitRow.setStockId(stockId);
-			observationVariables.put(STOCK_ID, new ObservationUnitData(stockId));
+			observationVariables.put(STOCK_ID, new ObservationUnitData(TermId.STOCK_ID.getId(), stockId));
 		}
 
 		final String trialInstanceColumnName = standardVariableNameMap.get(TermId.TRIAL_INSTANCE_FACTOR.getId());
@@ -1325,7 +1325,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		});
 		observationVariables.put(PARENT_OBS_UNIT_ID, new ObservationUnitData((String) row.get(PARENT_OBS_UNIT_ID)));
 		// Avoid overriding PLOT_NO variable if it was already set using standardVariableNameMap iteration
-		// TODO: check which is the value of observationVariableName for subobservations
 		observationVariables.putIfAbsent(observationVariableName, new ObservationUnitData((String) row.get(OBSERVATION_UNIT_NO)));
 
 		for (final String gpDesc : searchDto.getGenericGermplasmDescriptors()) {
