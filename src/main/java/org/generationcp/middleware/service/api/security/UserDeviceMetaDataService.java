@@ -8,4 +8,6 @@ public interface UserDeviceMetaDataService {
 
 	UserDeviceMetaDataDto addToExistingDevice(Integer userId, String deviceDetails, String location);
 
+	void updateLastLoggedIn(Integer userId, String deviceDetails, String location);
+
 }

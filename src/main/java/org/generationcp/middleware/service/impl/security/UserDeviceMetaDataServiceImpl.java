@@ -7,6 +7,7 @@ import org.generationcp.middleware.service.api.security.UserDeviceMetaDataDto;
 import org.generationcp.middleware.service.api.security.UserDeviceMetaDataService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -59,6 +60,21 @@ public class UserDeviceMetaDataServiceImpl implements UserDeviceMetaDataService 
 		userDeviceMetaDataDto.setLastLoggedIn(userDeviceMetaData.getLastLoggedIn());
 
 		return userDeviceMetaDataDto;
+
+	}
+
+	@Override
+	public void updateLastLoggedIn(final Integer userId, final String deviceDetails, final String location) {
+
+		final List<UserDeviceMetaData> knownDevices =
+			this.workbenchDaoFactory.getUserDeviceMetaDataDAO().findByUserIdDeviceAndLocation(userId, deviceDetails, location);
+
+		if (!CollectionUtils.isEmpty(knownDevices)) {
+			final UserDeviceMetaData userDeviceMetaData = knownDevices.get(0);
+			// Update last logged in
+			userDeviceMetaData.setLastLoggedIn(new Date());
+			this.workbenchDaoFactory.getUserDeviceMetaDataDAO().update(userDeviceMetaData);
+		}
 
 	}
 

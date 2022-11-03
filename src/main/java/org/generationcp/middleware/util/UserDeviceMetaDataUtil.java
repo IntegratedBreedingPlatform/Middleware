@@ -14,6 +14,7 @@ public class UserDeviceMetaDataUtil {
 	private static final String UNKNOWN = "UNKNOWN";
 
 	public static String extractIp(final HttpServletRequest request) {
+		// Extract the client IP address
 		final String clientIp;
 		final String clientXForwardedForIp = request.getHeader("x-forwarded-for");
 		if (Objects.nonNull(clientXForwardedForIp)) {
@@ -26,6 +27,7 @@ public class UserDeviceMetaDataUtil {
 	}
 
 	public static String getDeviceDetails(final HttpServletRequest request) {
+		// Extract the device details from User-Agent header in the request
 		final UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
 		if (Objects.nonNull(userAgent)) {
 			return userAgent.getBrowser()

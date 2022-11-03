@@ -63,4 +63,21 @@ public class UserDeviceMetaDataServiceImplTest extends IntegrationTestBase {
 
 	}
 
+	@Test
+	public void testUpdateLastLoggedIn() {
+		final int userId = 1;
+		final String deviceDetails = RandomStringUtils.randomAlphabetic(10);
+		final String location = RandomStringUtils.randomAlphabetic(10);
+
+		final UserDeviceMetaDataDto userDeviceMetaDataDto =
+			this.userDeviceMetaDataService.addToExistingDevice(userId, deviceDetails, location);
+
+		this.userDeviceMetaDataService.updateLastLoggedIn(userId, deviceDetails, location);
+
+		final Optional<UserDeviceMetaDataDto> result = this.userDeviceMetaDataService.findExistingDevice(userId, deviceDetails, location);
+		Assert.assertTrue(result.isPresent());
+		Assert.assertNotSame(result.get().getLastLoggedIn(), userDeviceMetaDataDto.getLastLoggedIn());
+
+	}
+
 }
