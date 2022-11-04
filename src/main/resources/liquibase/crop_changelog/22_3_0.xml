@@ -65,7 +65,8 @@
 	<changeSet author="cuenyad" id="v22.3.0-5">
 		<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
-					SELECT count(1) > 0 from projectprop where variable_id = (select cvterm_id from cvterm where name ='OBS_UNIT_ID' and cv_id = 1040)
+					SELECT count(1) > 0 from projectprop where
+					    variable_id = (select cvterm_id from cvterm where name ='OBS_UNIT_ID' and cv_id = 1040)
 						and type_id = 1804 and project_id in (SELECT project_id FROM project where program_uuid is null);
 				</sqlCheck>
 		</preConditions>
@@ -82,7 +83,9 @@
 	<changeSet author="cuenyad" id="v22.3.0-6">
 		<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
-					SELECT count(1) > 0 FROM CVTERMPROP WHERE CVTERM_ID = 8201 AND value = 'Germplasm Descriptor';
+					select count(1) > 0 from cvtermprop where
+					    cvterm_id = (select cvterm_id from cvterm where name ='OBS_UNIT_ID' and cv_id = 1040)
+					      and value = 'Germplasm Descriptor';
 				</sqlCheck>
 		</preConditions>
 		<comment>Recategorize OBS_UNIT_ID as Experimental Design variable</comment>
