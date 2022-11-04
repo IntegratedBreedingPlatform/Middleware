@@ -52,7 +52,6 @@ public class PlantSelectedResolver {
 		}
 
 		final AdvanceStudyRequest.BulkingRequest bulkingRequest = request.getBulkingRequest();
-		final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest = request.getLineSelectionRequest();
 		if (isBulkMethod) {
 			if (bulkingRequest != null && (bulkingRequest.getAllPlotsSelected() == null || !bulkingRequest.getAllPlotsSelected())) {
 				// User has selected a variable that defines the number of lines selected from each plot. However, this is tricky because
@@ -64,6 +63,7 @@ public class PlantSelectedResolver {
 				return 1;
 			}
 		} else {
+			final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest = request.getLineSelectionRequest();
 			// User has selected the same number of lines for each plot
 			if (lineSelectionRequest.getLinesSelected() == null) {
 				final String lineVariateValue =
