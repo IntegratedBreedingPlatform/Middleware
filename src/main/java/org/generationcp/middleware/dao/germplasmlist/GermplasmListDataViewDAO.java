@@ -109,7 +109,7 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 		}
 	}
 
-	public void deleteNameTypeFromGermplasmList(final Integer nameTypeId) {
+	public void deleteByNameType(final Integer nameTypeId) {
 		try {
 			final String sql = "DELETE FROM list_data_view WHERE name_fldno = :nameTypeId";
 			final Query query =
@@ -117,7 +117,7 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 			query.setParameter("nameTypeId", nameTypeId);
 			query.executeUpdate();
 		} catch (final HibernateException e) {
-			final String message = "Error with deleteNameTypeFromGermplasmList(nameTypeId=" + nameTypeId + "): " + e.getMessage();
+			final String message = "Error with deleteByNameType(nameTypeId=" + nameTypeId + "): " + e.getMessage();
 			LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}

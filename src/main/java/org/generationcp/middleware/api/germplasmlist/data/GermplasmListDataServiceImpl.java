@@ -293,7 +293,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 
 	@Override
 	public void deleteNameTypeFromGermplasmList(final Integer nameTypeId) {
-		this.daoFactory.getGermplasmListDataViewDAO().deleteNameTypeFromGermplasmList(nameTypeId);
+		this.daoFactory.getGermplasmListDataViewDAO().deleteByNameType(nameTypeId);
 	}
 
 	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<GermplasmListDataSearchResponse> response) {
