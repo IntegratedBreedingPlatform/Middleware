@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -136,7 +137,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final DatasetDTO environmentDataset = datasetsByType.get(DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		final List<ObservationUnitRow> plotObservations =
-			this.getPlotObservations(studyId, plotDataset.getDatasetId(), request.getInstanceIds());
+			this.getPlotObservations(studyId, plotDataset.getDatasetId(), request.getInstanceIds(), request.getSelectedReplications());
 		if (CollectionUtils.isEmpty(plotObservations)) {
 			return new ArrayList<>();
 		}
@@ -317,10 +318,24 @@ public class AdvanceServiceImpl implements AdvanceService {
 	}
 
 	private List<ObservationUnitRow> getPlotObservations(final Integer studyId, final Integer plotDatasetId,
-		final List<Integer> instancesIds) {
+		final List<Integer> instancesIds, final List<String> selectedReplications) {
 
 		final ObservationUnitsSearchDTO plotDataObservationsSearchDTO = new ObservationUnitsSearchDTO();
 		plotDataObservationsSearchDTO.setInstanceIds(instancesIds);
+
+		if (!CollectionUtils.isEmpty(selectedReplications)) {
+			final Map<String, List<String>> filteredValues = new HashMap<>();
+			filteredValues.put(String.valueOf(TermId.REP_NO.getId()), selectedReplications);
+			final ObservationUnitsSearchDTO.Filter filter = plotDataObservationsSearchDTO.new Filter();
+			filter.setFilteredValues(filteredValues);
+
+			final StandardVariable replicationNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.REP_NO.getId(), null);
+			final Map<String, String> variableTypeMap = new HashMap<>();
+			variableTypeMap.put(String.valueOf(TermId.REP_NO.getId()), replicationNumberVariable.getVariableTypes().iterator().next().name());
+			filter.setVariableTypeMap(variableTypeMap);
+			plotDataObservationsSearchDTO.setFilter(filter);
+		}
+
 		return this.datasetService
 			.getObservationUnitRows(studyId, plotDatasetId, plotDataObservationsSearchDTO,
 				new PageRequest(0, Integer.MAX_VALUE));

@@ -4,15 +4,13 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.List;
-import java.util.Set;
 
 @AutoProperty
 public class AdvanceStudyRequest {
 
 	// Represents the selected instance ids
 	private List<Integer> instanceIds;
-	// TODO: add replications param
-	private Set<String> selectedReplications;
+	private List<String> selectedReplications;
 
 	private BreedingMethodSelectionRequest breedingMethodSelectionRequest;
 	private LineSelectionRequest lineSelectionRequest;
@@ -27,11 +25,11 @@ public class AdvanceStudyRequest {
 		this.instanceIds = instanceIds;
 	}
 
-	public Set<String> getSelectedReplications() {
+	public List<String> getSelectedReplications() {
 		return selectedReplications;
 	}
 
-	public void setSelectedReplications(final Set<String> selectedReplications) {
+	public void setSelectedReplications(final List<String> selectedReplications) {
 		this.selectedReplications = selectedReplications;
 	}
 
