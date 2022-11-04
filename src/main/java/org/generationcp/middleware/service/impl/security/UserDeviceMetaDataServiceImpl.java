@@ -24,7 +24,7 @@ public class UserDeviceMetaDataServiceImpl implements UserDeviceMetaDataService 
 	}
 
 	@Override
-	public Optional<UserDeviceMetaDataDto> findExistingDevice(final Integer userId, final String deviceDetails, final String location) {
+	public Optional<UserDeviceMetaDataDto> findUserDevice(final Integer userId, final String deviceDetails, final String location) {
 
 		final List<UserDeviceMetaData> knownDevices =
 			this.workbenchDaoFactory.getUserDeviceMetaDataDAO().findByUserIdDeviceAndLocation(userId, deviceDetails, location);
@@ -44,7 +44,7 @@ public class UserDeviceMetaDataServiceImpl implements UserDeviceMetaDataService 
 	}
 
 	@Override
-	public UserDeviceMetaDataDto addToExistingDevice(final Integer userId, final String deviceDetails, final String location) {
+	public UserDeviceMetaDataDto addUserDevice(final Integer userId, final String deviceDetails, final String location) {
 
 		final UserDeviceMetaData userDeviceMetaData = new UserDeviceMetaData();
 		userDeviceMetaData.setUserId(userId);
@@ -64,7 +64,7 @@ public class UserDeviceMetaDataServiceImpl implements UserDeviceMetaDataService 
 	}
 
 	@Override
-	public void updateLastLoggedIn(final Integer userId, final String deviceDetails, final String location) {
+	public void updateUserDeviceLastLoggedIn(final Integer userId, final String deviceDetails, final String location) {
 
 		final List<UserDeviceMetaData> knownDevices =
 			this.workbenchDaoFactory.getUserDeviceMetaDataDAO().findByUserIdDeviceAndLocation(userId, deviceDetails, location);

@@ -16,14 +16,14 @@ public class UserDeviceMetaDataServiceImplTest extends IntegrationTestBase {
 	private UserDeviceMetaDataService userDeviceMetaDataService;
 
 	@Test
-	public void testAddToExistingDevice() {
+	public void testAddUserDevice() {
 
 		final int userId = 1;
 		final String deviceDetails = RandomStringUtils.randomAlphabetic(10);
 		final String location = RandomStringUtils.randomAlphabetic(10);
 
 		final UserDeviceMetaDataDto userDeviceMetaDataDto =
-			this.userDeviceMetaDataService.addToExistingDevice(userId, deviceDetails, location);
+			this.userDeviceMetaDataService.addUserDevice(userId, deviceDetails, location);
 
 		Assert.assertEquals(userId, userDeviceMetaDataDto.getUserId().intValue());
 		Assert.assertEquals(deviceDetails, userDeviceMetaDataDto.getDeviceDetails());
@@ -33,15 +33,15 @@ public class UserDeviceMetaDataServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testFindExistingDevice_DeviceAlreadyExists() {
+	public void testFindUserDevice_DeviceAlreadyExists() {
 		final int userId = 1;
 		final String deviceDetails = RandomStringUtils.randomAlphabetic(10);
 		final String location = RandomStringUtils.randomAlphabetic(10);
 
 		final UserDeviceMetaDataDto userDeviceMetaDataDto =
-			this.userDeviceMetaDataService.addToExistingDevice(userId, deviceDetails, location);
+			this.userDeviceMetaDataService.addUserDevice(userId, deviceDetails, location);
 
-		final Optional<UserDeviceMetaDataDto> result = this.userDeviceMetaDataService.findExistingDevice(userId, deviceDetails, location);
+		final Optional<UserDeviceMetaDataDto> result = this.userDeviceMetaDataService.findUserDevice(userId, deviceDetails, location);
 
 		Assert.assertTrue(result.isPresent());
 
@@ -53,28 +53,28 @@ public class UserDeviceMetaDataServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testFindExistingDevice_DeviceNotExists() {
+	public void testFindUserDevice_DeviceNotExists() {
 		final int userId = 1;
 		final String deviceDetails = RandomStringUtils.randomAlphabetic(10);
 		final String location = RandomStringUtils.randomAlphabetic(10);
 
-		final Optional<UserDeviceMetaDataDto> result = this.userDeviceMetaDataService.findExistingDevice(userId, deviceDetails, location);
+		final Optional<UserDeviceMetaDataDto> result = this.userDeviceMetaDataService.findUserDevice(userId, deviceDetails, location);
 		Assert.assertFalse(result.isPresent());
 
 	}
 
 	@Test
-	public void testUpdateLastLoggedIn() {
+	public void testUpdateUserDeviceLastLoggedIn() {
 		final int userId = 1;
 		final String deviceDetails = RandomStringUtils.randomAlphabetic(10);
 		final String location = RandomStringUtils.randomAlphabetic(10);
 
 		final UserDeviceMetaDataDto userDeviceMetaDataDto =
-			this.userDeviceMetaDataService.addToExistingDevice(userId, deviceDetails, location);
+			this.userDeviceMetaDataService.addUserDevice(userId, deviceDetails, location);
 
-		this.userDeviceMetaDataService.updateLastLoggedIn(userId, deviceDetails, location);
+		this.userDeviceMetaDataService.updateUserDeviceLastLoggedIn(userId, deviceDetails, location);
 
-		final Optional<UserDeviceMetaDataDto> result = this.userDeviceMetaDataService.findExistingDevice(userId, deviceDetails, location);
+		final Optional<UserDeviceMetaDataDto> result = this.userDeviceMetaDataService.findUserDevice(userId, deviceDetails, location);
 		Assert.assertTrue(result.isPresent());
 		Assert.assertNotSame(result.get().getLastLoggedIn(), userDeviceMetaDataDto.getLastLoggedIn());
 

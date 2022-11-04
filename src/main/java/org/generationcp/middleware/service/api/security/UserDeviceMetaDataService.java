@@ -4,10 +4,10 @@ import java.util.Optional;
 
 public interface UserDeviceMetaDataService {
 
-	Optional<UserDeviceMetaDataDto> findExistingDevice(Integer userId, String deviceDetails, String location);
+	Optional<UserDeviceMetaDataDto> findUserDevice(Integer userId, String deviceDetails, String location);
 
-	UserDeviceMetaDataDto addToExistingDevice(Integer userId, String deviceDetails, String location);
+	UserDeviceMetaDataDto addUserDevice(Integer userId, String deviceDetails, String location);
 
-	void updateLastLoggedIn(Integer userId, String deviceDetails, String location);
+	void updateUserDeviceLastLoggedIn(Integer userId, String deviceDetails, String location);
 
 }

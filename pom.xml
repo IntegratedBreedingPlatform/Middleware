@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
@@ -307,7 +307,7 @@
 			<artifactId>fest-reflect</artifactId>
 			<version>1.4.1</version>
 		</dependency>
-		
+
 		<!-- Liquibase -->
 		<dependency>
 			<groupId>org.liquibase</groupId>
@@ -364,11 +364,20 @@
 			<version>2.0</version>
 		</dependency>
 
+		<!-- Dependency for passing browser/client's User-Agent -->
 		<dependency><groupId>eu.bitwalker</groupId>
 			<artifactId>UserAgentUtils</artifactId>
 			<version>1.21</version>
-		</dependency><dependency><groupId>com.opera</groupId><artifactId>operadriver</artifactId><version>1.5</version><scope>compile</scope></dependency><dependency><groupId>com.opera</groupId><artifactId>operadriver</artifactId><version>1.5</version><scope>compile</scope></dependency>
-
+		</dependency>
+		<dependency><groupId>com.opera</groupId>
+			<artifactId>operadriver</artifactId>
+			<version>1.5</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency><groupId>com.opera</groupId>
+			<artifactId>operadriver</artifactId>
+			<version>1.5</version><scope>compile</scope>
+		</dependency>
 
 	</dependencies>
 
