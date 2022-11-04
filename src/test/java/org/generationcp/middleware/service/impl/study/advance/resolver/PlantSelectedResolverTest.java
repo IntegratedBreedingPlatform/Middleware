@@ -41,8 +41,8 @@ public class PlantSelectedResolverTest {
 		final Integer selectedBreedingMethodId = new Random().nextInt();
 		final Integer givenLinesSelected = new Random().nextInt();
 		final AdvanceStudyRequest advanceStudyRequest =
-			this.createMockAdvanceStudyRequest(selectedBreedingMethodId, null, null, givenLinesSelected,
-				null, null);
+			this.createMockAdvanceStudyRequest(selectedBreedingMethodId, null, givenLinesSelected, null, null, null
+			);
 
 		final Integer plantSelected =
 			this.plantSelectedResolver
@@ -51,8 +51,7 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getAllPlotsSelected();
-		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getPlotVariateId();
+		Mockito.verify(advanceStudyRequest, Mockito.times(1)).getBulkingRequest();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.times(2)).getLinesSelected();
@@ -71,8 +70,9 @@ public class PlantSelectedResolverTest {
 		final Integer selectedBreedingMethodId = new Random().nextInt();
 		final Integer expectedLinesSelected = new Random().nextInt();
 		final Integer lineVariateId = new Random().nextInt();
-		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(selectedBreedingMethodId, null, null, null,
-			lineVariateId, null);
+		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(selectedBreedingMethodId, null, null,
+			lineVariateId, null, null
+		);
 
 		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
 		Mockito.when(observationUnitRow.getVariableValueByVariableId(lineVariateId)).thenReturn(expectedLinesSelected.toString());
@@ -83,8 +83,7 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getAllPlotsSelected();
-		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getPlotVariateId();
+		Mockito.verify(advanceStudyRequest, Mockito.times(1)).getBulkingRequest();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.times(1)).getLinesSelected();
@@ -104,7 +103,8 @@ public class PlantSelectedResolverTest {
 		final boolean allPlotsSelected = true;
 
 		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(selectedBreedingMethodId, null, null, null,
-			null, allPlotsSelected);
+			allPlotsSelected, null
+		);
 
 		final Integer plantSelected =
 			this.plantSelectedResolver.resolvePlantSelected(advanceStudyRequest, new ObservationUnitRow(), new HashMap<>(), isBulkMethod);
@@ -135,8 +135,8 @@ public class PlantSelectedResolverTest {
 		final boolean allPlotsSelected = false;
 
 		final AdvanceStudyRequest advanceStudyRequest =
-			this.createMockAdvanceStudyRequest(selectedBreedingMethodId, null, plotVariateId, null,
-				null, allPlotsSelected);
+			this.createMockAdvanceStudyRequest(selectedBreedingMethodId, null, null, null, allPlotsSelected, plotVariateId
+			);
 
 		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
 		Mockito.when(observationUnitRow.getVariableValueByVariableId(plotVariateId)).thenReturn(linesSelected.toString());
@@ -169,8 +169,8 @@ public class PlantSelectedResolverTest {
 		final boolean allPlotsSelected = false;
 
 		final AdvanceStudyRequest advanceStudyRequest =
-			this.createMockAdvanceStudyRequest(selectedBreedingMethodId, null, plotVariateId, null,
-				null, allPlotsSelected);
+			this.createMockAdvanceStudyRequest(selectedBreedingMethodId, null, null, null, allPlotsSelected, plotVariateId
+			);
 
 		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
 		Mockito.when(observationUnitRow.getVariableValueByVariableId(plotVariateId)).thenReturn(null);
@@ -200,8 +200,8 @@ public class PlantSelectedResolverTest {
 		final Integer methodVariateId = new Random().nextInt();
 
 		final AdvanceStudyRequest advanceStudyRequest =
-			this.createMockAdvanceStudyRequest(null, methodVariateId, null, null,
-				null, null);
+			this.createMockAdvanceStudyRequest(null, methodVariateId, null, null, null, null
+			);
 
 		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
 		Mockito.when(observationUnitRow.getVariableValueByVariableId(methodVariateId)).thenReturn(null);
@@ -213,8 +213,7 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getPlotVariateId();
-		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest, Mockito.never()).getBulkingRequest();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLinesSelected();
@@ -235,8 +234,8 @@ public class PlantSelectedResolverTest {
 		final String plotBreedingMethodCode = RandomStringUtils.randomAlphabetic(10);
 
 		final AdvanceStudyRequest advanceStudyRequest =
-			this.createMockAdvanceStudyRequest(null, methodVariateId, null, expectedLinesSelected,
-				null, null);
+			this.createMockAdvanceStudyRequest(null, methodVariateId, expectedLinesSelected, null, null, null
+			);
 
 		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
 		Mockito.when(observationUnitRow.getVariableValueByVariableId(methodVariateId)).thenReturn(plotBreedingMethodCode);
@@ -252,8 +251,7 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getPlotVariateId();
-		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest, Mockito.times(1)).getBulkingRequest();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.times(2)).getLinesSelected();
@@ -273,8 +271,9 @@ public class PlantSelectedResolverTest {
 		final Integer expectedLinesSelected = new Random().nextInt();
 		final String plotBreedingMethodCode = RandomStringUtils.randomAlphabetic(10);
 		final Integer lineVariateId = new Random().nextInt();
-		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(null, methodVariateId, null, null,
-			lineVariateId, null);
+		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(null, methodVariateId, null, lineVariateId, null,
+			null
+		);
 
 		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
 		Mockito.when(observationUnitRow.getVariableValueByVariableId(methodVariateId)).thenReturn(plotBreedingMethodCode);
@@ -291,8 +290,7 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getPlotVariateId();
-		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest, Mockito.times(1)).getBulkingRequest();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.times(1)).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.times(1)).getLinesSelected();
@@ -312,8 +310,9 @@ public class PlantSelectedResolverTest {
 		final Integer plotVariateId = new Random().nextInt();
 		final String plotBreedingMethodCode = RandomStringUtils.randomAlphabetic(10);
 		final boolean allPlotsSelected = true;
-		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(null, methodVariateId, plotVariateId, null,
-			null, allPlotsSelected);
+		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(null, methodVariateId, null, null,
+			allPlotsSelected, plotVariateId
+		);
 
 		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
 		Mockito.when(observationUnitRow.getVariableValueByVariableId(methodVariateId)).thenReturn(plotBreedingMethodCode);
@@ -353,8 +352,9 @@ public class PlantSelectedResolverTest {
 		final boolean allPlotsSelected = false;
 		final Integer linesSelected = new Random().nextInt();
 
-		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(null, methodVariateId, plotVariateId, null,
-			null, allPlotsSelected);
+		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(null, methodVariateId, null, null,
+			allPlotsSelected, plotVariateId
+		);
 
 		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
 		Mockito.when(observationUnitRow.getVariableValueByVariableId(methodVariateId)).thenReturn(plotBreedingMethodCode);
@@ -393,8 +393,9 @@ public class PlantSelectedResolverTest {
 		final String plotBreedingMethodCode = RandomStringUtils.randomAlphabetic(10);
 		final boolean allPlotsSelected = false;
 
-		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(null, methodVariateId, plotVariateId, null,
-			null, allPlotsSelected);
+		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(null, methodVariateId, null, null,
+			allPlotsSelected, plotVariateId
+		);
 
 		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
 		Mockito.when(observationUnitRow.getVariableValueByVariableId(methodVariateId)).thenReturn(plotBreedingMethodCode);
@@ -419,26 +420,28 @@ public class PlantSelectedResolverTest {
 	}
 
 	private AdvanceStudyRequest createMockAdvanceStudyRequest(final Integer breedingMethodId, final Integer methodVariateId,
-		final Integer plotVariateId, final Integer linesSelected,
-		final Integer lineVariateId, final Boolean allPlotsSelected) {
+		final Integer linesSelected, final Integer lineVariateId, final Boolean allPlotsSelected, final Integer plotVariateId) {
+
+		final AdvanceStudyRequest advanceStudyRequest = Mockito.mock(AdvanceStudyRequest.class);
 
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			Mockito.mock(AdvanceStudyRequest.BreedingMethodSelectionRequest.class);
 		Mockito.when(breedingMethodSelectionRequest.getBreedingMethodId()).thenReturn(breedingMethodId);
 		Mockito.when(breedingMethodSelectionRequest.getMethodVariateId()).thenReturn(methodVariateId);
-
-		final AdvanceStudyRequest.BulkingRequest bulkingRequest = Mockito.mock(AdvanceStudyRequest.BulkingRequest.class);
-		Mockito.when(bulkingRequest.getPlotVariateId()).thenReturn(plotVariateId);
-		Mockito.when(bulkingRequest.getAllPlotsSelected()).thenReturn(allPlotsSelected);
+		Mockito.when(advanceStudyRequest.getBreedingMethodSelectionRequest()).thenReturn(breedingMethodSelectionRequest);
 
 		final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest =
 			Mockito.mock(AdvanceStudyRequest.LineSelectionRequest.class);
 		Mockito.when(lineSelectionRequest.getLinesSelected()).thenReturn(linesSelected);
 		Mockito.when(lineSelectionRequest.getLineVariateId()).thenReturn(lineVariateId);
-
-		final AdvanceStudyRequest advanceStudyRequest = Mockito.mock(AdvanceStudyRequest.class);
-		Mockito.when(advanceStudyRequest.getBreedingMethodSelectionRequest()).thenReturn(breedingMethodSelectionRequest);
 		Mockito.when(advanceStudyRequest.getLineSelectionRequest()).thenReturn(lineSelectionRequest);
+
+		if (plotVariateId != null || allPlotsSelected != null) {
+			final AdvanceStudyRequest.BulkingRequest bulkingRequest = Mockito.mock(AdvanceStudyRequest.BulkingRequest.class);
+			Mockito.when(bulkingRequest.getPlotVariateId()).thenReturn(plotVariateId);
+			Mockito.when(bulkingRequest.getAllPlotsSelected()).thenReturn(allPlotsSelected);
+			Mockito.when(advanceStudyRequest.getBulkingRequest()).thenReturn(bulkingRequest);
+		}
 
 		return advanceStudyRequest;
 	}

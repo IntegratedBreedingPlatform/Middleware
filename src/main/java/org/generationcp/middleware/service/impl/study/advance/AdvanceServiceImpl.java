@@ -286,9 +286,11 @@ public class AdvanceServiceImpl implements AdvanceService {
 					this.daoFactory.getGermplasmDao().save(germplasm);
 					advancedGermplasmGids.add(germplasm.getGid());
 
+					final Boolean allPlotsSelected =
+						request.getBulkingRequest() == null ? null : request.getBulkingRequest().getAllPlotsSelected();
 					// Adding attributes to the advanced germplasm
 					this.createGermplasmAttributes(study.getName(), advancingSource,
-						request.getBulkingRequest().getAllPlotsSelected(), germplasm.getGid(),
+						allPlotsSelected, germplasm.getGid(),
 						selectionNumber.get(), germplasm.getLocationId(), germplasm.getGdate(),
 						plotCodeVariableId, plotNumberVariableId, repNumberVariableId, trialInstanceVariableId,
 						plantNumberVariableId, studyEnvironmentVariables, environmentDataset.getVariables(),
@@ -331,7 +333,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 			final StandardVariable replicationNumberVariable = this.ontologyDataManager.getStandardVariable(TermId.REP_NO.getId(), null);
 			final Map<String, String> variableTypeMap = new HashMap<>();
-			variableTypeMap.put(String.valueOf(TermId.REP_NO.getId()), replicationNumberVariable.getVariableTypes().iterator().next().name());
+			variableTypeMap
+				.put(String.valueOf(TermId.REP_NO.getId()), replicationNumberVariable.getVariableTypes().iterator().next().name());
 			filter.setVariableTypeMap(variableTypeMap);
 			plotDataObservationsSearchDTO.setFilter(filter);
 		}
@@ -503,11 +506,13 @@ public class AdvanceServiceImpl implements AdvanceService {
 			advancingSource.getPlantsSelected(), plotObservation,
 			studyEnvironmentVariables, locationNameByIds, studyInstancesByInstanceNumber, environmentVariables);
 
-		final Attribute plotCodeAttribute = this.createGermplasmAttribute(advancedGermplasmGid, seedSource, plotCodeVariableId, locationId, date);
+		final Attribute plotCodeAttribute =
+			this.createGermplasmAttribute(advancedGermplasmGid, seedSource, plotCodeVariableId, locationId, date);
 		this.daoFactory.getAttributeDAO().save(plotCodeAttribute);
 
 		if (plotNumberVariableId != null) {
-			final Attribute plotNumberAttribute = this.createGermplasmAttribute(advancedGermplasmGid, plotNumber, plotNumberVariableId, locationId, date);
+			final Attribute plotNumberAttribute =
+				this.createGermplasmAttribute(advancedGermplasmGid, plotNumber, plotNumberVariableId, locationId, date);
 			this.daoFactory.getAttributeDAO().save(plotNumberAttribute);
 		}
 
