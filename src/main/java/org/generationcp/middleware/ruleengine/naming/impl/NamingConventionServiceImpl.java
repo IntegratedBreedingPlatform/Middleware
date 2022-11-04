@@ -67,14 +67,14 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 	@SuppressWarnings("unchecked")
 	@Deprecated
 	@Override
-	public void generateAdvanceListNames(final List<DeprecatedAdvancingSource> deprecatedAdvancingSourceItems, final boolean checkForDuplicateName,
+	public void generateAdvanceListNames(final List<DeprecatedAdvancingSource> advancingSourceItems, final boolean checkForDuplicateName,
 		final List<ImportedGermplasm> germplasmList) throws MiddlewareQueryException, RuleException {
 
 		final TimerWatch timer = new TimerWatch("advance");
 
 		Map<String, Integer> keySequenceMap = new HashMap<>();
 		final Iterator<ImportedGermplasm> germplasmIterator = germplasmList.iterator();
-		for (final DeprecatedAdvancingSource row : deprecatedAdvancingSourceItems) {
+		for (final DeprecatedAdvancingSource row : advancingSourceItems) {
 			if (row.getGermplasm() != null && row.getPlantsSelected() != null && row.getBreedingMethod() != null
 				&& row.getPlantsSelected() > 0 && row.getBreedingMethod().isBulkingMethod() != null) {
 				row.setKeySequenceMap(keySequenceMap);
