@@ -15,7 +15,8 @@ import java.util.Map;
 import java.util.Random;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 public class PlantSelectedResolverTest {
 
@@ -50,8 +51,8 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getAllPlotsSelected();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getPlotVariateId();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getPlotVariateId();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.times(2)).getLinesSelected();
@@ -82,8 +83,8 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getAllPlotsSelected();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getPlotVariateId();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getPlotVariateId();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.times(1)).getLinesSelected();
@@ -111,8 +112,8 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getPlotVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getPlotVariateId();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.times(2)).getAllPlotsSelected();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLinesSelected();
@@ -146,8 +147,8 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getPlotVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.times(1)).getPlotVariateId();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.times(2)).getAllPlotsSelected();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLinesSelected();
@@ -180,8 +181,8 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getPlotVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.times(1)).getPlotVariateId();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.times(2)).getAllPlotsSelected();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLinesSelected();
@@ -212,8 +213,8 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getPlotVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getPlotVariateId();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getAllPlotsSelected();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLinesSelected();
@@ -251,8 +252,8 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getPlotVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getPlotVariateId();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getAllPlotsSelected();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.times(2)).getLinesSelected();
@@ -290,8 +291,8 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getPlotVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getPlotVariateId();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getAllPlotsSelected();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.times(1)).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.times(1)).getLinesSelected();
@@ -329,8 +330,8 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getPlotVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.never()).getPlotVariateId();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.times(2)).getAllPlotsSelected();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLinesSelected();
@@ -370,8 +371,8 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getPlotVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.times(1)).getPlotVariateId();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.times(2)).getAllPlotsSelected();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLinesSelected();
@@ -410,8 +411,8 @@ public class PlantSelectedResolverTest {
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getMethodVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getPlotVariateId();
-		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getAllPlotsSelected();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.times(1)).getPlotVariateId();
+		Mockito.verify(advanceStudyRequest.getBulkingRequest(), Mockito.times(2)).getAllPlotsSelected();
 
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLineVariateId();
 		Mockito.verify(advanceStudyRequest.getLineSelectionRequest(), Mockito.never()).getLinesSelected();
@@ -425,8 +426,10 @@ public class PlantSelectedResolverTest {
 			Mockito.mock(AdvanceStudyRequest.BreedingMethodSelectionRequest.class);
 		Mockito.when(breedingMethodSelectionRequest.getBreedingMethodId()).thenReturn(breedingMethodId);
 		Mockito.when(breedingMethodSelectionRequest.getMethodVariateId()).thenReturn(methodVariateId);
-		Mockito.when(breedingMethodSelectionRequest.getPlotVariateId()).thenReturn(plotVariateId);
-		Mockito.when(breedingMethodSelectionRequest.getAllPlotsSelected()).thenReturn(allPlotsSelected);
+
+		final AdvanceStudyRequest.BulkingRequest bulkingRequest = Mockito.mock(AdvanceStudyRequest.BulkingRequest.class);
+		Mockito.when(bulkingRequest.getPlotVariateId()).thenReturn(plotVariateId);
+		Mockito.when(bulkingRequest.getAllPlotsSelected()).thenReturn(allPlotsSelected);
 
 		final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest =
 			Mockito.mock(AdvanceStudyRequest.LineSelectionRequest.class);

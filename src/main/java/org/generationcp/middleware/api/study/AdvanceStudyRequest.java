@@ -11,13 +11,12 @@ public class AdvanceStudyRequest {
 
 	// Represents the selected instance ids
 	private List<Integer> instanceIds;
-
-	private BreedingMethodSelectionRequest breedingMethodSelectionRequest;
-	private LineSelectionRequest lineSelectionRequest;
-
 	// TODO: add replications param
 	private Set<String> selectedReplications;
 
+	private BreedingMethodSelectionRequest breedingMethodSelectionRequest;
+	private LineSelectionRequest lineSelectionRequest;
+	private BulkingRequest bulkingRequest;
 	private SelectionTraitRequest selectionTraitRequest;
 
 	public List<Integer> getInstanceIds() {
@@ -26,6 +25,14 @@ public class AdvanceStudyRequest {
 
 	public void setInstanceIds(final List<Integer> instanceIds) {
 		this.instanceIds = instanceIds;
+	}
+
+	public Set<String> getSelectedReplications() {
+		return selectedReplications;
+	}
+
+	public void setSelectedReplications(final Set<String> selectedReplications) {
+		this.selectedReplications = selectedReplications;
 	}
 
 	public BreedingMethodSelectionRequest getBreedingMethodSelectionRequest() {
@@ -45,12 +52,12 @@ public class AdvanceStudyRequest {
 		this.lineSelectionRequest = lineSelectionRequest;
 	}
 
-	public Set<String> getSelectedReplications() {
-		return selectedReplications;
+	public BulkingRequest getBulkingRequest() {
+		return bulkingRequest;
 	}
 
-	public void setSelectedReplications(final Set<String> selectedReplications) {
-		this.selectedReplications = selectedReplications;
+	public void setBulkingRequest(final BulkingRequest bulkingRequest) {
+		this.bulkingRequest = bulkingRequest;
 	}
 
 	public SelectionTraitRequest getSelectionTraitRequest() {
@@ -89,13 +96,6 @@ public class AdvanceStudyRequest {
 		 */
 		private Integer methodVariateId;
 
-		/**
-		 * If the breedingMethodId corresponds to a bulking method or if the methodVariateId was selected, then allPlotsSelected or plotVariateId
-		 * must be set
-		 */
-		private Boolean allPlotsSelected;
-		private Integer plotVariateId;
-
 		public Integer getBreedingMethodId() {
 			return breedingMethodId;
 		}
@@ -110,22 +110,6 @@ public class AdvanceStudyRequest {
 
 		public void setMethodVariateId(final Integer methodVariateId) {
 			this.methodVariateId = methodVariateId;
-		}
-
-		public Boolean getAllPlotsSelected() {
-			return allPlotsSelected;
-		}
-
-		public void setAllPlotsSelected(final Boolean allPlotsSelected) {
-			this.allPlotsSelected = allPlotsSelected;
-		}
-
-		public Integer getPlotVariateId() {
-			return plotVariateId;
-		}
-
-		public void setPlotVariateId(final Integer plotVariateId) {
-			this.plotVariateId = plotVariateId;
 		}
 
 		@Override
@@ -145,6 +129,41 @@ public class AdvanceStudyRequest {
 
 	}
 
+	/**
+	 * If the breedingMethodId corresponds to a bulking method or if the methodVariateId was selected, then the BulkingRequest must has data
+	 *  for all plots selected or the variate that defines which plots were selected
+	 * must be set
+	 */
+	@AutoProperty
+	public static class BulkingRequest {
+
+		/**
+		 * If the user has selected all plots
+		 */
+		private Boolean allPlotsSelected;
+
+		/**
+		 * The variate id that defines which plots were selected
+		 */
+		private Integer plotVariateId;
+
+		public Boolean getAllPlotsSelected() {
+			return allPlotsSelected;
+		}
+
+		public void setAllPlotsSelected(final Boolean allPlotsSelected) {
+			this.allPlotsSelected = allPlotsSelected;
+		}
+
+		public Integer getPlotVariateId() {
+			return plotVariateId;
+		}
+
+		public void setPlotVariateId(final Integer plotVariateId) {
+			this.plotVariateId = plotVariateId;
+		}
+
+	}
 
 	@AutoProperty
 	public static class LineSelectionRequest {

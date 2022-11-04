@@ -51,16 +51,14 @@ public class PlantSelectedResolver {
 			return null;
 		}
 
-		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
-			request.getBreedingMethodSelectionRequest();
-		final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest =
-			request.getLineSelectionRequest();
+		final AdvanceStudyRequest.BulkingRequest bulkingRequest = request.getBulkingRequest();
+		final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest = request.getLineSelectionRequest();
 		if (isBulkMethod) {
-			if (breedingMethodSelectionRequest.getAllPlotsSelected() == null || !breedingMethodSelectionRequest.getAllPlotsSelected()) {
+			if (bulkingRequest.getAllPlotsSelected() == null || !bulkingRequest.getAllPlotsSelected()) {
 				// User has selected a variable that defines the number of lines selected from each plot. However, this is tricky because
 				// the variable works as a boolean. It return 1 if there is a value present, otherwise it returns zero.
 				final String plotVariateValue =
-					plotObservation.getVariableValueByVariableId(breedingMethodSelectionRequest.getPlotVariateId());
+					plotObservation.getVariableValueByVariableId(bulkingRequest.getPlotVariateId());
 				return StringUtils.isEmpty(plotVariateValue) ? 0 : 1;
 			} else {
 				return 1;

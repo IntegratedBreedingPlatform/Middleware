@@ -287,7 +287,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 					// Adding attributes to the advanced germplasm
 					this.createGermplasmAttributes(study.getName(), advancingSource,
-						request.getBreedingMethodSelectionRequest().getAllPlotsSelected(), germplasm.getGid(),
+						request.getBulkingRequest().getAllPlotsSelected(), germplasm.getGid(),
 						selectionNumber.get(), germplasm.getLocationId(), germplasm.getGdate(),
 						plotCodeVariableId, plotNumberVariableId, repNumberVariableId, trialInstanceVariableId,
 						plantNumberVariableId, studyEnvironmentVariables, environmentDataset.getVariables(),
