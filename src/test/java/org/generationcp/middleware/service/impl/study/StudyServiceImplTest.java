@@ -105,7 +105,6 @@ public class StudyServiceImplTest {
 		germplasmDescriptorsMap.put(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name());
 		germplasmDescriptorsMap.put(TermId.ENTRY_TYPE.getId(),TermId.ENTRY_TYPE.name());
 		germplasmDescriptorsMap.put(TermId.ENTRY_CODE.getId(),TermId.ENTRY_CODE.name());
-		germplasmDescriptorsMap.put(TermId.OBS_UNIT_ID.getId(),TermId.OBS_UNIT_ID.name());
 		germplasmDescriptorsMap.put(TermId.STOCK_ID.getId(), StudyServiceImplTest.STOCK_ID);
 		Mockito.when(this.studyServiceImpl.getGenericGermplasmDescriptors(StudyServiceImplTest.STUDY_ID)).thenReturn(germplasmDescriptorsMap);
 
