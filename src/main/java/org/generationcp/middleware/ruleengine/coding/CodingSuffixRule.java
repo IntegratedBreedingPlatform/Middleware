@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 @Component
-public class PrefixRule extends OrderedRule<CodingRuleExecutionContext> {
+public class CodingSuffixRule extends OrderedRule<CodingRuleExecutionContext> {
 
-	public static final String KEY = "Prefix";
+	public static final String KEY = "Suffix";
 
 	@Resource
 	private CodingExpressionResolver codingExpressionResolver;
@@ -20,13 +20,13 @@ public class PrefixRule extends OrderedRule<CodingRuleExecutionContext> {
 	public Object runRule(final CodingRuleExecutionContext context) throws RuleException {
 
 		final NamingConfiguration namingConfiguration = context.getNamingConfiguration();
-		String prefix = context.getNamingConfiguration().getPrefix();
+		String suffix = context.getNamingConfiguration().getSuffix();
 
-		if (prefix == null) {
-			prefix = "";
+		if (suffix == null) {
+			suffix = "";
 		}
 
-		final String resolvedData = codingExpressionResolver.resolve(context.getCurrentData(), prefix, namingConfiguration).get(0);
+		final String resolvedData = codingExpressionResolver.resolve(context.getCurrentData(), suffix, namingConfiguration).get(0);
 
 		context.setCurrentData(resolvedData);
 
@@ -36,6 +36,6 @@ public class PrefixRule extends OrderedRule<CodingRuleExecutionContext> {
 
 	@Override
 	public String getKey() {
-		return PrefixRule.KEY;
+		return CodingSuffixRule.KEY;
 	}
 }

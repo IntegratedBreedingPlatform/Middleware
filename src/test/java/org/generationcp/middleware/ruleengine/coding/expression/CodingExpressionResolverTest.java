@@ -36,9 +36,9 @@ public class CodingExpressionResolverTest {
 		namingConfiguration.setPrefix(prefix);
 		final String currentInput = "CML";
 
-		final SequenceExpression sequenceExpression = new SequenceExpression();
-		sequenceExpression.setGermplasmNamingService(this.germplasmNamingService);
-		Mockito.when(this.factory.lookup(SEQUENCE_CODE)).thenReturn(sequenceExpression);
+		final CodingSequenceExpression codingSequenceExpression = new CodingSequenceExpression();
+		codingSequenceExpression.setGermplasmNamingService(this.germplasmNamingService);
+		Mockito.when(this.factory.lookup(SEQUENCE_CODE)).thenReturn(codingSequenceExpression);
 		Mockito.when(this.germplasmNamingService.getNextNumberAndIncrementSequence(prefix)).thenReturn(startingSequenceNumber);
 		Mockito.when(this.germplasmNamingService.getNumberWithLeadingZeroesAsString(startingSequenceNumber, 1)).thenReturn(String.valueOf(startingSequenceNumber));
 
