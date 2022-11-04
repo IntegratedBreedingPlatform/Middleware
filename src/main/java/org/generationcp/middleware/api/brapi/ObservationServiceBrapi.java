@@ -13,4 +13,6 @@ public interface ObservationServiceBrapi {
 	long countObservations(ObservationSearchRequestDto observationSearchRequestDto);
 
 	List<ObservationDto> createObservations(List<ObservationDto> observations);
+
+	List<ObservationDto> updateObservations(List<ObservationDto> observations);
 }
