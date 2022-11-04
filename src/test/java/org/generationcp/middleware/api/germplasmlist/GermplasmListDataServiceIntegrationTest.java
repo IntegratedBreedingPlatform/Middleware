@@ -141,7 +141,7 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 
 		final Germplasm savedGermplasm = this.daoFactory.getGermplasmDao().save(germplasm);
 
-		final UserDefinedField nameType = this.createRandomeNameType();
+		final UserDefinedField nameType = this.createRandomNameType();
 
 		final Name name = new Name(null, savedGermplasm, nameType.getFldno(), 1, "Name", 0, 0, 0);
 		this.daoFactory.getNameDao().save(name);
@@ -194,7 +194,7 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 
 		final Germplasm savedGermplasm = this.daoFactory.getGermplasmDao().save(germplasm);
 
-		final UserDefinedField nameType = this.createRandomeNameType();
+		final UserDefinedField nameType = this.createRandomNameType();
 
 		final Name name = new Name(null, savedGermplasm, nameType.getFldno(), 1, "Name", 0, 0, 0);
 		this.daoFactory.getNameDao().save(name);
@@ -242,7 +242,7 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 		Assert.assertEquals(0, germplasmListDataDetails.get(0).getListData().getList().getView().size());
 	}
 
-	private UserDefinedField createRandomeNameType() {
+	private UserDefinedField createRandomNameType() {
 		UserDefinedField userDefinedField = new UserDefinedField();
 		userDefinedField.setFtable(UDTableType.NAMES_NAME.getTable());
 		userDefinedField.setFtype(UDTableType.NAMES_NAME.getType());
