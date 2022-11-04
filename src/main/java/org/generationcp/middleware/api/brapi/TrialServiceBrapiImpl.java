@@ -469,11 +469,6 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 					"ENTRY_NO");
 			properties.add(entryNoProp);
 
-			final ProjectProperty obsUnitIdProp =
-				new ProjectProperty(dataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, 8, TermId.OBS_UNIT_ID.getId(),
-					"OBS_UNIT_ID");
-			properties.add(obsUnitIdProp);
-
 		}
 		dataset.setProperties(properties);
 	}
