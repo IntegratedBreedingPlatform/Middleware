@@ -75,7 +75,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		 */
 		final List<Integer> fixedGermplasmDescriptors =
 			Lists.newArrayList(TermId.GID.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.ENTRY_TYPE.getId(),
-				TermId.ENTRY_CODE.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId());
+				TermId.ENTRY_CODE.getId(), TermId.CROSS.getId());
 		final Map<Integer, String> genericGermplasmDescriptors = Maps.newHashMap();
 
 		for (final Map.Entry<Integer, String> gpDescriptor : allGermplasmDescriptors.entrySet()) {
@@ -96,8 +96,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		 */
 		final List<Integer> fixedDesignFactors =
 			Lists.newArrayList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId(), TermId.ROW.getId(),
-				TermId.COL.getId(), TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE
-					.getId());
+				TermId.COL.getId(), TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId(),TermId.OBS_UNIT_ID.getId());
 		final Map<Integer, String> additionalDesignFactors = Maps.newHashMap();
 
 		for (final Map.Entry<Integer, String> designFactor : allDesignFactors.entrySet()) {

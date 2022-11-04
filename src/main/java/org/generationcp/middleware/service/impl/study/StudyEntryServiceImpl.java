@@ -409,16 +409,15 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 					VariableType.GERMPLASM_PASSPORT.getId(),
 					VariableType.GERMPLASM_DESCRIPTOR.getId(),
 					VariableType.ENTRY_DETAIL.getId()));
-		variables.removeIf(variable -> variable.getTermId() == TermId.OBS_UNIT_ID.getId());
 
 		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.datasetService.getDatasetNameTypes(plotDatasetId);
 		germplasmNameTypeDTOs.sort(Comparator.comparing(GermplasmNameTypeDTO::getCode));
 		variables.addAll(germplasmNameTypeDTOs.stream().map(
-			germplasmNameTypeDTO -> //
-				new MeasurementVariable(germplasmNameTypeDTO.getCode(), //
-					germplasmNameTypeDTO.getDescription(), //
-					germplasmNameTypeDTO.getId(), null, //
-					germplasmNameTypeDTO.getCode(), true)) //
+				germplasmNameTypeDTO -> //
+					new MeasurementVariable(germplasmNameTypeDTO.getCode(), //
+						germplasmNameTypeDTO.getDescription(), //
+						germplasmNameTypeDTO.getId(), null, //
+						germplasmNameTypeDTO.getCode(), true)) //
 			.collect(Collectors.toSet()));
 
 		return variables;
