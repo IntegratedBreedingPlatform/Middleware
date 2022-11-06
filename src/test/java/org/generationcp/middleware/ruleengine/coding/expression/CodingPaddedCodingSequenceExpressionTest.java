@@ -16,14 +16,14 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class PaddedSequenceExpressionTest {
+public class CodingPaddedCodingSequenceExpressionTest {
 
 	private static final Integer NEXT_NUMBER_FROM_DB = 43;
 	private static final String PREFIX = "ABC";
 	private static final String SUFFIX = "XYZ";
 	private static final String PADSEQ = "[PADSEQ]";
 	private static final String PADSEQ_WITH_NUMBER = "[PADSEQ.%s]";
-	private final PaddedSequenceExpression padSeqExpression = new PaddedSequenceExpression();
+	private final CodingPaddedSequenceExpression padSeqExpression = new CodingPaddedSequenceExpression();
 	private final NamingConfiguration namingConfiguration = new NamingConfiguration();
 
 	@Mock
@@ -46,7 +46,7 @@ public class PaddedSequenceExpressionTest {
 
 	@Test
 	public void testExpressionRegex() {
-		Assert.assertTrue(PaddedSequenceExpressionTest.PADSEQ.matches(this.padSeqExpression.getExpressionKey()));
+		Assert.assertTrue(CodingPaddedCodingSequenceExpressionTest.PADSEQ.matches(this.padSeqExpression.getExpressionKey()));
 		Assert.assertTrue("[PADSEQ.2]".matches(this.padSeqExpression.getExpressionKey()));
 		Assert.assertTrue("[PADSEQ.23]".matches(this.padSeqExpression.getExpressionKey()));
 		Assert.assertFalse("[PADSEQ.AB2]".matches(this.padSeqExpression.getExpressionKey()));
@@ -68,7 +68,7 @@ public class PaddedSequenceExpressionTest {
 	@Test
 	public void testApplyWithNumberOfDigitsSpecified() {
 		final Integer numberofDigits = 5;
-		this.namingConfiguration.setCount(String.format(PaddedSequenceExpressionTest.PADSEQ_WITH_NUMBER, numberofDigits));
+		this.namingConfiguration.setCount(String.format(CodingPaddedCodingSequenceExpressionTest.PADSEQ_WITH_NUMBER, numberofDigits));
 		final Integer count = 3;
 		final List<StringBuilder> values = this.createInitialValues(this.namingConfiguration, count);
 		Mockito.doReturn("000" + NEXT_NUMBER_FROM_DB, "000" + (NEXT_NUMBER_FROM_DB + 1), "000" + (NEXT_NUMBER_FROM_DB + 2))

@@ -192,7 +192,8 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final List<Variable> germplasmListVariables =
 			this.germplasmListService.getGermplasmListVariables(null, listId, VariableType.ENTRY_DETAIL.getId());
 		final List<ProjectProperty> entryDetailsProjectProperties = germplasmListVariables.stream()
-			.filter(variable -> TermId.ENTRY_TYPE.getId() != variable.getId() && TermId.ENTRY_NO.getId() != variable.getId())
+			.filter(variable -> !variable.isObsolete() && TermId.ENTRY_TYPE.getId() != variable.getId()
+				&& TermId.ENTRY_NO.getId() != variable.getId())
 			.map(variable -> new ProjectProperty(plotDataDataset, VariableType.ENTRY_DETAIL.getId(), null,
 				projectPropertyInitialRank.getAndIncrement(), variable.getId(), variable.getName()))
 			.collect(Collectors.toList());
@@ -381,7 +382,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 					VariableType.GERMPLASM_PASSPORT.getId(),
 					VariableType.GERMPLASM_DESCRIPTOR.getId(),
 					VariableType.ENTRY_DETAIL.getId()));
-		variables.removeIf(variable -> variable.getTermId() == TermId.OBS_UNIT_ID.getId());
 		return variables;
 	}
 

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 @Component
-public class CountRule extends OrderedRule<CodingRuleExecutionContext> {
+public class CodingCountRule extends OrderedRule<CodingRuleExecutionContext> {
 
 	public static final String KEY = "Count";
 
@@ -36,6 +36,6 @@ public class CountRule extends OrderedRule<CodingRuleExecutionContext> {
 
 	@Override
 	public String getKey() {
-		return CountRule.KEY;
+		return CodingCountRule.KEY;
 	}
 }

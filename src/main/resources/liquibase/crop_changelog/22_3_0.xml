@@ -1,0 +1,104 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="clarysabel" id="v22.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="listdata" columnName="entrycd_bkp"/>
+		</preConditions>
+		<comment>Drop column listdata.entrycd_bkp</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE listdata DROP COLUMN entrycd_bkp;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v22.3.0-2">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="stock" columnName="value_bkp"/>
+		</preConditions>
+		<comment>Drop column stock.value_bkp</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE stock DROP COLUMN value_bkp;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v22.3.0-3">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="stock" columnName="type_id_bkp"/>
+		</preConditions>
+		<comment>Drop column stock.type_id_bkp</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE stock DROP COLUMN type_id_bkp;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v22.3.0-4">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<columnExists tableName="program_location_default" columnName="breeding_location_id"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM program_location_default
+					WHERE breeding_location_id is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'program_location_default'
+					AND COLUMN_NAME = 'breeding_location_id'
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Set program_location_default.breeding_location_id as not nullable
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE program_location_default
+				MODIFY COLUMN breeding_location_id INT(11) NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v22.3.0-5">
+		<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT count(1) > 0 from projectprop where
+					    variable_id = (select cvterm_id from cvterm where name ='OBS_UNIT_ID' and cv_id = 1040)
+						and type_id = 1804 and project_id in (SELECT project_id FROM project where program_uuid is null);
+				</sqlCheck>
+		</preConditions>
+		<comment>Remove OBS_UNIT_ID variable from the study templates</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @OBS_UNIT_ID = (select cvterm_id from cvterm where name ='OBS_UNIT_ID' and cv_id = 1040);
+
+			delete from projectprop where variable_id = @OBS_UNIT_ID and type_id = 1804 and
+					project_id in (SELECT project_id FROM project where program_uuid is null);
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v22.3.0-6">
+		<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					select count(1) > 0 from cvtermprop where
+					    cvterm_id = (select cvterm_id from cvterm where name ='OBS_UNIT_ID' and cv_id = 1040)
+					      and value = 'Germplasm Descriptor';
+				</sqlCheck>
+		</preConditions>
+		<comment>Recategorize OBS_UNIT_ID as Experimental Design variable</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @OBS_UNIT_ID = (select cvterm_id from cvterm where name ='OBS_UNIT_ID' and cv_id = 1040);
+
+			# update the type of variable as Germplasm Descriptor.
+			UPDATE CVTERMPROP SET value = 'Experimental Design' WHERE CVTERM_ID = @OBS_UNIT_ID;
+
+			# update the Germplasm Descriptor cvterm_id by Experimental Design in the projectprop table.
+			UPDATE projectprop SET type_id = 1810  WHERE variable_id = @OBS_UNIT_ID and type_id = 1804;
+
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

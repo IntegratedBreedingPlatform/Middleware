@@ -6,7 +6,7 @@ import org.junit.Test;
 public class BaseCodingExpressionTest {
 	private static final String SEQUENCE_CODE = "[SEQUENCE]";
 
-	private final SequenceExpression expression = new SequenceExpression();
+	private final CodingSequenceExpression expression = new CodingSequenceExpression();
 
 	@Test
 	public void testReplaceProcessCodeWithValue() {

@@ -417,4 +417,12 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
+	public long countAllActiveUsers() {
+		final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
+		criteria.setProjection(Projections.rowCount());
+		criteria.add(Restrictions.eq("status", 0));
+		criteria.setMaxResults(Integer.MAX_VALUE);
+		return (long) criteria.uniqueResult();
+	}
+
 }
