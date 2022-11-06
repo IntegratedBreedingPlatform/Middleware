@@ -287,7 +287,7 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		 */
 		pedigreeNodeSearchRequest.setPedigreeDepth(4);
 		result = this.pedigreeServiceBrapi.searchPedigreeNodes(pedigreeNodeSearchRequest, null);
-		assertEquals(19, result.size());
+		assertEquals(18, result.size());
 
 		/**
 		 * Level 5

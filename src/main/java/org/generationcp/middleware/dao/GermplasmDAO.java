@@ -693,7 +693,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private void extractParentsGids(final Set<Integer> germplasmGids, final Set<Integer> gidsOfGermplasmAlreadyFetched,
 		final Germplasm germplasm) {
-		if (germplasm.getGpid1() != null && !gidsOfGermplasmAlreadyFetched.contains(germplasm.getGpid1())) {
+		if (germplasm.getMethod().isGenerative() && germplasm.getGpid1() != null && !gidsOfGermplasmAlreadyFetched.contains(germplasm.getGpid1())) {
 			germplasmGids.add(germplasm.getGpid1());
 		}
 		if (germplasm.getGpid2() != null && !gidsOfGermplasmAlreadyFetched.contains(germplasm.getGpid2())) {
