@@ -357,7 +357,6 @@ public class ExperimentBuilder extends Builder {
 		this.addExperimentFactors(variables, experimentModel, variableTypes);
 		this.addGermplasmFactors(variables, experimentModel, variableTypes, stockModelMap, derivativeParentsMapByGids, pedigreeTreeNodeTable,
 			attributeMapByGidsAndAttributeId);
-		this.addObsUnitIdFactor(variables, experimentModel, variableTypes);
 	}
 
 	private void addPlotExperimentFactors(final VariableList variables, final ExperimentModel experimentModel,
@@ -532,12 +531,16 @@ public class ExperimentBuilder extends Builder {
 		final VariableTypeList variableTypes) {
 		if (experimentModel.getProperties() != null) {
 			for (final ExperimentProperty property : experimentModel.getProperties()) {
+				if (property.getTypeId().equals(TermId.OBS_UNIT_ID.getId())) {
+					continue;
+				}
 				// Exclude the BLOCK_ID experiment property because it is not expected to included in the dataset variable list.
 				if (!property.getTypeId().equals(TermId.BLOCK_ID.getId())) {
 					variables.add(this.createVariable(property, variableTypes, PhenotypicType.TRIAL_DESIGN));
 				}
 			}
 		}
+		this.addObsUnitIdFactor(variables, experimentModel, variableTypes);
 	}
 
 	private void addExperimentFactors(final VariableList variables, final ExperimentModel experimentModel,
