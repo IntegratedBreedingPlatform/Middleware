@@ -34,6 +34,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.PhenotypeExternalReference;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -59,6 +60,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -406,6 +408,47 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertFalse(datasetVariablesMaps.get(summaryStatisticsDatasetId).containsKey(analysisVariable.getCvTermId()));
 
 	}
+
+	@Test
+	public void testUpdateObservations() {
+		final List<ObservationDto> observationDtos = this.createObservationDtos();
+		Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(Integer.valueOf(observationDtos.get(0).getObservationDbId()));
+		Assert.assertEquals(VALUE, phenotype.getDraftValue());
+		observationDtos.get(0).setValue(RandomStringUtils.randomNumeric(5));
+		this.observationServiceBrapi.updateObservations(observationDtos);
+		phenotype = this.daoFactory.getPhenotypeDAO().getById(Integer.valueOf(observationDtos.get(0).getObservationDbId()));
+		Assert.assertNotEquals(VALUE, phenotype.getDraftValue());
+		Assert.assertEquals(observationDtos.get(0).getValue(), phenotype.getDraftValue());
+	}
+
+	@Test
+	public void testUpdateObservations_UpdateExternalReferences() {
+		final List<ObservationDto> observationDtos = this.createObservationDtos();
+		Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(Integer.valueOf(observationDtos.get(0).getObservationDbId()));
+		Assert.assertEquals(1, phenotype.getExternalReferences().size());
+		Assert.assertEquals(observationDtos.get(0).getExternalReferences().get(0).getReferenceID(), phenotype.getExternalReferences().get(0).getReferenceId());
+
+		final String newRefId = RandomStringUtils.randomAlphanumeric(10);
+		observationDtos.get(0).getExternalReferences().get(0).setReferenceID(newRefId);
+		final ExternalReferenceDTO externalReferenceDTO = new ExternalReferenceDTO();
+		externalReferenceDTO.setReferenceID(RandomStringUtils.randomAlphanumeric(10));
+		externalReferenceDTO.setReferenceSource(RandomStringUtils.randomAlphanumeric(10));
+		observationDtos.get(0).getExternalReferences().add(externalReferenceDTO);
+
+		this.observationServiceBrapi.updateObservations(observationDtos);
+		phenotype = this.daoFactory.getPhenotypeDAO().getById(Integer.valueOf(observationDtos.get(0).getObservationDbId()));
+		Assert.assertEquals(2, phenotype.getExternalReferences().size());
+		Optional<PhenotypeExternalReference> existingPhenotypeExternalReference = phenotype.getExternalReferences().stream()
+				.filter(exref -> exref.getSource().equals(REF_SOURCE)).findFirst();
+		Assert.assertTrue(existingPhenotypeExternalReference.isPresent());
+		Assert.assertEquals(newRefId, existingPhenotypeExternalReference.get().getReferenceId());
+
+		Optional<PhenotypeExternalReference> addedPhenotypeExternalReference = phenotype.getExternalReferences().stream()
+				.filter(exref -> exref.getSource().equals(externalReferenceDTO.getReferenceSource())).findFirst();
+		Assert.assertTrue(addedPhenotypeExternalReference.isPresent());
+		Assert.assertEquals(externalReferenceDTO.getReferenceID(), addedPhenotypeExternalReference.get().getReferenceId());
+	}
+
 
 	private ObservationDto createObservationDto(final String value, final CVTerm traitVariable) {
 		final ObservationDto observationDtoForTrait = new ObservationDto();
