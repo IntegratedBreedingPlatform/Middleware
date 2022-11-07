@@ -612,7 +612,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final GermplasmSearchRequest germplasmSearchRequest = this.convertToGermplasmSearchRequest(pedigreeNodeSearchRequest);
 		final SQLQuery filterQuery = this.getSession().createSQLQuery(this.buildFilterGermplasmQuery(germplasmSearchRequest));
 		this.addGermplasmSearchParameters(new SqlQueryParamBuilder(filterQuery), germplasmSearchRequest);
-		addPaginationToSQLQuery(filterQuery, pageable);
 
 		// Use Set to make sure there will be no duplicates
 		final Set<PedigreeNodeDTO> pedigreeNodesToReturn = new HashSet<>();
