@@ -22,10 +22,10 @@ public class OneTimePasswordServiceImpl implements OneTimePasswordService {
 	final Random random = new Random();
 
 	@Value("${security.2fa.otp.expiry.interval}")
-	private int expiry = 5; // In minutes
+	private int expiry; // In minutes
 
 	@Value("${security.2fa.otp.length}")
-	private int otpCodeLength = 5;
+	private int otpCodeLength;
 
 	public OneTimePasswordServiceImpl(final HibernateSessionProvider workbenchSessionProvider) {
 		this.workbenchDaoFactory = new WorkbenchDaoFactory(workbenchSessionProvider);

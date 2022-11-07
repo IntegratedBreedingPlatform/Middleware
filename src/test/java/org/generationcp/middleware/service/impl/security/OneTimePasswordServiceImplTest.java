@@ -26,11 +26,12 @@ public class OneTimePasswordServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testIsOneTimePasswordValid_TokenAlreadyExpired() {
+	public void testIsOneTimePasswordValid_TokenAlreadyExpired() throws InterruptedException {
 		final OneTimePasswordServiceImpl oneTimePasswordServiceTemp = new OneTimePasswordServiceImpl(this.workbenchSessionProvider);
 		// Override expiry time to 0 so that OTP created is immediately expired
 		oneTimePasswordServiceTemp.setExpiry(0);
 		final OneTimePasswordDto oneTimePasswordDto = oneTimePasswordServiceTemp.createOneTimePassword();
+		Thread.sleep(1000);
 		Assert.assertFalse(oneTimePasswordServiceTemp.isOneTimePasswordValid(oneTimePasswordDto.getOtpCode()));
 	}
 
