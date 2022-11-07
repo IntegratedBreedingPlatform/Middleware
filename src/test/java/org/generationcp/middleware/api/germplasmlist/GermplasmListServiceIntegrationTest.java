@@ -9,7 +9,6 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
-import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
@@ -790,7 +789,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 
 	private Germplasm createGermplasm(final Method method) {
 		final Germplasm germplasm = new Germplasm(null, 0, 0, 0,
-			0, 0, 0, 0,
+			0, 0, 0,
 			0, 0, null, null, method);
 
 		final Germplasm savedGermplasm = this.daoFactory.getGermplasmDao().save(germplasm);

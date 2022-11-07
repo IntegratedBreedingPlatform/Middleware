@@ -69,7 +69,7 @@ public class LotAttributeServiceImplIntegrationTest extends IntegrationTestBase 
 		this.cropType.setUseUUID(false);
 
 		final Germplasm germplasm =
-			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		this.lot =

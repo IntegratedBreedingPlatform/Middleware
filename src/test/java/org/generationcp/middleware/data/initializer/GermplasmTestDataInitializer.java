@@ -7,7 +7,6 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.util.Util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -18,7 +17,7 @@ public class GermplasmTestDataInitializer {
 
 	public static Germplasm createGermplasmWithPreferredName() {
 		final Name name = new Name(null, null, 1, 1, GermplasmTestDataInitializer.PREFERRED_NAME, 0, 0, 0);
-		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(),
+		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(),
 			0, 0, 0, name, null, new Method(1));
 		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
 		return germplasm;
@@ -26,7 +25,7 @@ public class GermplasmTestDataInitializer {
 
 	public static Germplasm createGermplasmWithPreferredName(final String preferredName) {
 		final Name name = new Name(null, null, 1, 1, preferredName, 0, 0, 0);
-		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(),
+		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(),
 			0, 0, 0, name, null, new Method(1));
 		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
 		return germplasm;
@@ -39,28 +38,25 @@ public class GermplasmTestDataInitializer {
 		germplasm.setGpid1(1);
 		germplasm.setGpid2(2);
 		germplasm.setGnpgs(2);
-		germplasm.setLgid(Integer.valueOf(0));
 		germplasm.setGrplce(Integer.valueOf(0));
 		germplasm.setLocationId(Integer.valueOf(1));
 		germplasm.setMethod(new Method(1));
 		germplasm.setMgid(Integer.valueOf(0));
 		germplasm.setReferenceId(Integer.valueOf(1));
-		germplasm.setLgid(Integer.valueOf(0));
 		germplasm.setLocationName("LocationName");
 		germplasm.setPreferredName(GermplasmTestDataInitializer.createGermplasmName(id));
 		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
 		return germplasm;
 	}
 
-	public static Germplasm createGermplasm(final Integer gDate, final int gpId1, final int gpId2, final int gnpgs, final int lgId,
-			final int grplace, final int locationId, final int methodId , final int mgId, final int userId, final int referenceId,
-			final String methodName, final String locationName) {
+	public static Germplasm createGermplasm(final Integer gDate, final int gpId1, final int gpId2, final int gnpgs,
+		final int grplace, final int locationId, final int methodId, final int mgId, final int referenceId,
+		final String locationName) {
 		final Germplasm germplasm = new Germplasm();
 		germplasm.setGdate(gDate);
 		germplasm.setGpid1(gpId1);
 		germplasm.setGpid2(gpId2);
 		germplasm.setGnpgs(gnpgs);
-		germplasm.setLgid(lgId);
 		germplasm.setGrplce(grplace);
 		germplasm.setLocationId(locationId);
 		germplasm.setMethod(new Method(methodId));

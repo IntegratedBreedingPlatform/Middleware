@@ -95,7 +95,7 @@ public class GermplasmNameServiceImplIntegrationTest extends IntegrationTestBase
 	}
 
 	private Germplasm createGermplasm() {
-		final Germplasm germplasm = new Germplasm(null, -1, 0, 0, 0, 0, 0, 0,
+		final Germplasm germplasm = new Germplasm(null, -1, 0, 0, 0, 0, 0,
 			0, 0, null, null, new Method(1));
 		this.daoFactory.getGermplasmDao().save(germplasm);
 		return germplasm;

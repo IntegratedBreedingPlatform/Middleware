@@ -153,7 +153,6 @@ public class NameDAOTest extends IntegrationTestBase {
 		germplasm.setGnpgs(0);
 		germplasm.setGpid1(0);
 		germplasm.setGpid2(0);
-		germplasm.setLgid(0);
 		germplasm.setGrplce(0);
 		germplasm.setReferenceId(0);
 		germplasm.setMgid(0);

@@ -274,7 +274,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 		germplasm.setGrplce(0);
 		germplasm.setMgid(0);
-		germplasm.setLgid(0);
 		germplasm.setLocationId(locationsMapByAbbr.get(germplasmDto.getLocationAbbr().toUpperCase()));
 		germplasm.setDeleted(Boolean.FALSE);
 		germplasm.setGdate(Integer.valueOf(germplasmDto.getCreationDate()));

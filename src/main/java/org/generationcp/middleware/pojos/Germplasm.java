@@ -212,10 +212,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	private Integer gpid2;
 
 	@Basic(optional = false)
-	@Column(name = "lgid")
-	private Integer lgid;
-
-	@Basic(optional = false)
 	@Column(name = "glocn")
 	private Integer locationId;
 
@@ -425,14 +421,13 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	}
 
 	public Germplasm(final Integer gid, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
-		final Integer lgid, final Integer locationId, final Integer gdate, final Integer referenceId,
+		final Integer locationId, final Integer gdate, final Integer referenceId,
 		final Integer grplce, final Integer mgid, final Name preferredName, final String preferredAbbreviation, final Method method) {
 		this(gid);
 		this.gid = gid;
 		this.gnpgs = gnpgs;
 		this.gpid1 = gpid1;
 		this.gpid2 = gpid2;
-		this.lgid = lgid;
 		this.locationId = locationId;
 		this.gdate = gdate;
 		this.referenceId = referenceId;
@@ -496,14 +491,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 
 	public void setGpid2(final Integer gpid2) {
 		this.gpid2 = gpid2;
-	}
-
-	public Integer getLgid() {
-		return this.lgid;
-	}
-
-	public void setLgid(final Integer lgid) {
-		this.lgid = lgid;
 	}
 
 	public Integer getGdate() {
@@ -627,8 +614,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		builder.append(this.gpid2);
 		builder.append(", createdBy=");
 		builder.append(super.getCreatedBy());
-		builder.append(", lgid=");
-		builder.append(this.lgid);
 		builder.append(", locationId=");
 		builder.append(this.locationId);
 		builder.append(", gdate=");
@@ -912,7 +897,7 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		try {
 			germplasm = (Germplasm) super.clone();
 		} catch (final CloneNotSupportedException e) {
-			germplasm =  new Germplasm(this.getGid(), this.gnpgs, this.gpid1, this.gpid2, this.lgid, this.locationId, this.gdate,
+			germplasm =  new Germplasm(this.getGid(), this.gnpgs, this.gpid1, this.gpid2, this.locationId, this.gdate,
 				this.referenceId, this.grplce, this.mgid, this.preferredName, this.preferredAbbreviation, this.method);
 		}
 		return germplasm;

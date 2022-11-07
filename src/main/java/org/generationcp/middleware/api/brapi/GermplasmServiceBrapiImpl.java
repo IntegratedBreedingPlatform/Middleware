@@ -126,7 +126,6 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
-			germplasm.setLgid(0);
 			germplasm.setGnpgs(0);
 			germplasm.setGpid1(0);
 			germplasm.setGpid2(0);

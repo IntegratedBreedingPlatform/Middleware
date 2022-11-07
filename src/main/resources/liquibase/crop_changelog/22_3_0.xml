@@ -62,4 +62,33 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="clarysabel" id="v22.3.0-10">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<columnExists tableName="program_location_default" columnName="breeding_location_id"/>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1)
+					FROM program_location_default
+					WHERE breeding_location_id is null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'program_location_default'
+					AND COLUMN_NAME = 'breeding_location_id'
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Set program_location_default.breeding_location_id as not nullable
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE program_location_default
+				MODIFY COLUMN breeding_location_id INT(11) NOT NULL;
+		</sql>
+	</changeSet>
+
+
 </databaseChangeLog>

@@ -156,7 +156,7 @@ public class CopServiceImplTest extends IntegrationTestBase {
 	private Germplasm createGermplasm(final String name, final int gnpgs, final int gpid1, final int gpid2) {
 		final Name preferredName = new Name();
 		preferredName.setNval(name);
-		final Germplasm germplasm = new Germplasm(null, gnpgs, gpid1, gpid2, 0, 0, 0, 0, 0, 0, preferredName, null, new Method(1));
+		final Germplasm germplasm = new Germplasm(null, gnpgs, gpid1, gpid2, 0, 0, 0, 0, 0, preferredName, null, new Method(1));
 		this.daoFactory.getGermplasmDao().save(germplasm);
 		this.sessionProvder.getSession().flush();
 		this.sessionProvder.getSession().refresh(germplasm);

@@ -119,7 +119,7 @@ public class GermplasmGroupingServiceImplIntegrationTest extends IntegrationTest
 		final Integer gpid1, final Integer mgid) {
 		final Method method = this.createBreedingMethod(breedingMethodType);
 		final Germplasm germplasm = new Germplasm(null, gnpgs, gpid1, 0,
-			0, 0, Integer.parseInt(this.creationDate), 0,
+			0, Integer.parseInt(this.creationDate), 0,
 			0, mgid, null, null, method);
 
 		this.daoFactory.getGermplasmDao().save(germplasm);

@@ -886,7 +886,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	private Germplasm createGermplasm() {
 		final Name name = new Name(null, null, 1, 1, "Name", 0, 0, 0);
-		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(), 0, 0, 0, name, null,
+		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(), 0, 0, 0, name, null,
 			new Method(UNKNOWN_GENERATIVE_METHOD_ID));
 
 		this.germplasmTestDataGenerator.addGermplasm(germplasm, name, this.cropType);
