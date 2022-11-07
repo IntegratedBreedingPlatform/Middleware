@@ -221,9 +221,9 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(REF_ID, observationDto.getExternalReferences().get(0).getReferenceID());
 		Assert.assertEquals(REF_SOURCE, observationDto.getExternalReferences().get(0).getReferenceSource());
 
-		Integer experimentId = this.daoFactory.getExperimentDao()
+		final Integer experimentId = this.daoFactory.getExperimentDao()
 			.getByObsUnitIds(Arrays.asList(observationDto.getObservationUnitDbId())).get(0).getNdExperimentId();
-		Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
 			experimentId, Integer.parseInt(observationDto.getObservationVariableDbId()));
 		Assert.assertEquals(VALUE, phenotype.getDraftValue());
 	}
@@ -267,9 +267,9 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(REF_ID, resultObservationDto.getExternalReferences().get(0).getReferenceID());
 		Assert.assertEquals(REF_SOURCE, resultObservationDto.getExternalReferences().get(0).getReferenceSource());
 
-		Integer experimentId = this.daoFactory.getExperimentDao()
+		final Integer experimentId = this.daoFactory.getExperimentDao()
 			.getByObsUnitIds(Arrays.asList(resultObservationDto.getObservationUnitDbId())).get(0).getNdExperimentId();
-		Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
 			experimentId, Integer.parseInt(resultObservationDto.getObservationVariableDbId()));
 		Assert.assertEquals(value, phenotype.getDraftValue());
 	}
@@ -438,12 +438,12 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		this.observationServiceBrapi.updateObservations(observationDtos);
 		phenotype = this.daoFactory.getPhenotypeDAO().getById(Integer.valueOf(observationDtos.get(0).getObservationDbId()));
 		Assert.assertEquals(2, phenotype.getExternalReferences().size());
-		Optional<PhenotypeExternalReference> existingPhenotypeExternalReference = phenotype.getExternalReferences().stream()
+		final Optional<PhenotypeExternalReference> existingPhenotypeExternalReference = phenotype.getExternalReferences().stream()
 				.filter(exref -> exref.getSource().equals(REF_SOURCE)).findFirst();
 		Assert.assertTrue(existingPhenotypeExternalReference.isPresent());
 		Assert.assertEquals(newRefId, existingPhenotypeExternalReference.get().getReferenceId());
 
-		Optional<PhenotypeExternalReference> addedPhenotypeExternalReference = phenotype.getExternalReferences().stream()
+		final Optional<PhenotypeExternalReference> addedPhenotypeExternalReference = phenotype.getExternalReferences().stream()
 				.filter(exref -> exref.getSource().equals(externalReferenceDTO.getReferenceSource())).findFirst();
 		Assert.assertTrue(addedPhenotypeExternalReference.isPresent());
 		Assert.assertEquals(externalReferenceDTO.getReferenceID(), addedPhenotypeExternalReference.get().getReferenceId());

@@ -117,11 +117,11 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 			final Phenotype saved;
 			if (existingObservationsMap.containsKey(observation.getObservationUnitDbId(),
 				observation.getObservationVariableDbId())) {
-				saved = updateExistingPhenotype(validValuesForCategoricalVariables, observation,
+				saved = this.updateExistingPhenotype(validValuesForCategoricalVariables, observation,
 					(ObservationDto) existingObservationsMap.get(observation.getObservationUnitDbId(),
 						observation.getObservationVariableDbId()));
 			} else {
-				saved = createNewPhenotype(experimentModelMap, validValuesForCategoricalVariables,
+				saved = this.createNewPhenotype(experimentModelMap, validValuesForCategoricalVariables,
 					observation);
 			}
 			observationDbIds.add(saved.getPhenotypeId());
@@ -313,7 +313,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 				if (!variableTypesOfVariables.containsKey(variableId))
 					return;
 
-				boolean isVariableExistingInDataset = datasetVariablesMap.containsKey(dmsProject.getProjectId()) && datasetVariablesMap.get(dmsProject.getProjectId())
+				final boolean isVariableExistingInDataset = datasetVariablesMap.containsKey(dmsProject.getProjectId()) && datasetVariablesMap.get(dmsProject.getProjectId())
 					.containsKey(variableId);
 				this.assignVariableToDataset(variableTypesOfVariables, dmsProject, variableId, variablesMap.get(variableId), isVariableExistingInDataset);
 
