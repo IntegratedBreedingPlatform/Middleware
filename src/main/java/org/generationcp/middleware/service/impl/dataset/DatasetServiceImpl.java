@@ -207,15 +207,16 @@ public class DatasetServiceImpl implements DatasetService {
 				Collections.singletonList(VariableType.ANALYSIS_SUMMARY.getId()));
 			// Sort by TermId to group related summary statics variables together
 			columns.sort(Comparator.comparing(MeasurementVariable::getTermId));
-			this.addVariableColumn(studyId, columns, TermId.LOCATION_ID.getId());
+			this.addVariableColumn(studyId, columns, TermId.LOCATION_ID.getId(), 0);
 			//Set alias for LOCATION_ID to LOCATION_NAME
 			columns.get(0).setAlias(LOCATION_NAME);
-			this.addVariableColumn(studyId, columns, TermId.TRIAL_INSTANCE_FACTOR.getId());
+			this.addVariableColumn(studyId, columns, TermId.TRIAL_INSTANCE_FACTOR.getId(), 0);
 			return columns;
 		} else if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.MEANS_DATA.getId())) {
 			final List<MeasurementVariable> columns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
 				MEANS_VARIABLE_TYPES);
-			this.addVariableColumn(studyId, columns, TermId.TRIAL_INSTANCE_FACTOR.getId());
+			this.addVariableColumn(studyId, columns, TermId.OBS_UNIT_ID.getId(), 2);
+			this.addVariableColumn(studyId, columns, TermId.TRIAL_INSTANCE_FACTOR.getId(), 0);
 			return columns;
 		} else {
 			return this.getObservationsColumns(datasetDTO, studyId, draftMode);
@@ -313,11 +314,11 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		sortedColumns.addAll(variateColumns);
-		this.addVariableColumn(studyId, sortedColumns, TermId.TRIAL_INSTANCE_FACTOR.getId());
+		this.addVariableColumn(studyId, sortedColumns, TermId.TRIAL_INSTANCE_FACTOR.getId(), 0);
 		return sortedColumns;
 	}
 
-	private void addVariableColumn(final Integer studyId, final List<MeasurementVariable> sortedColumns, final Integer termId) {
+	private void addVariableColumn(final Integer studyId, final List<MeasurementVariable> sortedColumns, final Integer termId, final int positionColumn) {
 		final DmsProject environmentDataset =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
 		final CVTerm cvTerm = this.daoFactory.getCvTermDao().getById(termId);
@@ -330,7 +331,7 @@ public class DatasetServiceImpl implements DatasetService {
 		measurementVariable.setAlias(variableAlias.isPresent() ? variableAlias.get().getAlias() : cvTerm.getName());
 		measurementVariable.setTermId(termId);
 		measurementVariable.setFactor(true);
-		sortedColumns.add(0, measurementVariable);
+		sortedColumns.add(positionColumn, measurementVariable);
 	}
 
 	private MeasurementVariable addTermIdColumn(final TermId termId, final VariableType variableType, final String name,
@@ -1394,10 +1395,9 @@ public class DatasetServiceImpl implements DatasetService {
 		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
 		final List<Integer> descriptorPropertyIds = plotDataset.getProperties()
 			.stream()
-			.filter(projectProperty -> TermId.OBS_UNIT_ID.getId() != projectProperty.getVariableId() &&
-				(VariableType.GERMPLASM_DESCRIPTOR.getId().equals(projectProperty.getTypeId()) ||
+			.filter(projectProperty -> VariableType.GERMPLASM_DESCRIPTOR.getId().equals(projectProperty.getTypeId()) ||
 					VariableType.GERMPLASM_ATTRIBUTE.getId().equals(projectProperty.getTypeId()) ||
-					VariableType.GERMPLASM_PASSPORT.getId().equals(projectProperty.getTypeId())))
+					VariableType.GERMPLASM_PASSPORT.getId().equals(projectProperty.getTypeId()))
 			.map(ProjectProperty::getVariableId)
 			.collect(Collectors.toList());
 
