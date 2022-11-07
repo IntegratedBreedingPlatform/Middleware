@@ -660,10 +660,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 						attribute.setcValueId(cValueId);
 						this.daoFactory.getAttributeDAO().update(attribute);
 					} else {
-						this.daoFactory.getAttributeDAO()
-							.save(new Attribute(null, germplasm.getGid(), variable.getId(), value, cValueId,
-								germplasm.getLocationId(),
-								0, Util.getCurrentDateAsIntegerValue()));
+						if(variable.isObsolete()) {
+							conflictErrors.put("germplasm.update.obsolete.attributes", new String[] {
+								variableNameOrAlias, String.valueOf(germplasm.getGid())});
+						} else {
+							this.daoFactory.getAttributeDAO()
+								.save(new Attribute(null, germplasm.getGid(), variable.getId(), value, cValueId,
+									germplasm.getLocationId(),
+									0, Util.getCurrentDateAsIntegerValue()));
+						}
 					}
 				}
 			}

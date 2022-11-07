@@ -236,9 +236,13 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final Map<Integer, DmsProject> trialIdPlotDatasetMap =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.PLOT_DATA.getId()).stream()
 				.collect(Collectors.toMap(plotDataset -> plotDataset.getStudy().getProjectId(), Function.identity()));
+		// TODO: Adding OBS_UNIT_ID if it does not exist in projectprop.
+		this.addObsUnitIdVariableIfNotPresent(trialIdPlotDatasetMap);
 		final Map<Integer, DmsProject> trialIdMeansDatasetMap =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.MEANS_DATA.getId()).stream()
 				.collect(Collectors.toMap(plotDataset -> plotDataset.getStudy().getProjectId(), Function.identity()));
+		// TODO: Adding OBS_UNIT_ID if it does not exist in projectprop.
+		this.addObsUnitIdVariableIfNotPresent(trialIdMeansDatasetMap);
 		final Map<Integer, List<Integer>> plotExperimentVariablesMap = this.populatePlotExperimentVariablesMap(trialIdPlotDatasetMap);
 
 		final Map<String, MeasurementVariable> variableNamesMap =
@@ -315,6 +319,21 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		}
 
 		return observationUnitDbIds;
+	}
+
+	private void addObsUnitIdVariableIfNotPresent(final Map<Integer, DmsProject> plotDatasetMap) {
+		for (final Map.Entry<Integer, DmsProject> plotDatasetEntry : plotDatasetMap.entrySet()) {
+			final DmsProject plotDataset = plotDatasetEntry.getValue();
+			if (!plotDataset.getProperties().stream() //
+				.filter(property -> property.getTypeId() == VariableType.EXPERIMENTAL_DESIGN.getId() && //
+					property.getVariable().getCvTermId() == TermId.OBS_UNIT_ID.getId() //
+				).findFirst().isPresent()) {
+				final ProjectProperty property =
+					new ProjectProperty(plotDataset, VariableType.EXPERIMENTAL_DESIGN.getId(), null, //
+						plotDataset.getProperties().size(), TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name());
+				plotDataset.addProperty(property);
+			}
+		}
 	}
 
 	@Override

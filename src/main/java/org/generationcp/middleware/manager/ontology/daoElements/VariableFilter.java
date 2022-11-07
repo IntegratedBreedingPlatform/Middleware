@@ -84,6 +84,10 @@ public class VariableFilter {
 		this.variableIds.add(id);
 	}
 
+	public void addVariableIds(final List<Integer> ids) {
+		this.variableIds.addAll(ids);
+	}
+
 	public List<Integer> getExcludedVariableIds() {
 		return this.excludedVariableIds;
 	}
