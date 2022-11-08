@@ -14,9 +14,9 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `workbench`.`one_time_password` (
-				`id`       INT NOT NULL AUTO_INCREMENT,
-				`otp_code` INT NULL,
-				`expires`  DATETIME NULL,
+				`id`       INT      NOT NULL AUTO_INCREMENT,
+				`otp_code` INT      NOT NULL,
+				`expires`  DATETIME NOT NULL,
 				PRIMARY KEY (`id`)
 			);
 		</sql>
@@ -33,11 +33,17 @@
 		<sql dbms="mysql" splitStatements="true">
 		  CREATE TABLE `workbench`.`user_device_meta_data` (
 			  `id`             INT NOT NULL AUTO_INCREMENT,
-			  `userid`         INT NULL,
-			  `device_details` VARCHAR(300) NULL,
+			  `userid`         INT NOT NULL,
+			  `device_details` VARCHAR(500) NULL,
 			  `location`       VARCHAR(300) NULL,
 			  `last_logged_in` DATETIME NULL,
-			  PRIMARY KEY (`id`)
+			  PRIMARY KEY (`id`),
+			  INDEX            `user_device_metadata_userid_fk_idx` (`userid` ASC),
+			  CONSTRAINT `user_device_metadata_userid_fk`
+				  FOREIGN KEY (`userid`)
+					  REFERENCES `workbench`.`users`(`userid`)
+					  ON DELETE NO ACTION
+					  ON UPDATE NO ACTION
 		  );
 		</sql>
 	</changeSet>
@@ -49,7 +55,7 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE `workbench`.`users`
-				ADD COLUMN `multi_factor_authentication` TINYINT NULL DEFAULT 0 AFTER `cdate`;
+				ADD COLUMN `multi_factor_authentication_enabled` TINYINT NULL DEFAULT 0 AFTER `cdate`;
 		</sql>
 	</changeSet>
 </databaseChangeLog>

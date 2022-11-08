@@ -155,7 +155,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	@Column(name = "cdate")
 	private Integer cdate;
 
-	@Column(name = "multi_factor_authentication")
+	@Column(name = "multi_factor_authentication_enabled")
 	private boolean multiFactorAuthenticationEnabled;
 
 	@Fetch(FetchMode.SUBSELECT)

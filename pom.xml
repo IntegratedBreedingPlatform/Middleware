@@ -364,7 +364,7 @@
 			<version>2.0</version>
 		</dependency>
 
-		<!-- Dependency for passing browser/client's User-Agent -->
+		<!-- Dependency for parsing browser/client's User-Agent -->
 		<dependency><groupId>eu.bitwalker</groupId>
 			<artifactId>UserAgentUtils</artifactId>
 			<version>1.21</version>
