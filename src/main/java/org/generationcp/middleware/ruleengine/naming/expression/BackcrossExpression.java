@@ -2,7 +2,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public class BackcrossExpression extends BaseExpression {
 	private PedigreeDataManager pedigreeDataManager;
 
 	@Override
-	public void apply(final List<StringBuilder> values, final AdvancingSource source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final DeprecatedAdvancingSource source, final String capturedText) {
 
 		String output = "";
 

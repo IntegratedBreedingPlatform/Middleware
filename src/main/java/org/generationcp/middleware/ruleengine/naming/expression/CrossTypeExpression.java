@@ -4,7 +4,7 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,7 @@ public class CrossTypeExpression extends BaseExpression {
 	}
 
 	@Override
-	public void apply(final List<StringBuilder> values, final AdvancingSource source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final DeprecatedAdvancingSource source, final String capturedText) {
 		String crossTypeAbbreviation = "";
 		final Method breedingMethod = source.getBreedingMethod();
 

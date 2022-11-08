@@ -2,7 +2,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class GroupCountExpression extends BaseExpression {
 	public static final int CAPTURED_FINAL_EXPRESSION_GROUP = 1;
 
 	@Override
-	public void apply(final List<StringBuilder> values, final AdvancingSource source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final DeprecatedAdvancingSource source, final String capturedText) {
 		for (final StringBuilder value : values) {
 			String currentValue = value.toString();
 
@@ -69,7 +69,7 @@ public class GroupCountExpression extends BaseExpression {
 		}
 	}
 
-	protected String removeMetaCharacters(final String value, final String countPrefix, final AdvancingSource source) {
+	protected String removeMetaCharacters(final String value, final String countPrefix, final DeprecatedAdvancingSource source) {
 		// we strip the B*[COUNT] or #*COUNT from the name being processed
 		String valueWithoutProcessCode = value.replace(countPrefix + this.getExpressionKey(), "");
 

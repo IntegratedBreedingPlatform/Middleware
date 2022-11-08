@@ -14,7 +14,7 @@ package org.generationcp.middleware.ruleengine.naming.service;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.ruleengine.RuleException;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSourceList;
 import org.generationcp.middleware.ruleengine.pojo.ImportedCross;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
@@ -28,7 +28,7 @@ import java.util.List;
  */
 public interface NamingConventionService {
 
-	void generateAdvanceListNames(List<AdvancingSource> advancingSourceItems, boolean checkForDuplicateName, List<ImportedGermplasm> germplasmList) throws
+	void generateAdvanceListNames(List<DeprecatedAdvancingSource> advancingSourceItems, boolean checkForDuplicateName, List<ImportedGermplasm> germplasmList) throws
 		MiddlewareQueryException, RuleException;
 
 	/*

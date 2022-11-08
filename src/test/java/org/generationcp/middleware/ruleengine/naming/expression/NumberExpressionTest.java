@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class NumberExpressionTest extends TestExpression {
 	private static final String SUFFIX = "RS";
 	private static final String NUMBER = "[NUMBER]";
 
-	private AdvancingSource source;
+	private DeprecatedAdvancingSource source;
 	private NumberExpression expression;
 
 	@Before
