@@ -12,6 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class UserDeviceMetaDataServiceImplTest extends IntegrationTestBase {
@@ -114,6 +115,7 @@ public class UserDeviceMetaDataServiceImplTest extends IntegrationTestBase {
 		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
 		user.setStatus(0);
 		user.setPerson(person);
+		user.setRoles(new ArrayList<>());
 		return this.userService.addUser(user);
 	}
 
