@@ -10,4 +10,6 @@ public interface UserDeviceMetaDataService {
 
 	void updateUserDeviceLastLoggedIn(Integer userId, String deviceDetails, String location);
 
+	long countUserDevices(Integer userId);
+
 }

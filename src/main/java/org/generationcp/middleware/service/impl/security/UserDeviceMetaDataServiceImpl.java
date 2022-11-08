@@ -78,4 +78,9 @@ public class UserDeviceMetaDataServiceImpl implements UserDeviceMetaDataService 
 
 	}
 
+	@Override
+	public long countUserDevices(final Integer userId) {
+		return this.workbenchDaoFactory.getUserDeviceMetaDataDAO().countAllByUserId(userId);
+	}
+
 }

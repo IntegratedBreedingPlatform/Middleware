@@ -3,6 +3,7 @@ package org.generationcp.middleware.dao;
 import org.generationcp.middleware.pojos.workbench.security.UserDeviceMetaData;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.List;
@@ -25,6 +26,13 @@ public class UserDeviceMetaDataDAO extends GenericDAO<UserDeviceMetaData, Intege
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("userId", userId));
 		return criteria.list();
+	}
+
+	public long countAllByUserId(final Integer userId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.setProjection(Projections.rowCount());
+		criteria.add(Restrictions.eq("userId", userId));
+		return (long) criteria.uniqueResult();
 	}
 
 }
