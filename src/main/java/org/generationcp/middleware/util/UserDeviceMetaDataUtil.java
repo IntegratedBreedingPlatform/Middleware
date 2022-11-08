@@ -26,9 +26,9 @@ public class UserDeviceMetaDataUtil {
 		return clientIp;
 	}
 
-	public static String getDeviceDetails(final HttpServletRequest request) {
+	public static String parseDeviceDetailsForDisplay(final String deviceDetails) {
 		// Extract the device details from User-Agent header in the request
-		final UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
+		final UserAgent userAgent = UserAgent.parseUserAgentString(deviceDetails);
 		if (Objects.nonNull(userAgent)) {
 			return userAgent.getBrowser()
 				+ " " + userAgent.getBrowserVersion().getMajorVersion() + "."
