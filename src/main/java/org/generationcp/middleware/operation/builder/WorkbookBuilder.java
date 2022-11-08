@@ -561,6 +561,17 @@ public class WorkbookBuilder extends Builder {
 		return this.studyDataManager.getExperimentSampleMap(studyDbId);
 	}
 
+	protected void populateMeasurementData(final Experiment experiment,
+		final List<MeasurementVariable> nameTypes,
+		final List<MeasurementData> measurementDataList) {
+
+		for (final MeasurementVariable nameType : nameTypes) {
+			final MeasurementData measurementData = new MeasurementData(nameType.getName(), experiment.getNameValueMap().get(nameType.getTermId()), false,
+				this.getDataType(DataType.CHARACTER_VARIABLE.getId()), nameType);
+			measurementDataList.add(measurementData);
+		}
+	}
+
 	protected void populateMeasurementData(
 		final List<MeasurementVariable> variateList, final VariableList variates,
 		final List<MeasurementData> measurementDataList) {
@@ -883,7 +894,7 @@ public class WorkbookBuilder extends Builder {
 	public List<MeasurementRow> buildDatasetObservations(
 		final List<Experiment> experiments,
 		final VariableTypeList variateTypes, final List<MeasurementVariable> factorList,
-		final List<MeasurementVariable> variateList) {
+		final List<MeasurementVariable> variateList, final List<MeasurementVariable> names) {
 
 		final List<MeasurementRow> observations = new ArrayList<>();
 		for (final Experiment experiment : experiments) {
@@ -895,6 +906,7 @@ public class WorkbookBuilder extends Builder {
 				factorList, factors);
 
 			this.populateMeasurementData(variateList, variates, measurementDataList);
+			this.populateMeasurementData(experiment, names, measurementDataList);
 
 			final MeasurementRow measurementRow = new MeasurementRow(measurementDataList);
 			measurementRow.setExperimentId(experimentId);
