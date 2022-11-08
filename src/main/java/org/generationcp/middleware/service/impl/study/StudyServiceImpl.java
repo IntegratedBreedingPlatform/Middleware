@@ -184,6 +184,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 			.getGeolocationIdsByPropertyTypeAndValue(TermId.LOCATION_ID.getId(), locationId.toString()).size() > 0;
 	}
 
+	@Override
+	public void deleteNameTypeFromStudies(final Integer nameTypeId) {
+		this.daoFactory.getProjectPropertyDAO().deleteNameTypeFromStudies(nameTypeId);
+	}
+
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
 	}

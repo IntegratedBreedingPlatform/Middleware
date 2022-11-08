@@ -22,6 +22,13 @@ public class GermplasmNameTypeDTO extends GermplasmNameTypeRequestDTO {
 		this.setName(name);
 	}
 
+	public GermplasmNameTypeDTO(final Integer id, final String code, final String name, final String description) {
+		this.id = id;
+		this.setCode(code);
+		this.setName(name);
+		this.setDescription(name);
+	}
+
 	public GermplasmNameTypeDTO(final Integer id, final String code, final String name, final String description, final String userName, final Integer date) {
 		this.setId(id);
 		this.setCode(code);

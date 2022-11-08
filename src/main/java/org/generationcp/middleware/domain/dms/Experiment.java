@@ -36,6 +36,8 @@ public class Experiment implements Serializable{
 
 	private String obsUnitId;
 
+	private Map<Integer, String> nameValueMap;
+
 	public int getId() {
 		return this.id;
 	}
@@ -111,6 +113,14 @@ public class Experiment implements Serializable{
 				variate.print(indent + 6);
 			}
 		}
+	}
+
+	public Map<Integer, String> getNameValueMap() {
+		return this.nameValueMap;
+	}
+
+	public void setNameValueMap(final Map<Integer, String> nameValueMap) {
+		this.nameValueMap = nameValueMap;
 	}
 
 	@Override

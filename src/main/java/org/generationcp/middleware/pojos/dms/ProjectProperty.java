@@ -79,6 +79,9 @@ public class ProjectProperty implements Serializable {
 	@Formula("(select c.definition from cvterm c where c.cvterm_id = variable_id) ")
 	private String description;
 
+	@Column(name = "name_fldno")
+	private Integer nameFldno;
+
 	public ProjectProperty() {
 	}
 
@@ -90,6 +93,21 @@ public class ProjectProperty implements Serializable {
 		this.rank = rank;
 		this.variableId = variableId;
 		this.alias = alias;
+	}
+
+	public ProjectProperty(final DmsProject project, final Integer rank, final Integer nameFldno, final String alias) {
+		this.project = project;
+		this.rank = rank;
+		this.nameFldno = nameFldno;
+		this.alias = alias;
+	}
+
+	public Integer getNameFldno() {
+		return this.nameFldno;
+	}
+
+	public void setNameFldno(final Integer nameFldno) {
+		this.nameFldno = nameFldno;
 	}
 
 	public Integer getProjectPropertyId() {
@@ -211,6 +229,8 @@ public class ProjectProperty implements Serializable {
 		builder.append(this.variableId);
 		builder.append(", alias=");
 		builder.append(this.alias);
+		builder.append(", nameType=");
+		builder.append(this.nameFldno);
 		builder.append("]");
 		return builder.toString();
 	}
