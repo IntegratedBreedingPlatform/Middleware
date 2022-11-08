@@ -184,7 +184,7 @@ public class UserServiceImpl implements UserService {
 			user.setName(userDto.getUsername());
 			user.setAssignDate(currentDate);
 			user.setCloseDate(currentDate);
-			user.setStatus(userDto.equals("true") ? 0 : 1);
+			user.setStatus(userDto.getStatus().equals("true") ? 0 : 1);
 
 			final List<UserRole> userRoles = new ArrayList<>();
 			if (userDto.getUserRoles() != null) {
