@@ -136,7 +136,7 @@ public class UserServiceImpl implements UserService {
 			user.setAssignDate(currentDate);
 			user.setCloseDate(currentDate);
 			user.setInstalid(0);
-			user.setStatus(userDto.equals("true") ? 0 : 1);
+			user.setStatus(userDto.getStatus().equals("true") ? 0 : 1);
 			user.setType(0);
 
 			// Add user roles to the particular user
