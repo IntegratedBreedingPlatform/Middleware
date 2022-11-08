@@ -336,7 +336,7 @@ public class ProjectPropertySaver extends Saver {
 	private void updateVariable(final DmsProject project, final MeasurementVariable variable) {
 		if (project.getProperties() != null) {
 			for (final ProjectProperty property : project.getProperties()) {
-				if (property.getVariableId().equals(variable.getTermId())) {
+				if (property.getVariableId()!= null && property.getVariableId().equals(variable.getTermId())) {
 					property.setValue(variable.getValue());
 					property.setAlias(variable.getName());
 					this.daoFactory.getProjectPropertyDAO().update(property);

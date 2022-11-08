@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.NameTypeMetadataFilterRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.UDTableType;
@@ -146,7 +147,26 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		return returnList;
 	}
 
-	public List<org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO> searchNameTypes(final String query) {
+	public List<UserDefinedField> getNameTypesByNameTypeListIds(final Set<Integer> nameTypeIds) {
+		List<UserDefinedField> returnList = new ArrayList<>();
+		if (nameTypeIds != null && !nameTypeIds.isEmpty()) {
+			try {
+
+				final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
+				criteria.add(Restrictions.eq("ftable", UDTableType.NAMES_NAME.getTable()));
+				criteria.add(Restrictions.eq("ftype", UDTableType.NAMES_NAME.getType()));
+				criteria.add(Restrictions.in("fldno", nameTypeIds));
+				return criteria.list();
+
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException("Error with getNameTypesByNameTypeListIds(listIds=" + nameTypeIds + "): " + e.getMessage(),
+					e);
+			}
+		}
+		return returnList;
+	}
+
+	public List<GermplasmNameTypeDTO> searchNameTypes(final String query) {
 		if (StringUtils.isBlank(query)) {
 			return Collections.emptyList();
 		}
@@ -165,11 +185,40 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			sqlQuery.addScalar("code");
 			sqlQuery.addScalar("id");
 			sqlQuery.addScalar("name");
-			sqlQuery.setResultTransformer(Transformers.aliasToBean(org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO.class));
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(GermplasmNameTypeDTO.class));
 
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error with searchNameTypes(query=" + query + "): " + e.getMessage(), e);
+		}
+	}
+
+	public List<GermplasmNameTypeDTO> getDatasetNameTypes(final Integer datasetId) {
+		if (datasetId == null) {
+			return Collections.emptyList();
+		}
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery("SELECT " //
+				+ "   u.fcode AS code," //
+				+ "   u.fldno AS id," //
+				+ "   u.fname AS name," //
+				+ "   u.fdesc AS description" //
+				+ " FROM  udflds u inner join projectprop pp on pp.name_fldno = u.fldno" //
+				+ " WHERE u.ftable = '" + UDTableType.NAMES_NAME.getTable() + "'" //
+				+ "   and u.ftype = '" + UDTableType.NAMES_NAME.getType() + "'"
+				+ "   and pp.project_id = :projectId"
+				+ "   group by u.fldno");
+
+			sqlQuery.setParameter("projectId", datasetId);
+			sqlQuery.addScalar("code");
+			sqlQuery.addScalar("id");
+			sqlQuery.addScalar("name");
+			sqlQuery.addScalar("description");
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(GermplasmNameTypeDTO.class));
+
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getDatasetNameTypes(projecId=" + datasetId + "): " + e.getMessage(), e);
 		}
 	}
 
@@ -249,4 +298,16 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		}
 	}
 
+	public List<UserDefinedField> getByFldnos(final Set<Integer> fldno) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
+			criteria.add(Restrictions.in("fldno", fldno));
+			criteria.addOrder(Order.asc("fname"));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error executing UserDefinedFieldDAO.getByName(fldno={}) : {}";
+			UserDefinedFieldDAO.LOG.error(message, fldno, e.getMessage());
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }

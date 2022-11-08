@@ -41,6 +41,8 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	private Filter filter;
 	private List<MeasurementVariableDto> passportAndAttributes;
 
+	private List<MeasurementVariableDto> nameTypes;
+
 	public class Filter {
 
 		private Boolean byOutOfBound;
@@ -285,6 +287,14 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 
 	public void setPassportAndAttributes(final List<MeasurementVariableDto> passportAndAttributes) {
 		this.passportAndAttributes = passportAndAttributes;
+	}
+
+	public List<MeasurementVariableDto> getNameTypes() {
+		return this.nameTypes;
+	}
+
+	public void setNameTypes(final List<MeasurementVariableDto> nameTypes) {
+		this.nameTypes = nameTypes;
 	}
 
 	@Override

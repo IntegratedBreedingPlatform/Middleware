@@ -6,6 +6,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
@@ -13,6 +14,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
@@ -92,5 +94,33 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message);
 		}
+	}
+
+	public long countGermplasmListWithNameType(final Integer nameTypeId) {
+		try {
+			final String sql = "SELECT count(1) FROM list_data_view WHERE name_fldno = :nameType";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("nameType", nameTypeId);
+			return ((BigInteger) query.uniqueResult()).longValue();
+		} catch (final HibernateException e) {
+			final String message = "Error with countGermplasmListWithNameType(nameTypeId=" + nameTypeId + "): " + e.getMessage();
+			LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public void deleteByNameType(final Integer nameTypeId) {
+		try {
+			final String sql = "DELETE FROM list_data_view WHERE name_fldno = :nameTypeId";
+			final Query query =
+				this.getSession().createSQLQuery(sql);
+			query.setParameter("nameTypeId", nameTypeId);
+			query.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error with deleteByNameType(nameTypeId=" + nameTypeId + "): " + e.getMessage();
+			LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
+		}
+
 	}
 }

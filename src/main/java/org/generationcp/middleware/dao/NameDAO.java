@@ -424,12 +424,12 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return returnList;
 	}
 
-	public boolean isNameTypeInUse(final Integer nameTypeId) {
+	public long countNameTypeInUse(final Integer nameTypeId) {
 		try {
 			final String sql = "SELECT count(1) FROM names WHERE ntype = :nameType";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameter("nameType", nameTypeId);
-			return ((BigInteger) query.uniqueResult()).longValue() > 0;
+			return ((BigInteger) query.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
 			final String message = "Error with isNameTypeInUse(nameTypeId=" + nameTypeId + "): " + e.getMessage();
 			NameDAO.LOG.error(message);

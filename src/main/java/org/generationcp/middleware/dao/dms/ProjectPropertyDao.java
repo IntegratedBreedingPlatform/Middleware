@@ -30,14 +30,13 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link ProjectProperty}.
@@ -285,6 +284,32 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		query.executeUpdate();
 	}
 
+	public void deleteProjectNameTypes(final Integer projectId, final List<Integer> nameTypes) {
+		try {
+			final String sql = "DELETE FROM projectprop WHERE project_id = :projectId and name_fldno IN (:nameTypes)";
+			final Query query = this.getSession().createSQLQuery(sql);
+			query.setParameter("projectId", projectId);
+			query.setParameterList("nameTypes", nameTypes);
+			query.executeUpdate();
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with deleteProjectNameTypes() query from projectId: " + projectId + " nameTypes:" + nameTypes;
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public void deleteNameTypeFromStudies(final Integer nameType) {
+		try {
+			final String sql = "DELETE FROM projectprop WHERE name_fldno = :nameType";
+			final Query query =
+				this.getSession().createSQLQuery(sql);
+			query.setParameter("nameType", nameType);
+			query.executeUpdate();
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with deleteNameTypeFromStudies() query from nameType: " + nameType;
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 	public void deleteDatasetVariablesByVariableTypes(final Integer projectId, final List<Integer> variableTypeIds) {
 		final String sql = "DELETE FROM projectprop WHERE project_id = :projectId AND type_id IN (:variableTypeIds)";
 		final Query query =
@@ -414,4 +439,15 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return Collections.unmodifiableList(Collections.<MeasurementVariableDto>emptyList());
 	}
 
+	public long countStudiesWithNameType(final Integer nameTypeId) {
+		try {
+			final String sql = "SELECT count(1) FROM projectprop where name_fldno = :nameTypeId";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("nameTypeId", nameTypeId);
+			return ((BigInteger) query.uniqueResult()).longValue();
+		} catch (final HibernateException e) {
+			final String message = "Error with countStudiesWithNameType(nameTypeId=" + nameTypeId + "): " + e.getMessage();
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }

@@ -223,7 +223,19 @@ public class ExperimentBuilder extends Builder {
 		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
 		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
 		experiment.setObsUnitId(experimentModel.getObsUnitId());
+		experiment.setNameValueMap(this.buildNameTypeIdNameValueMap(experimentModel));
 		return experiment;
+	}
+
+	private Map<Integer, String> buildNameTypeIdNameValueMap(final ExperimentModel experimentModel) {
+		final Map nameValueMap = new HashMap<>();
+
+		if(experimentModel.getStock() != null) {
+			experimentModel.getStock().getGermplasm().getNames().forEach(name -> {
+				nameValueMap.put(name.getTypeId(), name.getNval());
+			});
+		}
+		return nameValueMap;
 	}
 
 	private Experiment createExperiment(final ExperimentModel experimentModel, final VariableTypeList variableTypes,
