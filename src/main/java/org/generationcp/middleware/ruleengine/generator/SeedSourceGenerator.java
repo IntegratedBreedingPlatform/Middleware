@@ -12,12 +12,14 @@ import org.generationcp.middleware.ruleengine.resolver.LocationAbbreviationResol
 import org.generationcp.middleware.ruleengine.resolver.LocationResolver;
 import org.generationcp.middleware.ruleengine.resolver.SeasonResolver;
 import org.generationcp.middleware.ruleengine.service.GermplasmNamingProperties;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +42,8 @@ public class SeedSourceGenerator {
 
 	}
 
-	public String generateSeedSource(final ObservationUnitRow observationUnitRow,
-		final List<MeasurementVariable> conditions, final String selectionNumber,
+	public String generateSeedSource(final Collection<ObservationUnitData> observations,
+		final List<MeasurementVariable> studyEnvironmentVariables, final String selectionNumber,
 		final String plotNumber, final String studyName, final String plantNumber, final Map<String, String> locationIdNameMap,
 		final Map<Integer, StudyInstance> studyInstanceMap,
 		final List<MeasurementVariable> environmentVariables) {
@@ -115,11 +117,11 @@ public class SeedSourceGenerator {
 		keyComponentValueResolvers.put(KeyComponent.SELECTION_NUMBER, selectionNumberResolver);
 		keyComponentValueResolvers.put(KeyComponent.PLANT_NO, plantNumberResolver);
 		keyComponentValueResolvers.put(KeyComponent.LOCATION,
-			new LocationResolver(conditions, observationUnitRow, locationIdNameMap));
+			new LocationResolver(studyEnvironmentVariables, observations, locationIdNameMap));
 		keyComponentValueResolvers.put(KeyComponent.LABBR,
-			new LocationAbbreviationResolver(observationUnitRow, studyInstanceMap));
+			new LocationAbbreviationResolver(observations, studyInstanceMap));
 		keyComponentValueResolvers.put(KeyComponent.SEASON,
-			new SeasonResolver(this.ontologyVariableDataManager, conditions, observationUnitRow,
+			new SeasonResolver(this.ontologyVariableDataManager, studyEnvironmentVariables, observations,
 				environmentVariablesByTermId));
 
 		return service.generateKey(new SeedSourceTemplateProvider(this.germplasmNamingProperties,
@@ -136,14 +138,14 @@ public class SeedSourceGenerator {
 
 		final Integer femalePlotNo = crossInfo.getFemalePlotNo();
 		final String femaleSeedSource =
-			this.generateSeedSource(environmentRow.getLeft(),
+			this.generateSeedSource(environmentRow.getLeft() == null ? new ArrayList<>() : environmentRow.getLeft().getVariables().values(),
 				conditions.getLeft(), null, femalePlotNo != null? femalePlotNo.toString() : "", crossInfo.getFemaleStudyName(), null,
 				locationIdNameMap.getLeft(), studyInstanceMap.getLeft(), environmentVariables.getLeft());
 
 		final List<Integer> malePlotNos = crossInfo.getMalePlotNos();
 		for (final Integer malePlotNo : malePlotNos) {
 			final String maleSeedSource =
-				this.generateSeedSource(environmentRow.getRight(),
+				this.generateSeedSource(environmentRow.getRight() == null ? new ArrayList<>() : environmentRow.getRight().getVariables().values(),
 					conditions.getRight(), null, malePlotNo != null ? malePlotNo.toString() : "", crossInfo.getMaleStudyName(), null,
 					locationIdNameMap.getRight(), studyInstanceMap.getRight(),
 					environmentVariables.getRight());

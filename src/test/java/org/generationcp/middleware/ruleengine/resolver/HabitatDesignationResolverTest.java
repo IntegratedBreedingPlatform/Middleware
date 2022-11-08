@@ -22,6 +22,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,12 +68,9 @@ public class HabitatDesignationResolverTest {
 
 		workbook.setConditions(Lists.newArrayList(measurementVariable));
 
-		final MeasurementRow trialInstanceObservation = workbook.getTrialObservationByTrialInstanceNo(TermId.TRIAL_INSTANCE_FACTOR.getId());
-		final StudyTypeDto studyType = workbook.getStudyDetails().getStudyType();
-
 		final HabitatDesignationResolver habitatDesignationResolver =
 			new HabitatDesignationResolver(this.ontologyVariableDataManager, workbook.getConditions(),
-				fromMeasurementRow(trialInstanceObservation), getMeasurementVariableByTermId(trialInstanceObservation));
+				new ArrayList<>(), new HashMap<>());
 		final String designation = habitatDesignationResolver.resolve();
 		Assert.assertEquals("Habitat Designation should be resolved to the value of Habitat_Designation variable value in Nursery settings.",
 				HABITAT_CATEGORY_VALUE, designation);
@@ -103,11 +101,9 @@ public class HabitatDesignationResolverTest {
 
 		workbook.setTrialObservations(Lists.newArrayList(trialInstanceObservation));
 		
-		final StudyTypeDto studyType = workbook.getStudyDetails().getStudyType();
-
 		final HabitatDesignationResolver habitatDesignationResolver =
 			new HabitatDesignationResolver(this.ontologyVariableDataManager, workbook.getConditions(),
-				fromMeasurementRow(trialInstanceObservation), getMeasurementVariableByTermId(trialInstanceObservation));
+				fromMeasurementRow(trialInstanceObservation).getVariables().values(), getMeasurementVariableByTermId(trialInstanceObservation));
 		final String season = habitatDesignationResolver.resolve();
 		Assert.assertEquals("Habitat Designation should be resolved to the value of Habitat_Designation variable value in environment level settings.",
 				HABITAT_CATEGORY_VALUE, season);
@@ -128,18 +124,14 @@ public class HabitatDesignationResolverTest {
 		instance1MV.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		instance1MV.setValue("1");
 		
-		final MeasurementRow trialInstanceObservation = null;
-
-		final List<MeasurementVariable> conditions = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> conditions = new ArrayList<>();
 		conditions.add(instance1MV);
 		conditions.add(instance1HabitatMV);
 		workbook.setConditions(conditions );
 
-		final StudyTypeDto studyType = workbook.getStudyDetails().getStudyType();
-
 		final HabitatDesignationResolver habitatDesignationResolver =
 			new HabitatDesignationResolver(this.ontologyVariableDataManager, workbook.getConditions(),
-				fromMeasurementRow(trialInstanceObservation), getMeasurementVariableByTermId(trialInstanceObservation));
+				new ArrayList<>(), new HashMap<>());
 		final String season = habitatDesignationResolver.resolve();
 		Assert.assertEquals("Habitat Designation should be resolved to the value of Habitat_Designation variable value in environment level settings.",
 				HABITAT_CATEGORY_VALUE, season);

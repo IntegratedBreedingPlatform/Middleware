@@ -4,7 +4,7 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.ruleengine.OrderedRuleExecutionContext;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.context.MessageSource;
 
 import java.util.List;
@@ -15,14 +15,14 @@ import java.util.List;
 public class NamingRuleExecutionContext extends OrderedRuleExecutionContext {
 
 	private ProcessCodeService processCodeService;
-	private AdvancingSource advancingSource;
+	private DeprecatedAdvancingSource advancingSource;
 	private GermplasmDataManager germplasmDataManager;
 	private List<String> currentData;
 	private MessageSource messageSource;
 
 	private List<String> tempData;
 
-	public NamingRuleExecutionContext(List<String> executionOrder, ProcessCodeService processCodeService, AdvancingSource advancingSource,
+	public NamingRuleExecutionContext(List<String> executionOrder, ProcessCodeService processCodeService, DeprecatedAdvancingSource advancingSource,
 			GermplasmDataManager germplasmDataManager, List<String> currentData) {
 		super(executionOrder);
 		this.processCodeService = processCodeService;
@@ -45,11 +45,11 @@ public class NamingRuleExecutionContext extends OrderedRuleExecutionContext {
 		this.processCodeService = processCodeService;
 	}
 
-	public AdvancingSource getAdvancingSource() {
+	public DeprecatedAdvancingSource getAdvancingSource() {
 		return this.advancingSource;
 	}
 
-	public void setAdvancingSource(AdvancingSource advancingSource) {
+	public void setAdvancingSource(DeprecatedAdvancingSource advancingSource) {
 		this.advancingSource = advancingSource;
 	}
 

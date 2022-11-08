@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import junit.framework.Assert;
 import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -31,7 +31,7 @@ public class BackcrossExpressionTest extends TestExpression {
 		Mockito.when(pedigreeDataManager.calculateRecurrentParent(maleParentGid, femaleParentGid))
 				.thenReturn(PedigreeDataManagerImpl.FEMALE_RECURRENT);
 
-		AdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", "-", null, "[BC]", null, true);
+		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", "-", null, "[BC]", null, true);
 		List<StringBuilder> values = this.createInitialValues(source);
 		source.setFemaleGid(femaleParentGid);
 		source.setMaleGid(maleParentGid);
@@ -51,7 +51,7 @@ public class BackcrossExpressionTest extends TestExpression {
 		Mockito.when(pedigreeDataManager.calculateRecurrentParent(maleParentGid, femaleParentGid))
 				.thenReturn(PedigreeDataManagerImpl.MALE_RECURRENT);
 
-		AdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", "-", null, "[BC]", null, true);
+		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", "-", null, "[BC]", null, true);
 		List<StringBuilder> values = this.createInitialValues(source);
 		source.setFemaleGid(femaleParentGid);
 		source.setMaleGid(maleParentGid);
@@ -71,7 +71,7 @@ public class BackcrossExpressionTest extends TestExpression {
 		Mockito.when(pedigreeDataManager.calculateRecurrentParent(maleParentGid, femaleParentGid))
 				.thenReturn(PedigreeDataManagerImpl.MALE_RECURRENT);
 
-		AdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", "-", null, "AA[BC]CC", null, true);
+		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", "-", null, "AA[BC]CC", null, true);
 		List<StringBuilder> values = this.createInitialValues(source);
 		source.setFemaleGid(femaleParentGid);
 		source.setMaleGid(maleParentGid);
@@ -90,7 +90,7 @@ public class BackcrossExpressionTest extends TestExpression {
 
 		Mockito.when(pedigreeDataManager.calculateRecurrentParent(maleParentGid, femaleParentGid)).thenReturn(PedigreeDataManagerImpl.NONE);
 
-		AdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", "-", null, "[BC]", null, true);
+		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", "-", null, "[BC]", null, true);
 		List<StringBuilder> values = this.createInitialValues(source);
 		source.setFemaleGid(femaleParentGid);
 		source.setMaleGid(maleParentGid);

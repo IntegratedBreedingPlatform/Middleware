@@ -2,7 +2,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.util.ExpressionHelper;
 import org.generationcp.middleware.ruleengine.util.ExpressionHelperCallback;
 import org.springframework.stereotype.Component;
@@ -18,7 +18,7 @@ public class BulkCountExpression extends BaseExpression {
 	}
 
 	@Override
-	public void apply(List<StringBuilder> values, AdvancingSource source, final String capturedText) {
+	public void apply(List<StringBuilder> values, DeprecatedAdvancingSource source, final String capturedText) {
 		for (StringBuilder container : values) {
             String computedValue;
 			if (source.getRootName() != null) {

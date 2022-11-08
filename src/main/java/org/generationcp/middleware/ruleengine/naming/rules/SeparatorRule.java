@@ -4,7 +4,7 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class SeparatorRule extends OrderedRule<NamingRuleExecutionContext> {
 	@Override
 	public Object runRule(NamingRuleExecutionContext context) throws RuleException {
 		List<String> input = context.getCurrentData();
-		AdvancingSource source = context.getAdvancingSource();
+		DeprecatedAdvancingSource source = context.getAdvancingSource();
 
 		ProcessCodeService processCodeService = context.getProcessCodeService();
 		String separatorExpression = source.getBreedingMethod().getSeparator();

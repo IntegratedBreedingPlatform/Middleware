@@ -16,7 +16,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.service.GermplasmNamingProperties;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
@@ -116,7 +116,7 @@ public class BreedersCrossIDGeneratorTest {
 		studyDetails.setId(1);
 		workbook.setStudyDetails(studyDetails);
 
-		final AdvancingSource source = new AdvancingSource();
+		final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource();
 		source.setEnvironmentDatasetId(12);
 
 		final MeasurementVariable instance1LocationAbbrMV = new MeasurementVariable();
