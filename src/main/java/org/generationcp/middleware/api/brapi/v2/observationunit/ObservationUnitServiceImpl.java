@@ -325,7 +325,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		for (final Map.Entry<Integer, DmsProject> plotDatasetEntry : plotDatasetMap.entrySet()) {
 			final DmsProject plotDataset = plotDatasetEntry.getValue();
 			if (!plotDataset.getProperties().stream() //
-				.filter(property -> property.getTypeId() == VariableType.EXPERIMENTAL_DESIGN.getId() && //
+				.filter(property -> property.getTypeId().equals(VariableType.EXPERIMENTAL_DESIGN.getId()) && //
 					property.getVariable().getCvTermId() == TermId.OBS_UNIT_ID.getId() //
 				).findFirst().isPresent()) {
 				final ProjectProperty property =
