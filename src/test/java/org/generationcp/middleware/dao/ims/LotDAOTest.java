@@ -96,7 +96,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetAvailableBalanceCountAndTotalLotsCount() {
 		final Germplasm germplasm =
-			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
@@ -123,7 +123,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetGermplasmsWithOpenLots() {
 		final Germplasm germplasm =
-			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot =
@@ -146,7 +146,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetGermplasmsWithNoOpenLots() {
 		final Germplasm germplasm =
-			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot =
@@ -288,12 +288,12 @@ public class LotDAOTest extends IntegrationTestBase {
 	private void createDataForSearchLotsTest() {
 
 		this.germplasm1 =
-			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		final Integer germplasmId1 =
 			this.germplasmTestDataGenerator.addGermplasm(this.germplasm1, this.germplasm1.getPreferredName(), this.cropType);
 
 		this.germplasm2 =
-			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		final Integer germplasmId2 =
 			this.germplasmTestDataGenerator.addGermplasm(this.germplasm2, this.germplasm2.getPreferredName(), this.cropType);
 

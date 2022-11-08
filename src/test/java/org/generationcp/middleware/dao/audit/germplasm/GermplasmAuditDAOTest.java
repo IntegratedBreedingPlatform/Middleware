@@ -562,7 +562,6 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 		queryParams.put("gnpgs", progenitorsNumber);
 		queryParams.put("gpid1", femaleParentGID);
 		queryParams.put("gpid2", maleParentGID);
-		queryParams.put("lgid", new Random().nextInt());
 		queryParams.put("glocn", locationId);
 		queryParams.put("gdate", creationDate);
 		queryParams.put("gref", new Random().nextInt());

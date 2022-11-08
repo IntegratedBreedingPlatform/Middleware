@@ -317,11 +317,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				// Save germplasm and name entries if non-existing
 				if (germplasmFound == null || germplasmFound.getGid() == null) {
 					final List<Name> nameList = germplasms.get(counter).getRight();
-					// Lgid could not be null in the DB, so we are saving a
-					// value before saving it to the DB
-					if (germplasm.getLgid() == null) {
-						germplasm.setLgid(germplasm.getGid() != null ? germplasm.getGid() : Integer.valueOf(0));
-					}
+
 					GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(germplasm));
 					germplasm = germplasmDao.save(germplasm);
 
@@ -342,11 +338,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 						final Germplasm parent = parentGermplasmsByGids.get(germplasm.getGpid2());
 						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm, parent);
 						this.germplasmGroupingService.copyCodedNames(germplasm, parent);
-					}
-
-					// set Lgid to GID if it's value was not set previously
-					if (germplasm.getLgid().equals(Integer.valueOf(0))) {
-						germplasm.setLgid(germplasm.getGid());
 					}
 
 					// Save Germplasm attributes
