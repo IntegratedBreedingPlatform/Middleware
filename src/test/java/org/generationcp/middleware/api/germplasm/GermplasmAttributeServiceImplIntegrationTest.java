@@ -3,10 +3,10 @@ package org.generationcp.middleware.api.germplasm;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.domain.shared.AttributeDto;
-import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.shared.AttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
@@ -131,7 +131,7 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
 		final Integer gpid1, final Integer gpid2, final Bibref reference) {
 		final Germplasm germplasm = new Germplasm(null, gnpgs, gpid1, gpid2,
-			0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
+			(location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
 			0, 0, null, null, method);
 		if (StringUtils.isNotEmpty(germplasmUUID)) {
 			germplasm.setGermplasmUUID(germplasmUUID);

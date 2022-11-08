@@ -136,4 +136,20 @@
 			</sql>
 	</changeSet>
 
+	<changeSet author="clarysabel" id="v22.3.0-10">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="germplsm" columnName="lgid"/>
+		</preConditions>
+		<comment>Drop lgid column in germplsm table</comment>
+		<dropColumn tableName="germplsm" columnName="lgid"/>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v22.3.0-11">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="germplsm_aud" columnName="lgid"/>
+		</preConditions>
+		<comment>Drop lgid column in germplsm_aud table</comment>
+		<dropColumn tableName="germplsm_aud" columnName="lgid"/>
+	</changeSet>
+
 </databaseChangeLog>
