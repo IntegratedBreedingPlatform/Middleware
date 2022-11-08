@@ -368,7 +368,7 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertTrue(studyDetailsDtoOptional.isPresent());
 		final StudyDetailsDto studyDetailsDto = studyDetailsDtoOptional.get();
 		Assert.assertEquals(1, studyDetailsDto.getContacts().size());
-		Assert.assertEquals(user.getUserid(), studyDetailsDto.getContacts().get(0).getUserId());
+		Assert.assertEquals(user.getUserid(), studyDetailsDto.getContacts().get(0).getId());
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
 		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());

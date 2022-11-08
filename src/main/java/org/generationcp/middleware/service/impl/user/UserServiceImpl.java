@@ -136,7 +136,7 @@ public class UserServiceImpl implements UserService {
 			user.setAssignDate(currentDate);
 			user.setCloseDate(currentDate);
 			user.setInstalid(0);
-			user.setStatus(userDto.getStatus());
+			user.setStatus(userDto.equals("true") ? 0 : 1);
 			user.setType(0);
 
 			// Add user roles to the particular user
@@ -178,13 +178,13 @@ public class UserServiceImpl implements UserService {
 		final Integer idUserSaved;
 
 		try {
-			user = this.getUserById(userDto.getUserId());
+			user = this.getUserById(userDto.getId());
 			this.createPersonFromDto(userDto, user.getPerson());
 
 			user.setName(userDto.getUsername());
 			user.setAssignDate(currentDate);
 			user.setCloseDate(currentDate);
-			user.setStatus(userDto.getStatus());
+			user.setStatus(userDto.equals("true") ? 0 : 1);
 
 			final List<UserRole> userRoles = new ArrayList<>();
 			if (userDto.getUserRoles() != null) {
