@@ -1,7 +1,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 
 public abstract class AttributeExpression implements Expression {
 
@@ -10,7 +10,7 @@ public abstract class AttributeExpression implements Expression {
 	protected static String	METHOD_TYPE_DER = "DER";
 	protected static String METHOD_TYPE_MAN= "MAN";
 
-	protected Integer getGroupSourceGID(final AdvancingSource source) {
+	protected Integer getGroupSourceGID(final DeprecatedAdvancingSource source) {
 
 		final Integer sourceGpid1 = source.getGermplasm().getGpid1();
 		final Integer sourceGpid2 = source.getGermplasm().getGpid2();

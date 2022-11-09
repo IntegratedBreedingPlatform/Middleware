@@ -7,12 +7,14 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -32,6 +34,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -277,6 +280,13 @@ public class DatasetServiceImpl implements DatasetService {
 		if (addStockIdColumn) {
 			sortedColumns.add(this.addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR, null, true));
 		}
+
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.getDatasetNameTypes(observationSetIdSupplier.get());
+		germplasmNameTypeDTOs.sort(Comparator.comparing(GermplasmNameTypeDTO::getCode));
+		sortedColumns.addAll(germplasmNameTypeDTOs.stream().map(germplasmNameTypeDTO ->
+				new MeasurementVariable(germplasmNameTypeDTO.getCode(), germplasmNameTypeDTO.getDescription(), germplasmNameTypeDTO.getId(), null,
+					germplasmNameTypeDTO.getCode(), true)) //
+			.collect(Collectors.toSet()));
 
 		passports.sort(Comparator.comparing(MeasurementVariable::getName));
 		sortedColumns.addAll(passports);
@@ -768,6 +778,13 @@ public class DatasetServiceImpl implements DatasetService {
 				this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(observationSetId,
 					VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId());
 			searchDTO.setPassportAndAttributes(passportAndAttributes);
+
+			final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.getDatasetNameTypes(observationSetId);
+
+			searchDTO.setNameTypes(germplasmNameTypeDTOs.stream()
+				.map(germplasmNameTypeDTO ->
+					new MeasurementVariableDto(germplasmNameTypeDTO.getId(), germplasmNameTypeDTO.getCode()))
+				.collect(Collectors.toList()));
 		}
 	}
 
@@ -1391,18 +1408,23 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void updatePlotDatasetProperties(final Integer studyId, final List<Integer> variableIds, final String programUUID) {
+	public void updatePlotDatasetProperties(final Integer studyId, final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, final String programUUID) {
 		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
 		final List<Integer> descriptorPropertyIds = plotDataset.getProperties()
 			.stream()
-			.filter(projectProperty -> VariableType.GERMPLASM_DESCRIPTOR.getId().equals(projectProperty.getTypeId()) ||
+			.filter(projectProperty -> projectProperty.getTypeId() != null  &&
+					projectProperty.getVariableId() != null  &&
+					VariableType.GERMPLASM_DESCRIPTOR.getId().equals(projectProperty.getTypeId()) ||
 					VariableType.GERMPLASM_ATTRIBUTE.getId().equals(projectProperty.getTypeId()) ||
 					VariableType.GERMPLASM_PASSPORT.getId().equals(projectProperty.getTypeId()))
 			.map(ProjectProperty::getVariableId)
 			.collect(Collectors.toList());
 
-		final List<Integer> newPropertyVariableIds = variableIds.stream()
-				.filter(variableId -> !descriptorPropertyIds.contains(variableId)).collect(Collectors.toList());
+		final List<Integer> newPropertyVariableIds = plotDatasetPropertiesDTO.getVariableIds()
+			.stream()
+			.filter(variableId -> !descriptorPropertyIds.contains(variableId))
+			.collect(Collectors.toList());
+
 		if (!CollectionUtils.isEmpty(newPropertyVariableIds)) {
 			final AtomicInteger nextRank =
 				new AtomicInteger(this.daoFactory.getProjectPropertyDAO().getNextRank(plotDataset.getProjectId()));
@@ -1427,10 +1449,40 @@ public class DatasetServiceImpl implements DatasetService {
 				});
 		}
 
+		final List<Integer> namTypeIds = plotDataset.getProperties()
+			.stream()
+			.filter(projectProperty -> projectProperty.getTypeId() == null  &&
+				projectProperty.getVariableId() == null  &&
+				projectProperty.getNameFldno() != null)
+			.map(ProjectProperty::getNameFldno)
+			.collect(Collectors.toList());
+
+		final List<Integer> newNameTypeIds = plotDatasetPropertiesDTO.getNameTypeIds().stream()
+			.filter(nameTypeId -> !namTypeIds.contains(nameTypeId)).collect(Collectors.toList());
+
+		if (!CollectionUtils.isEmpty(newNameTypeIds)) {
+			final AtomicInteger nextRank =
+				new AtomicInteger(this.daoFactory.getProjectPropertyDAO().getNextRank(plotDataset.getProjectId()));
+			this.daoFactory.getUserDefinedFieldDAO().getByFldnos(new HashSet(newNameTypeIds))
+				.stream()
+				.forEach(userDefinedField -> {
+					final ProjectProperty projectProperty =
+						new ProjectProperty(plotDataset, nextRank.getAndIncrement(), ((UserDefinedField) userDefinedField).getFldno(),  ((UserDefinedField) userDefinedField).getFcode());
+					this.daoFactory.getProjectPropertyDAO().save(projectProperty);
+				});
+		}
+
 		final List<Integer> removeVariableIds = descriptorPropertyIds.stream()
-			.filter(variableId -> !variableIds.contains(variableId)).collect(Collectors.toList());
+			.filter(variableId -> !plotDatasetPropertiesDTO.getVariableIds().contains(variableId)).collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(removeVariableIds)) {
 			this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(plotDataset.getProjectId(), removeVariableIds);
+		}
+
+		final List<Integer> nameTypeIdsToRemove = namTypeIds.stream()
+			.filter(nameTypeId -> !plotDatasetPropertiesDTO.getNameTypeIds().contains(nameTypeId)).collect(Collectors.toList());
+
+		if (!CollectionUtils.isEmpty(nameTypeIdsToRemove)) {
+			this.daoFactory.getProjectPropertyDAO().deleteProjectNameTypes(plotDataset.getProjectId(), nameTypeIdsToRemove);
 		}
 	}
 
@@ -1664,4 +1716,10 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 		}
 	}
+
+	@Override
+	public List<GermplasmNameTypeDTO> getDatasetNameTypes(final Integer datasetId) {
+		return this.daoFactory.getUserDefinedFieldDAO().getDatasetNameTypes(datasetId);
+	}
+
 }

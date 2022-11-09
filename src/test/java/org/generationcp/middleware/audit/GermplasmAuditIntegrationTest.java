@@ -120,7 +120,6 @@ public class GermplasmAuditIntegrationTest extends AuditIntegrationTestBase {
 		queryParams.put("gpid1", new Random().nextInt());
 		queryParams.put("gpid2", new Random().nextInt());
 		queryParams.put("created_by", new Random().nextInt());
-		queryParams.put("lgid", new Random().nextInt());
 		queryParams.put("glocn", new Random().nextInt());
 		queryParams.put("gdate", new Random().nextInt());
 		queryParams.put("gref", new Random().nextInt());

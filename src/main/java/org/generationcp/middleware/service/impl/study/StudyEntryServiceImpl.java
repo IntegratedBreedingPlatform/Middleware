@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -28,6 +29,7 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -163,9 +165,10 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		final DmsProject plotDataDataset = this.getPlotDataset(studyId);
 		final List<Integer> variableIds = plotDataDataset.getProperties().stream()
-			.filter(projectProperty -> VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()) && (
-				!projectProperty.getVariableId().equals(TermId.ENTRY_TYPE.getId()) &&
-					!projectProperty.getVariableId().equals(TermId.ENTRY_NO.getId())))
+			.filter(projectProperty -> projectProperty.getTypeId() != null &&
+				 VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()) &&
+				(!projectProperty.getVariableId().equals(TermId.ENTRY_TYPE.getId()) &&
+				 !projectProperty.getVariableId().equals(TermId.ENTRY_NO.getId())))
 			.map(ProjectProperty::getVariableId)
 			.collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(variableIds)) {
@@ -180,9 +183,10 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		// Filter entry details project variable except ENTRY_TYPE and ENTRY_NO because they are going to be added later
 		final List<ProjectProperty> projectProperties = plotDataDataset.getProperties()
 			.stream()
-			.filter(projectProperty -> projectProperty.getVariableId().equals(TermId.ENTRY_TYPE.getId()) ||
-				projectProperty.getVariableId().equals(TermId.ENTRY_NO.getId()) ||
-				!VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()))
+			.filter(projectProperty -> projectProperty.getVariableId() != null &&
+				(projectProperty.getVariableId().equals(TermId.ENTRY_TYPE.getId()) ||
+				 projectProperty.getVariableId().equals(TermId.ENTRY_NO.getId()) ||
+				 !VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId())))
 			.collect(Collectors.toList());
 
 		this.setStudyGenerationLevel(listId, studyId);
@@ -341,9 +345,17 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				projectVariableIds.contains(column.getId())))
 			.collect(Collectors.toList());
 
+		final List<Integer> nameTypeIds = plotDataset.getProperties().stream()
+			.filter(projectProperty -> projectProperty.getTypeId() == null  &&
+				projectProperty.getVariableId() == null  &&
+				projectProperty.getNameFldno() != null)
+			.map(ProjectProperty::getNameFldno)
+			.collect(Collectors.toList());
+
 		final List<StockModel> entries = this.daoFactory.getStockDao().getStocksForStudy(studyId);
 		final List<Integer> gids = entries.stream().map(stockModel -> stockModel.getGermplasm().getGid()).collect(toList());
 		final List<Attribute> attributes = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(gids);
+		final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids);
 		if (!CollectionUtils.isEmpty(attributes)) {
 			final VariableFilter variableFilter = new VariableFilter();
 			variableFilter.setProgramUuid(programUUID);
@@ -368,6 +380,21 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			columns.addAll(germplasmAttributeColumns);
 		}
 
+		final List<GermplasmNameTypeDTO> existingNameTypes = this.datasetService.getDatasetNameTypes(plotDataset.getProjectId());
+		if(!CollectionUtils.isEmpty(existingNameTypes)){
+			columns.addAll(existingNameTypes.stream().map(nameType ->
+					new StudyEntryColumnDTO(nameType.getId(), nameType.getCode(), null, null, true))
+				.collect(toList()));
+		}
+
+		if (!CollectionUtils.isEmpty(nameTypes)) {
+			columns.addAll(
+				nameTypes.stream().filter((nameType) -> !nameTypeIds.contains(nameType.getFldno()))
+					.map(nameType ->
+						new StudyEntryColumnDTO(nameType.getFldno(), nameType.getFcode(), null, null, nameTypeIds.contains(nameType.getFldno())))
+					.collect(toList()));
+		}
+
 		return columns;
 	}
 
@@ -382,6 +409,17 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 					VariableType.GERMPLASM_PASSPORT.getId(),
 					VariableType.GERMPLASM_DESCRIPTOR.getId(),
 					VariableType.ENTRY_DETAIL.getId()));
+
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.datasetService.getDatasetNameTypes(plotDatasetId);
+		germplasmNameTypeDTOs.sort(Comparator.comparing(GermplasmNameTypeDTO::getCode));
+		variables.addAll(germplasmNameTypeDTOs.stream().map(
+				germplasmNameTypeDTO -> //
+					new MeasurementVariable(germplasmNameTypeDTO.getCode(), //
+						germplasmNameTypeDTO.getDescription(), //
+						germplasmNameTypeDTO.getId(), null, //
+						germplasmNameTypeDTO.getCode(), true)) //
+			.collect(Collectors.toSet()));
+
 		return variables;
 	}
 

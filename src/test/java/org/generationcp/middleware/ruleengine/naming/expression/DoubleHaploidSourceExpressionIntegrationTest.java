@@ -1,7 +1,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
 import org.junit.Assert;
@@ -26,7 +26,7 @@ public class DoubleHaploidSourceExpressionIntegrationTest extends IntegrationTes
     @Test
     public void testDoubleHaploidApplyRuleWithMultipleThreads() throws ExecutionException, InterruptedException {
 
-        final AdvancingSource source = new AdvancingSource();
+        final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource();
 
         final int threads = 10;
         final List<Future<String>> resultingDesignations = new ArrayList<>();

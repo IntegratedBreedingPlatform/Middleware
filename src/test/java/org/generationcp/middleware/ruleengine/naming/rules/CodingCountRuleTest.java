@@ -6,7 +6,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.ruleengine.Rule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.RuleExecutionContext;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class CodingCountRuleTest extends BaseNamingRuleTest {
 		this.breedingMethod.setSnametype(this.breedingMethodSnameType);
 		this.breedingMethod.setSeparator("-");
 		this.breedingMethod.setCount("");
-		this.row = new AdvancingSource();
+		this.row = new DeprecatedAdvancingSource();
 		this.row.setBreedingMethod(this.breedingMethod);
 		this.rule = new CountRule();
 

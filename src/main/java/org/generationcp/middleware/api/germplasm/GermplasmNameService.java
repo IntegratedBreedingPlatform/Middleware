@@ -34,4 +34,5 @@ public interface GermplasmNameService {
 	boolean isLocationUsedInGermplasmName(Integer locationId);
 
 	Map<Integer, String> getPreferredNamesByGIDs(List<Integer> gids);
+
 }

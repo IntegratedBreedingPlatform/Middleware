@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
@@ -151,6 +152,9 @@ public class DatasetServiceImplTest {
 
 	@Mock
 	private StockDao stockDao;
+
+	@Mock
+	private UserDefinedFieldDAO userDefinedFieldDAO;
 	@InjectMocks
 	private DatasetServiceImpl datasetService = new DatasetServiceImpl();
 
@@ -182,7 +186,8 @@ public class DatasetServiceImplTest {
 		when(this.daoFactory.getExperimentDao()).thenReturn(this.experimentDao);
 		when(this.daoFactory.getFormulaDAO()).thenReturn(this.formulaDao);
 		when(this.daoFactory.getObservationUnitsSearchDAO()).thenReturn(this.obsUnitsSearchDao);
-		when(daoFactory.getStockDao()).thenReturn(this.stockDao);
+		when(this.daoFactory.getStockDao()).thenReturn(this.stockDao);
+		when(this.daoFactory.getUserDefinedFieldDAO()).thenReturn(this.userDefinedFieldDAO);
 	}
 
 	@Test

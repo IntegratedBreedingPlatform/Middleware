@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ public class ChangeLocationExpression extends BaseExpression {
     private GermplasmDataManager germplasmDataManager;
 
     @Override
-    public void apply(List<StringBuilder> values, AdvancingSource source, final String capturedText) {
+    public void apply(List<StringBuilder> values, DeprecatedAdvancingSource source, final String capturedText) {
         for (StringBuilder container : values) {
 
             try {

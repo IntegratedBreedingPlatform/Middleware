@@ -53,4 +53,6 @@ public interface StudyService {
 
 	boolean isLocationUsedInStudy(Integer locationId);
 
+	void deleteNameTypeFromStudies(Integer nameTypeId);
+
 }

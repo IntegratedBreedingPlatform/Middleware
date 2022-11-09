@@ -55,9 +55,9 @@ public class UserDefinedFieldDAOTest extends IntegrationTestBase {
 
 	private void setupTestData() {
 		final Germplasm germplasm1 =
-				GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+				GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		final Germplasm germplasm2 =
-				GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+				GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		this.germplasmDao.save(germplasm1);
 		this.germplasmDao.save(germplasm2);
 		this.gids = Arrays.asList(germplasm1.getGid(), germplasm2.getGid());

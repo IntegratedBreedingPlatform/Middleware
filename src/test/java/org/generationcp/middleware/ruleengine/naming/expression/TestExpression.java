@@ -5,7 +5,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ public class TestExpression {
 
 	public static final Logger LOG = LoggerFactory.getLogger(TestExpression.class);
 
-	public void printResult(List<StringBuilder> values, AdvancingSource source) {
+	public void printResult(List<StringBuilder> values, DeprecatedAdvancingSource source) {
 		LOG.debug("DESIG = " + source.getGermplasm().getDesig());
 		LOG.debug("RESULTS=");
 		for (StringBuilder value : values) {
@@ -33,21 +33,21 @@ public class TestExpression {
 		return result;
 	}
 
-	public AdvancingSource createAdvancingSourceTestData(final Method method,final ImportedGermplasm germplasm, final String name, final String season,
+	public DeprecatedAdvancingSource createAdvancingSourceTestData(final Method method,final ImportedGermplasm germplasm, final String name, final String season,
 		final String studyName) {
 		final List<Name> names = new ArrayList<>();
 		names.add(new Name(1, new Germplasm(1), 3, 0, name + "_three", 0, 0, 0));
 		names.add(new Name(1, new Germplasm(1), 5, 0, name + "_five", 0, 0, 0));
 		names.add(new Name(1, new Germplasm(1), 2, 1, name + "_two", 0, 0, 0));
 
-		final AdvancingSource source = new AdvancingSource(germplasm, names, 2, method, studyName, "1");
+		final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource(germplasm, names, 2, method, studyName, "1");
 		source.setRootName(name);
 		source.setSeason(season);
 		return source;
 
 	}
 
-	public AdvancingSource createAdvancingSourceTestData(String name, String separator, String prefix, String count, String suffix,
+	public DeprecatedAdvancingSource createAdvancingSourceTestData(String name, String separator, String prefix, String count, String suffix,
 			boolean isBulking) {
 
 		final Method method = new Method();
@@ -68,14 +68,14 @@ public class TestExpression {
 		names.add(new Name(1, new Germplasm(1), 5, 0, name + "_five", 0, 0, 0));
 		names.add(new Name(1, new Germplasm(1), 2, 1, name + "_two", 0, 0, 0));
 
-		final AdvancingSource source = new AdvancingSource(germplasm, names, 2, method, "MNL", "1");
+		final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource(germplasm, names, 2, method, "MNL", "1");
 		source.setRootName(name);
 		source.setSeason("Dry");
 		source.setStudyName("NurseryTest");
 		return source;
 	}
 
-	public List<StringBuilder> createInitialValues(AdvancingSource source) {
+	public List<StringBuilder> createInitialValues(DeprecatedAdvancingSource source) {
 		final List<StringBuilder> builders = new ArrayList<>();
 
 		final StringBuilder builder = new StringBuilder();

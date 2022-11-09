@@ -3,29 +3,29 @@ package org.generationcp.middleware.ruleengine.resolver;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Revolves Location value for Nurseries and Trials.
  */
 public class LocationAbbreviationResolver implements KeyComponentValueResolver {
 
-	protected ObservationUnitRow observationUnitRow;
-	protected Map<Integer, StudyInstance> studyInstanceMap;
+	protected final Collection<ObservationUnitData> observations;
+	protected final Map<Integer, StudyInstance> studyInstanceMap;
 
 	private static final Logger LOG = LoggerFactory.getLogger(LocationAbbreviationResolver.class);
 
-	public LocationAbbreviationResolver(final ObservationUnitRow observationUnitRow, final Map<Integer, StudyInstance> studyInstanceMap) {
+	public LocationAbbreviationResolver(final Collection<ObservationUnitData> observations,
+		final Map<Integer, StudyInstance> studyInstanceMap) {
 
-		this.observationUnitRow = observationUnitRow;
+		this.observations = observations;
 		this.studyInstanceMap = studyInstanceMap;
 	}
 
@@ -34,13 +34,11 @@ public class LocationAbbreviationResolver implements KeyComponentValueResolver {
 		String location = "";
 
 		if (!CollectionUtils.isEmpty(this.studyInstanceMap)) {
-			if (this.observationUnitRow != null) {
+			if (!CollectionUtils.isEmpty(this.observations)) {
 
-				final Optional<ObservationUnitData> instanceNoUnitData =
-					Optional.ofNullable(this.observationUnitRow.getVariables().entrySet().stream().collect(Collectors
-						.toMap(k -> k.getValue().getVariableId(),
-							Map.Entry::getValue)).get(TermId.TRIAL_INSTANCE_FACTOR.getId()));
-
+				final Optional<ObservationUnitData> instanceNoUnitData = this.observations.stream()
+					.filter(observationUnitData -> TermId.TRIAL_INSTANCE_FACTOR.getId() == observationUnitData.getVariableId())
+					.findFirst();
 				if (instanceNoUnitData.isPresent()) {
 					final String instanceNo = instanceNoUnitData.get().getValue();
 					if (instanceNo != null && this.studyInstanceMap.containsKey(Integer.valueOf(instanceNo))) {

@@ -3,18 +3,16 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import junit.framework.Assert;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.operation.builder.WorkbookBuilderTest;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -48,7 +46,7 @@ public class CrossTypeExpressionTest {
 
 	@Test
 	public void testResolveForNurseryWithSingleCrossBreedingMethod(){
-		final AdvancingSource source = new AdvancingSource();
+		final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource();
 		final Method breedingMethod = this.generateBreedingMethod("Single cross");
 		final ImportedGermplasm importedGermplasm = new ImportedGermplasm();
 		source.setBreedingMethod(breedingMethod);
@@ -64,7 +62,7 @@ public class CrossTypeExpressionTest {
 
 
 	public void testResolveForNurseryWithDoubleCrossBreedingMethod() {
-		final AdvancingSource source = new AdvancingSource();
+		final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource();
 		final Method breedingMethod = this.generateBreedingMethod("Double cross");
 		final ImportedGermplasm importedGermplasm = new ImportedGermplasm();
 		source.setBreedingMethod(breedingMethod);

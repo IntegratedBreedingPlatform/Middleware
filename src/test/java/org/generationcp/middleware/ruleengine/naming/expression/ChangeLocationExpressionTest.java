@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +43,7 @@ public class ChangeLocationExpressionTest {
         when(germplasm.getLocationId()).thenReturn(ORIGINAL_LOCATION_ID);
         List<StringBuilder> input = constructExpressionInput();
 
-        AdvancingSource source = new AdvancingSource();
+        DeprecatedAdvancingSource source = new DeprecatedAdvancingSource();
         source.setHarvestLocationId(ORIGINAL_LOCATION_ID);
         ImportedGermplasm importedGermplasm = mock(ImportedGermplasm.class);
         when(importedGermplasm.getGid()).thenReturn(Integer.toString(TEST_GID));
@@ -61,7 +61,7 @@ public class ChangeLocationExpressionTest {
         when(germplasm.getLocationId()).thenReturn(ORIGINAL_LOCATION_ID);
         List<StringBuilder> input = constructExpressionInput();
 
-        AdvancingSource source = new AdvancingSource();
+        DeprecatedAdvancingSource source = new DeprecatedAdvancingSource();
         source.setHarvestLocationId(ORIGINAL_LOCATION_ID + 1);
         ImportedGermplasm importedGermplasm = mock(ImportedGermplasm.class);
         when(importedGermplasm.getGid()).thenReturn(Integer.toString(TEST_GID));

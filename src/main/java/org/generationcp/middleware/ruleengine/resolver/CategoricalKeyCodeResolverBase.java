@@ -9,8 +9,9 @@ import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -18,18 +19,18 @@ public abstract class CategoricalKeyCodeResolverBase implements KeyComponentValu
 
 	protected OntologyVariableDataManager ontologyVariableDataManager;
 
-	protected List<MeasurementVariable> conditions;
-	protected ObservationUnitRow observationUnitRow;
-	protected Map<Integer, MeasurementVariable> environmentVariablesByTermId;
+	protected final List<MeasurementVariable> studyEnvironmentVariables;
+	protected final Collection<ObservationUnitData> observations;
+	protected final Map<Integer, MeasurementVariable> environmentVariablesByTermId;
 
 	public CategoricalKeyCodeResolverBase(final OntologyVariableDataManager ontologyVariableDataManager,
-		final List<MeasurementVariable> conditions, final ObservationUnitRow observationUnitRow,
+		final List<MeasurementVariable> studyEnvironmentVariables, final Collection<ObservationUnitData> observations,
 		final Map<Integer, MeasurementVariable> environmentVariablesByTermId) {
 
 		this.ontologyVariableDataManager = ontologyVariableDataManager;
-		this.observationUnitRow = observationUnitRow;
+		this.observations = observations;
 		this.environmentVariablesByTermId = environmentVariablesByTermId;
-		this.conditions = conditions;
+		this.studyEnvironmentVariables = studyEnvironmentVariables;
 	}
 
 	protected abstract TermId getKeyCodeId();
@@ -40,7 +41,7 @@ public abstract class CategoricalKeyCodeResolverBase implements KeyComponentValu
 
 	protected abstract String getValueFromObservationUnitData(ObservationUnitData observationUnitData);
 
-	protected abstract String getValueFromTrialConditions(MeasurementVariable trialCondition);
+	protected abstract String getValueFromStudyEnvironmentVariable(MeasurementVariable studyEnvironmentVariable);
 
 	@Override
 	public String resolve() {
@@ -48,8 +49,8 @@ public abstract class CategoricalKeyCodeResolverBase implements KeyComponentValu
 
 		MeasurementVariable measurementVariable = null;
 
-		if (this.conditions != null) {
-			for (final MeasurementVariable mv : this.conditions) {
+		if (this.studyEnvironmentVariables != null) {
+			for (final MeasurementVariable mv : this.studyEnvironmentVariables) {
 				if (mv.getTermId() == this.getKeyCodeId().getId()) {
 					measurementVariable = mv;
 				}
@@ -71,18 +72,18 @@ public abstract class CategoricalKeyCodeResolverBase implements KeyComponentValu
 			}
 		}
 
-		if (this.observationUnitRow != null) {
-			for (final ObservationUnitData observationUnitData : this.observationUnitRow.getVariables().values()) {
+		if (!CollectionUtils.isEmpty(this.observations)) {
+			for (final ObservationUnitData observationUnitData : this.observations) {
 				if (observationUnitData.getVariableId() == this.getKeyCodeId().getId()) {
 					resolvedValue = this.getValueFromObservationUnitData(observationUnitData);
 					break;
 				}
 			}
 		}
-		if (StringUtils.isBlank(resolvedValue) && this.conditions != null) {
-			for (final MeasurementVariable trialCondition : this.conditions) {
-				if (trialCondition.getTermId() == this.getKeyCodeId().getId()) {
-					resolvedValue = this.getValueFromTrialConditions(trialCondition);
+		if (StringUtils.isBlank(resolvedValue) && this.studyEnvironmentVariables != null) {
+			for (final MeasurementVariable studyEnvironmentVariable : this.studyEnvironmentVariables) {
+				if (studyEnvironmentVariable.getTermId() == this.getKeyCodeId().getId()) {
+					resolvedValue = this.getValueFromStudyEnvironmentVariable(studyEnvironmentVariable);
 					break;
 				}
 			}

@@ -5,10 +5,10 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -17,10 +17,10 @@ public class HabitatDesignationResolver extends CategoricalKeyCodeResolverBase {
 	private static final Logger LOG = LoggerFactory.getLogger(HabitatDesignationResolver.class);
 
 	public HabitatDesignationResolver(final OntologyVariableDataManager ontologyVariableDataManager,
-		final List<MeasurementVariable> conditions, final ObservationUnitRow observationUnitRow,
+		final List<MeasurementVariable> studyEnvironmentVariables, final Collection<ObservationUnitData> observations,
 		final Map<Integer, MeasurementVariable> measurementVariableByTermId) {
 
-		super(ontologyVariableDataManager, conditions, observationUnitRow, measurementVariableByTermId);
+		super(ontologyVariableDataManager, studyEnvironmentVariables, observations, measurementVariableByTermId);
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class HabitatDesignationResolver extends CategoricalKeyCodeResolverBase {
 	}
 
 	@Override
-	protected String getValueFromTrialConditions(final MeasurementVariable trialCondition) {
-		return trialCondition.getValue();
+	protected String getValueFromStudyEnvironmentVariable(final MeasurementVariable studyEnvironmentVariable) {
+		return studyEnvironmentVariable.getValue();
 	}
 }

@@ -6,7 +6,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.ruleengine.BranchingRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.pojo.AdvanceGermplasmChangeDetail;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +27,7 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 
 		List<String> currentData = context.getCurrentData();
 		GermplasmDataManager germplasmDataManager = context.getGermplasmDataManager();
-		AdvancingSource source = context.getAdvancingSource();
+		DeprecatedAdvancingSource source = context.getAdvancingSource();
 
 		// as per agreement, unique name checking can be limited to only the first entry for the germplasm
 		String nameForChecking = currentData.get(0);
@@ -50,7 +50,7 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 		return null;
 	}
 
-	protected void processNonUniqueName(NamingRuleExecutionContext context, AdvancingSource source) {
+	protected void processNonUniqueName(NamingRuleExecutionContext context, DeprecatedAdvancingSource source) {
 		// if a duplicate is found, initialize an AdvanceGermplasmChangeDetail object containing the original duplicate, for confirmation
 		// later on with the user
 		this.initializeChangeDetailForAdvancingSource(context);
@@ -77,7 +77,7 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 
 	@Override
 	public String getNextRuleStepKey(NamingRuleExecutionContext context) {
-		AdvancingSource source = context.getAdvancingSource();
+		DeprecatedAdvancingSource source = context.getAdvancingSource();
 
 		AdvanceGermplasmChangeDetail changeDetailObject = source.getChangeDetail();
 

@@ -67,7 +67,7 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 		this.cropType.setPlotCodePrefix(randomAlphanumeric(4));
 		this.cropType.setCropName("maize");
 		this.germplasm1 =
-			GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		GermplasmGuidGenerator.generateGermplasmGuids(this.cropType, singletonList(this.germplasm1));
 
 		this.germplasmDao.save(this.germplasm1);
@@ -150,7 +150,7 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 		assertThat(this.fileMetadataDAO.getByGids(Arrays.asList(this.germplasm1.getGid())), hasSize(3));
 
 		final Germplasm germplasm = GermplasmTestDataInitializer
-				.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+				.createGermplasm(20180909, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		this.germplasmDao.save(germplasm);
 		final List<String> targetFileUUIDs = new ArrayList();
 		targetFileUUIDs.add(this.fileMetadata1.getFileUUID());
