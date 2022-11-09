@@ -136,8 +136,9 @@ public class UserServiceImpl implements UserService {
 			user.setAssignDate(currentDate);
 			user.setCloseDate(currentDate);
 			user.setInstalid(0);
-			user.setStatus(userDto.getStatus());
+			user.setStatus(userDto.getStatus().equals("true") ? 0 : 1);
 			user.setType(0);
+			user.setMultiFactorAuthenticationEnabled(userDto.isMultiFactorAuthenticationEnabled());
 
 			// Add user roles to the particular user
 			final List<UserRole> userRoles = new ArrayList<>();
@@ -178,13 +179,14 @@ public class UserServiceImpl implements UserService {
 		final Integer idUserSaved;
 
 		try {
-			user = this.getUserById(userDto.getUserId());
+			user = this.getUserById(userDto.getId());
 			this.createPersonFromDto(userDto, user.getPerson());
 
 			user.setName(userDto.getUsername());
 			user.setAssignDate(currentDate);
 			user.setCloseDate(currentDate);
-			user.setStatus(userDto.getStatus());
+			user.setStatus(userDto.getStatus().equals("true") ? 0 : 1);
+			user.setMultiFactorAuthenticationEnabled(userDto.isMultiFactorAuthenticationEnabled());
 
 			final List<UserRole> userRoles = new ArrayList<>();
 			if (userDto.getUserRoles() != null) {

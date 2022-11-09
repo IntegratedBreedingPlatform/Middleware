@@ -204,7 +204,7 @@ public class WorkbenchTestDataUtil {
 		final UserDto userdto = new UserDto();
 
 		if (userId != null && !userId.equals(0)) {
-			userdto.setUserId(userId);
+			userdto.setId(userId);
 		}
 
 		final String username = RandomStringUtils.randomAlphanumeric(30);
@@ -223,7 +223,7 @@ public class WorkbenchTestDataUtil {
 		userdto.setPassword("fwgtrgrehgewsdsdeferhkjlkjSli");
 		final String email = RandomStringUtils.randomAlphanumeric(24);
 		userdto.setEmail("test" + email + "@leafnode.io");
-		userdto.setStatus(0);
+		userdto.setStatus("true");
 		return userdto;
 	}
 

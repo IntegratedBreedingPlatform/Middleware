@@ -3,6 +3,7 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.dao.CropGenotypingParameterDAO;
 import org.generationcp.middleware.dao.CropPersonDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
+import org.generationcp.middleware.dao.OneTimePasswordDAO;
 import org.generationcp.middleware.dao.PermissionDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
@@ -15,6 +16,7 @@ import org.generationcp.middleware.dao.RoleDAO;
 import org.generationcp.middleware.dao.RoleTypeDAO;
 import org.generationcp.middleware.dao.RoleTypePermissionDAO;
 import org.generationcp.middleware.dao.ToolDAO;
+import org.generationcp.middleware.dao.UserDeviceMetaDataDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.UserRoleDao;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
@@ -173,6 +175,14 @@ public class WorkbenchDaoFactory {
 
 	public FeedbackUserDAO getFeedbackUserDAO() {
 		return new FeedbackUserDAO(this.sessionProvider.getSession());
+	}
+
+	public OneTimePasswordDAO getOneTimePasswordDAO() {
+		return new OneTimePasswordDAO(this.sessionProvider.getSession());
+	}
+
+	public UserDeviceMetaDataDAO getUserDeviceMetaDataDAO() {
+		return new UserDeviceMetaDataDAO(this.sessionProvider.getSession());
 	}
 
 }

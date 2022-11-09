@@ -80,7 +80,7 @@ public class WorkbenchUserDAOIntegrationTest extends IntegrationTestBase {
 		final List<UserDto> users = this.workbenchUserDAO.getAllProgramEligibleUsers(project1.getUniqueID(), null, null);
 		assertThat(users, hasSize(1));
 		final UserDto userDto = users.get(0);
-		assertThat(userDto.getUserId(), equalTo(user4.getUserid()));
+		assertThat(userDto.getId(), equalTo(user4.getUserid()));
 		assertThat(userDto.getFirstName(), equalTo(user4.getPerson().getFirstName()));
 		assertThat(userDto.getLastName(), equalTo(user4.getPerson().getLastName()));
 		assertThat(userDto.getEmail(), equalTo(user4.getPerson().getEmail()));
