@@ -3,7 +3,6 @@ package org.generationcp.middleware.service.impl.user;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.crop.CropService;
-import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.dao.UserRoleDao;
 import org.generationcp.middleware.data.initializer.UserRoleDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
@@ -267,7 +266,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	public void testUpdateUser() {
 		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(0);
 		final Integer userId = this.userService.createUser(userDto);
-		userDto.setUserId(userId);
+		userDto.setId(userId);
 		final Integer result = this.userService.updateUser(userDto);
 
 		assertThat("Expected id of userDto saved record in workbench_user.", result != null);
