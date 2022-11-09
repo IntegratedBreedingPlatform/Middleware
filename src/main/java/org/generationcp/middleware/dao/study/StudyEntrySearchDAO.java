@@ -106,7 +106,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	private static final String IMMEDIATE_SOURCE_NAME_JOIN =
 		" LEFT JOIN names immediateSource ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
 	private static final String GROUP_SOURCE_NAME_JOIN =
-		"LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0 ";
+		"LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0 AND groupSourceName.nstat = 1 ";
 	private static final String BREEDING_METHODS_ABBR_JOIN =
 		"LEFT JOIN methods m ON m.mid = g.methn ";
 	private static final String GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN = "LEFT JOIN atributs %1$s ON s.dbxref_id = %1$s.gid AND %1$s.atype = %2$s";
