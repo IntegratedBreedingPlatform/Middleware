@@ -11,6 +11,16 @@ public class GermplasmListDataUpdateViewDTO {
 	private Integer typeId;
 	private GermplasmListColumnCategory category;
 
+	public GermplasmListDataUpdateViewDTO() {
+
+	}
+
+	public GermplasmListDataUpdateViewDTO(final int id, final Integer typeId, final GermplasmListColumnCategory category) {
+		this.id = id;
+		this.typeId = typeId;
+		this.category = category;
+
+	}
 	public int getId() {
 		return id;
 	}

@@ -14,6 +14,8 @@ public interface GermplasmNameTypeService {
 
 	Optional<GermplasmNameTypeDTO> getNameTypeById(Integer id);
 
+	List<GermplasmNameTypeDTO> getNameTypesByNameTypeListIds(Set<Integer> ids);
+
 	Integer createNameType(GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO);
 
 	List<GermplasmNameTypeDTO> searchNameTypes(NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest, Pageable pageable);
@@ -29,4 +31,10 @@ public interface GermplasmNameTypeService {
 	void updateNameType(Integer nameTypeId, GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO);
 
 	void deleteNameType(Integer nameTypeId);
+
+	NameTypeMetadata getNameTypeMetadata(Integer nameTypeId);
+
+	boolean isNameTypeUsedInStudies(Integer nameTypeId);
+
+	boolean isNameTypeUsedInGermplasmList(Integer nameTypeId);
 }

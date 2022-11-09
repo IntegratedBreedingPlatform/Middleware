@@ -2,7 +2,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -47,7 +47,7 @@ public class CodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testWithNegativeNumberPlantsSelected() {
-		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE, SUFFIX, true);
+		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE, SUFFIX, true);
 		source.setPlantsSelected(-2);
 		final List<StringBuilder> values = this.createInitialValues(source);
 
@@ -59,7 +59,7 @@ public class CodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testCaseSensitiveSequence() {
-		final AdvancingSource source =
+		final DeprecatedAdvancingSource source =
 			this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE.toLowerCase(), SUFFIX, true);
 		source.setPlantsSelected(PLANTS_SELECTED);
 		final List<StringBuilder> values = this.createInitialValues(source);
@@ -71,7 +71,7 @@ public class CodingSequenceExpressionTest extends TestExpression {
 	@Test
 	public void testWithNullPlantsSelected() {
 		// final false refers to nonBulking
-		final AdvancingSource source =
+		final DeprecatedAdvancingSource source =
 			this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE.toLowerCase(), SUFFIX, false);
 		source.setPlantsSelected(null);
 		final int currentMaxSequence = 10;
@@ -86,7 +86,7 @@ public class CodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testBulkingWithPlantsSelected() {
-		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE, SUFFIX, true);
+		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE, SUFFIX, true);
 		source.setPlantsSelected(PLANTS_SELECTED);
 		final List<StringBuilder> values = this.createInitialValues(source);
 
@@ -98,7 +98,7 @@ public class CodingSequenceExpressionTest extends TestExpression {
 	@Test
 	public void testNonBulkingWithPlantsSelected() {
 		// final false refers to nonBulking
-		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE, SUFFIX, false);
+		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE, SUFFIX, false);
 		source.setPlantsSelected(PLANTS_SELECTED);
 		final int currentMaxSequence = 13;
 		source.setCurrentMaxSequence(currentMaxSequence);

@@ -7,11 +7,11 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -23,10 +23,10 @@ public class SeasonResolver extends CategoricalKeyCodeResolverBase {
 	private static final Logger LOG = LoggerFactory.getLogger(SeasonResolver.class);
 
 	public SeasonResolver(final OntologyVariableDataManager ontologyVariableDataManager,
-		final List<MeasurementVariable> conditions, final ObservationUnitRow observationUnitRow,
+		final List<MeasurementVariable> studyEnvironmentVariables, final Collection<ObservationUnitData> observations,
 		final Map<Integer, MeasurementVariable> environmentVariablesByTermId) {
 
-		super(ontologyVariableDataManager, conditions, observationUnitRow, environmentVariablesByTermId);
+		super(ontologyVariableDataManager, studyEnvironmentVariables, observations, environmentVariablesByTermId);
 	}
 
 	@Override
@@ -72,9 +72,9 @@ public class SeasonResolver extends CategoricalKeyCodeResolverBase {
 	}
 
 	@Override
-	protected String getValueFromTrialConditions(final MeasurementVariable variable) {
-		if (TermId.SEASON_VAR.getId() == variable.getTermId()) {
-			return this.getValue(variable.getValue(), variable.getPossibleValues());
+	protected String getValueFromStudyEnvironmentVariable(final MeasurementVariable studyEnvironmentVariable) {
+		if (TermId.SEASON_VAR.getId() == studyEnvironmentVariable.getTermId()) {
+			return this.getValue(studyEnvironmentVariable.getValue(), studyEnvironmentVariable.getPossibleValues());
 		}
 		return "";
 	}

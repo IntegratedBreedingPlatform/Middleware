@@ -59,6 +59,17 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
+	public List<GermplasmNameTypeDTO> getNameTypesByNameTypeListIds(final Set<Integer> nameTypeIds) {
+		final List<UserDefinedField> nameTypeList = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByNameTypeListIds(nameTypeIds);
+		if (nameTypeList != null && !nameTypeList.isEmpty()) {
+			return nameTypeList.stream().map( nameType -> //
+				new  GermplasmNameTypeDTO(nameType.getFldno(), nameType.getFcode(), nameType.getFname())) //
+				.collect(Collectors.toList());
+		}
+		return Collections.emptyList();
+	}
+
+	@Override
 	public Integer createNameType(final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
 		final String fDesc =
 			StringUtils.isBlank(germplasmNameTypeRequestDTO.getDescription()) ? GermplasmNameTypeServiceImpl.DEFAULT_FIELD :
@@ -168,6 +179,26 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	public void deleteNameType(final Integer nameTypeId) {
 		final UserDefinedField userDefinedField = this.daoFactory.getUserDefinedFieldDAO().getById(nameTypeId);
 		this.daoFactory.getUserDefinedFieldDAO().makeTransient(userDefinedField);
+	}
+
+	@Override
+	public NameTypeMetadata getNameTypeMetadata(final Integer nameTypeId) {
+		final NameTypeMetadata nameTypeMetadata = new NameTypeMetadata();
+
+		nameTypeMetadata.setGermplasmCount(this.daoFactory.getNameDao().countNameTypeInUse(nameTypeId));
+		nameTypeMetadata.setStudiesCount(this.daoFactory.getProjectPropertyDAO().countStudiesWithNameType(nameTypeId));
+		nameTypeMetadata.setGermplasmListCount(this.daoFactory.getGermplasmListDataViewDAO().countGermplasmListWithNameType(nameTypeId));
+		return nameTypeMetadata;
+	}
+
+	@Override
+	public boolean isNameTypeUsedInStudies(final Integer nameTypeId) {
+		return this.daoFactory.getProjectPropertyDAO().countStudiesWithNameType(nameTypeId) > 0;
+	}
+
+	@Override
+	public boolean isNameTypeUsedInGermplasmList(final Integer nameTypeId) {
+		return this.daoFactory.getGermplasmListDataViewDAO().countGermplasmListWithNameType(nameTypeId) > 0;
 	}
 
 }

@@ -72,14 +72,14 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	private void setupTestData() {
 		this.germplasmList = new ArrayList<>();
 		final Germplasm germplasm1 =
-			GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		germplasm1.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		final Germplasm germplasm2 =
-			GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		germplasm2.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		this.germplasmTestDataGenerator.addGermplasm(germplasm2, germplasm2.getPreferredName(), this.cropType);
 		final Germplasm germplasm3 =
-			GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		germplasm3.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		this.germplasmList.add(this.daoFactory.getGermplasmDao().save(germplasm1));
 		this.germplasmList.add(this.daoFactory.getGermplasmDao().save(germplasm2));

@@ -155,7 +155,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 	@Override
 	public boolean isNameTypeUsedAsGermplasmName(final Integer nameTypeId){
-		return this.daoFactory.getNameDao().isNameTypeInUse(nameTypeId);
+		return this.daoFactory.getNameDao().countNameTypeInUse(nameTypeId) > 0;
 	}
 
 	@Override
@@ -167,4 +167,5 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	public Map<Integer, String> getPreferredNamesByGIDs(final List<Integer> gids) {
 		return this.daoFactory.getNameDao().getPreferredNamesByGIDs(gids);
 	}
+
 }

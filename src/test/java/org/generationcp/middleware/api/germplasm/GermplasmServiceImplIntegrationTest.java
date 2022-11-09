@@ -2606,7 +2606,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Integer gpid1, final Integer gpid2, final Bibref reference, final String germplasmPUI) {
 
 		final Germplasm germplasm = new Germplasm(null, gnpgs, gpid1, gpid2,
-			0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
+			(location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
 			0, 0, null, null, method);
 		germplasm.setBibref(reference);
 
@@ -2626,7 +2626,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
 		final Integer gpid1, final Integer gpid2, final Bibref reference, final String germplasmPUI) {
 		final Germplasm germplasm = new Germplasm(null, gnpgs, gpid1, gpid2,
-			0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
+			(location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
 			0, 0, null, null, method);
 		if (StringUtils.isNotEmpty(germplasmUUID)) {
 			germplasm.setGermplasmUUID(germplasmUUID);

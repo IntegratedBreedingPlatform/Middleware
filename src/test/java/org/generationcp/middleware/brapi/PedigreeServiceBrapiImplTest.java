@@ -882,7 +882,7 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 	private Germplasm createGermplasm(final Method method, final Location location, final Integer gnpgs,
 		final Integer gpid1, final Integer gpid2, final Bibref reference) {
 		final Germplasm germplasm = new Germplasm(null, gnpgs, gpid1, gpid2,
-			0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.CREATION_DATE), 0,
+			(location == null) ? 0 : location.getLocid(), Integer.parseInt(this.CREATION_DATE), 0,
 			0, 0, null, null, method);
 
 		germplasm.setGermplasmUUID(UUID.randomUUID().toString());

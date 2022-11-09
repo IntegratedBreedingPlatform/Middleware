@@ -14,6 +14,7 @@ package org.generationcp.middleware.operation.builder;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -23,6 +24,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.helper.VariableInfo;
@@ -30,6 +32,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +40,10 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DataSetBuilder extends Builder {
 
@@ -53,6 +58,9 @@ public class DataSetBuilder extends Builder {
 	private static final List<Integer> HIDDEN_DATASET_COLUMNS = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId());
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataSetBuilder.class);
+
+	@Resource
+	private DatasetService datasetService;
 
 	public DataSetBuilder() {
 
@@ -143,6 +151,17 @@ public class DataSetBuilder extends Builder {
 
 	public Workbook buildCompleteDataset(final int datasetId) {
 		final DataSet dataset = this.build(datasetId);
+
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.datasetService.getDatasetNameTypes(dataset.getId());
+		germplasmNameTypeDTOs.sort(Comparator.comparing(GermplasmNameTypeDTO::getCode));
+		final List<MeasurementVariable> NameList = germplasmNameTypeDTOs.stream().map(
+				germplasmNameTypeDTO -> //
+					new MeasurementVariable(germplasmNameTypeDTO.getCode(), //
+						germplasmNameTypeDTO.getDescription(), //
+						germplasmNameTypeDTO.getId(), DataType.CHARACTER_VARIABLE.getId(), //
+						germplasmNameTypeDTO.getCode(), true)) //
+			.collect(Collectors.toList());
+
 		final boolean isMeasurementDataset =
 			(dataset.getDatasetType() != null) ? dataset.getDatasetType().isObservationType() : Boolean.FALSE;
 		VariableTypeList variables;
@@ -161,12 +180,13 @@ public class DataSetBuilder extends Builder {
 		final List<MeasurementVariable> factorList = this.getMeasurementVariableTransformer().transform(variables.getFactors(), true);
 		final List<MeasurementVariable> variateList = this.getMeasurementVariableTransformer().transform(variables.getVariates(), false);
 		final Workbook workbook = new Workbook();
-		workbook.setObservations(this.workbookBuilder.buildDatasetObservations(experiments, variables, factorList, variateList));
+		workbook.setObservations(this.workbookBuilder.buildDatasetObservations(experiments, variables, factorList, variateList, NameList));
 		workbook.setFactors(factorList);
 		workbook.setVariates(variateList);
 		final List<MeasurementVariable> measurementDatasetVariables = new ArrayList<>();
 		measurementDatasetVariables.addAll(factorList);
 		measurementDatasetVariables.addAll(variateList);
+		measurementDatasetVariables.addAll(NameList);
 		workbook.setMeasurementDatasetVariables(measurementDatasetVariables);
 
 		return workbook;
