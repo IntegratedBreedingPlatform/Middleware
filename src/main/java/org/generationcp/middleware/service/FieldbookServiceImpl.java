@@ -30,6 +30,7 @@ import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -646,8 +647,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Map<Integer, List<Name>> getNamesByGids(final List<Integer> gids) {
-		return this.daoFactory.getNameDao().getNamesByGidsInMap(gids);
+	public Map<Integer, List<BasicNameDTO>> getNamesByGids(final List<Integer> gids) {
+		return this.daoFactory.getNameDao().getBasicNamesByGids(new HashSet<>(gids))
+			.stream()
+			.collect(Collectors.groupingBy(BasicNameDTO::getGid, Collectors.toList()));
 	}
 
 	@Override

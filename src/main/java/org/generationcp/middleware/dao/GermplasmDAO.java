@@ -24,7 +24,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeMapper;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeSearchRequest;
-import org.generationcp.middleware.domain.germplasm.BasicGermplasm;
+import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.ParentType;
@@ -39,7 +39,6 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
@@ -2029,7 +2028,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return results;
 	}
 
-	public List<BasicGermplasm> getBasicGermplasmByGids(final Set<Integer> gids) {
+	public List<BasicGermplasmDTO> getBasicGermplasmByGids(final Set<Integer> gids) {
 
 		final String queryString = "SELECT g.gid, g.gpid1, g.gpid2, g.gnpgs, g.mgid, g.methn as methodId "
 			+ " FROM germplsm g WHERE g.gid IN( :gids ) "
@@ -2037,7 +2036,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			+ " AND g.grplce = 0";
 		final SQLQuery query = this.getSession().createSQLQuery(queryString);
 		query.setParameterList("gids", gids);
-		query.setResultTransformer(Transformers.aliasToBean(BasicGermplasm.class));
+		query.setResultTransformer(Transformers.aliasToBean(BasicGermplasmDTO.class));
 		return query.list();
 	}
 

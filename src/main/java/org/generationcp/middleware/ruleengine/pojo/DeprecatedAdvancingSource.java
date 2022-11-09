@@ -15,10 +15,10 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitUtils;
 
@@ -51,7 +51,7 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 
 	private List<SampleDTO> samples = new ArrayList<>();
 
-	public DeprecatedAdvancingSource(final ImportedGermplasm germplasm, final List<Name> names, final Integer plantsSelected,
+	public DeprecatedAdvancingSource(final ImportedGermplasm germplasm, final List<BasicNameDTO> names, final Integer plantsSelected,
 		final Method breedingMethod,
 		final String studyName, final String plotNumber) {
 		super();
@@ -105,7 +105,7 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 	/**
 	 * @param names the names to set
 	 */
-	public void setNames(final List<Name> names) {
+	public void setNames(final List<BasicNameDTO> names) {
 		this.names = names;
 	}
 

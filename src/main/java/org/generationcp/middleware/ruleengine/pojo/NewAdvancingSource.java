@@ -1,9 +1,10 @@
 package org.generationcp.middleware.ruleengine.pojo;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.List;
 // TODO: please, change this name
 public class NewAdvancingSource extends AbstractAdvancingSource {
 
-	private Germplasm originGermplasm;
+	private BasicGermplasmDTO originGermplasm;
 
 	// TODO: besides data processors, this is only being used by BreedersCrossIDExpression. Please, try to remove it from there.
 	//This will be used if we have trail
@@ -25,13 +26,13 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 	public NewAdvancingSource() {
 	}
 
-	// TODO: create builder.
-	public NewAdvancingSource(final Germplasm originGermplasm, final List<Name> names,
+	public NewAdvancingSource(final BasicGermplasmDTO originGermplasm, final List<BasicNameDTO> names,
 		final ObservationUnitRow plotObservation,
 		final ObservationUnitRow trialInstanceObservation,
 		final List<MeasurementVariable> studyEnvironmentVariables,
 		final Method breedingMethod,
-		final Integer studyId, final Integer environmentDatasetId, final String season, final String selectionTraitValue,
+		final Method sourceMethod, final Integer studyId, final Integer environmentDatasetId,
+		final String season, final String selectionTraitValue,
 		final Integer plantSelected) {
 
 		this.originGermplasm = originGermplasm;
@@ -39,12 +40,12 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 		this.plotObservation = plotObservation;
 		this.trialInstanceObservation = trialInstanceObservation;
 		this.conditions = studyEnvironmentVariables;
-		this.breedingMethod = this.originGermplasm.getMethod();
 
 		this.studyId = studyId;
 		this.environmentDatasetId = environmentDatasetId;
 
 		this.breedingMethod = breedingMethod;
+		this.sourceMethod = sourceMethod;
 		this.season = season;
 		this.selectionTraitValue = selectionTraitValue;
 		this.plantsSelected = plantSelected;
@@ -59,7 +60,7 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 		return plotObservation;
 	}
 
-	public Germplasm getOriginGermplasm() {
+	public BasicGermplasmDTO getOriginGermplasm() {
 		return originGermplasm;
 	}
 
@@ -86,11 +87,6 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 	@Override
 	public Integer getOriginGermplasmGnpgs() {
 		return this.originGermplasm.getGnpgs();
-	}
-
-	@Override
-	public String getOriginGermplasmBreedingMethodType() {
-		return this.originGermplasm.getMethod().getMtype();
 	}
 
 	@Override

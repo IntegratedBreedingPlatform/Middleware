@@ -7,8 +7,8 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +21,8 @@ public class RootNameExpression implements Expression {
 	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
 		for (final StringBuilder value : values) {
 			final Integer snametype = source.getBreedingMethod().getSnametype();
-			Name name = null;
-			final List<Name> names = source.getNames();
+			BasicNameDTO name = null;
+			final List<BasicNameDTO> names = source.getNames();
 
 			// this checks the matching sname type of the method to the names
 			if (snametype != null) {
@@ -61,12 +61,12 @@ public class RootNameExpression implements Expression {
 		}
 	}
 
-	public Name findNameUsingNameType(final Integer nameType, final List<Name> names) {
+	public BasicNameDTO findNameUsingNameType(final Integer nameType, final List<BasicNameDTO> names) {
 		if (names == null) {
 			return null;
 		}
 
-		for (final Name name : names) {
+		for (final BasicNameDTO name : names) {
 			if (name.getTypeId() != null && name.getTypeId().equals(nameType)) {
 				return name;
 			}
@@ -75,12 +75,12 @@ public class RootNameExpression implements Expression {
 		return null;
 	}
 
-	public Name findPreferredName(final List<Name> names) {
+	public BasicNameDTO findPreferredName(final List<BasicNameDTO> names) {
 		if (names == null) {
 			return null;
 		}
 
-		for (final Name name : names) {
+		for (final BasicNameDTO name : names) {
 			if (name.getNstat() != null && name.getNstat().equals(1)) {
 				return name;
 			}

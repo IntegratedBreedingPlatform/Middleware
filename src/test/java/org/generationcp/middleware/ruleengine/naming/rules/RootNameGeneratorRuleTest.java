@@ -1,8 +1,8 @@
 
 package org.generationcp.middleware.ruleengine.naming.rules;
 
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,8 +30,8 @@ public class RootNameGeneratorRuleTest extends BaseNamingRuleTest {
 
 	}
 
-	private Name generateNewName(Integer typeId, Integer nStat) {
-		Name name = new Name();
+	private BasicNameDTO generateNewName(final Integer typeId, final  Integer nStat) {
+		final BasicNameDTO name = new BasicNameDTO();
 		name.setTypeId(typeId);
 		name.setNstat(nStat);
 		name.setNval(this.testGermplasmName);
@@ -40,7 +40,7 @@ public class RootNameGeneratorRuleTest extends BaseNamingRuleTest {
 
 	@Test
 	public void testGetGermplasmRootNameWithTheSameSnameTypeWithMethod() {
-		List<Name> names = new ArrayList<Name>();
+		List<BasicNameDTO> names = new ArrayList<>();
 		names.add(this.generateNewName(this.breedingMethodSnameType, 1));
 		this.row.setNames(names);
 		List<String> input = new ArrayList<String>();

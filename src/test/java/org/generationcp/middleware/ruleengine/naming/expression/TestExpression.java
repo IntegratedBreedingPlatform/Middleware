@@ -1,9 +1,8 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
 import org.slf4j.Logger;
@@ -34,10 +33,10 @@ public class TestExpression {
 
 	public DeprecatedAdvancingSource createAdvancingSourceTestData(final Method method,final ImportedGermplasm germplasm, final String name, final String season,
 		final String studyName) {
-		final List<Name> names = new ArrayList<>();
-		names.add(new Name(1, new Germplasm(1), 3, 0, name + "_three", 0, 0, 0));
-		names.add(new Name(1, new Germplasm(1), 5, 0, name + "_five", 0, 0, 0));
-		names.add(new Name(1, new Germplasm(1), 2, 1, name + "_two", 0, 0, 0));
+		final List<BasicNameDTO> names = new ArrayList<>();
+		names.add(this.createBasicNameDTO(3, 0, name + "_three"));
+		names.add(this.createBasicNameDTO(5, 0, name + "_five"));
+		names.add(this.createBasicNameDTO(2, 1, name + "_two"));
 
 		final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource(germplasm, names, 2, method, studyName, "1");
 		source.setRootName(name);
@@ -62,10 +61,11 @@ public class TestExpression {
 
 		final ImportedGermplasm germplasm = new ImportedGermplasm();
 		germplasm.setDesig(name);
-		final List<Name> names = new ArrayList<Name>();
-		names.add(new Name(1, new Germplasm(1), 3, 0, name + "_three", 0, 0, 0));
-		names.add(new Name(1, new Germplasm(1), 5, 0, name + "_five", 0, 0, 0));
-		names.add(new Name(1, new Germplasm(1), 2, 1, name + "_two", 0, 0, 0));
+
+		final List<BasicNameDTO> names = new ArrayList<>();
+		names.add(this.createBasicNameDTO(3, 0, name + "_three"));
+		names.add(this.createBasicNameDTO(5, 0, name + "_five"));
+		names.add(this.createBasicNameDTO(2, 1, name + "_two"));
 
 		final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource(germplasm, names, 2, method, "MNL", "1");
 		source.setRootName(name);
@@ -137,5 +137,14 @@ public class TestExpression {
 
 	public String getNonNullValue(String value) {
 		return value != null ? value : "";
+	}
+
+	private BasicNameDTO createBasicNameDTO(final Integer typeId, final Integer nstat, final String value) {
+		final BasicNameDTO name = new BasicNameDTO();
+		name.setGid(1);
+		name.setTypeId(typeId);
+		name.setNstat(nstat);
+		name.setNval(value);
+		return name;
 	}
 }

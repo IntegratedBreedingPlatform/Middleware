@@ -22,6 +22,7 @@ import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -485,7 +486,7 @@ public interface FieldbookService {
 	 * @return the names by gids
 	 */
 	@Deprecated
-	Map<Integer, List<Name>> getNamesByGids(List<Integer> gids);
+	Map<Integer, List<BasicNameDTO>> getNamesByGids(List<Integer> gids);
 
 	/**
 	 * Count germplasm list data by list id.

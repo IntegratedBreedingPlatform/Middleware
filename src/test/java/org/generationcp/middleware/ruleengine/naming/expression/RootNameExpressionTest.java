@@ -1,8 +1,8 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import junit.framework.Assert;
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class RootNameExpressionTest extends TestExpression {
 
 		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("Germplasm", null, null, null, null, true);
 		int i = 0;
-		final Name name = new Name();
+		final BasicNameDTO name = new BasicNameDTO();
 		name.setTypeId(10);
 		source.getNames().add(name);
 		source.getBreedingMethod().setSnametype(10);
@@ -58,10 +58,10 @@ public class RootNameExpressionTest extends TestExpression {
 				"(a/b/c/d)");
 
 		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("Germplasm", null, null, null, null, true);
-		final Name name = new Name();
+		final BasicNameDTO name = new BasicNameDTO();
 		name.setTypeId(11);
 		name.setNstat(2);
-		final List<Name> names = new ArrayList<Name>();
+		final List<BasicNameDTO> names = new ArrayList<>();
 		names.add(name);
 		source.setNames(names);
 		source.getBreedingMethod().setSnametype(10);
@@ -84,18 +84,18 @@ public class RootNameExpressionTest extends TestExpression {
 		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("Germplasm", null, null, null, null, true);
 
 		// Create lineName Name and set is as preferred
-		final Name lineName = new Name();
+		final BasicNameDTO lineName = new BasicNameDTO();
 		lineName.setTypeId(GermplasmNameType.LINE_NAME.getUserDefinedFieldID());
 		lineName.setNval(lineNameValue);
 		lineName.setNstat(1);
 
 		// Create derivative name
-		final Name derivativeName = new Name();
+		final BasicNameDTO derivativeName = new BasicNameDTO();
 		derivativeName.setTypeId(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID());
 		derivativeName.setNval(derivativeNameValue);
 		derivativeName.setNstat(2);
 
-		final List<Name> names = new ArrayList<Name>();
+		final List<BasicNameDTO> names = new ArrayList<>();
 		names.add(lineName);
 		names.add(derivativeName);
 

@@ -1,6 +1,10 @@
 package org.generationcp.middleware.domain.germplasm;
 
-public class BasicGermplasm {
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
+
+@AutoProperty
+public class BasicGermplasmDTO {
 
 	private Integer gid;
 	private Integer gpid1;
@@ -55,6 +59,21 @@ public class BasicGermplasm {
 
 	public void setMethodId(final Integer methodId) {
 		this.methodId = methodId;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 
 }

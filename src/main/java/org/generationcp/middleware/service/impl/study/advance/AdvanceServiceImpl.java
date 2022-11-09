@@ -10,7 +10,8 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.germplasm.BasicGermplasm;
+import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -25,7 +26,6 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmStudySourceType;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.ruleengine.RuleException;
@@ -187,16 +187,15 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.map(ObservationUnitRow::getGid)
 			.collect(Collectors.toSet());
 
-		final Map<Integer, List<Name>> namesByGids =
-			this.daoFactory.getNameDao().getNamesByGidsInMap(new ArrayList<>(gids));
+		final Map<Integer, List<BasicNameDTO>> namesByGids = this.getNamesByGids(gids);
 
-		final Map<Integer, BasicGermplasm> originGermplasmsByGid = this.getGermplasmByGids(gids);
+		final Map<Integer, BasicGermplasmDTO> originGermplasmsByGid = this.getGermplasmByGids(gids);
 		final CropType cropType = this.cropService.getCropTypeByName(ContextHolder.getCurrentCrop());
 		final List<NewAdvancingSource> advancingSources = new ArrayList<>();
 		final Set<Integer> originGermplasmParentGids = new HashSet<>();
 
 		plotObservations.forEach(row -> {
-			final BasicGermplasm originGermplasm = originGermplasmsByGid.get(row.getGid());
+			final BasicGermplasmDTO originGermplasm = originGermplasmsByGid.get(row.getGid());
 			// Get the selected breeding method
 			final Method breedingMethod =
 				this.breedingMethodResolver.resolveBreedingMethod(request.getBreedingMethodSelectionRequest(), row, breedingMethodsByCode,
@@ -402,10 +401,16 @@ public class AdvanceServiceImpl implements AdvanceService {
 		return this.daoFactory.getLocationDAO().getByIds(new ArrayList<>(locationIds));
 	}
 
-	private Map<Integer, BasicGermplasm> getGermplasmByGids(final Set<Integer> gids) {
+	private Map<Integer, List<BasicNameDTO>> getNamesByGids(final Set<Integer> gids) {
+		return this.daoFactory.getNameDao().getBasicNamesByGids(gids)
+			.stream()
+			.collect(Collectors.groupingBy(BasicNameDTO::getGid, Collectors.toList()));
+	}
+
+	private Map<Integer, BasicGermplasmDTO> getGermplasmByGids(final Set<Integer> gids) {
 		return this.daoFactory.getGermplasmDao().getBasicGermplasmByGids(gids)
 			.stream()
-			.collect(Collectors.toMap(BasicGermplasm::getGid, basicGermplasm -> basicGermplasm));
+			.collect(Collectors.toMap(BasicGermplasmDTO::getGid, basicGermplasmDTO -> basicGermplasmDTO));
 	}
 
 	private Set<Integer> getVariableValuesFromObservations(final List<ObservationUnitRow> observations, final Integer variableId) {
@@ -433,7 +438,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 	private void createAdvancedGermplasm(final CropType cropType, final NewAdvancingSource advancingSource) {
 
 		for (int i = 0; i < advancingSource.getPlantsSelected(); i++) {
-			final BasicGermplasm originGermplasm = advancingSource.getOriginGermplasm();
+			final BasicGermplasmDTO originGermplasm = advancingSource.getOriginGermplasm();
 			final Germplasm advancedGermplasm = new Germplasm();
 			if (originGermplasm.getGpid1() == 0 || (advancingSource.getSourceMethod() != null && advancingSource.getSourceMethod()
 				.isDerivative())) {

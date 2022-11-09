@@ -1,8 +1,8 @@
 package org.generationcp.middleware.ruleengine.pojo;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +29,7 @@ public abstract class AbstractAdvancingSource implements AdvancingSourceAdapter 
 	protected Integer harvestLocationId;
 	protected String selectionTraitValue;
 
-	protected List<Name> names;
+	protected List<BasicNameDTO> names;
 
 	protected Integer plantsSelected;
 
@@ -115,7 +115,7 @@ public abstract class AbstractAdvancingSource implements AdvancingSourceAdapter 
 		this.selectionTraitValue = selectionTraitValue;
 	}
 
-	public List<Name> getNames() {
+	public List<BasicNameDTO> getNames() {
 		return names;
 	}
 
