@@ -24,7 +24,7 @@
 	<changeSet author="aldrin" id="v22.3.0-2">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<tableExists tableName="user_device_metadata"></tableExists>
+				<tableExists tableName="user_device_meta_data"></tableExists>
 			</not>
 		</preConditions>
 		<comment>
