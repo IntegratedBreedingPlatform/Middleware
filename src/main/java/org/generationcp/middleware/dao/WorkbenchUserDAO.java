@@ -3,8 +3,8 @@ package org.generationcp.middleware.dao;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersQuery;
 import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
-import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.dao.workbench.ProgramMembersQuery;
+import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
@@ -355,7 +355,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 				users.add(new UserDto((Integer) item.get(ProgramEligibleUsersQuery.USER_ID),
 					(String) item.get(ProgramEligibleUsersQuery.USERNAME),
 					(String) item.get(ProgramEligibleUsersQuery.FIRST_NAME), (String) item.get(ProgramEligibleUsersQuery.LAST_NAME), null,
-					0, (String) item.get(ProgramEligibleUsersQuery.EMAIL)));
+					"true", (String) item.get(ProgramEligibleUsersQuery.EMAIL)));
 			}
 			return users;
 
