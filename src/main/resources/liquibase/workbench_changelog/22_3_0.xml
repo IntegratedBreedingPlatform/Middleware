@@ -50,7 +50,7 @@
 	<changeSet author="aldrin" id="v22.3.0-3">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<columnExists tableName="users" columnName="multi_factor_authentication"/>
+				<columnExists tableName="users" columnName="multi_factor_authentication_enabled"/>
 			</not>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
