@@ -1,7 +1,6 @@
 package org.generationcp.middleware.service.impl.study.advance;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
@@ -11,6 +10,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.germplasm.BasicGermplasm;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -53,6 +53,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
@@ -173,6 +174,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 		this.daoFactory.getMethodDAO().getAllMethod().forEach(method -> {
 			breedingMethodsByCode.put(method.getMcode(), method);
 			breedingMethodsById.put(method.getMid(), method);
+
+			// Breeding methods will only be used as read entities, so detaching it from the hibernate session to prevent performance issues later
+			this.daoFactory.getMethodDAO().evict(method);
 		});
 
 		final List<Location> locations = this.getLocationsFromTrialObservationUnits(trialObservations);
@@ -186,15 +190,13 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Map<Integer, List<Name>> namesByGids =
 			this.daoFactory.getNameDao().getNamesByGidsInMap(new ArrayList<>(gids));
 
-		// TODO: Considering performance issue due to we will have a lot of objects in the memory... Is really needed to have the germplasm entity??? At least according to to the old advance we need only a few of germplasm properties:
-		//  https://github.com/IntegratedBreedingPlatform/Fieldbook/blob/f242b4219653d926f20a06214c0c8b1083af148e/src/main/java/com/efficio/fieldbook/web/naming/impl/AdvancingSourceListFactory.java#L245
-		//  Besides that part of the code, there are other properties that are required such as mgid, progenitors data, etc. Take a look how many things of germplasm we need in the advance process
-		final Map<Integer, Germplasm> originGermplasmsByGid = this.getGermplasmByGids(gids);
+		final Map<Integer, BasicGermplasm> originGermplasmsByGid = this.getGermplasmByGids(gids);
 		final CropType cropType = this.cropService.getCropTypeByName(ContextHolder.getCurrentCrop());
 		final List<NewAdvancingSource> advancingSources = new ArrayList<>();
 		final Set<Integer> originGermplasmParentGids = new HashSet<>();
+
 		plotObservations.forEach(row -> {
-			final Germplasm originGermplasm = originGermplasmsByGid.get(row.getGid());
+			final BasicGermplasm originGermplasm = originGermplasmsByGid.get(row.getGid());
 			// Get the selected breeding method
 			final Method breedingMethod =
 				this.breedingMethodResolver.resolveBreedingMethod(request.getBreedingMethodSelectionRequest(), row, breedingMethodsByCode,
@@ -220,8 +222,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 			final NewAdvancingSource advancingSource =
 				new NewAdvancingSource(originGermplasm, namesByGids.get(row.getGid()), row, trialInstanceObservation,
 					studyEnvironmentVariables,
-					breedingMethod, studyId,
-					environmentDataset.getDatasetId(), seasonStudyLevel, selectionTraitStudyLevel, plantsSelected);
+					breedingMethod, breedingMethodsById.get(originGermplasm.getMethodId()),
+					studyId, environmentDataset.getDatasetId(), seasonStudyLevel, selectionTraitStudyLevel, plantsSelected);
 
 			// Resolves data related to season, selection trait and location for environment and plot
 			this.resolveEnvironmentAndPlotLevelData(environmentDataset.getDatasetId(), plotDataset.getDatasetId(),
@@ -261,9 +263,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 			final Map<String, String> locationNameByIds =
 				locations.stream().collect(Collectors.toMap(location -> String.valueOf(location.getLocid()), Location::getLname));
 
-			final Map<Integer, Germplasm> parentOriginGermplasmsByGids =
-				org.apache.commons.collections.CollectionUtils.isEmpty(originGermplasmParentGids) ? new HashMap<>() :
-					this.getGermplasmByGids(originGermplasmParentGids);
+//			final Map<Integer, Germplasm> parentOriginGermplasmsByGids =
+//				org.apache.commons.collections.CollectionUtils.isEmpty(originGermplasmParentGids) ? new HashMap<>() :
+//					this.getGermplasmByGids(originGermplasmParentGids);
 
 			final Integer plotCodeVariableId = this.germplasmService.getPlotCodeField().getId();
 			final Integer plotNumberVariableId = this.getVariableId(PLOT_NUMBER_VARIABLE_NAME);
@@ -276,9 +278,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 					// inherit 'selection history at fixation' and code names of parent if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
-						final Germplasm parent = parentOriginGermplasmsByGids.get(germplasm.getGpid2());
-						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm, parent);
-						this.germplasmGroupingService.copyCodedNames(germplasm, parent);
+						// TODO: implement it
+//						final Germplasm parent = parentOriginGermplasmsByGids.get(germplasm.getGpid2());
+//						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm, parent);
+//						this.germplasmGroupingService.copyCodedNames(germplasm, parent);
 					}
 
 					// Finally, persisting the new advanced line with its derivative name. Also, it has the selection history at fixation and
@@ -399,9 +402,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 		return this.daoFactory.getLocationDAO().getByIds(new ArrayList<>(locationIds));
 	}
 
-	private Map<Integer, Germplasm> getGermplasmByGids(final Set<Integer> gids) {
-		return this.daoFactory.getGermplasmDao().getByGIDList(new ArrayList<>(gids)).stream()
-			.collect(Collectors.toMap(Germplasm::getGid, germplasm -> germplasm));
+	private Map<Integer, BasicGermplasm> getGermplasmByGids(final Set<Integer> gids) {
+		return this.daoFactory.getGermplasmDao().getBasicGermplasmByGids(gids)
+			.stream()
+			.collect(Collectors.toMap(BasicGermplasm::getGid, basicGermplasm -> basicGermplasm));
 	}
 
 	private Set<Integer> getVariableValuesFromObservations(final List<ObservationUnitRow> observations, final Integer variableId) {
@@ -429,9 +433,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 	private void createAdvancedGermplasm(final CropType cropType, final NewAdvancingSource advancingSource) {
 
 		for (int i = 0; i < advancingSource.getPlantsSelected(); i++) {
-			final Germplasm originGermplasm = advancingSource.getOriginGermplasm();
+			final BasicGermplasm originGermplasm = advancingSource.getOriginGermplasm();
 			final Germplasm advancedGermplasm = new Germplasm();
-			if (originGermplasm.getGpid1() == 0 || originGermplasm.getMethod().isDerivative()) {
+			if (originGermplasm.getGpid1() == 0 || (advancingSource.getSourceMethod() != null && advancingSource.getSourceMethod()
+				.isDerivative())) {
 				advancedGermplasm.setGpid1(originGermplasm.getGid());
 			} else {
 				advancedGermplasm.setGpid1(originGermplasm.getGpid1());
@@ -439,7 +444,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 			advancedGermplasm.setGpid2(-1);
 			advancedGermplasm.setGnpgs(-1);
-			advancedGermplasm.setLgid(0);
 
 			final Integer locationId = advancingSource.getHarvestLocationId();
 			advancedGermplasm.setLocationId(locationId);

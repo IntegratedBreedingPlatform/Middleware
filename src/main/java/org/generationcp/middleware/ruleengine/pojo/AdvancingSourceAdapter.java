@@ -12,8 +12,6 @@ public interface AdvancingSourceAdapter {
 
 	Integer getOriginGermplasmGnpgs();
 
-	String getOriginGermplasmBreedingMethodType();
-
 	ObservationUnitRow getTrialInstanceObservation();
 
 	boolean isBulkingMethod();

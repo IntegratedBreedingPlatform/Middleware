@@ -38,7 +38,6 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 	 */
 	private Integer breedingMethodId;
 	private String studyName;
-	private Method sourceMethod;
 	private String prefix;
 	private String suffix;
 	private String plotNumber;
@@ -137,10 +136,6 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 
 	public void setEnvironmentDatasetId(final Integer environmentDatasetId) {
 		this.environmentDatasetId = environmentDatasetId;
-	}
-
-	public Method getSourceMethod() {
-		return this.sourceMethod;
 	}
 
 	/**
@@ -292,11 +287,6 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 	@Override
 	public Integer getOriginGermplasmGnpgs() {
 		return this.germplasm.getGnpgs();
-	}
-
-	@Override
-	public String getOriginGermplasmBreedingMethodType() {
-		return (this.sourceMethod == null) ? null : this.sourceMethod.getMtype();
 	}
 
 	@Override

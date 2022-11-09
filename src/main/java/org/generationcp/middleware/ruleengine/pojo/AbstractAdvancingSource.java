@@ -18,6 +18,7 @@ public abstract class AbstractAdvancingSource implements AdvancingSourceAdapter 
 	protected Boolean designationIsPreviewOnly;
 
 	protected Method breedingMethod;
+	protected Method sourceMethod;
 
 	protected String rootName;
 	protected Integer rootNameType;
@@ -60,6 +61,10 @@ public abstract class AbstractAdvancingSource implements AdvancingSourceAdapter 
 
 	public Method getBreedingMethod() {
 		return breedingMethod;
+	}
+
+	public Method getSourceMethod() {
+		return this.sourceMethod;
 	}
 
 	public String getRootName() {

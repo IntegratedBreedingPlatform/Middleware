@@ -9,7 +9,7 @@ public abstract class AttributeExpression implements Expression {
 
 		final Integer sourceGpid1 = source.getOriginGermplasmGpid1();
 		final Integer sourceGpid2 = source.getOriginGermplasmGpid2();
-		final String sourceMethodType = source.getOriginGermplasmBreedingMethodType();
+		final String sourceMethodType = (source.getSourceMethod() == null) ? null : source.getSourceMethod().getMtype();
 
 		if (MethodType.isGenerative(sourceMethodType) || source.getOriginGermplasmGnpgs() < 0 && (sourceGpid1 != null && sourceGpid1
 			.equals(0))
