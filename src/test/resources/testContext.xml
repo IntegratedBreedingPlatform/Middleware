@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
 	   xmlns:util="http://www.springframework.org/schema/util"
 
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
 						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
 						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
 						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
 						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
 
-	<context:property-placeholder location="classpath:test.properties, classpath:crossing.properties" />
+	<context:property-placeholder location="classpath:test.properties, classpath:crossing.properties"/>
 	<util:properties id="testProperties" location="classpath:test.properties"/>
-	<context:annotation-config />
+	<context:annotation-config/>
 
-	<tx:annotation-driven />
+	<tx:annotation-driven/>
 
-	<bean id="xaDataSources" class="org.generationcp.middleware.hibernate.IntegrationTestXADataSources" >
+	<bean id="xaDataSources" class="org.generationcp.middleware.hibernate.IntegrationTestXADataSources">
         <constructor-arg name="cropDbname" value="#{testProperties['crop.dbname']}"/>
     </bean>
 
 	<bean id="atomikosTransactionManager" class="com.atomikos.icatch.jta.UserTransactionManager"
-		init-method="init" destroy-method="close">
-		<property name="forceShutdown" value="false" />
+		  init-method="init" destroy-method="close">
+		<property name="forceShutdown" value="false"/>
 	</bean>
 
 	<bean id="atomikosUserTransaction" class="com.atomikos.icatch.jta.J2eeUserTransaction">
-		<property name="transactionTimeout" value="${test.atomikos.transaction.timeout}" />
+		<property name="transactionTimeout" value="${test.atomikos.transaction.timeout}"/>
 	</bean>
 
 
@@ -36,21 +36,21 @@
 	</bean>
 
 	<bean id="transactionManager"
-		class="org.springframework.transaction.jta.JtaTransactionManager"
-		depends-on="atomikosTransactionManager,atomikosUserTransaction">
-		<property name="transactionManager" ref="atomikosTransactionManager" />
-		<property name="userTransaction" ref="atomikosUserTransaction" />
+		  class="org.springframework.transaction.jta.JtaTransactionManager"
+		  depends-on="atomikosTransactionManager,atomikosUserTransaction">
+		<property name="transactionManager" ref="atomikosTransactionManager"/>
+		<property name="userTransaction" ref="atomikosUserTransaction"/>
 	</bean>
 
 	<bean id="roleService"
-		class="org.generationcp.middleware.api.role.RoleServiceImpl"
-		destroy-method="close">
-		<constructor-arg ref="workbenchSessionProvider" />
+		  class="org.generationcp.middleware.api.role.RoleServiceImpl"
+		  destroy-method="close">
+		<constructor-arg ref="workbenchSessionProvider"/>
 	</bean>
 
 	<bean id="userService"
 		  class="org.generationcp.middleware.service.impl.user.UserServiceImpl">
-		<constructor-arg ref="workbenchSessionProvider" />
+		<constructor-arg ref="workbenchSessionProvider"/>
 	</bean>
 
 	<bean id="programService"
@@ -61,12 +61,12 @@
 	<bean id="permissionService"
 		  class="org.generationcp.middleware.service.api.permission.PermissionServiceImpl"
 		  destroy-method="close">
-		<constructor-arg ref="workbenchSessionProvider" />
+		<constructor-arg ref="workbenchSessionProvider"/>
 	</bean>
 
 	<bean id="workbenchSessionProvider"
-		class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
-		<property name="sessionFactory" ref="WORKBENCH_SessionFactory" />
+		  class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
+		<property name="sessionFactory" ref="WORKBENCH_SessionFactory"/>
 	</bean>
 
     <bean id="ontologyDataManager" class="org.generationcp.middleware.manager.OntologyDataManagerImpl">
@@ -89,8 +89,8 @@
 	</bean>
 
 	<bean id="crossExpansionProperties"
-		class="org.generationcp.middleware.util.CrossExpansionProperties">
-		<constructor-arg ref="dummyCrossExpansionProps" />
+		  class="org.generationcp.middleware.util.CrossExpansionProperties">
+		<constructor-arg ref="dummyCrossExpansionProps"/>
 	</bean>
 
     <bean id="oldPedigreeService" class="org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl">
@@ -203,63 +203,63 @@
     </bean>
 
 	<bean id="trialEnvironmentBuilder" factory-bean="managerFactory"
-	  factory-method="getTrialEnvironmentBuilder">
-		<aop:scoped-proxy />
+		  factory-method="getTrialEnvironmentBuilder">
+		<aop:scoped-proxy/>
 	</bean>
 
 	<bean id="dataSetBuilder" factory-bean="managerFactory"
 		  factory-method="getDataSetBuilder">
-		<aop:scoped-proxy />
+		<aop:scoped-proxy/>
 	</bean>
 
 	<bean id="stockBuilder" factory-bean="managerFactory"
 		  factory-method="getStockBuilder">
-		<aop:scoped-proxy />
+		<aop:scoped-proxy/>
 	</bean>
 
 	<bean id="workbookBuilder" factory-bean="managerFactory"
 		  factory-method="getWorkbookBuilder">
-		<aop:scoped-proxy />
+		<aop:scoped-proxy/>
 	</bean>
 
 	<bean id="workbookSaver" factory-bean="managerFactory"
 		  factory-method="getWorkbookSaver">
-		<aop:scoped-proxy />
+		<aop:scoped-proxy/>
 	</bean>
 
 	<bean id="keySequenceRegisterService" factory-bean="managerFactory"
 		  factory-method="getKeySequenceRegisterService" scope="request">
-		<aop:scoped-proxy />
+		<aop:scoped-proxy/>
 	</bean>
 
     <bean id="studyDataManager" factory-bean="managerFactory"
-          factory-method="getStudyDataManager">
-        <aop:scoped-proxy />
+		  factory-method="getStudyDataManager">
+        <aop:scoped-proxy/>
     </bean>
 
 	<bean id="experimentDesignService" factory-bean="managerFactory"
 		  factory-method="getExperimentDesignService">
-        <aop:scoped-proxy />
+        <aop:scoped-proxy/>
     </bean>
 
 	<bean id="datasetService" factory-bean="managerFactory"
-			  factory-method="getDatasetMiddlewareService">
-        <aop:scoped-proxy />
+		  factory-method="getDatasetMiddlewareService">
+        <aop:scoped-proxy/>
     </bean>
 
 	<bean id="derivedVariableService" factory-bean="managerFactory"
 		  factory-method="getDerivedVariableService">
-        <aop:scoped-proxy />
+        <aop:scoped-proxy/>
     </bean>
 
 	<bean id="variableDataValidatorFactory" factory-bean="managerFactory"
 		  factory-method="getVariableDataValidatorFactory">
-        <aop:scoped-proxy />
+        <aop:scoped-proxy/>
     </bean>
 
 	<bean id="searchRequestService" factory-bean="managerFactory" factory-method="getSearchRequestService"
 		  scope="request">
-		<aop:scoped-proxy />
+		<aop:scoped-proxy/>
 	</bean>
 
 	<bean id="transactionService" class="org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl">
@@ -353,9 +353,9 @@
 
 	<bean id="personValidator" class="org.generationcp.middleware.service.api.ontology.PersonValidator"/>
 
-	<bean id="breedingMethodValidator" class="org.generationcp.middleware.service.api.ontology.BreedingMethodValidator" />
+	<bean id="breedingMethodValidator" class="org.generationcp.middleware.service.api.ontology.BreedingMethodValidator"/>
 
-	<bean id="locationValidator" class="org.generationcp.middleware.service.api.ontology.LocationValidator" />
+	<bean id="locationValidator" class="org.generationcp.middleware.service.api.ontology.LocationValidator"/>
 
 	<bean id="breedingMethodService" class="org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
@@ -410,11 +410,11 @@
 	</bean>
 
 	<bean id="cropService" class="org.generationcp.middleware.api.crop.CropServiceImpl">
-		<constructor-arg ref="workbenchSessionProvider" />
+		<constructor-arg ref="workbenchSessionProvider"/>
 	</bean>
 
 	<bean id="toolService" class="org.generationcp.middleware.api.tool.ToolServiceImpl">
-		<constructor-arg ref="workbenchSessionProvider" />
+		<constructor-arg ref="workbenchSessionProvider"/>
 	</bean>
 
 	<bean id="studyEntryObservationService" class="org.generationcp.middleware.api.study.StudyEntryObservationServiceImpl">
@@ -422,7 +422,15 @@
 	</bean>
 
 	<bean id="roleTypeService" class="org.generationcp.middleware.api.role.RoleTypeServiceImpl">
-		<constructor-arg ref="workbenchSessionProvider" />
+		<constructor-arg ref="workbenchSessionProvider"/>
+	</bean>
+
+	<bean id="oneTimePasswordService" class="org.generationcp.middleware.service.impl.security.OneTimePasswordServiceImpl">
+		<constructor-arg ref="workbenchSessionProvider"/>
+	</bean>
+
+	<bean id="userDeviceMetaDataService" class="org.generationcp.middleware.service.impl.security.UserDeviceMetaDataServiceImpl">
+		<constructor-arg ref="workbenchSessionProvider"/>
 	</bean>
 
 	<bean id="advanceService" class="org.generationcp.middleware.service.impl.study.advance.AdvanceServiceImpl">
