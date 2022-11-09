@@ -1,0 +1,61 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	<changeSet author="aldrin" id="v22.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="one_time_password"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create table 'one_time_password'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `workbench`.`one_time_password` (
+				`id`       INT      NOT NULL AUTO_INCREMENT,
+				`otp_code` INT      NOT NULL,
+				`expires`  DATETIME NOT NULL,
+				PRIMARY KEY (`id`)
+			);
+		</sql>
+	</changeSet>
+	<changeSet author="aldrin" id="v22.3.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="user_device_meta_data"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create table 'user_device_meta_data'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+		  CREATE TABLE `workbench`.`user_device_meta_data` (
+			  `id`             INT NOT NULL AUTO_INCREMENT,
+			  `userid`         INT NOT NULL,
+			  `device_details` VARCHAR(500) NULL,
+			  `location`       VARCHAR(300) NULL,
+			  `last_logged_in` DATETIME NULL,
+			  PRIMARY KEY (`id`),
+			  INDEX            `user_device_metadata_userid_fk_idx` (`userid` ASC),
+			  CONSTRAINT `user_device_metadata_userid_fk`
+				  FOREIGN KEY (`userid`)
+					  REFERENCES `workbench`.`users`(`userid`)
+					  ON DELETE NO ACTION
+					  ON UPDATE NO ACTION
+		  );
+		</sql>
+	</changeSet>
+	<changeSet author="aldrin" id="v22.3.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="users" columnName="multi_factor_authentication_enabled"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE `workbench`.`users`
+				ADD COLUMN `multi_factor_authentication_enabled` TINYINT NULL DEFAULT 0 AFTER `cdate`;
+		</sql>
+	</changeSet>
+</databaseChangeLog>
