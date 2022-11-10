@@ -133,9 +133,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 	@Override
 	public List<Integer> advanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
 
-		final Map<Integer, DatasetDTO> datasetsByType = this.getDatasetsByType(studyId);
-		final DatasetDTO plotDataset = datasetsByType.get(DatasetTypeEnum.PLOT_DATA.getId());
-		final DatasetDTO environmentDataset = datasetsByType.get(DatasetTypeEnum.SUMMARY_DATA.getId());
+		final DatasetDTO plotDataset =
+			this.datasetService.getDatasetsWithVariables(studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId())).get(0);
+		final DatasetDTO environmentDataset =
+			this.datasetService.getDatasetsWithVariables(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId())).get(0);
 
 		final List<ObservationUnitRow> plotObservations =
 			this.getPlotObservations(studyId, plotDataset.getDatasetId(), request.getInstanceIds(), request.getSelectedReplications());
@@ -311,14 +312,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 		}
 
 		return advancedGermplasmGids;
-	}
-
-	private Map<Integer, DatasetDTO> getDatasetsByType(final Integer studyId) {
-		final List<Integer> datasetTypeIds = Arrays.asList(
-			DatasetTypeEnum.SUMMARY_DATA.getId(),
-			DatasetTypeEnum.PLOT_DATA.getId());
-		return this.datasetService.getDatasetsWithVariables(studyId, new HashSet<>(datasetTypeIds)).stream().collect(Collectors.toMap(
-			DatasetDTO::getDatasetTypeId, datasetDTO -> datasetDTO));
 	}
 
 	private List<ObservationUnitRow> getPlotObservations(final Integer studyId, final Integer plotDatasetId,
