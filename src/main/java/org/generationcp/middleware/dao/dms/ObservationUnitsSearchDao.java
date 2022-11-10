@@ -71,7 +71,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final String NAME_JOIN = " INNER JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1 ";
 	private static final String IMMEDIATE_SOURCE_NAME_JOIN = " LEFT JOIN names immediateSource  ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
 	private static final String GROUP_SOURCE_NAME_JOIN =
-		" LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0";
+		" LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0 AND groupSourceName.nstat = 1 ";
 	private static final String LOCATION_JOIN = " LEFT JOIN nd_geolocationprop gprop on gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = " + TermId.LOCATION_ID.getId()
 		+ " LEFT JOIN location loc on loc.locid = gprop.value ";
 	private static final String GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN = " LEFT JOIN atributs %1$s ON s.dbxref_id = %1$s.gid AND %1$s.atype = %2$s ";
