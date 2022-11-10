@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
@@ -27,12 +27,12 @@ public class SeasonDataResolver {
 	}
 
 	/**
-	 * Resolves season data at environment level. The required data will be set into the provided {@link NewAdvancingSource}
+	 * Resolves season data at environment level. The required data will be set into the provided {@link AdvancingSource}
 	 *
 	 * @param source
 	 * @param plotDataVariablesByTermId
 	 */
-	public void resolveEnvironmentLevelData(final NewAdvancingSource source,
+	public void resolveEnvironmentLevelData(final AdvancingSource source,
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId) {
 		if (StringUtils.isBlank(source.getSeason()) && DataResolverHelper
 			.checkHasTrailInstanceObservations(source.getTrialInstanceObservation())) {

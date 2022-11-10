@@ -5,10 +5,9 @@ import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.generationcp.middleware.service.impl.study.advance.resolver.level.SelectionTraitDataResolver;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -149,7 +148,7 @@ public class SelectionTraitDataResolverTest {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setEnvironmentVariables(environmentVariables);
 
-		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
+		final AdvancingSource source = Mockito.mock(AdvancingSource.class);
 		Mockito.when(source.getTrialInstanceObservation()).thenReturn(observationUnitRow);
 
 		this.selectionTraitDataResolver.resolveEnvironmentLevelData(DATASET_ID, selectionTraitRequest, source, plotDataVariablesByTermId);
@@ -175,7 +174,7 @@ public class SelectionTraitDataResolverTest {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setEnvironmentVariables(environmentVariables);
 
-		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
+		final AdvancingSource source = Mockito.mock(AdvancingSource.class);
 		Mockito.when(source.getTrialInstanceObservation()).thenReturn(observationUnitRow);
 
 		this.selectionTraitDataResolver.resolveEnvironmentLevelData(DATASET_ID, selectionTraitRequest, source, plotDataVariablesByTermId);
@@ -206,7 +205,7 @@ public class SelectionTraitDataResolverTest {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setVariables(environmentvariables);
 
-		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
+		final AdvancingSource source = Mockito.mock(AdvancingSource.class);
 
 		this.selectionTraitDataResolver
 			.resolvePlotLevelData(DATASET_ID, selectionTraitRequest, source, observationUnitRow, plotDataVariablesByTermId);
@@ -232,7 +231,7 @@ public class SelectionTraitDataResolverTest {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setVariables(variables);
 
-		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
+		final AdvancingSource source = Mockito.mock(AdvancingSource.class);
 
 		this.selectionTraitDataResolver
 			.resolvePlotLevelData(DATASET_ID, selectionTraitRequest, source, observationUnitRow, plotDataVariablesByTermId);

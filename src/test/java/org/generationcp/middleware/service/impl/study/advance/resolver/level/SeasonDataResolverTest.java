@@ -5,10 +5,9 @@ import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitia
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.generationcp.middleware.service.impl.study.advance.resolver.level.SeasonDataResolver;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -128,7 +127,7 @@ public class SeasonDataResolverTest {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setEnvironmentVariables(environmentVariables);
 
-		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
+		final AdvancingSource source = Mockito.mock(AdvancingSource.class);
 		Mockito.when(source.getTrialInstanceObservation()).thenReturn(observationUnitRow);
 
 		final MeasurementVariable firstInstanceMeasurementVariable = MeasurementVariableTestDataInitializer
@@ -157,7 +156,7 @@ public class SeasonDataResolverTest {
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 		observationUnitRow.setEnvironmentVariables(environmentVariables);
 
-		final NewAdvancingSource source = Mockito.mock(NewAdvancingSource.class);
+		final AdvancingSource source = Mockito.mock(AdvancingSource.class);
 		Mockito.when(source.getTrialInstanceObservation()).thenReturn(observationUnitRow);
 
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId = new HashMap<>();

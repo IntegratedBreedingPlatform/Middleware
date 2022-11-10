@@ -10,8 +10,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: please, change this name
-public class NewAdvancingSource extends AbstractAdvancingSource {
+public class AdvancingSource extends AbstractAdvancingSource {
 
 	private BasicGermplasmDTO originGermplasm;
 
@@ -23,10 +22,10 @@ public class NewAdvancingSource extends AbstractAdvancingSource {
 
 	private List<Germplasm> advancedGermplasms = new ArrayList<>();
 
-	public NewAdvancingSource() {
+	public AdvancingSource() {
 	}
 
-	public NewAdvancingSource(final BasicGermplasmDTO originGermplasm, final List<BasicNameDTO> names,
+	public AdvancingSource(final BasicGermplasmDTO originGermplasm, final List<BasicNameDTO> names,
 		final ObservationUnitRow plotObservation,
 		final ObservationUnitRow trialInstanceObservation,
 		final List<MeasurementVariable> studyEnvironmentVariables,

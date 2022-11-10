@@ -21,7 +21,7 @@ import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSourceList;
 import org.generationcp.middleware.ruleengine.pojo.ImportedCross;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
-import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.TimerWatch;
@@ -114,10 +114,10 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 	}
 
 	@Override
-	public void generateAdvanceListName(final List<NewAdvancingSource> advancingSources) throws RuleException {
+	public void generateAdvanceListName(final List<AdvancingSource> advancingSources) throws RuleException {
 
 		Map<String, Integer> keySequenceMap = new HashMap<>();
-		for (final NewAdvancingSource advancingSource : advancingSources) {
+		for (final AdvancingSource advancingSource : advancingSources) {
 
 			advancingSource.setKeySequenceMap(keySequenceMap);
 

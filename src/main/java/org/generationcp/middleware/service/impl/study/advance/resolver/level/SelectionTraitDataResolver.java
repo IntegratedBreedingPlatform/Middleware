@@ -4,7 +4,7 @@ import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 
@@ -60,13 +60,13 @@ public class SelectionTraitDataResolver {
 	}
 
 	/**
-	 * Resolves selection trait value at environment level. The required data will be set into the provided {@link NewAdvancingSource}
+	 * Resolves selection trait value at environment level. The required data will be set into the provided {@link AdvancingSource}
 	 *
 	 * @param source
 	 * @param plotDataVariablesByTermId
 	 */
 	public void resolveEnvironmentLevelData(final Integer datasetId, final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest,
-		final NewAdvancingSource source,
+		final AdvancingSource source,
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId) {
 
 		if (!this.shouldResolveLevel(datasetId, selectionTraitRequest)) {
@@ -83,14 +83,14 @@ public class SelectionTraitDataResolver {
 	}
 
 	/**
-	 * Resolves selection trait value at plot level. The required data will be set into the provided {@link NewAdvancingSource}
+	 * Resolves selection trait value at plot level. The required data will be set into the provided {@link AdvancingSource}
 	 *
 	 * @param source
 	 * @param row
 	 * @param plotDataVariablesByTermId
 	 */
 	public void resolvePlotLevelData(final Integer datasetId, final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest,
-		final NewAdvancingSource source, final ObservationUnitRow row,
+		final AdvancingSource source, final ObservationUnitRow row,
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId) {
 
 		if (!this.shouldResolveLevel(datasetId, selectionTraitRequest)) {
@@ -104,7 +104,7 @@ public class SelectionTraitDataResolver {
 			selectionTraitRequest.getVariableId());
 	}
 
-	private void getTraitSelectionValue(final NewAdvancingSource source,
+	private void getTraitSelectionValue(final AdvancingSource source,
 		final Collection<ObservationUnitData> observationUnitDataCollection,
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId,
 		final BiPredicate<ValueReference, ObservationUnitData> filterPredicate, final Integer selectedSelectionTraitVariableId) {

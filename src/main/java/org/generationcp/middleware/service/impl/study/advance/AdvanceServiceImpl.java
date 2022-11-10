@@ -31,7 +31,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.generator.SeedSourceGenerator;
 import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
-import org.generationcp.middleware.ruleengine.pojo.NewAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
@@ -191,7 +191,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 		final Map<Integer, BasicGermplasmDTO> originGermplasmsByGid = this.getGermplasmByGids(gids);
 		final CropType cropType = this.cropService.getCropTypeByName(ContextHolder.getCurrentCrop());
-		final List<NewAdvancingSource> advancingSources = new ArrayList<>();
+		final List<AdvancingSource> advancingSources = new ArrayList<>();
 		final Set<Integer> originGermplasmParentGids = new HashSet<>();
 
 		plotObservations.forEach(row -> {
@@ -218,8 +218,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 					.setTrialInstanceObservations(trialInstanceNumber, trialObservations, studyInstancesByInstanceNumber) : null;
 
 			// Creates the advancing source. This object will be useful for expressions used later when the names are being generated
-			final NewAdvancingSource advancingSource =
-				new NewAdvancingSource(originGermplasm, namesByGids.get(row.getGid()), row, trialInstanceObservation,
+			final AdvancingSource advancingSource =
+				new AdvancingSource(originGermplasm, namesByGids.get(row.getGid()), row, trialInstanceObservation,
 					studyEnvironmentVariables,
 					breedingMethod, breedingMethodsById.get(originGermplasm.getMethodId()),
 					studyId, environmentDataset.getDatasetId(), seasonStudyLevel, selectionTraitStudyLevel, plantsSelected);
@@ -424,7 +424,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	private void resolveEnvironmentAndPlotLevelData(final Integer environmentDatasetId, final Integer plotDatasetId,
 		final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest,
-		final NewAdvancingSource source, final ObservationUnitRow row,
+		final AdvancingSource source, final ObservationUnitRow row,
 		final Map<Integer, Location> locationsByLocationId,
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId) {
 		this.locationDataResolver.resolveEnvironmentLevelData(source, locationsByLocationId);
@@ -435,7 +435,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.resolvePlotLevelData(plotDatasetId, selectionTraitRequest, source, row, plotDataVariablesByTermId);
 	}
 
-	private void createAdvancedGermplasm(final CropType cropType, final NewAdvancingSource advancingSource) {
+	private void createAdvancedGermplasm(final CropType cropType, final AdvancingSource advancingSource) {
 
 		for (int i = 0; i < advancingSource.getPlantsSelected(); i++) {
 			final BasicGermplasmDTO originGermplasm = advancingSource.getOriginGermplasm();
@@ -485,7 +485,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 	}
 
 	private void createGermplasmAttributes(final String studyName,
-		final NewAdvancingSource advancingSource, final Boolean allPlotsSelected,
+		final AdvancingSource advancingSource, final Boolean allPlotsSelected,
 		final Integer advancedGermplasmGid, final Integer selectionNumber,
 		final Integer locationId, final Integer date, final Integer plotCodeVariableId, final Integer plotNumberVariableId,
 		final Integer repNumberVariableId,
