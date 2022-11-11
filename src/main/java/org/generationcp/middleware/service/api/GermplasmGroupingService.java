@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api;
 
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 
@@ -56,10 +57,12 @@ public interface GermplasmGroupingService {
 	/**
 	 * Service to copy 'selection history at fixation' name of the parent to the
 	 * submitted child germplasm.
-	 *
-	 * @param germplasm - the germplasm to copy name to.
+	 *  @param germplasm - the germplasm to copy name to.
+	 * @param parentGid
+	 * @param parentNames
 	 */
-	void copyParentalSelectionHistoryAtFixation(Germplasm germplasm, Germplasm parent);
+	void copyParentalSelectionHistoryAtFixation(Germplasm germplasm, final Integer parentGid,
+		final List<BasicNameDTO> parentNames);
 
 	/**
 	 * Get all group members where the given germplasm is a founder. For the
@@ -71,5 +74,5 @@ public interface GermplasmGroupingService {
 
 	List<Integer> getDescendantGroupMembersGids(Integer gid, Integer mgid);
 
-	void copyCodedNames(Germplasm germplasm, Germplasm sourceGermplasm);
+	void copyCodedNames(Germplasm germplasm, List<BasicNameDTO> sourceNames);
 }

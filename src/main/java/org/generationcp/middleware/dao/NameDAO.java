@@ -471,7 +471,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	public List<BasicNameDTO> getBasicNamesByGids(final Set<Integer> gids) {
-		final String sql = "SELECT n.nid, n.gid, n.ntype AS typeId, n.nstat, n.nval "
+		final String sql = "SELECT n.nid, n.gid, n.ntype AS typeId, n.nstat, n.nval, n.nlocn as locationId "
 			+ " FROM names n "
 			+ " WHERE n.gid IN (:gids) AND n.nstat <> " + DELETED;
 		final SQLQuery query = this.getSession().createSQLQuery(sql);

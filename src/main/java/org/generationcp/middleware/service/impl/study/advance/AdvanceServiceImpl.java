@@ -263,9 +263,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 			final Map<String, String> locationNameByIds =
 				locations.stream().collect(Collectors.toMap(location -> String.valueOf(location.getLocid()), Location::getLname));
 
-//			final Map<Integer, Germplasm> parentOriginGermplasmsByGids =
-//				org.apache.commons.collections.CollectionUtils.isEmpty(originGermplasmParentGids) ? new HashMap<>() :
-//					this.getGermplasmByGids(originGermplasmParentGids);
+			final Map<Integer, List<BasicNameDTO>> parentOriginGermplasmNamesByGids =
+				org.apache.commons.collections.CollectionUtils.isEmpty(originGermplasmParentGids) ? new HashMap<>() :
+					this.getNamesByGids(originGermplasmParentGids);
 
 			final Integer plotCodeVariableId = this.germplasmService.getPlotCodeField().getId();
 			final Integer plotNumberVariableId = this.getVariableId(PLOT_NUMBER_VARIABLE_NAME);
@@ -278,10 +278,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 					// inherit 'selection history at fixation' and code names of parent if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
-						// TODO: implement it
-//						final Germplasm parent = parentOriginGermplasmsByGids.get(germplasm.getGpid2());
-//						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm, parent);
-//						this.germplasmGroupingService.copyCodedNames(germplasm, parent);
+						final List<BasicNameDTO> parentNames = parentOriginGermplasmNamesByGids.get(germplasm.getGpid2());
+						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm, germplasm.getGpid2(), parentNames);
+						this.germplasmGroupingService.copyCodedNames(germplasm, parentNames);
 					}
 
 					// Finally, persisting the new advanced line with its derivative name. Also, it has the selection history at fixation and

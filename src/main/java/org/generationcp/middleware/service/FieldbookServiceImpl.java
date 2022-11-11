@@ -289,8 +289,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 			final Map<Integer, Germplasm> existingGermplasmsByGids =
 				CollectionUtils.isEmpty(existingGids) ? new HashMap<>() : this.getGermplasmByGids(existingGids);
-			final Map<Integer, Germplasm> parentGermplasmsByGids =
-				CollectionUtils.isEmpty(parentGids) ? new HashMap<>() : this.getGermplasmByGids(parentGids);
+			final Map<Integer, List<BasicNameDTO>> parentGermplasmNamesByGids =
+				CollectionUtils.isEmpty(parentGids) ? new HashMap<>() : this.getNamesByGids(parentGids);
 
 			// Save germplasms, names, list data
 			for (final Pair<Germplasm, List<Name>> pair : germplasms) {
@@ -336,9 +336,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					// parent
 					// if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
-						final Germplasm parent = parentGermplasmsByGids.get(germplasm.getGpid2());
-						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm, parent);
-						this.germplasmGroupingService.copyCodedNames(germplasm, parent);
+						final List<BasicNameDTO> parentNames = parentGermplasmNamesByGids.get(germplasm.getGpid2());
+						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm, germplasm.getGpid2(), parentNames);
+						this.germplasmGroupingService.copyCodedNames(germplasm, parentNames);
 					}
 
 					// Save Germplasm attributes
@@ -647,7 +647,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Map<Integer, List<BasicNameDTO>> getNamesByGids(final List<Integer> gids) {
+	public Map<Integer, List<BasicNameDTO>> getNamesByGids(final Set<Integer> gids) {
 		return this.daoFactory.getNameDao().getBasicNamesByGids(new HashSet<>(gids))
 			.stream()
 			.collect(Collectors.groupingBy(BasicNameDTO::getGid, Collectors.toList()));

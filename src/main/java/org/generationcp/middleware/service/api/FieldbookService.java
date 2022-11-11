@@ -37,6 +37,7 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This is the API for Fieldbook requirements.
@@ -486,7 +487,7 @@ public interface FieldbookService {
 	 * @return the names by gids
 	 */
 	@Deprecated
-	Map<Integer, List<BasicNameDTO>> getNamesByGids(List<Integer> gids);
+	Map<Integer, List<BasicNameDTO>> getNamesByGids(Set<Integer> gids);
 
 	/**
 	 * Count germplasm list data by list id.

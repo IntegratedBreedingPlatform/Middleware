@@ -11,6 +11,7 @@ public class BasicNameDTO {
 	private Integer typeId;
 	private Integer nstat;
 	private String nval;
+	private Integer locationId;
 
 	public Integer getNid() {
 		return nid;
@@ -50,6 +51,14 @@ public class BasicNameDTO {
 
 	public void setNval(final String nval) {
 		this.nval = nval;
+	}
+
+	public Integer getLocationId() {
+		return locationId;
+	}
+
+	public void setLocationId(final Integer locationId) {
+		this.locationId = locationId;
 	}
 
 	@Override
