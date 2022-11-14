@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.impl;
 
-import org.generationcp.middleware.ruleengine.naming.expression.Expression;
+import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedExpression;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.util.ExpressionHelper;
@@ -32,7 +32,7 @@ public class ProcessCodeServiceImpl implements ProcessCodeService {
 
 		ExpressionHelper.evaluateExpression(processCode, ExpressionHelper.PROCESS_CODE_PATTERN,
 			(capturedText, originalInput, start, end) -> {
-				final Expression expression = ProcessCodeServiceImpl.this.factory.lookup(capturedText);
+				final DeprecatedExpression expression = ProcessCodeServiceImpl.this.factory.lookup(capturedText);
 
 				// It's possible for the expression to add more elements to the builders variable.
 				if (expression != null) {

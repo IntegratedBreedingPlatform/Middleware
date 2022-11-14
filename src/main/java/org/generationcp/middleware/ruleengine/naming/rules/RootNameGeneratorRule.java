@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
-import org.generationcp.middleware.ruleengine.naming.expression.RootNameExpression;
+import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedRootNameExpression;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ public class RootNameGeneratorRule extends OrderedRule<NamingRuleExecutionContex
 	@Override
 	public Object runRule(NamingRuleExecutionContext context) throws RuleException {
 
-		RootNameExpression rootNameExpression = new RootNameExpression();
+		DeprecatedRootNameExpression rootNameExpression = new DeprecatedRootNameExpression();
 		DeprecatedAdvancingSource advancingSource = context.getAdvancingSource();
 
 		List<StringBuilder> builders = new ArrayList<>();

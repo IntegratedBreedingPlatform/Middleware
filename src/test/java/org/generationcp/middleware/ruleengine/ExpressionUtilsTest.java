@@ -1,8 +1,8 @@
 package org.generationcp.middleware.ruleengine;
 
-import org.generationcp.middleware.ruleengine.naming.expression.Expression;
-import org.generationcp.middleware.ruleengine.naming.expression.FirstExpression;
-import org.generationcp.middleware.ruleengine.naming.expression.PaddedSequenceExpression;
+import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedExpression;
+import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedFirstExpression;
+import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedPaddedSequenceExpression;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class ExpressionUtilsTest {
 
-	private final Expression unitUnderTest = new FirstExpression();
+	private final DeprecatedExpression unitUnderTest = new DeprecatedFirstExpression();
 
 	@Test
 	public void testReplaceProcessCodeWithValue() {
@@ -35,7 +35,7 @@ public class ExpressionUtilsTest {
 
 	@Test
 	public void testReplaceRegularExpressionProcessCodeWithNullValue() {
-		final PaddedSequenceExpression expression = new PaddedSequenceExpression();
+		final DeprecatedPaddedSequenceExpression expression = new DeprecatedPaddedSequenceExpression();
 		final StringBuilder builder = new StringBuilder("ABC" + "[PADSEQ.3]");
 
 		final String nullVariable = null;
@@ -46,7 +46,7 @@ public class ExpressionUtilsTest {
 
 	@Test
 	public void testReplaceRegularExpressionProcessCodeWithValue() {
-		final PaddedSequenceExpression expression = new PaddedSequenceExpression();
+		final DeprecatedPaddedSequenceExpression expression = new DeprecatedPaddedSequenceExpression();
 		final StringBuilder builder = new StringBuilder("ABC" + "[PADSEQ.3]");
 
 		final String value = "023";
@@ -57,7 +57,7 @@ public class ExpressionUtilsTest {
 
 	@Test
 	public void testGetNumberOfDigitsFromKey() {
-		final PaddedSequenceExpression expression = new PaddedSequenceExpression();
+		final DeprecatedPaddedSequenceExpression expression = new DeprecatedPaddedSequenceExpression();
 		final Pattern pattern = Pattern.compile(expression.getExpressionKey());
 		// When no digit is specified
 		Assert.assertEquals(ExpressionUtils.DEFAULT_LENGTH, ExpressionUtils.getNumberOfDigitsFromKey(pattern,  new StringBuilder("ABC" + "[PADSEQ]XYZ")));

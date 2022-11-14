@@ -1,8 +1,8 @@
 package org.generationcp.middleware.ruleengine.naming.impl;
 
-import org.generationcp.middleware.ruleengine.naming.expression.FirstExpression;
-import org.generationcp.middleware.ruleengine.naming.expression.SeasonExpression;
-import org.generationcp.middleware.ruleengine.naming.expression.SequenceExpression;
+import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedFirstExpression;
+import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedSeasonExpression;
+import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedSequenceExpression;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,9 +19,9 @@ public class ProcessCodeFactoryTest {
 	public void init() {
 
 		this.factory.init();
-		this.factory.addExpression(new SeasonExpression());
-		this.factory.addExpression(new SequenceExpression());
-		this.factory.addExpression(new FirstExpression());
+		this.factory.addExpression(new DeprecatedSeasonExpression());
+		this.factory.addExpression(new DeprecatedSequenceExpression());
+		this.factory.addExpression(new DeprecatedFirstExpression());
 	}
 
 	@Test

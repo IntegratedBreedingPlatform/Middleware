@@ -29,6 +29,7 @@ import java.util.Map;
  * The POJO containing information needed for Advancing.
  *
  */
+@Deprecated
 public class DeprecatedAdvancingSource {
 
 	private ImportedGermplasm germplasm;
