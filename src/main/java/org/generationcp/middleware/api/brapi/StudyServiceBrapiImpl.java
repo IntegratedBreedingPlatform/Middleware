@@ -745,6 +745,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 		return geolocationVariables;
 	}
 
+	//TODO check everything that's calling this if variable is obsolete IBP-6080
 	private void addProjectProperty(final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap,
 		final Map<Integer, DmsProject> environmentDatasetMap, final Integer trialDbId, final VariableType variableType,
 		final Integer termId, final String value, final String alias) {

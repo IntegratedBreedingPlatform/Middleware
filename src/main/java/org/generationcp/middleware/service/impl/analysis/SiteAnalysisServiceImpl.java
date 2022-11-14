@@ -62,7 +62,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 			meansImportRequest.getData().stream().map(o -> o.getValues().keySet()).flatMap(Set::stream).collect(Collectors.toSet());
 		final Map<String, CVTerm> analysisVariablesMap =
 			new CaseInsensitiveMap(
-				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisVariableNames, CvId.VARIABLES).stream().collect(Collectors.toMap(
+				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisVariableNames, CvId.VARIABLES, true).stream().collect(Collectors.toMap(
 					CVTerm::getName, Function.identity())));
 
 		// Create means dataset
@@ -85,7 +85,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 				.collect(Collectors.toSet());
 		final Map<String, CVTerm> analysisSummaryVariablesMap =
 			new CaseInsensitiveMap(
-				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisSummaryVariableNames, CvId.VARIABLES).stream()
+				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisSummaryVariableNames, CvId.VARIABLES, true).stream()
 					.collect(Collectors.toMap(
 						CVTerm::getName, Function.identity())));
 
@@ -261,7 +261,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 
 		for (final Map.Entry<String, CVTerm> entry : analaysisSummaryVariablesMap.entrySet()) {
 			// Only add variables not yet exist in the dataset.
-			if (!existingVariablesInDataset.contains(entry.getValue().getCvTermId())) {
+			if (!entry.getValue().isObsolete() && !existingVariablesInDataset.contains(entry.getValue().getCvTermId())) {
 				this.addProjectProperty(summaryStatisticDataset, entry.getValue().getCvTermId(), entry.getValue().getName(),
 					VariableType.ANALYSIS_SUMMARY,
 					rank.incrementAndGet());
@@ -276,6 +276,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		return cvTerm.getName();
 	}
 
+	//TODO check everything that's calling this if variable is obsolete IBP-6057
 	private void addProjectProperty(final DmsProject meansDataset, final Integer variableId, final String variableName,
 		final VariableType variableType, final Integer rank) {
 		final ProjectProperty projectProperty = new ProjectProperty();

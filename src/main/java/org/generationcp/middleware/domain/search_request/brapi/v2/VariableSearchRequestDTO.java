@@ -1,5 +1,6 @@
 package org.generationcp.middleware.domain.search_request.brapi.v2;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -22,6 +23,8 @@ public class VariableSearchRequestDTO extends SearchRequestDto {
     private List<String> studyDbId;
     private List<String> traitClasses;
     private List<String> traitDbIds;
+
+    @JsonIgnore
     private Boolean filterObsoletes = false;
 
     public VariableSearchRequestDTO() {
