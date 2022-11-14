@@ -13,7 +13,7 @@ import java.util.List;
 
 @Deprecated
 @Component
-public class CrossTypeExpression extends DeprecatedBaseExpression {
+public class DeprecatedCrossTypeExpression extends DeprecatedBaseExpression {
 
 	public static final String KEY = "[CRSTYP]";
 
@@ -29,7 +29,7 @@ public class CrossTypeExpression extends DeprecatedBaseExpression {
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
 
-	public CrossTypeExpression() {
+	public DeprecatedCrossTypeExpression() {
 	}
 
 	@Override
@@ -86,6 +86,6 @@ public class CrossTypeExpression extends DeprecatedBaseExpression {
 
 	@Override
 	public String getExpressionKey() {
-		return CrossTypeExpression.KEY;
+		return DeprecatedCrossTypeExpression.KEY;
 	}
 }

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CrossTypeExpressionTest {
+public class DeprecatedCrossTypeExpressionTest {
 
 	private static final String CRSTYP = "[CRSTYP]";
 	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
@@ -30,7 +30,7 @@ public class CrossTypeExpressionTest {
 	private GermplasmDataManager germplasmDataManager;
 
 	@InjectMocks
-	private CrossTypeExpression crossTypeExpression;
+	private DeprecatedCrossTypeExpression crossTypeExpression;
 
 	@Before
 	public void setUp() {
