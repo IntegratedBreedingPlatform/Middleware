@@ -4,7 +4,7 @@ package org.generationcp.middleware.ruleengine.naming.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.generationcp.middleware.ruleengine.naming.expression.Expression;
+import org.generationcp.middleware.ruleengine.naming.newexpression.Expression;
 
 public class ProcessCodeFactory {
 

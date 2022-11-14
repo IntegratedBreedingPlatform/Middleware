@@ -2,6 +2,8 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.ruleengine.RuleFactory;
 import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
+import org.generationcp.middleware.ruleengine.naming.newexpression.ComponentPostProcessor;
+import org.generationcp.middleware.ruleengine.naming.newexpression.Expression;
 import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.junit.Test;
 import org.junit.runner.RunWith;

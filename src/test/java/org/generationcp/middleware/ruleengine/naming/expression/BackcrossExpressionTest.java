@@ -3,6 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import junit.framework.Assert;
 import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
+import org.generationcp.middleware.ruleengine.naming.newexpression.BackcrossExpression;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Test;
 import org.junit.runner.RunWith;

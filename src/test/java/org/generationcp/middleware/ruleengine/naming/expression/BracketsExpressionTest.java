@@ -2,6 +2,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.manager.GermplasmNameType;
+import org.generationcp.middleware.ruleengine.naming.newexpression.BracketsExpression;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Assert;
 import org.junit.Test;

@@ -6,6 +6,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.ruleengine.naming.newexpression.CrossTypeExpression;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
 import org.junit.Before;

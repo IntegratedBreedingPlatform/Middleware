@@ -1,8 +1,8 @@
 package org.generationcp.middleware.ruleengine.naming.impl;
 
-import org.generationcp.middleware.ruleengine.naming.expression.FirstExpression;
-import org.generationcp.middleware.ruleengine.naming.expression.SeasonExpression;
-import org.generationcp.middleware.ruleengine.naming.expression.SequenceExpression;
+import org.generationcp.middleware.ruleengine.naming.newexpression.FirstExpression;
+import org.generationcp.middleware.ruleengine.naming.newexpression.SeasonExpression;
+import org.generationcp.middleware.ruleengine.naming.newexpression.SequenceExpression;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

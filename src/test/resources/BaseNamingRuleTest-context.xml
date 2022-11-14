@@ -15,7 +15,7 @@
 	<context:property-placeholder location="classpath:test.properties, classpath:crossing.properties" />
 
 
-   	<bean class="org.generationcp.middleware.ruleengine.naming.expression.ComponentPostProcessor">
+   	<bean class="org.generationcp.middleware.ruleengine.naming.newexpression.ComponentPostProcessor">
         <property name="ruleFactory" ref="ruleFactory"/>
 		<property name="processCodeFactory" ref="processCodeFactory" />
     </bean>

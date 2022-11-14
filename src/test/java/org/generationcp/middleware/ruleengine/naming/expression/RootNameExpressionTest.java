@@ -3,6 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import junit.framework.Assert;
 import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.manager.GermplasmNameType;
+import org.generationcp.middleware.ruleengine.naming.newexpression.RootNameExpression;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
+import org.generationcp.middleware.ruleengine.naming.newexpression.SequenceExpression;
 import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Before;

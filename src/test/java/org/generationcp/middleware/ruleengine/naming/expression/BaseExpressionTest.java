@@ -1,6 +1,8 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import junit.framework.Assert;
+import org.generationcp.middleware.ruleengine.naming.newexpression.BaseExpression;
+import org.generationcp.middleware.ruleengine.naming.newexpression.FirstExpression;
 import org.junit.Test;
 
 public class BaseExpressionTest {

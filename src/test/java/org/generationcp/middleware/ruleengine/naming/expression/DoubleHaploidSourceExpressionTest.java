@@ -2,6 +2,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.ruleengine.naming.newexpression.DoubleHaploidSourceExpression;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.junit.Test;

@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
+import org.generationcp.middleware.ruleengine.naming.newexpression.TopLocationAbbreviationExpression;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Test;
 
