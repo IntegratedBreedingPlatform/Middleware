@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
@@ -22,7 +22,7 @@ public abstract class BaseNamingRuleTest {
 
 	protected DeprecatedAdvancingSource row;
 
-	protected NamingRuleExecutionContext createExecutionContext(List<String> input) {
-		return new NamingRuleExecutionContext(null, this.processCodeService, this.row, null, input);
+	protected DeprecatedNamingRuleExecutionContext createExecutionContext(List<String> input) {
+		return new DeprecatedNamingRuleExecutionContext(null, this.processCodeService, this.row, null, input);
 	}
 }

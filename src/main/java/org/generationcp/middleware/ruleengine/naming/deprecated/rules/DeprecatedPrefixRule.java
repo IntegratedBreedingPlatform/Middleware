@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
@@ -18,13 +18,15 @@ import java.util.List;
  * 
  *
  */
+
+@Deprecated
 @Component
-public class PrefixRule extends OrderedRule<NamingRuleExecutionContext> {
+public class DeprecatedPrefixRule extends OrderedRule<DeprecatedNamingRuleExecutionContext> {
 
 	public static final String KEY = "Prefix";
 
 	@Override
-	public Object runRule(NamingRuleExecutionContext context) throws RuleException {
+	public Object runRule(DeprecatedNamingRuleExecutionContext context) throws RuleException {
 
 		// append a separator string onto each element of the list - in place
 		List<String> input = context.getCurrentData();
@@ -48,6 +50,6 @@ public class PrefixRule extends OrderedRule<NamingRuleExecutionContext> {
 
 	@Override
 	public String getKey() {
-		return PrefixRule.KEY;
+		return DeprecatedPrefixRule.KEY;
 	}
 }

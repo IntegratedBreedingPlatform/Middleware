@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.pojos.Method;
@@ -12,9 +12,9 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CodingSuffixRuleTest extends BaseNamingRuleTest {
+public class DeprecatedSuffixRuleTest extends BaseNamingRuleTest {
 
-	private SuffixRule rule;
+	private DeprecatedSuffixRule rule;
 	private Method breedingMethod;
 	private String testGermplasmName;
 	private Integer breedingMethodSnameType;
@@ -29,7 +29,7 @@ public class CodingSuffixRuleTest extends BaseNamingRuleTest {
 		this.row = new DeprecatedAdvancingSource();
 		this.row.setBreedingMethod(this.breedingMethod);
 		this.testGermplasmName = "CMT1234-B-3-";
-		this.rule = new SuffixRule();
+		this.rule = new DeprecatedSuffixRule();
 	}
 
 	@Test

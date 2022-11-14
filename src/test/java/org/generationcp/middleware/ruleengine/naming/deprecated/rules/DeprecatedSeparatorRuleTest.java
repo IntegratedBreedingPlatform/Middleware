@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.pojos.Method;
@@ -11,9 +11,9 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SeparatorRuleTest extends BaseNamingRuleTest {
+public class DeprecatedSeparatorRuleTest extends BaseNamingRuleTest {
 
-	private SeparatorRule rule;
+	private DeprecatedSeparatorRule rule;
 	private Method breedingMethod;
 	private String testGermplasmName;
 	private Integer breedingMethodSnameType;
@@ -27,7 +27,7 @@ public class SeparatorRuleTest extends BaseNamingRuleTest {
 		this.row = new DeprecatedAdvancingSource();
 		this.row.setBreedingMethod(this.breedingMethod);
 		this.testGermplasmName = "CMT1234";
-		this.rule = new SeparatorRule();
+		this.rule = new DeprecatedSeparatorRule();
 
 	}
 

@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -25,12 +25,12 @@ import java.util.List;
  */
 
 @RunWith(MockitoJUnitRunner.class)
-public class EnforceUniqueNameRuleTest {
+public class DeprecatedEnforceUniqueNameRuleTest {
 
 	public static final int TEST_MAX_SEQUENCE = 0;
 	public static final int ENFORCE_RULE_INDEX = 1;
 
-	private EnforceUniqueNameRule dut;
+	private DeprecatedEnforceUniqueNameRule dut;
 
 	@Mock
 	private GermplasmDataManager germplasmDataManager;
@@ -42,13 +42,13 @@ public class EnforceUniqueNameRuleTest {
 	private Method breedingMethod;
 
 	@Mock
-	private NamingRuleExecutionContext context;
+	private DeprecatedNamingRuleExecutionContext context;
 
 	private List<String> tempData;
 
 	@Before
 	public void setUp() throws Exception {
-		this.dut = new EnforceUniqueNameRule();
+		this.dut = new DeprecatedEnforceUniqueNameRule();
 	}
 
 	@Test
@@ -59,7 +59,7 @@ public class EnforceUniqueNameRuleTest {
 		this.dut.runRule(this.context);
 
 		Mockito.verify(this.context, Mockito.never()).setCurrentData(this.tempData);
-		Mockito.verify(this.source, Mockito.never()).setCurrentMaxSequence(EnforceUniqueNameRuleTest.TEST_MAX_SEQUENCE + 1);
+		Mockito.verify(this.source, Mockito.never()).setCurrentMaxSequence(DeprecatedEnforceUniqueNameRuleTest.TEST_MAX_SEQUENCE + 1);
 		Mockito.verify(this.source, Mockito.never()).setChangeDetail(Matchers.any(AdvanceGermplasmChangeDetail.class));
 	}
 
@@ -77,7 +77,7 @@ public class EnforceUniqueNameRuleTest {
 		// verify that force unique name generation flag is set
 		Mockito.verify(this.source).setForceUniqueNameGeneration(true);
 		// verify that default count rule is provided so that count rule execution will proceed
-		Mockito.verify(this.breedingMethod).setCount(CountRule.DEFAULT_COUNT);
+		Mockito.verify(this.breedingMethod).setCount(DeprecatedCountRule.DEFAULT_COUNT);
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class EnforceUniqueNameRuleTest {
 		Mockito.verify(this.source).setChangeDetail(Matchers.any(AdvanceGermplasmChangeDetail.class));
 
 		// verify that max sequence is incremented
-		Mockito.verify(this.source).setCurrentMaxSequence(EnforceUniqueNameRuleTest.TEST_MAX_SEQUENCE + 1);
+		Mockito.verify(this.source).setCurrentMaxSequence(DeprecatedEnforceUniqueNameRuleTest.TEST_MAX_SEQUENCE + 1);
 
 	}
 
@@ -118,12 +118,12 @@ public class EnforceUniqueNameRuleTest {
 
 		this.setupTestExecutionContext();
 		Mockito.when(this.germplasmDataManager.checkIfMatches(Matchers.anyString())).thenReturn(true);
-		Mockito.when(this.breedingMethod.getCount()).thenReturn(CountRule.DEFAULT_COUNT);
+		Mockito.when(this.breedingMethod.getCount()).thenReturn(DeprecatedCountRule.DEFAULT_COUNT);
 
 		this.dut.runRule(this.context);
 
 		// verify that max sequence is incremented
-		Mockito.verify(this.source).setCurrentMaxSequence(EnforceUniqueNameRuleTest.TEST_MAX_SEQUENCE + 1);
+		Mockito.verify(this.source).setCurrentMaxSequence(DeprecatedEnforceUniqueNameRuleTest.TEST_MAX_SEQUENCE + 1);
 
 		// verify that current rule execution state is pointed back to previous stored data
 		Mockito.verify(this.context).setCurrentData(this.tempData);
@@ -159,7 +159,7 @@ public class EnforceUniqueNameRuleTest {
 		String nextKey = this.dut.getNextRuleStepKey(this.context);
 
 		Assert.assertNotNull("Duplicate has been found and check still fails, so next key should not be null", nextKey);
-		Assert.assertEquals("Rule does not pass execution control to CountRule even after failing the check", CountRule.KEY, nextKey);
+		Assert.assertEquals("Rule does not pass execution control to CountRule even after failing the check", DeprecatedCountRule.KEY, nextKey);
 	}
 
 	@Test
@@ -179,8 +179,8 @@ public class EnforceUniqueNameRuleTest {
 
 	protected void setupTestExecutionContext() {
 		List<String> dummySequenceOrder = new ArrayList<>();
-		dummySequenceOrder.add(CountRule.KEY);
-		dummySequenceOrder.add(EnforceUniqueNameRule.KEY);
+		dummySequenceOrder.add(DeprecatedCountRule.KEY);
+		dummySequenceOrder.add(DeprecatedEnforceUniqueNameRule.KEY);
 
 		List<String> dummyInitialState = new ArrayList<>();
 		dummyInitialState.add("ETFN 1-1");
@@ -197,9 +197,9 @@ public class EnforceUniqueNameRuleTest {
 		Mockito.when(this.context.getMessageSource()).thenReturn(Mockito.mock(MessageSource.class));
 
 		Mockito.when(this.source.getBreedingMethod()).thenReturn(this.breedingMethod);
-		Mockito.when(this.source.getCurrentMaxSequence()).thenReturn(EnforceUniqueNameRuleTest.TEST_MAX_SEQUENCE);
+		Mockito.when(this.source.getCurrentMaxSequence()).thenReturn(DeprecatedEnforceUniqueNameRuleTest.TEST_MAX_SEQUENCE);
 
-		Mockito.when(this.context.getCurrentExecutionIndex()).thenReturn(EnforceUniqueNameRuleTest.ENFORCE_RULE_INDEX);
+		Mockito.when(this.context.getCurrentExecutionIndex()).thenReturn(DeprecatedEnforceUniqueNameRuleTest.ENFORCE_RULE_INDEX);
 
 	}
 }

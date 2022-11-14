@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
@@ -9,13 +9,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Deprecated
 @Component
-public class SeparatorRule extends OrderedRule<NamingRuleExecutionContext> {
+public class DeprecatedSeparatorRule extends OrderedRule<DeprecatedNamingRuleExecutionContext> {
 
 	public static final String KEY = "Separator";
 
 	@Override
-	public Object runRule(NamingRuleExecutionContext context) throws RuleException {
+	public Object runRule(DeprecatedNamingRuleExecutionContext context) throws RuleException {
 		List<String> input = context.getCurrentData();
 		DeprecatedAdvancingSource source = context.getAdvancingSource();
 
@@ -38,6 +39,6 @@ public class SeparatorRule extends OrderedRule<NamingRuleExecutionContext> {
 
 	@Override
 	public String getKey() {
-		return SeparatorRule.KEY;
+		return DeprecatedSeparatorRule.KEY;
 	}
 }

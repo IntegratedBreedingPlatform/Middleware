@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
@@ -9,13 +9,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Deprecated
 @Component
-public class SuffixRule extends OrderedRule<NamingRuleExecutionContext> {
+public class DeprecatedSuffixRule extends OrderedRule<DeprecatedNamingRuleExecutionContext> {
 
 	public static final String KEY = "Suffix";
 
 	@Override
-	public Object runRule(NamingRuleExecutionContext context) throws RuleException {
+	public Object runRule(DeprecatedNamingRuleExecutionContext context) throws RuleException {
 		// append a suffix string onto each element of the list - in place
 
 		ProcessCodeService processCodeService = context.getProcessCodeService();
@@ -39,6 +40,6 @@ public class SuffixRule extends OrderedRule<NamingRuleExecutionContext> {
 
 	@Override
 	public String getKey() {
-		return SuffixRule.KEY;
+		return DeprecatedSuffixRule.KEY;
 	}
 }

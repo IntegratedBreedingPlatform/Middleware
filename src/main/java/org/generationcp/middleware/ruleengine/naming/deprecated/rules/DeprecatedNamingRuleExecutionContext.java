@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.ruleengine.OrderedRuleExecutionContext;
@@ -12,7 +12,8 @@ import java.util.List;
 /**
  * Created by IntelliJ IDEA. User: Daniel Villafuerte Date: 2/14/2015 Time: 12:53 AM
  */
-public class NamingRuleExecutionContext extends OrderedRuleExecutionContext {
+@Deprecated
+public class DeprecatedNamingRuleExecutionContext extends OrderedRuleExecutionContext {
 
 	private ProcessCodeService processCodeService;
 	private DeprecatedAdvancingSource advancingSource;
@@ -22,7 +23,7 @@ public class NamingRuleExecutionContext extends OrderedRuleExecutionContext {
 
 	private List<String> tempData;
 
-	public NamingRuleExecutionContext(List<String> executionOrder, ProcessCodeService processCodeService, DeprecatedAdvancingSource advancingSource,
+	public DeprecatedNamingRuleExecutionContext(List<String> executionOrder, ProcessCodeService processCodeService, DeprecatedAdvancingSource advancingSource,
 			GermplasmDataManager germplasmDataManager, List<String> currentData) {
 		super(executionOrder);
 		this.processCodeService = processCodeService;

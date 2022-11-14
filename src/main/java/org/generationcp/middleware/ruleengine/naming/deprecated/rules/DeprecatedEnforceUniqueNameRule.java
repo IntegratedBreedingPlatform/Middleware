@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -17,13 +17,14 @@ import java.util.Locale;
  * Created by IntelliJ IDEA. User: Daniel Villafuerte Date: 2/17/2015 Time: 1:50 PM
  */
 
+@Deprecated
 @Component
-public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionContext> {
+public class DeprecatedEnforceUniqueNameRule extends BranchingRule<DeprecatedNamingRuleExecutionContext> {
 
 	public static final String KEY = "Unique";
 
 	@Override
-	public Object runRule(NamingRuleExecutionContext context) throws RuleException {
+	public Object runRule(DeprecatedNamingRuleExecutionContext context) throws RuleException {
 
 		List<String> currentData = context.getCurrentData();
 		GermplasmDataManager germplasmDataManager = context.getGermplasmDataManager();
@@ -50,7 +51,7 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 		return null;
 	}
 
-	protected void processNonUniqueName(NamingRuleExecutionContext context, DeprecatedAdvancingSource source) {
+	protected void processNonUniqueName(DeprecatedNamingRuleExecutionContext context, DeprecatedAdvancingSource source) {
 		// if a duplicate is found, initialize an AdvanceGermplasmChangeDetail object containing the original duplicate, for confirmation
 		// later on with the user
 		this.initializeChangeDetailForAdvancingSource(context);
@@ -61,7 +62,7 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 		if (!source.isForceUniqueNameGeneration()) {
 			// if there is no current count expression, use the default to provide incrementing support
 			if (source.getBreedingMethod().getCount() == null || source.getBreedingMethod().getCount().isEmpty()) {
-				source.getBreedingMethod().setCount(CountRule.DEFAULT_COUNT);
+				source.getBreedingMethod().setCount(DeprecatedCountRule.DEFAULT_COUNT);
 				source.setForceUniqueNameGeneration(true);
 			} else if (source.isBulk()) {
 				source.setForceUniqueNameGeneration(true);
@@ -76,7 +77,7 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 	}
 
 	@Override
-	public String getNextRuleStepKey(NamingRuleExecutionContext context) {
+	public String getNextRuleStepKey(DeprecatedNamingRuleExecutionContext context) {
 		DeprecatedAdvancingSource source = context.getAdvancingSource();
 
 		AdvanceGermplasmChangeDetail changeDetailObject = source.getChangeDetail();
@@ -84,12 +85,12 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 		if (changeDetailObject == null || changeDetailObject.getNewAdvanceName() != null) {
 			return super.getNextRuleStepKey(context);
 		} else {
-			this.prepareContextForBranchingToKey(context, CountRule.KEY);
-			return CountRule.KEY;
+			this.prepareContextForBranchingToKey(context, DeprecatedCountRule.KEY);
+			return DeprecatedCountRule.KEY;
 		}
 	}
 
-	protected void initializeChangeDetailForAdvancingSource(NamingRuleExecutionContext context) {
+	protected void initializeChangeDetailForAdvancingSource(DeprecatedNamingRuleExecutionContext context) {
 		AdvanceGermplasmChangeDetail changeDetail = context.getAdvancingSource().getChangeDetail();
 
 		// change detail object only needs to be initialized once per advancing source
@@ -104,7 +105,7 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 		}
 	}
 
-	protected void updateChangeDetailForAdvancingSource(NamingRuleExecutionContext context) {
+	protected void updateChangeDetailForAdvancingSource(DeprecatedNamingRuleExecutionContext context) {
 		AdvanceGermplasmChangeDetail changeDetail = context.getAdvancingSource().getChangeDetail();
 
 		if (changeDetail != null) {
@@ -120,6 +121,6 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 
 	@Override
 	public String getKey() {
-		return EnforceUniqueNameRule.KEY;
+		return DeprecatedEnforceUniqueNameRule.KEY;
 	}
 }

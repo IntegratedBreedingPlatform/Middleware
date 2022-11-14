@@ -12,8 +12,8 @@ import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.RuleExecutionContext;
 import org.generationcp.middleware.ruleengine.RuleFactory;
 import org.generationcp.middleware.ruleengine.RulesNotConfiguredException;
-import org.generationcp.middleware.ruleengine.naming.rules.EnforceUniqueNameRule;
-import org.generationcp.middleware.ruleengine.naming.rules.NamingRuleExecutionContext;
+import org.generationcp.middleware.ruleengine.naming.deprecated.rules.DeprecatedEnforceUniqueNameRule;
+import org.generationcp.middleware.ruleengine.naming.deprecated.rules.DeprecatedNamingRuleExecutionContext;
 import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
@@ -184,11 +184,11 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 		if (checkForDuplicateName) {
 			// new array list is required since list generated from asList method does not support adding of more elements
 			sequenceList = new ArrayList<>(sequenceList);
-			sequenceList.add(EnforceUniqueNameRule.KEY);
+			sequenceList.add(DeprecatedEnforceUniqueNameRule.KEY);
 		}
 
-		final NamingRuleExecutionContext context =
-			new NamingRuleExecutionContext(sequenceList, this.processCodeService, row, this.germplasmDataManager,
+		final DeprecatedNamingRuleExecutionContext context =
+			new DeprecatedNamingRuleExecutionContext(sequenceList, this.processCodeService, row, this.germplasmDataManager,
 				new ArrayList<String>());
 		context.setMessageSource(this.messageSource);
 

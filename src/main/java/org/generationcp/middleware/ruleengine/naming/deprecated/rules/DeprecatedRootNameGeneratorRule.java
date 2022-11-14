@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
@@ -10,13 +10,14 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 @Component
-public class RootNameGeneratorRule extends OrderedRule<NamingRuleExecutionContext> {
+public class DeprecatedRootNameGeneratorRule extends OrderedRule<DeprecatedNamingRuleExecutionContext> {
 
 	public static final String KEY = "RootNameGenerator";
 
 	@Override
-	public Object runRule(NamingRuleExecutionContext context) throws RuleException {
+	public Object runRule(DeprecatedNamingRuleExecutionContext context) throws RuleException {
 
 		DeprecatedRootNameExpression rootNameExpression = new DeprecatedRootNameExpression();
 		DeprecatedAdvancingSource advancingSource = context.getAdvancingSource();
@@ -38,6 +39,6 @@ public class RootNameGeneratorRule extends OrderedRule<NamingRuleExecutionContex
 
 	@Override
 	public String getKey() {
-		return RootNameGeneratorRule.KEY;
+		return DeprecatedRootNameGeneratorRule.KEY;
 	}
 }

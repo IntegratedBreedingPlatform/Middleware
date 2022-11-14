@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -12,9 +12,9 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RootNameGeneratorRuleTest extends BaseNamingRuleTest {
+public class DeprecatedRootNameGeneratorRuleTest extends BaseNamingRuleTest {
 
-	private RootNameGeneratorRule rootNameGeneratorRule;
+	private DeprecatedRootNameGeneratorRule deprecatedRootNameGeneratorRule;
 	private Method breedingMethod;
 	private String testGermplasmName;
 	private Integer breedingMethodSnameType;
@@ -27,7 +27,7 @@ public class RootNameGeneratorRuleTest extends BaseNamingRuleTest {
 		this.row = new DeprecatedAdvancingSource();
 		this.row.setBreedingMethod(this.breedingMethod);
 		this.testGermplasmName = "advance-germplasm-name";
-		this.rootNameGeneratorRule = new RootNameGeneratorRule();
+		this.deprecatedRootNameGeneratorRule = new DeprecatedRootNameGeneratorRule();
 
 	}
 
@@ -47,7 +47,7 @@ public class RootNameGeneratorRuleTest extends BaseNamingRuleTest {
 		List<String> input = new ArrayList<String>();
 
 		try {
-			input = (List<String>) this.rootNameGeneratorRule.runRule(this.createExecutionContext(input));
+			input = (List<String>) this.deprecatedRootNameGeneratorRule.runRule(this.createExecutionContext(input));
 		} catch (RuleException re) {
 			Assert.fail("Should return the correct root name if the methd snametype is equal to the names' type id");
 		}

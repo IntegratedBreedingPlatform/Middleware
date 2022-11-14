@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
@@ -10,14 +10,15 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 @Component
-public class CountRule extends OrderedRule<NamingRuleExecutionContext> {
+public class DeprecatedCountRule extends OrderedRule<DeprecatedNamingRuleExecutionContext> {
 
 	public static final String KEY = "Count";
 	public static final String DEFAULT_COUNT = "[NUMBER]";
 
 	@Override
-	public Object runRule(NamingRuleExecutionContext context) throws RuleException {
+	public Object runRule(DeprecatedNamingRuleExecutionContext context) throws RuleException {
 		// create counts first - we need a list in case we have a sequence
 
 		ProcessCodeService service = context.getProcessCodeService();
@@ -46,6 +47,6 @@ public class CountRule extends OrderedRule<NamingRuleExecutionContext> {
 
 	@Override
 	public String getKey() {
-		return CountRule.KEY;
+		return DeprecatedCountRule.KEY;
 	}
 }
