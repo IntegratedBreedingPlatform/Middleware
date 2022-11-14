@@ -39,6 +39,9 @@ public interface KeySequenceRegisterService {
 	 */
 	int getNextSequence(String keyPrefix);
 
+	// TODO: rename me!
+	int getNextSequenceWithoutHibernate(String keyPrefix);
+
 	/**
 	 * If keyPrefix exists in key sequence registry, update the last sequence number
 	 * with lastSequenceUsed parameter if it is greater than the value of last sequence saved for that sequence.
@@ -56,6 +59,8 @@ public interface KeySequenceRegisterService {
 	 * @param lastSequenceUsed
 	 */
 	void saveLastSequenceUsed(String keyPrefix, Integer lastSequenceUsed);
+
+	void saveLastSequenceUsedWithoutHibernate(String keyPrefix, Integer lastSequenceUsed);
 
 	/**
 	 * Deletes the KeySequenceRegister entries given the Key Prefixes

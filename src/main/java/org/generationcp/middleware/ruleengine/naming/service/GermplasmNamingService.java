@@ -13,6 +13,9 @@ public interface GermplasmNamingService {
 
 	int getNextNumberAndIncrementSequence(String keyPrefix);
 
+	// TODO: rename me!
+	int getNextNumberAndIncrementSequenceWithoutHibernate(String keyPrefix);
+
 	void saveLastSequenceUsed(String keyPrefix, Integer lastSequenceUsed);
 
 	String getNumberWithLeadingZeroesAsString(final Integer number, final Integer numOfDigits);

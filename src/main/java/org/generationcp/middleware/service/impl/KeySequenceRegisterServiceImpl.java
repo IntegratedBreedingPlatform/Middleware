@@ -39,13 +39,23 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 	}
 
 	@Override
+	public int getNextSequenceWithoutHibernate(final String keyPrefix) {
+		return this.keySequenceRegisterDAO.getNextSequenceWithoutHibernate(keyPrefix);
+	}
+
+	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void saveLastSequenceUsed(final String keyPrefix, final Integer lastSequenceUsed) {
 		this.keySequenceRegisterDAO.saveLastSequenceUsed(keyPrefix, lastSequenceUsed);
 	}
 
 	@Override
-	public void deleteKeySequences(final List<String> keyPrefixes){
+	public void saveLastSequenceUsedWithoutHibernate(final String keyPrefix, final Integer lastSequenceUsed) {
+		this.keySequenceRegisterDAO.saveLastSequenceUsedWithoutHibernate(keyPrefix, lastSequenceUsed);
+	}
+
+	@Override
+	public void deleteKeySequences(final List<String> keyPrefixes) {
 		this.daoFactory.getKeySequenceRegisterDAO().deleteByKeyPrefixes(keyPrefixes);
 	}
 }

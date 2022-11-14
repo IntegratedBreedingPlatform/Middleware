@@ -111,7 +111,31 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 	}
 
 	@Override
+	public int getNextNumberAndIncrementSequenceWithoutHibernate(final String keyPrefix) {
+		final int nextSequence = this.getNextSequenceWithoutHibernate(keyPrefix);
+		this.keySequenceRegisterService.saveLastSequenceUsedWithoutHibernate(keyPrefix, nextSequence);
+		return nextSequence;
+	}
+
+	@Override
 	public void saveLastSequenceUsed(final String keyPrefix, final Integer lastSequenceUsed) {
 		this.keySequenceRegisterService.saveLastSequenceUsed(keyPrefix, lastSequenceUsed);
 	}
+
+	// TODO: rename me!
+	private int getNextSequenceWithoutHibernate(final String keyPrefix) {
+		if (!StringUtils.isEmpty(keyPrefix)) {
+			final int nextSequenceNumber = this.keySequenceRegisterService.getNextSequenceWithoutHibernate(keyPrefix.trim());
+			if (nextSequenceNumber > 1) {
+				return nextSequenceNumber;
+
+				// If the sequence doesn't exist yet in key_sequence_register table, query in NAMES table for the latest one used
+			} else {
+				return Integer.valueOf(this.germplasmDataManager.getNextSequenceNumberAsString(keyPrefix.trim()));
+			}
+		}
+
+		return 1;
+	}
+
 }
