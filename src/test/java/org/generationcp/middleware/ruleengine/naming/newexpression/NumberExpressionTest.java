@@ -1,7 +1,6 @@
 
-package org.generationcp.middleware.ruleengine.naming.expression;
+package org.generationcp.middleware.ruleengine.naming.newexpression;
 
-import org.generationcp.middleware.ruleengine.naming.newexpression.NumberExpression;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Before;
 import org.junit.Test;

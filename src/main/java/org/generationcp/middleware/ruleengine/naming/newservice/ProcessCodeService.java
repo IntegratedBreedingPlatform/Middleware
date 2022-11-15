@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.service;
+package org.generationcp.middleware.ruleengine.naming.newservice;
 
 import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 

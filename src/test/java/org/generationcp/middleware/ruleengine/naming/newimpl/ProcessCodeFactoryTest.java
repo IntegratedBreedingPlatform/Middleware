@@ -1,4 +1,4 @@
-package org.generationcp.middleware.ruleengine.naming.impl;
+package org.generationcp.middleware.ruleengine.naming.newimpl;
 
 import org.generationcp.middleware.ruleengine.naming.newexpression.FirstExpression;
 import org.generationcp.middleware.ruleengine.naming.newexpression.SeasonExpression;

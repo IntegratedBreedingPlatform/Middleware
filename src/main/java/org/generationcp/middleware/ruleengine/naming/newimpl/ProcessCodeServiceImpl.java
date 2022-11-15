@@ -1,8 +1,8 @@
 
-package org.generationcp.middleware.ruleengine.naming.impl;
+package org.generationcp.middleware.ruleengine.naming.newimpl;
 
 import org.generationcp.middleware.ruleengine.naming.newexpression.Expression;
-import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
+import org.generationcp.middleware.ruleengine.naming.newservice.ProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.generationcp.middleware.ruleengine.util.ExpressionHelper;
 import org.springframework.stereotype.Service;

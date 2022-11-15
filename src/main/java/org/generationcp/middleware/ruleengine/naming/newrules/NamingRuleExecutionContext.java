@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.newrules;
 
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.ruleengine.OrderedRuleExecutionContext;
-import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
+import org.generationcp.middleware.ruleengine.naming.newservice.ProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.springframework.context.MessageSource;
 

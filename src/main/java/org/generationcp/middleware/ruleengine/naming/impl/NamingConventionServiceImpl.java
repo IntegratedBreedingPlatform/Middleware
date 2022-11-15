@@ -15,7 +15,7 @@ import org.generationcp.middleware.ruleengine.RulesNotConfiguredException;
 import org.generationcp.middleware.ruleengine.naming.newrules.EnforceUniqueNameRule;
 import org.generationcp.middleware.ruleengine.naming.newrules.NamingRuleExecutionContext;
 import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
-import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
+import org.generationcp.middleware.ruleengine.naming.newservice.ProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSourceList;

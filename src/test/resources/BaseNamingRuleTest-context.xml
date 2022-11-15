@@ -40,10 +40,10 @@
             In conjunction with the RulesPostProcessor above, this automatically populates the map in the RuleFactory
              -->
 	<context:component-scan base-package="org.generationcp.middleware.ruleengine.naming" />
-	<context:component-scan base-package="org.generationcp.middleware.ruleengine.naming.expression" />
+	<context:component-scan base-package="org.generationcp.middleware.ruleengine.naming.newexpression" />
 
 	<bean id="processCodeFactory"
-		  class="org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory"
+		  class="org.generationcp.middleware.ruleengine.naming.newimpl.ProcessCodeFactory"
 		  init-method="init"/>
 
 	<!-- Singleton bean as there is nothing request specific in here. -->

@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.impl;
+package org.generationcp.middleware.ruleengine.naming.newimpl;
 
 import java.util.HashMap;
 import java.util.Map;

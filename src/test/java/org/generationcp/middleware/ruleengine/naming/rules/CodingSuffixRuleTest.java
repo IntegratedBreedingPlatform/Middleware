@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeServiceImpl;
+import org.generationcp.middleware.ruleengine.naming.newimpl.ProcessCodeServiceImpl;
 import org.generationcp.middleware.ruleengine.naming.newrules.SuffixRule;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Before;

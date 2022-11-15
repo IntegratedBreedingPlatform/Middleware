@@ -1,8 +1,7 @@
 
-package org.generationcp.middleware.ruleengine.naming.expression;
+package org.generationcp.middleware.ruleengine.naming.newexpression;
 
 import junit.framework.Assert;
-import org.generationcp.middleware.ruleengine.naming.newexpression.SeasonExpression;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Test;
 import org.slf4j.Logger;

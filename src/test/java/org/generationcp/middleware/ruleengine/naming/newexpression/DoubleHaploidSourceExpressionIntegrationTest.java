@@ -1,7 +1,6 @@
-package org.generationcp.middleware.ruleengine.naming.expression;
+package org.generationcp.middleware.ruleengine.naming.newexpression;
 
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.ruleengine.naming.newexpression.DoubleHaploidSourceExpression;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;

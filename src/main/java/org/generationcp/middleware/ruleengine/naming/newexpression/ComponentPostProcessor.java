@@ -1,7 +1,7 @@
 package org.generationcp.middleware.ruleengine.naming.newexpression;
 
 import org.generationcp.middleware.ruleengine.RulesPostProcessor;
-import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
+import org.generationcp.middleware.ruleengine.naming.newimpl.ProcessCodeFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 
