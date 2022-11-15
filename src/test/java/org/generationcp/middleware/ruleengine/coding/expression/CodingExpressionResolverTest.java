@@ -1,7 +1,7 @@
 package org.generationcp.middleware.ruleengine.coding.expression;
 
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
-import org.generationcp.middleware.ruleengine.newnaming.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedGermplasmNamingService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -22,7 +22,7 @@ public class CodingExpressionResolverTest {
 	private CodingExpressionFactory factory;
 
 	@Mock
-	private GermplasmNamingService germplasmNamingService;
+	private DeprecatedGermplasmNamingService germplasmNamingService;
 
 	@InjectMocks
 	private final CodingExpressionResolver codingExpressionResolver = new CodingExpressionResolver();

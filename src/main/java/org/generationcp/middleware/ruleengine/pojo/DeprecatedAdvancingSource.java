@@ -11,47 +11,73 @@
 
 package org.generationcp.middleware.ruleengine.pojo;
 
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitUtils;
+import org.generationcp.middleware.pojos.Name;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
+ *
  * The POJO containing information needed for Advancing.
+ *
  */
 @Deprecated
-public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
+public class DeprecatedAdvancingSource {
 
 	private ImportedGermplasm germplasm;
-
+	private List<Name> names;
+	private Integer plantsSelected;
+	private Method breedingMethod;
 	/**
 	 * This field is used to temporarily store the breeding method ID until such time as it can be resolved to a proper breeding Method object
 	 */
 	private Integer breedingMethodId;
+	private boolean isBulk;
 	private String studyName;
+	private Integer studyId;
+	private Integer environmentDatasetId;
+	private String season;
+	private String locationAbbreviation;
+	private String rootName;
+	private Method sourceMethod;
+	private int currentMaxSequence;
+	private AdvanceGermplasmChangeDetail changeDetail;
 	private String prefix;
 	private String suffix;
+	private Integer rootNameType;
+	private Integer harvestLocationId;
 	private String plotNumber;
-	private String trialInstanceNumber;
-	private String replicationNumber;
+    private String selectionTraitValue;
+    
+    private String trialInstanceNumber;
+    private String replicationNumber;
 
+	private int maleGid;
+
+	private int femaleGid;
+
+	private boolean isForceUniqueNameGeneration;
+
+	//This will be used to store conditions
+	private List<MeasurementVariable> conditions;
 	//This will be used if we have trail
-	private MeasurementRow trailInstanceObservationMeasurementRow;
+	private MeasurementRow trailInstanceObservation;
 
 	private StudyTypeDto studyType;
 
 	private List<SampleDTO> samples = new ArrayList<>();
+	private Boolean designationIsPreviewOnly;
+	private Map<String, Integer> keySequenceMap = new HashMap<>();
 
-	public DeprecatedAdvancingSource(final ImportedGermplasm germplasm, final List<BasicNameDTO> names, final Integer plantsSelected,
+	public DeprecatedAdvancingSource(final ImportedGermplasm germplasm, final List<Name> names, final Integer plantsSelected,
 		final Method breedingMethod,
 		final String studyName, final String plotNumber) {
 		super();
@@ -87,6 +113,13 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 	}
 
 	/**
+	 * @return the plantsSelected
+	 */
+	public Integer getPlantsSelected() {
+		return this.plantsSelected;
+	}
+
+	/**
 	 * @param plantsSelected the plantsSelected to set
 	 */
 	public void setPlantsSelected(final Integer plantsSelected) {
@@ -96,17 +129,37 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 	/**
 	 * @return the isBulk
 	 */
-	@Override
-	public boolean isBulkingMethod() {
+	public boolean isBulk() {
 		final Boolean isBulk = this.getBreedingMethod().isBulkingMethod();
 		return this.getBreedingMethod() != null && isBulk != null ? isBulk : false;
 	}
 
 	/**
+	 * @param isBulk the isBulk to set
+	 */
+	public void setBulk(final boolean isBulk) {
+		this.isBulk = isBulk;
+	}
+
+	/**
+	 * @return the names
+	 */
+	public List<Name> getNames() {
+		return this.names;
+	}
+
+	/**
 	 * @param names the names to set
 	 */
-	public void setNames(final List<BasicNameDTO> names) {
+	public void setNames(final List<Name> names) {
 		this.names = names;
+	}
+
+	/**
+	 * @return the breedingMethod
+	 */
+	public Method getBreedingMethod() {
+		return this.breedingMethod;
 	}
 
 	/**
@@ -130,8 +183,16 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 		this.studyName = studyName;
 	}
 
+	public Integer getStudyId() {
+		return studyId;
+	}
+
 	public void setStudyId(final Integer studyId) {
 		this.studyId = studyId;
+	}
+
+	public Integer getEnvironmentDatasetId() {
+		return this.environmentDatasetId;
 	}
 
 	public void setEnvironmentDatasetId(final Integer environmentDatasetId) {
@@ -139,10 +200,87 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 	}
 
 	/**
+	 * @return the season
+	 */
+	public String getSeason() {
+		return this.season;
+	}
+
+	/**
+	 * @param season the season to set
+	 */
+	public void setSeason(final String season) {
+		this.season = season;
+	}
+
+	/**
+	 * @return the locationAbbreviation
+	 */
+	public String getLocationAbbreviation() {
+		return this.locationAbbreviation;
+	}
+
+	/**
+	 * @param locationAbbreviation the locationAbbreviation to set
+	 */
+	public void setLocationAbbreviation(final String locationAbbreviation) {
+		this.locationAbbreviation = locationAbbreviation;
+	}
+
+	/**
+	 * @return the rootName
+	 */
+	public String getRootName() {
+		return this.rootName;
+	}
+
+	/**
+	 * @param rootName the rootName to set
+	 */
+	public void setRootName(final String rootName) {
+		this.rootName = rootName;
+	}
+
+	/**
+	 * @return the sourceMethod
+	 */
+	public Method getSourceMethod() {
+		return this.sourceMethod;
+	}
+
+	/**
 	 * @param sourceMethod the sourceMethod to set
 	 */
 	public void setSourceMethod(final Method sourceMethod) {
 		this.sourceMethod = sourceMethod;
+	}
+
+	/**
+	 * @return the currentMaxSequence
+	 */
+	public int getCurrentMaxSequence() {
+		return this.currentMaxSequence;
+	}
+
+	/**
+	 * @param currentMaxSequence the currentMaxSequence to set
+	 */
+	public void setCurrentMaxSequence(final int currentMaxSequence) {
+		this.currentMaxSequence = currentMaxSequence;
+	}
+
+	/**
+	 * @return the changeDetail
+	 */
+	public AdvanceGermplasmChangeDetail getChangeDetail() {
+		return this.changeDetail;
+	}
+
+	/**
+	 * @param changeDetail the changeDetail to set
+	 */
+	public void setChangeDetail(final AdvanceGermplasmChangeDetail changeDetail) {
+		this.changeDetail = changeDetail;
 	}
 
 	/**
@@ -173,6 +311,22 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 		this.suffix = suffix;
 	}
 
+	public boolean isForceUniqueNameGeneration() {
+		return this.isForceUniqueNameGeneration;
+	}
+
+	public void setForceUniqueNameGeneration(final boolean isForceUniqueNameGeneration) {
+		this.isForceUniqueNameGeneration = isForceUniqueNameGeneration;
+	}
+
+	public Integer getRootNameType() {
+		return this.rootNameType;
+	}
+
+	public void setRootNameType(final Integer rootNameType) {
+		this.rootNameType = rootNameType;
+	}
+
 	public String getPlotNumber() {
 		return this.plotNumber;
 	}
@@ -186,6 +340,22 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
+	public Integer getHarvestLocationId() {
+		return this.harvestLocationId;
+	}
+
+	public void setHarvestLocationId(final Integer harvestLocationId) {
+		this.harvestLocationId = harvestLocationId;
+	}
+
+    public String getSelectionTraitValue() {
+        return selectionTraitValue;
+    }
+
+    public void setSelectionTraitValue(final String selectionTraitValue) {
+        this.selectionTraitValue = selectionTraitValue;
+    }
+
 	public String getTrialInstanceNumber() {
 		return this.trialInstanceNumber;
 	}
@@ -195,23 +365,27 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 	}
 
 	public String getReplicationNumber() {
-		return replicationNumber;
+		return this.replicationNumber;
 	}
 
 	public void setReplicationNumber(final String replicationNumber) {
 		this.replicationNumber = replicationNumber;
 	}
 
+	public List<MeasurementVariable> getConditions() {
+		return conditions;
+	}
+
 	public void setConditions(final List<MeasurementVariable> conditions) {
 		this.conditions = conditions;
 	}
 
-	public void setTrailInstanceObservationMeasurementRow(final MeasurementRow trailInstanceObservationMeasurementRow) {
-		this.trailInstanceObservationMeasurementRow = trailInstanceObservationMeasurementRow;
+	public MeasurementRow getTrailInstanceObservation() {
+		return trailInstanceObservation;
 	}
 
-	public MeasurementRow getTrailInstanceObservationMeasurementRow() {
-		return trailInstanceObservationMeasurementRow;
+	public void setTrailInstanceObservation(final MeasurementRow trailInstanceObservation) {
+		this.trailInstanceObservation = trailInstanceObservation;
 	}
 
 	public StudyTypeDto getStudyType() {
@@ -232,25 +406,33 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 
 	public DeprecatedAdvancingSource copy() {
         final DeprecatedAdvancingSource
-			source = new DeprecatedAdvancingSource(germplasm, this.names, this.plantsSelected, this.breedingMethod, this.studyName, this.plotNumber);
-		source.setSeason(this.season);
-		source.setLocationAbbreviation(this.locationAbbreviation);
-		source.setRootName(this.rootName);
-		source.setSourceMethod(this.sourceMethod);
-		source.setCurrentMaxSequence(this.currentMaxSequence);
-		source.setChangeDetail(this.changeDetail);
-		source.setPrefix(this.prefix);
-		source.setSuffix(this.suffix);
-		source.setRootNameType(this.rootNameType);
-		source.setHarvestLocationId(this.harvestLocationId);
-		source.setSelectionTraitValue(this.selectionTraitValue);
-		source.setTrialInstanceNumber(this.trialInstanceNumber);
-		source.setReplicationNumber(this.replicationNumber);
-		return source;
+			source = new DeprecatedAdvancingSource(germplasm, names, plantsSelected, breedingMethod, studyName, plotNumber);
+        source.setSeason(this.season);
+        source.setLocationAbbreviation(this.locationAbbreviation);
+        source.setRootName(this.rootName);
+        source.setSourceMethod(this.sourceMethod);
+        source.setCurrentMaxSequence(this.currentMaxSequence);
+        source.setChangeDetail(this.changeDetail);
+        source.setPrefix(this.prefix);
+        source.setSuffix(this.suffix);
+        source.setRootNameType(this.rootNameType);
+        source.setHarvestLocationId(this.harvestLocationId);
+        source.setSelectionTraitValue(this.selectionTraitValue);
+        source.setTrialInstanceNumber(this.trialInstanceNumber);
+        source.setReplicationNumber(this.replicationNumber);
+        return source;
+    }
+
+	public int getMaleGid() {
+		return maleGid;
 	}
 
 	public void setMaleGid(final int maleGid) {
 		this.maleGid = maleGid;
+	}
+
+	public int getFemaleGid() {
+		return femaleGid;
 	}
 
 	public void setFemaleGid(final int femaleGid) {
@@ -265,33 +447,19 @@ public class DeprecatedAdvancingSource extends AbstractAdvancingSource {
 		this.samples = samples;
 	}
 
-	public void setDesignationIsPreviewOnly(final Boolean designationIsPreviewOnly) {
+	public Boolean getDesignationIsPreviewOnly() {
+		return designationIsPreviewOnly;
+	}
+
+	public void setDesignationIsPreviewOnly(Boolean designationIsPreviewOnly) {
 		this.designationIsPreviewOnly = designationIsPreviewOnly;
 	}
 
-	@Override
-	public Integer getOriginGermplasmGid() {
-		return NumberUtils.isNumber(this.germplasm.getGid()) ? Integer.valueOf(this.germplasm.getGid()) : null;
+	public Map<String, Integer> getKeySequenceMap() {
+		return keySequenceMap;
 	}
 
-	@Override
-	public Integer getOriginGermplasmGpid1() {
-		return this.germplasm.getGpid1();
+	public void setKeySequenceMap(Map<String, Integer> keySequenceMap) {
+		this.keySequenceMap = keySequenceMap;
 	}
-
-	@Override
-	public Integer getOriginGermplasmGpid2() {
-		return this.germplasm.getGpid2();
-	}
-
-	@Override
-	public Integer getOriginGermplasmGnpgs() {
-		return this.germplasm.getGnpgs();
-	}
-
-	@Override
-	public ObservationUnitRow getTrialInstanceObservation() {
-		return ObservationUnitUtils.fromMeasurementRow(this.trailInstanceObservationMeasurementRow);
-	}
-
 }
