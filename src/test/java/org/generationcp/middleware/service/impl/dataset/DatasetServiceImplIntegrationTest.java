@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
@@ -98,16 +99,25 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     private List<Integer> instanceIds;
     private Integer subObsDatasetId;
     private DaoFactory daoFactory;
+    private WorkbenchDaoFactory workbenchDaoFactory;
 
 
     @Before
     public void setUp() {
+        if (this.daoFactory == null) {
+            this.daoFactory =new DaoFactory(this.sessionProvder);
+        }
+
+        if (this.workbenchDaoFactory == null) {
+            this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
+        }
+
         this.dataSetupTest = new DataSetupTest();
         this.dataSetupTest.setDataImportService(this.dataImportService);
         this.dataSetupTest.setGermplasmListManager(this.germplasmListManager);
         this.dataSetupTest.setMiddlewareFieldbookService(this.middlewareFieldbookService);
 
-        this.workbenchTestDataUtil.setUpWorkbench();
+        this.workbenchTestDataUtil.setUpWorkbench(workbenchDaoFactory);
 
         if (this.commonTestProject == null) {
             this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();

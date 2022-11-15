@@ -59,7 +59,6 @@ import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.user.UserServiceImpl;
 
@@ -460,7 +459,7 @@ public class IntegrationTestDataInitializer {
 		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, role)));
 		final List<CropType> crops = new ArrayList<>();
 		crops.add(this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
-		this.userService.addUser(workbenchUser);
+		this.workbenchDaoFactory.getWorkbenchUserDAO().save(workbenchUser);
 
 		return workbenchUser;
 

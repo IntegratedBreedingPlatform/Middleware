@@ -9,13 +9,14 @@ import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.program.ProgramService;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.api.role.RoleService;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.StudyExternalReference;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -60,6 +61,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	private ProgramService programService;
 
 	private DaoFactory daoFactory;
+	private WorkbenchDaoFactory workbenchDaoFactory;
 	private IntegrationTestDataInitializer testDataInitializer;
 	private Project commonTestProject;
 	private CropType crop;
@@ -71,7 +73,8 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	@Before
 	public void setUp() {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.workbenchTestDataUtil.setUpWorkbench();
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
+		this.workbenchTestDataUtil.setUpWorkbench(this.workbenchDaoFactory);
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 			this.crop = this.programService.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();

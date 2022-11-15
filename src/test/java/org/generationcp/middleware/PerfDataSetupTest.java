@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -57,12 +58,18 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 	private static final Logger LOG = LoggerFactory.getLogger(PerfDataSetupTest.class);
 
 	private DaoFactory daoFactory;
+	private WorkbenchDaoFactory workbenchDaoFactory;
 
 	@Before
 	public void setUp() {
 		if (this.daoFactory == null) {
 			this.daoFactory = new DaoFactory(this.sessionProvder);
 		}
+
+		if (this.workbenchDaoFactory == null) {
+			this.workbenchDaoFactory = new WorkbenchDaoFactory(this.sessionProvder);
+		}
+
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 		}
@@ -106,7 +113,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		// Role ID 1 = ADMIN
 		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, 1)));
 
-		this.userService.addUser(workbenchUser);
+		this.workbenchDaoFactory.getWorkbenchUserDAO().save(workbenchUser);
 
 		CropType cropType = this.cropService.getCropTypeByName("maize");
 		if (cropType == null) {

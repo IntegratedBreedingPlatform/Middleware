@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -71,6 +72,8 @@ public class DataSetupTest extends IntegrationTestBase {
 
     private DaoFactory daoFactory;
 
+    private WorkbenchDaoFactory workbenchDaoFactory;
+
     private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
     public static final int NUMBER_OF_GERMPLASM = 20;
@@ -117,6 +120,7 @@ public class DataSetupTest extends IntegrationTestBase {
         if (this.germplasmTestDataGenerator == null) {
             this.daoFactory = new DaoFactory(this.sessionProvder);
             this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
+            this.workbenchDaoFactory = new WorkbenchDaoFactory(this.sessionProvder);
         }
     }
 
@@ -142,7 +146,7 @@ public class DataSetupTest extends IntegrationTestBase {
         person.setContact("No Contact");
         person.setLanguage(1);
         person.setPhone("02121212121");
-        this.userService.addPerson(person);
+        this.workbenchDaoFactory.getPersonDAO().save(person);
 
         final WorkbenchUser workbenchUser = new WorkbenchUser();
         workbenchUser.setInstalid(1);
@@ -159,7 +163,7 @@ public class DataSetupTest extends IntegrationTestBase {
         // Role ID 1 = ADMIN
         workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, 1)));
 
-        this.userService.addUser(workbenchUser);
+        this.workbenchDaoFactory.getWorkbenchUserDAO().save(workbenchUser);
 
         CropType cropType = this.cropService.getCropTypeByName("maize");
         if (cropType == null) {
@@ -203,7 +207,7 @@ public class DataSetupTest extends IntegrationTestBase {
         final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt,
                 Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
 
-        final Integer germplasmListId = this.germplasmListManager.addGermplasmList(germplasmList);
+       this.germplasmListManager.addGermplasmList(germplasmList);
         germplasmList.setProgramUUID(programUUID);
 
         // Germplasm list data

@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -69,6 +70,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 	private Project commonTestProject;
 	private WorkbenchUser testUser;
 	private DaoFactory daoFactory;
+	private WorkbenchDaoFactory workbenchDaoFactory;
 	private StudySummary studySummary;
 	private StudyInstanceDto studyInstanceDto;
 	private Germplasm germplasm;
@@ -76,8 +78,9 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 	@Before
 	public void setUp() {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 
-		this.workbenchTestDataUtil.setUpWorkbench();
+		this.workbenchTestDataUtil.setUpWorkbench(workbenchDaoFactory);
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 			this.crop = this.programService.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();

@@ -4,6 +4,7 @@ package org.generationcp.middleware;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.program.ProgramService;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -43,6 +44,7 @@ public class WorkbenchTestDataUtil {
 	private Person testPerson1, testPerson2;
 	private ProjectActivity testProjectActivity1, testProjectActivity2;
 	private CropType cropType;
+
 
 	public WorkbenchTestDataUtil() {
 		// Do nothing
@@ -123,7 +125,7 @@ public class WorkbenchTestDataUtil {
 		return projectActivity;
 	}
 
-	public void setUpWorkbench() {
+	public void setUpWorkbench(final WorkbenchDaoFactory workbenchDaoFactory) {
 		this.commonTestProject = this.createTestProjectData();
 		this.cropType = this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
 		this.commonTestProject.setCropType(this.cropType);
@@ -131,18 +133,18 @@ public class WorkbenchTestDataUtil {
 		crops.add(this.cropType);
 
 		this.testPerson1 = this.createTestPersonData();
-		this.userService.addPerson(this.testPerson1);
+		workbenchDaoFactory.getPersonDAO().save(this.testPerson1);
 		this.testPerson2 = this.createTestPersonData();
-		this.userService.addPerson(this.testPerson2);
+		workbenchDaoFactory.getPersonDAO().save(this.testPerson2);
 
 		this.testUser1 = this.createTestUserData();
 		this.testUser1.setPerson(this.testPerson1);
 		this.testPerson1.setCrops(crops);
-		this.userService.addUser(this.testUser1);
+		workbenchDaoFactory.getWorkbenchUserDAO().save(this.testUser1);
 		this.testUser2 = this.createTestUserData();
 		this.testUser2.setPerson(this.testPerson2);
 		this.testPerson2.setCrops(crops);
-		this.userService.addUser(this.testUser2);
+		workbenchDaoFactory.getWorkbenchUserDAO().save(this.testUser2);
 
 		this.commonTestProject.setUserId(this.testUser1.getUserid());
 		this.programService.addProgram(this.commonTestProject);

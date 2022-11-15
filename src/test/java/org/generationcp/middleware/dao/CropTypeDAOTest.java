@@ -14,6 +14,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.role.RoleService;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -28,7 +29,7 @@ import java.util.Set;
 
 public class CropTypeDAOTest extends IntegrationTestBase {
 
-	private CropTypeDAO cropTypeDAO;
+	private WorkbenchDaoFactory workbenchDaoFactory;
 
 	@Autowired
 	private RoleService roleService;
@@ -38,9 +39,11 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		this.cropTypeDAO = new CropTypeDAO();
-		this.cropTypeDAO.setSession(this.workbenchSessionProvider.getSession());
+		if (workbenchDaoFactory == null) {
+			this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
+		}
 	}
+
 
 	@Test
 	public void testGetAvailableCropsForUser() {
@@ -57,8 +60,8 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 				Sets.newHashSet(customCrop1, customCrop2));
 		final WorkbenchUser workbenchUser2 = this.createWorkbenchUser(RandomStringUtils.randomAlphabetic(10), Sets.newHashSet(customCrop3));
 
-		final List<CropType> cropsForWorkbenchUser1 = this.cropTypeDAO.getAvailableCropsForUser(workbenchUser1.getUserid());
-		final List<CropType> cropsForWorkbenchUser2 = this.cropTypeDAO.getAvailableCropsForUser(workbenchUser2.getUserid());
+		final List<CropType> cropsForWorkbenchUser1 = this.workbenchDaoFactory.getCropTypeDAO().getAvailableCropsForUser(workbenchUser1.getUserid());
+		final List<CropType> cropsForWorkbenchUser2 = this.workbenchDaoFactory.getCropTypeDAO().getAvailableCropsForUser(workbenchUser2.getUserid());
 
 		Assert.assertEquals(2, cropsForWorkbenchUser1.size());
 		Assert.assertEquals(crop1, cropsForWorkbenchUser1.get(0).getCropName());
@@ -96,14 +99,14 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 		person.setPhone("23");
 		person.setPositionName("positionMName");
 		person.setTitle("Mrs");
-		this.userService.addPerson(person);
-		return this.userService.addUser(workbenchUser);
+		this.workbenchDaoFactory.getPersonDAO().save(person);
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().save(workbenchUser);
 	}
 
 	CropType createCropType(final String cropName) {
 		final CropType cropType = new CropType();
 		cropType.setCropName(cropName);
-		this.cropTypeDAO.saveOrUpdate(cropType);
+		this.workbenchDaoFactory.getCropTypeDAO().saveOrUpdate(cropType);
 		return cropType;
 	}
 
