@@ -8,19 +8,53 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class AdvancingSource extends AbstractAdvancingSource {
+public class AdvancingSource {
 
 	private BasicGermplasmDTO originGermplasm;
+	private List<BasicNameDTO> names;
+	private ObservationUnitRow plotObservation;
 
 	// TODO: besides data processors, this is only being used by BreedersCrossIDExpression. Please, try to remove it from there.
 	//This will be used if we have trail
 	private ObservationUnitRow trialInstanceObservation;
 
-	private ObservationUnitRow plotObservation;
+	// Setting conditions for Breeders Cross ID
+	private List<MeasurementVariable> conditions;
+
+	// TODO: these properties should be passed by a context or whatever
+	private Integer studyId;
+	private Integer environmentDatasetId;
+
+	private Method breedingMethod;
+	private Method sourceMethod;
+
+	// These properties values are being set by data resolvers
+	private String season;
+	private String selectionTraitValue;
+	private String locationAbbreviation;
+	private Integer harvestLocationId;
+
+	private Integer plantsSelected;
+	// TODO: remove it
+	private Boolean designationIsPreviewOnly;
+
+	private String rootName;
+	private Integer rootNameType;
+
+	private Map<String, Integer> keySequenceMap = new HashMap<>();
 
 	private List<Germplasm> advancedGermplasms = new ArrayList<>();
+
+	// These are only used by crosses generation process. Remove them once cross process will be redo it
+	private int maleGid;
+	private int femaleGid;
+	private boolean isForceUniqueNameGeneration;
+	private int currentMaxSequence;
+	private AdvanceGermplasmChangeDetail changeDetail;
 
 	public AdvancingSource(final BasicGermplasmDTO originGermplasm, final List<BasicNameDTO> names,
 		final ObservationUnitRow plotObservation,
@@ -52,47 +86,156 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		this.designationIsPreviewOnly = false;
 	}
 
+	public BasicGermplasmDTO getOriginGermplasm() {
+		return originGermplasm;
+	}
+
+	public List<BasicNameDTO> getNames() {
+		return names;
+	}
 
 	public ObservationUnitRow getPlotObservation() {
 		return plotObservation;
 	}
 
-	public BasicGermplasmDTO getOriginGermplasm() {
-		return originGermplasm;
-	}
-
-	@Override
 	public ObservationUnitRow getTrialInstanceObservation() {
 		return trialInstanceObservation;
 	}
 
-	@Override
-	public Integer getOriginGermplasmGid() {
-		return this.originGermplasm.getGid();
+	public List<MeasurementVariable> getConditions() {
+		return conditions;
 	}
 
-	@Override
-	public Integer getOriginGermplasmGpid1() {
-		return this.originGermplasm.getGpid1();
+	public Integer getStudyId() {
+		return studyId;
 	}
 
-	@Override
-	public Integer getOriginGermplasmGpid2() {
-		return this.originGermplasm.getGpid2();
+	public Integer getEnvironmentDatasetId() {
+		return environmentDatasetId;
 	}
 
-	@Override
-	public Integer getOriginGermplasmGnpgs() {
-		return this.originGermplasm.getGnpgs();
+	public Method getBreedingMethod() {
+		return breedingMethod;
 	}
 
-	@Override
-	public boolean isBulkingMethod() {
-		return this.getBreedingMethod().isBulkingMethod();
+	public Method getSourceMethod() {
+		return sourceMethod;
+	}
+
+	public String getSeason() {
+		return season;
+	}
+
+	public void setSeason(final String season) {
+		this.season = season;
+	}
+
+	public String getSelectionTraitValue() {
+		return selectionTraitValue;
+	}
+
+	public void setSelectionTraitValue(final String selectionTraitValue) {
+		this.selectionTraitValue = selectionTraitValue;
+	}
+
+	public String getLocationAbbreviation() {
+		return locationAbbreviation;
+	}
+
+	public void setLocationAbbreviation(final String locationAbbreviation) {
+		this.locationAbbreviation = locationAbbreviation;
+	}
+
+	public Integer getHarvestLocationId() {
+		return harvestLocationId;
+	}
+
+	public void setHarvestLocationId(final Integer harvestLocationId) {
+		this.harvestLocationId = harvestLocationId;
+	}
+
+	public Integer getPlantsSelected() {
+		return plantsSelected;
+	}
+
+	public Boolean getDesignationIsPreviewOnly() {
+		return designationIsPreviewOnly;
+	}
+
+	public String getRootName() {
+		return rootName;
+	}
+
+	public void setRootName(final String rootName) {
+		this.rootName = rootName;
+	}
+
+	public Integer getRootNameType() {
+		return rootNameType;
+	}
+
+	public void setRootNameType(final Integer rootNameType) {
+		this.rootNameType = rootNameType;
+	}
+
+	public Map<String, Integer> getKeySequenceMap() {
+		return keySequenceMap;
+	}
+
+	public void setKeySequenceMap(final Map<String, Integer> keySequenceMap) {
+		this.keySequenceMap = keySequenceMap;
 	}
 
 	public List<Germplasm> getAdvancedGermplasms() {
 		return advancedGermplasms;
+	}
+
+	public int getMaleGid() {
+		return maleGid;
+	}
+
+	public void setOriginGermplasm(final BasicGermplasmDTO originGermplasm) {
+		this.originGermplasm = originGermplasm;
+	}
+
+	public void setMaleGid(final int maleGid) {
+		this.maleGid = maleGid;
+	}
+
+	public int getFemaleGid() {
+		return femaleGid;
+	}
+
+	public void setFemaleGid(final int femaleGid) {
+		this.femaleGid = femaleGid;
+	}
+
+	public boolean isForceUniqueNameGeneration() {
+		return isForceUniqueNameGeneration;
+	}
+
+	public void setForceUniqueNameGeneration(final boolean forceUniqueNameGeneration) {
+		isForceUniqueNameGeneration = forceUniqueNameGeneration;
+	}
+
+	public int getCurrentMaxSequence() {
+		return currentMaxSequence;
+	}
+
+	public void setCurrentMaxSequence(final int currentMaxSequence) {
+		this.currentMaxSequence = currentMaxSequence;
+	}
+
+	public AdvanceGermplasmChangeDetail getChangeDetail() {
+		return changeDetail;
+	}
+
+	public void setChangeDetail(final AdvanceGermplasmChangeDetail changeDetail) {
+		this.changeDetail = changeDetail;
+	}
+
+	public boolean isBulkingMethod() {
+		return this.getBreedingMethod().isBulkingMethod();
 	}
 
 	public void addAdvancedGermplasm(final Germplasm advancedGermplasm) {

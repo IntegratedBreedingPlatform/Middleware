@@ -4,7 +4,7 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class SuffixRule extends OrderedRule<NamingRuleExecutionContext> {
 		// append a suffix string onto each element of the list - in place
 
 		final ProcessCodeService processCodeService = context.getProcessCodeService();
-		final AbstractAdvancingSource advancingSource = context.getAdvancingSource();
+		final AdvancingSource advancingSource = context.getAdvancingSource();
 		String suffix = advancingSource.getBreedingMethod().getSuffix();
 
 		if (suffix == null) {

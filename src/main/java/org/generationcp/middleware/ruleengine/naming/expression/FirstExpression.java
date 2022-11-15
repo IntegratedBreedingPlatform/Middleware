@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,8 +20,8 @@ public class FirstExpression extends BaseExpression {
 	}
 
 	@Override
-	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
-		final String separatorExpression = source.getBreedingMethod().getSeparator();
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
+		final String separatorExpression = advancingSource.getBreedingMethod().getSeparator();
 
 		for (final StringBuilder value : values) {
 			if (separatorExpression != null && separatorExpression.toUpperCase().contains(FirstExpression.KEY)) {
@@ -32,11 +32,11 @@ public class FirstExpression extends BaseExpression {
 				}
 				final String literalSeparator = separatorExpression.substring(start, end);
 
-				final int index = source.getRootName().indexOf(literalSeparator);
+				final int index = advancingSource.getRootName().indexOf(literalSeparator);
 				if (index > -1) {
-					final String newRootName = source.getRootName().substring(0, index);
-					start = value.indexOf(source.getRootName());
-					end = start + source.getRootName().length();
+					final String newRootName = advancingSource.getRootName().substring(0, index);
+					start = value.indexOf(advancingSource.getRootName());
+					end = start + advancingSource.getRootName().length();
 					value.replace(start, end, newRootName);
 				}
 			}

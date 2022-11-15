@@ -2,7 +2,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,12 +16,12 @@ public class BracketsExpression extends BaseExpression {
 	}
 
 	@Override
-	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
 		for (final StringBuilder container : values) {
 
-			final String newRootName = source.getRootName();
+			final String newRootName = advancingSource.getRootName();
 
-			if (source.getRootNameType() != null && this.isCrossNameType(source.getRootNameType())) {
+			if (advancingSource.getRootNameType() != null && this.isCrossNameType(advancingSource.getRootNameType())) {
 
 				// if root name already has parentheses
 				if (newRootName.charAt(0) != '(' || newRootName.charAt(newRootName.length() - 1) != ')') {

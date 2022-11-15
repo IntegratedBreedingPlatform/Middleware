@@ -1,7 +1,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.ruleengine.generator.BreedersCrossIDGenerator;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public class BreedersCrossIDExpression extends BaseExpression {
 	}
 
 	@Override
-	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
 
 		/**
 		 * Refer NamingConventionServiceImpl.addImportedGermplasmToList method
@@ -28,8 +28,8 @@ public class BreedersCrossIDExpression extends BaseExpression {
 		 */
 		for (final StringBuilder container : values) {
 			final String newValue = this.breedersCrossIDGenerator
-				.generateBreedersCrossID(source.getStudyId(), source.getEnvironmentDatasetId(), source.getConditions(),
-					source.getTrialInstanceObservation());
+				.generateBreedersCrossID(advancingSource.getStudyId(), advancingSource.getEnvironmentDatasetId(), advancingSource.getConditions(),
+					advancingSource.getTrialInstanceObservation());
 			this.replaceExpressionWithValue(container, newValue);
 		}
 	}

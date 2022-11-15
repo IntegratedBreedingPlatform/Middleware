@@ -12,7 +12,6 @@ import org.generationcp.middleware.ruleengine.naming.rules.EnforceUniqueNameRule
 import org.generationcp.middleware.ruleengine.naming.rules.NamingRuleExecutionContext;
 import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -78,7 +77,7 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 		}
 	}
 
-	protected <T extends AbstractAdvancingSource> RuleExecutionContext setupNamingRuleExecutionContext(final T row,
+	protected RuleExecutionContext setupNamingRuleExecutionContext(final AdvancingSource advancingSource,
 		final boolean checkForDuplicateName) {
 		List<String> sequenceList = Arrays.asList(this.ruleFactory.getRuleSequenceForNamespace("naming"));
 
@@ -89,7 +88,7 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 		}
 
 		final NamingRuleExecutionContext context =
-			new NamingRuleExecutionContext(sequenceList, this.processCodeService, row, this.germplasmDataManager,
+			new NamingRuleExecutionContext(sequenceList, this.processCodeService, advancingSource, this.germplasmDataManager,
 				new ArrayList<String>());
 		context.setMessageSource(this.messageSource);
 

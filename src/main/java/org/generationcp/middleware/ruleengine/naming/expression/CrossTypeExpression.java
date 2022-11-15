@@ -4,7 +4,7 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,16 +32,16 @@ public class CrossTypeExpression extends BaseExpression {
 	}
 
 	@Override
-	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
 		String crossTypeAbbreviation = "";
-		final Method breedingMethod = source.getBreedingMethod();
+		final Method breedingMethod = advancingSource.getBreedingMethod();
 
 		if (breedingMethod.getMname().equals(SINGLE_CROSS)) {
 			crossTypeAbbreviation = "S";
 		} else if (breedingMethod.getMname().equals(DOUBLE_CROSS)) {
 			crossTypeAbbreviation = "D";
 		} else if (breedingMethod.getMname().equals(BACK_CROSS)) {
-			crossTypeAbbreviation = getRecurrentParentType(source.getOriginGermplasmGid());
+			crossTypeAbbreviation = getRecurrentParentType(advancingSource.getOriginGermplasm().getGid());
 		} else if(this.isTopCrossMethod(breedingMethod)){
 			crossTypeAbbreviation = "T";
 		}

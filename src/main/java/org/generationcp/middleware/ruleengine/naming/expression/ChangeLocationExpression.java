@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -23,15 +23,15 @@ public class ChangeLocationExpression extends BaseExpression {
     private GermplasmDataManager germplasmDataManager;
 
     @Override
-    public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+    public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
         for (final StringBuilder container : values) {
 
             try {
                 // TODO: change it!! this won't perform well
-                final Germplasm originalGermplasm = germplasmDataManager.getGermplasmByGID(source.getOriginGermplasmGid());
+                final Germplasm originalGermplasm = germplasmDataManager.getGermplasmByGID(advancingSource.getOriginGermplasm().getGid());
                 String suffixValue = "";
-                if (source.getHarvestLocationId() != null && !originalGermplasm.getLocationId().equals(source.getHarvestLocationId())) {
-                    suffixValue = source.getLocationAbbreviation();
+                if (advancingSource.getHarvestLocationId() != null && !originalGermplasm.getLocationId().equals(advancingSource.getHarvestLocationId())) {
+                    suffixValue = advancingSource.getLocationAbbreviation();
                 }
 
                 this.replaceExpressionWithValue(container, suffixValue);

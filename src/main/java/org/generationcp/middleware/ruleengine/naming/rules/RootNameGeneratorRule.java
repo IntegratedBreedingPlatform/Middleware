@@ -4,7 +4,7 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.naming.expression.RootNameExpression;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class RootNameGeneratorRule extends OrderedRule<NamingRuleExecutionContex
 	public Object runRule(final NamingRuleExecutionContext context) throws RuleException {
 
 		final RootNameExpression rootNameExpression = new RootNameExpression();
-		final AbstractAdvancingSource advancingSource = context.getAdvancingSource();
+		final AdvancingSource advancingSource = context.getAdvancingSource();
 
 		final List<StringBuilder> builders = new ArrayList<>();
 		builders.add(new StringBuilder());

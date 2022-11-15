@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,11 +25,11 @@ public class DoubleHaploidSourceExpression extends BaseExpression {
 	/**
 	 * Method to append '@' + [lastUsedSequence] in designation column ex. @1, @2 etc.
 	 * @param values       Designation column value
-	 * @param source       Advancing Source object contains information about source
+	 * @param advancingSource       Advancing Source object contains information about source
 	 * @param capturedText
 	 */
 	@Override
-	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
 		for (final StringBuilder value : values) {
 			final int checkIndex = value.lastIndexOf("@0");
 			if (checkIndex != -1) {

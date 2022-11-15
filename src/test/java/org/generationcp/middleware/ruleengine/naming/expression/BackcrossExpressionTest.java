@@ -27,14 +27,14 @@ public class BackcrossExpressionTest extends org.generationcp.middleware.ruleeng
 	@Test
 	public void testResolveBackcrossParentFemale() {
 
-		int maleParentGid = 1;
-		int femaleParentGid = 2;
+		final int maleParentGid = 1;
+		final int femaleParentGid = 2;
 
 		Mockito.when(pedigreeDataManager.calculateRecurrentParent(maleParentGid, femaleParentGid))
 				.thenReturn(PedigreeDataManagerImpl.FEMALE_RECURRENT);
 
-		AdvancingSource source = this.createAdvancingSourceTestData(DESIGNATION, "-", null, "[BC]", null, true, 2);
-		List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
+		final AdvancingSource source = this.createAdvancingSourceTestData(DESIGNATION, "-", null, "[BC]", null, true, 2);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 		source.setFemaleGid(femaleParentGid);
 		source.setMaleGid(maleParentGid);
 
@@ -47,14 +47,14 @@ public class BackcrossExpressionTest extends org.generationcp.middleware.ruleeng
 	@Test
 	public void testResolveBackcrossParentMale() {
 
-		int maleParentGid = 1;
-		int femaleParentGid = 2;
+		final int maleParentGid = 1;
+		final int femaleParentGid = 2;
 
 		Mockito.when(pedigreeDataManager.calculateRecurrentParent(maleParentGid, femaleParentGid))
 				.thenReturn(PedigreeDataManagerImpl.MALE_RECURRENT);
 
-		AdvancingSource source = this.createAdvancingSourceTestData(DESIGNATION, "-", null, "[BC]", null, true, 2);
-		List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
+		final AdvancingSource source = this.createAdvancingSourceTestData(DESIGNATION, "-", null, "[BC]", null, true, 2);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 		source.setFemaleGid(femaleParentGid);
 		source.setMaleGid(maleParentGid);
 
@@ -67,14 +67,14 @@ public class BackcrossExpressionTest extends org.generationcp.middleware.ruleeng
 	@Test
 	public void testResolveBackcrossParentMaleWithLiteralStringBeforeAndAfterTheProcessCode() {
 
-		int maleParentGid = 1;
-		int femaleParentGid = 2;
+		final int maleParentGid = 1;
+		final int femaleParentGid = 2;
 
 		Mockito.when(pedigreeDataManager.calculateRecurrentParent(maleParentGid, femaleParentGid))
 				.thenReturn(PedigreeDataManagerImpl.MALE_RECURRENT);
 
-		AdvancingSource source = this.createAdvancingSourceTestData(DESIGNATION, "-", null, "AA[BC]CC", null, true, 2);
-		List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
+		final AdvancingSource source = this.createAdvancingSourceTestData(DESIGNATION, "-", null, "AA[BC]CC", null, true, 2);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 		source.setFemaleGid(femaleParentGid);
 		source.setMaleGid(maleParentGid);
 
@@ -87,13 +87,13 @@ public class BackcrossExpressionTest extends org.generationcp.middleware.ruleeng
 	@Test
 	public void testResolveBackcrossParentWithNoRecurringParent() {
 
-		int maleParentGid = 1;
-		int femaleParentGid = 2;
+		final int maleParentGid = 1;
+		final int femaleParentGid = 2;
 
 		Mockito.when(pedigreeDataManager.calculateRecurrentParent(maleParentGid, femaleParentGid)).thenReturn(PedigreeDataManagerImpl.NONE);
 
-		AdvancingSource source = this.createAdvancingSourceTestData(DESIGNATION, "-", null, "[BC]", null, true, 2);
-		List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
+		final AdvancingSource source = this.createAdvancingSourceTestData(DESIGNATION, "-", null, "[BC]", null, true, 2);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 		source.setFemaleGid(femaleParentGid);
 		source.setMaleGid(maleParentGid);
 

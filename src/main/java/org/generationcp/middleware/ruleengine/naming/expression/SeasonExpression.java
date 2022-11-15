@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -18,11 +18,11 @@ public class SeasonExpression extends BaseExpression {
 	}
 
 	@Override
-	public <T extends AbstractAdvancingSource> void apply(List<StringBuilder> values, T source, final String capturedText) {
+	public void apply(List<StringBuilder> values, AdvancingSource advancingSource, final String capturedText) {
 		for (final StringBuilder container : values) {
 
 
-			String newValue = source.getSeason();
+			String newValue = advancingSource.getSeason();
 			// If a season value is not specified for a Nursery, then default to the current year-month
 			if (newValue == null || newValue.equals("")) {
 				final SimpleDateFormat formatter = new SimpleDateFormat("YYYYMM");

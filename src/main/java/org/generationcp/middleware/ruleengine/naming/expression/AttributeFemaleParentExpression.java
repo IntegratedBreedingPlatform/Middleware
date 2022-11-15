@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,17 +21,17 @@ public class AttributeFemaleParentExpression extends AttributeExpression {
 	private GermplasmDataManager germplasmDataManager;
 
 	@Override
-	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
 
-		final Method breedingMethod = source.getBreedingMethod();
+		final Method breedingMethod = advancingSource.getBreedingMethod();
 		Integer gpid1 = null;
 		if (breedingMethod.isGenerative()) {
 			// If the method is Generative, GPID1 refers to the GID of the female parent
-			gpid1 = source.getFemaleGid();
+			gpid1 = advancingSource.getFemaleGid();
 		} else if (breedingMethod.isDerivativeOrMaintenance()) {
 
 			// if the method is Derivative or Maintenance, GPID1 refers to the female parent of the group source
-			final Integer groupSourceGID = getGroupSourceGID(source);
+			final Integer groupSourceGID = getGroupSourceGID(advancingSource);
 			gpid1 = getSourceParentGID(groupSourceGID);
 
 		}

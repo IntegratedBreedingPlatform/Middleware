@@ -2,7 +2,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.ruleengine.util.ExpressionHelper;
 import org.generationcp.middleware.ruleengine.util.ExpressionHelperCallback;
 import org.springframework.stereotype.Component;
@@ -18,12 +18,12 @@ public class BulkCountExpression extends BaseExpression {
 	}
 
 	@Override
-	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
 		for (final StringBuilder container : values) {
             final String computedValue;
-			if (source.getRootName() != null) {
+			if (advancingSource.getRootName() != null) {
 				final BulkExpressionHelperCallback callback = new BulkExpressionHelperCallback();
-				ExpressionHelper.evaluateExpression(source.getRootName(), "-([0-9]*)B", callback);
+				ExpressionHelper.evaluateExpression(advancingSource.getRootName(), "-([0-9]*)B", callback);
 
 				final StringBuilder lastBulkCount = callback.getLastBulkCount();
 

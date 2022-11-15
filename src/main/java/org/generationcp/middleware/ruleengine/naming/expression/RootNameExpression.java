@@ -9,7 +9,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,11 +18,11 @@ import java.util.List;
 public class RootNameExpression implements Expression {
 
 	@Override
-	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
 		for (final StringBuilder value : values) {
-			final Integer snametype = source.getBreedingMethod().getSnametype();
+			final Integer snametype = advancingSource.getBreedingMethod().getSnametype();
 			BasicNameDTO name = null;
-			final List<BasicNameDTO> names = source.getNames();
+			final List<BasicNameDTO> names = advancingSource.getNames();
 
 			// this checks the matching sname type of the method to the names
 			if (snametype != null) {
@@ -50,8 +50,8 @@ public class RootNameExpression implements Expression {
 				typeId = name.getTypeId();
 			}
 
-			source.setRootNameType(typeId);
-			source.setRootName(nameString);
+			advancingSource.setRootNameType(typeId);
+			advancingSource.setRootName(nameString);
 
 			if (!this.checkNameIfEnclosed(nameString)) {
 				value.append("(").append(nameString).append(")");

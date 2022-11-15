@@ -2,7 +2,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,11 +20,11 @@ public class BackcrossExpression extends BaseExpression {
 	private PedigreeDataManager pedigreeDataManager;
 
 	@Override
-	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
 
 		String output = "";
 
-		final int computation = pedigreeDataManager.calculateRecurrentParent(source.getMaleGid(), source.getFemaleGid());
+		final int computation = pedigreeDataManager.calculateRecurrentParent(advancingSource.getMaleGid(), advancingSource.getFemaleGid());
 
 		if (PedigreeDataManagerImpl.FEMALE_RECURRENT == computation) {
 			output += FEMALE_RECURRENT_SUFFIX;

@@ -2,7 +2,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class GroupCountExpression extends BaseExpression {
 	public static final int CAPTURED_FINAL_EXPRESSION_GROUP = 1;
 
 	@Override
-	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
 		for (final StringBuilder value : values) {
 			String currentValue = value.toString();
 
@@ -31,13 +31,13 @@ public class GroupCountExpression extends BaseExpression {
 			final String targetCountExpression = this.getTargetCountExpression(countPrefix);
 
 			// we remove meta characters added by our process code system so that they don't interfere with processing
-			final String noMetaString = removeMetaCharacters(currentValue, countPrefix, source);
+			final String noMetaString = removeMetaCharacters(currentValue, countPrefix, advancingSource);
 
 			final CountResultBean result = this.countExpressionOccurence(targetCountExpression, noMetaString);
 			int generatedCountValue = result.getCount();
 
 			// if the method is a bulking method, we're expected to increment the count
-			if (Boolean.TRUE.equals(source.getBreedingMethod().isBulkingMethod())) {
+			if (Boolean.TRUE.equals(advancingSource.getBreedingMethod().isBulkingMethod())) {
 				generatedCountValue = result.getCount() + 1;
 			}
 
@@ -56,8 +56,8 @@ public class GroupCountExpression extends BaseExpression {
 				// do while loop is used because there should be a -B or -# appended if the count is 0
 				int i = 0;
 				do {
-                    if (!StringUtils.isEmpty(source.getBreedingMethod().getSeparator())) {
-                        value.append(source.getBreedingMethod().getSeparator());
+                    if (!StringUtils.isEmpty(advancingSource.getBreedingMethod().getSeparator())) {
+                        value.append(advancingSource.getBreedingMethod().getSeparator());
                     }
 
 					value.append(targetCountExpression);
@@ -69,15 +69,15 @@ public class GroupCountExpression extends BaseExpression {
 		}
 	}
 
-	protected <T extends AbstractAdvancingSource> String removeMetaCharacters(final String value, final String countPrefix, final T source) {
+	protected String removeMetaCharacters(final String value, final String countPrefix, final AdvancingSource advancingSource) {
 		// we strip the B*[COUNT] or #*COUNT from the name being processed
 		String valueWithoutProcessCode = value.replace(countPrefix + this.getExpressionKey(), "");
 
 		// if in case a separator is defined for the breeding method, it will have been added to the end of the name. we'll need to remove
 		// it so that it doesn't hide the character we're looking to count (which is expected to be at the end of the line)
-		if (!StringUtils.isEmpty(source.getBreedingMethod().getSeparator())
-				&& valueWithoutProcessCode.endsWith(source.getBreedingMethod().getSeparator())) {
-			final int lastIndex = valueWithoutProcessCode.lastIndexOf(source.getBreedingMethod().getSeparator());
+		if (!StringUtils.isEmpty(advancingSource.getBreedingMethod().getSeparator())
+				&& valueWithoutProcessCode.endsWith(advancingSource.getBreedingMethod().getSeparator())) {
+			final int lastIndex = valueWithoutProcessCode.lastIndexOf(advancingSource.getBreedingMethod().getSeparator());
 			valueWithoutProcessCode = valueWithoutProcessCode.substring(0, lastIndex);
 		}
 

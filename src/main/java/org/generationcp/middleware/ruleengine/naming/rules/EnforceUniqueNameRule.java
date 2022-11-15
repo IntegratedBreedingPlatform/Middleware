@@ -5,8 +5,8 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.ruleengine.BranchingRule;
 import org.generationcp.middleware.ruleengine.RuleException;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.AdvanceGermplasmChangeDetail;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +27,7 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 
 		final List<String> currentData = context.getCurrentData();
 		final GermplasmDataManager germplasmDataManager = context.getGermplasmDataManager();
-		final AbstractAdvancingSource source = context.getAdvancingSource();
+		final AdvancingSource source = context.getAdvancingSource();
 
 		// as per agreement, unique name checking can be limited to only the first entry for the germplasm
 		final String nameForChecking = currentData.get(0);
@@ -50,7 +50,7 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 		return null;
 	}
 
-	protected void processNonUniqueName(final NamingRuleExecutionContext context, final AbstractAdvancingSource source) {
+	protected void processNonUniqueName(final NamingRuleExecutionContext context, final AdvancingSource advancingSource) {
 		// if a duplicate is found, initialize an AdvanceGermplasmChangeDetail object containing the original duplicate, for confirmation
 		// later on with the user
 		this.initializeChangeDetailForAdvancingSource(context);
@@ -58,26 +58,26 @@ public class EnforceUniqueNameRule extends BranchingRule<NamingRuleExecutionCont
 		// restore rule execution state to a previous temp save point
 		context.setCurrentData(context.getTempData());
 
-		if (!source.isForceUniqueNameGeneration()) {
+		if (!advancingSource.isForceUniqueNameGeneration()) {
 			// if there is no current count expression, use the default to provide incrementing support
-			if (source.getBreedingMethod().getCount() == null || source.getBreedingMethod().getCount().isEmpty()) {
-				source.getBreedingMethod().setCount(CountRule.DEFAULT_COUNT);
-				source.setForceUniqueNameGeneration(true);
-			} else if (source.isBulkingMethod()) {
-				source.setForceUniqueNameGeneration(true);
+			if (advancingSource.getBreedingMethod().getCount() == null || advancingSource.getBreedingMethod().getCount().isEmpty()) {
+				advancingSource.getBreedingMethod().setCount(CountRule.DEFAULT_COUNT);
+				advancingSource.setForceUniqueNameGeneration(true);
+			} else if (advancingSource.isBulkingMethod()) {
+				advancingSource.setForceUniqueNameGeneration(true);
 			} else {
 				// simply increment the sequence used to generate the count. no other flags set so as to preserve previously used logic
-				source.setCurrentMaxSequence(source.getCurrentMaxSequence() + 1);
+				advancingSource.setCurrentMaxSequence(advancingSource.getCurrentMaxSequence() + 1);
 			}
 		} else {
 			// if force unique name generation flag is set, then simply increment the current sequence used for generating the count
-			source.setCurrentMaxSequence(source.getCurrentMaxSequence() + 1);
+			advancingSource.setCurrentMaxSequence(advancingSource.getCurrentMaxSequence() + 1);
 		}
 	}
 
 	@Override
 	public String getNextRuleStepKey(final NamingRuleExecutionContext context) {
-		final AbstractAdvancingSource source = context.getAdvancingSource();
+		final AdvancingSource source = context.getAdvancingSource();
 
 		final AdvanceGermplasmChangeDetail changeDetailObject = source.getChangeDetail();
 

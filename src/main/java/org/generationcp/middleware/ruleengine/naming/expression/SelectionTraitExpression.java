@@ -1,6 +1,6 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,9 +14,9 @@ public class SelectionTraitExpression extends BaseExpression {
     }
 
     @Override
-    public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+    public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
         for (final StringBuilder container : values) {
-            this.replaceExpressionWithValue(container, source.getSelectionTraitValue());
+            this.replaceExpressionWithValue(container, advancingSource.getSelectionTraitValue());
         }
 
     }

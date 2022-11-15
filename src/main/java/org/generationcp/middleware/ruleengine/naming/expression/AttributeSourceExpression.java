@@ -1,7 +1,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,12 +18,12 @@ public class AttributeSourceExpression extends AttributeExpression {
 	public static final String PATTERN_KEY = "\\[" + ATTRIBUTE_KEY + "\\.([^\\.]*)\\]"; // Example: ATTRSC.1010
 
 	@Override
-	public <T extends AbstractAdvancingSource> void apply(final List<StringBuilder> values, final T source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
 		for (final StringBuilder value : values) {
 			String newValue = "";
 			final Integer variableId = Integer.valueOf(capturedText.substring(1, capturedText.length() - 1).split("\\.")[1]);
-			if (source.getBreedingMethod().isDerivativeOrMaintenance()) {
-				newValue = germplasmDataManager.getAttributeValue(source.getOriginGermplasmGid(), variableId);
+			if (advancingSource.getBreedingMethod().isDerivativeOrMaintenance()) {
+				newValue = germplasmDataManager.getAttributeValue(advancingSource.getOriginGermplasm().getGid(), variableId);
 			}
 			this.replaceAttributeExpressionWithValue(value, ATTRIBUTE_KEY, variableId, newValue);
 		}
