@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.generationcp.middleware.ruleengine.ExpressionUtils;
 import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
@@ -49,22 +48,8 @@ public class SequenceExpression extends BaseExpression implements Expression {
 						final Matcher matcher = pattern.matcher(upperCaseValue);
 						if (matcher.find()) {
 							final String keyPrefix = upperCaseValue.substring(0, matcher.start());
-
-							final int nextNumberInSequence;
-							// In preview mode, do not increment the prefix in sequence registry
-							if (BooleanUtils.isTrue(advancingSource.getDesignationIsPreviewOnly())) {
-								if (advancingSource.getKeySequenceMap().containsKey(keyPrefix)) {
-									nextNumberInSequence = advancingSource.getKeySequenceMap().get(keyPrefix) + 1;
-								} else {
-									nextNumberInSequence = this.germplasmNamingService.getNextSequence(keyPrefix);
-								}
-								advancingSource.getKeySequenceMap().put(keyPrefix, nextNumberInSequence);
-
-							// Look up last sequence number from database for KeyPrefix with synchronization at class level
-							} else {
-								nextNumberInSequence = this.germplasmNamingService.getNextNumberAndIncrementSequence(keyPrefix);
-							}
-
+							final int nextNumberInSequence =
+								this.germplasmNamingService.getNextNumberAndIncrementSequenceWithoutHibernate(keyPrefix);
 							final String numberString = this.germplasmNamingService
 								.getNumberWithLeadingZeroesAsString(nextNumberInSequence, this.getNumberOfDigits(value));
 

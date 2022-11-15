@@ -39,13 +39,9 @@ public class AdvancingSource {
 	private Integer harvestLocationId;
 
 	private Integer plantsSelected;
-	// TODO: remove it
-	private Boolean designationIsPreviewOnly;
 
 	private String rootName;
 	private Integer rootNameType;
-
-	private Map<String, Integer> keySequenceMap = new HashMap<>();
 
 	private List<Germplasm> advancedGermplasms = new ArrayList<>();
 
@@ -83,7 +79,6 @@ public class AdvancingSource {
 		// We are setting this properties due to keep backward compatibility with the AdvancingSource of the old advance process
 		this.locationAbbreviation = "";
 		this.currentMaxSequence = 0;
-		this.designationIsPreviewOnly = false;
 	}
 
 	public BasicGermplasmDTO getOriginGermplasm() {
@@ -158,10 +153,6 @@ public class AdvancingSource {
 		return plantsSelected;
 	}
 
-	public Boolean getDesignationIsPreviewOnly() {
-		return designationIsPreviewOnly;
-	}
-
 	public String getRootName() {
 		return rootName;
 	}
@@ -176,14 +167,6 @@ public class AdvancingSource {
 
 	public void setRootNameType(final Integer rootNameType) {
 		this.rootNameType = rootNameType;
-	}
-
-	public Map<String, Integer> getKeySequenceMap() {
-		return keySequenceMap;
-	}
-
-	public void setKeySequenceMap(final Map<String, Integer> keySequenceMap) {
-		this.keySequenceMap = keySequenceMap;
 	}
 
 	public List<Germplasm> getAdvancedGermplasms() {

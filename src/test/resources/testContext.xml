@@ -433,10 +433,6 @@
 		<constructor-arg ref="workbenchSessionProvider"/>
 	</bean>
 
-	<bean id="advanceService" class="org.generationcp.middleware.service.impl.study.advance.AdvanceServiceImpl">
-		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
-	</bean>
-
 	<bean id="seedSourceGenerator" class="org.generationcp.middleware.ruleengine.generator.SeedSourceGenerator">
 	</bean>
 

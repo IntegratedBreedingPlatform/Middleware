@@ -1,5 +1,6 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
+import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -39,12 +40,13 @@ public class ChangeLocationExpressionTest {
 	public void testChangeLocationExpressionNoChange() throws MiddlewareException {
 		final Germplasm germplasm = mock(Germplasm.class);
 		when(germplasmDataManager.getGermplasmByGID(anyInt())).thenReturn(germplasm);
-
 		when(germplasm.getLocationId()).thenReturn(ORIGINAL_LOCATION_ID);
-		final List<StringBuilder> input = constructExpressionInput();
 
 		final AdvancingSource source = mock(AdvancingSource.class);
 		Mockito.when(source.getHarvestLocationId()).thenReturn(ORIGINAL_LOCATION_ID);
+		Mockito.when(source.getOriginGermplasm()).thenReturn(Mockito.mock(BasicGermplasmDTO.class));
+
+		final List<StringBuilder> input = constructExpressionInput();
 
 		dut.apply(input, source, null);
 		assertEquals("", input.get(0).toString());
@@ -54,14 +56,14 @@ public class ChangeLocationExpressionTest {
 	public void testChangeLocationExpressionChanged() throws MiddlewareException {
 		final Germplasm germplasm = mock(Germplasm.class);
 		when(germplasmDataManager.getGermplasmByGID(anyInt())).thenReturn(germplasm);
-
 		when(germplasm.getLocationId()).thenReturn(ORIGINAL_LOCATION_ID);
-		final List<StringBuilder> input = constructExpressionInput();
 
 		final AdvancingSource source = mock(AdvancingSource.class);
 		Mockito.when(source.getHarvestLocationId()).thenReturn(ORIGINAL_LOCATION_ID + 1);
-
 		Mockito.when(source.getLocationAbbreviation()).thenReturn(NEW_LOCATION_ABBR);
+		Mockito.when(source.getOriginGermplasm()).thenReturn(Mockito.mock(BasicGermplasmDTO.class));
+
+		final List<StringBuilder> input = constructExpressionInput();
 
 		dut.apply(input, source, null);
 		assertEquals(NEW_LOCATION_ABBR, input.get(0).toString());

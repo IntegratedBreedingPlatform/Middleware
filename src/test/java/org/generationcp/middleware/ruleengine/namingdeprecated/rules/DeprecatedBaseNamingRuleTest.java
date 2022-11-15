@@ -14,7 +14,7 @@ import java.util.List;
  * Created by IntelliJ IDEA. User: Daniel Villafuerte Date: 2/13/2015 Time: 6:02 PM
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:BaseNamingRuleTest-context.xml", "classpath:testContext.xml"})
+@ContextConfiguration(locations = {"classpath:testContext.xml", "classpath:DeprecatedBaseNamingRuleTest-context.xml"})
 public abstract class DeprecatedBaseNamingRuleTest {
 
 	@Resource

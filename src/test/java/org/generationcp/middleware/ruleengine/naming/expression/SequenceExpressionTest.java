@@ -36,7 +36,7 @@ public class SequenceExpressionTest extends TestExpression {
 		this.expression.setGermplasmNamingService(this.germplasmNamingService);
 
 		Mockito.doReturn(NEXT_NUMBER_FROM_DB, NEXT_NUMBER_FROM_DB + 1, NEXT_NUMBER_FROM_DB + 2, NEXT_NUMBER_FROM_DB + 3,
-			NEXT_NUMBER_FROM_DB + 4).when(this.germplasmNamingService).getNextNumberAndIncrementSequence(
+			NEXT_NUMBER_FROM_DB + 4).when(this.germplasmNamingService).getNextNumberAndIncrementSequenceWithoutHibernate(
 			ArgumentMatchers.anyString());
 		Mockito
 			.doReturn(String.valueOf(NEXT_NUMBER_FROM_DB), String.valueOf(NEXT_NUMBER_FROM_DB + 1), String.valueOf(NEXT_NUMBER_FROM_DB + 2),
@@ -104,7 +104,7 @@ public class SequenceExpressionTest extends TestExpression {
 		this.expression.apply(values, source, null);
 		assertEquals(PLANTS_SELECTED.intValue(), values.size());
 		Mockito.verify(this.germplasmNamingService, Mockito.times(PLANTS_SELECTED))
-			.getNextNumberAndIncrementSequence(ROOT_NAME + SEPARATOR + PREFIX);
+			.getNextNumberAndIncrementSequenceWithoutHibernate(ROOT_NAME + SEPARATOR + PREFIX);
 		// If non-bulking, name is generated for each plant selected
 		assertEquals(ROOT_NAME + SEPARATOR + PREFIX + (NEXT_NUMBER_FROM_DB) + SUFFIX, values.get(0).toString());
 		assertEquals(ROOT_NAME + SEPARATOR + PREFIX + (NEXT_NUMBER_FROM_DB + 1) + SUFFIX, values.get(1).toString());
