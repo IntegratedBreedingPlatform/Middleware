@@ -78,16 +78,6 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddPerson() {
-		final Person person = this.workbenchTestDataUtil.createTestPersonData();
-		final Person result = this.userService.addPerson(person);
-		assertNotNull("Expected id of a newly saved record in persons.", result);
-
-		final Person readPerson = this.userService.getPersonById(result.getId());
-		assertEquals(person.getLastName(), readPerson.getLastName());
-	}
-
-	@Test
 	public void testAddUsersWithRoles() {
 		// Admin
 		final Person adminPerson = new Person();
@@ -213,8 +203,8 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		user.setStatus(0);
 		user.setPerson(person);
 		this.workbenchDaoFactory.getWorkbenchUserDAO().save(user);
-		final WorkbenchUser retrievedUser = this.userService.getUserByFullname(user.getPerson().getDisplayName());
-		Assert.assertEquals(user.getUserid(), retrievedUser.getUserid());
+		final UserDto retrievedUser = this.userService.getUserByFullname(user.getPerson().getDisplayName());
+		Assert.assertEquals(user.getUserid(), retrievedUser.getId());
 
 		user.setStatus(1);
 		this.workbenchDaoFactory.getWorkbenchUserDAO().save(user);
@@ -282,9 +272,9 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		roleType.setId(1);
 		role.setRoleType(roleType);
 		userRole.setRole(role);
-		userRoleDao.saveOrUpdate(userRole);
+		this.workbenchDaoFactory.getUserRoleDao().saveOrUpdate(userRole);
 
-		this.sessionProvder.getSession().flush();
+		this.workbenchSessionProvider.getSession().flush();
 
 		final List<WorkbenchUser> newResults = this.userService.getUsersByProjectId(this.commonTestProject.getProjectId());
 		assertNotNull(newResults);
@@ -296,23 +286,6 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		final List<UserDto> userDtos = this.userService.getAllUsersSortedByLastName();
 		assertThat("Expected list users not null.", userDtos != null);
 		assertThat("Expected list users not empty.", !userDtos.isEmpty());
-	}
-
-	@Test
-	public void testGetSuperAdminUsers() {
-		final List<WorkbenchUser> superAdminUsers = this.userService.getSuperAdminUsers();
-		int superAdminCountBefore = 0;
-		if (superAdminUsers != null) {
-			superAdminCountBefore = superAdminUsers.size();
-		}
-		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
-		user.setRoles(Arrays.asList(new UserRole(user, new Role(5, "SUPERADMIN"))));
-
-		final WorkbenchUser workbenchUser = this.workbenchDaoFactory.getWorkbenchUserDAO().save(user);
-		final List<WorkbenchUser> latestSuperAdminUsers = this.userService.getSuperAdminUsers();
-		assertNotNull(latestSuperAdminUsers);
-		assertEquals(latestSuperAdminUsers.size(), superAdminCountBefore + 1);
-		assertTrue(latestSuperAdminUsers.contains(workbenchUser));
 	}
 
 	@Test
@@ -339,7 +312,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	public void testGetPersonsByCrop() {
 		final WorkbenchUser workbenchUser = this.integrationTestDataInitializer.createUserForTesting();
 		final CropPerson cropPerson = new CropPerson(this.commonTestProject.getCropType(), workbenchUser.getPerson());
-		this.userService.saveCropPerson(cropPerson);
+		this.workbenchDaoFactory.getCropPersonDAO().save(cropPerson);
 		final List<Person> persons = this.userService.getPersonsByCrop(this.commonTestProject.getCropType());
 
 		assertTrue(!persons.isEmpty());
@@ -365,17 +338,6 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		assertEquals(
 			workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
 			result.get(workbenchUser.getUserid()));
-	}
-
-	@Test
-	public void testSaveCropPerson() {
-		final WorkbenchUser workbenchUser = this.integrationTestDataInitializer.createUserForTesting();
-		final CropPerson cropPerson = new CropPerson(this.commonTestProject.getCropType(), workbenchUser.getPerson());
-		this.userService.saveCropPerson(cropPerson);
-
-		final CropPerson savedCropPerson = this.workbenchDaoFactory.getCropPersonDAO()
-			.getByCropNameAndPersonId(this.commonTestProject.getCropType().getCropName(), cropPerson.getPerson().getId());
-		assertNotNull(savedCropPerson);
 	}
 
 }

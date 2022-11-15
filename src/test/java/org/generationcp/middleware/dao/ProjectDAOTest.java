@@ -14,7 +14,6 @@ import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
-import org.generationcp.middleware.service.api.user.UserService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,9 +34,6 @@ public class ProjectDAOTest extends IntegrationTestBase {
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
-
-	@Autowired
-	private UserService userService;
 
 	@Autowired
 	private ProgramService programService;
@@ -136,7 +132,6 @@ public class ProjectDAOTest extends IntegrationTestBase {
 
 			this.assignRole(this.cropAdmin, Collections.singletonList(this.cropAdminRole));
 		}
-
 	}
 
 	@Test
@@ -194,6 +189,6 @@ public class ProjectDAOTest extends IntegrationTestBase {
 			}
 			this.workbenchDaoFactory.getUserRoleDao().saveOrUpdate(userRole);
 		}
-
+		this.workbenchSessionProvider.getSession().flush();
 	}
 }

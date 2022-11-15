@@ -5,10 +5,8 @@ import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.workbench.CropPerson;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +37,7 @@ public interface UserService {
 	 */
 	List<WorkbenchUser> getUserByName(String name, int start, int numOfRows, Operation op);
 
-	WorkbenchUser getUserByFullname(String fullname);
+	UserDto getUserByFullname(String fullname);
 
 	Long countUsersByFullname(String fullname);
 
@@ -61,14 +59,6 @@ public interface UserService {
 	 * @return
 	 */
 	List<UserDto> getAllUsersSortedByLastName();
-
-	/**
-	 * Adds a user.
-	 *
-	 * @param user - the user to add
-	 * @return Returns the the {@code WorkbenchUser} record added
-	 */
-	WorkbenchUser addUser(WorkbenchUser user);
 
 	/**
 	 * create the user.
@@ -121,14 +111,6 @@ public interface UserService {
 	String getPersonNameForPersonId(int personId);
 
 	List<Person> getPersonsByCrop(CropType cropType);
-
-	/**
-	 * Adds the person.
-	 *
-	 * @param person - the Person to add
-	 * @return Returns the {@code Person} record added
-	 */
-	Person addPerson(Person person);
 
 	/**
 	 * Changes the password of the user.
@@ -184,30 +166,6 @@ public interface UserService {
 	 * @param userId the user id
 	 */
 	void incrementUserLogInCount(int userId);
-
-	/**
-	 * Insert or update the specified {@link UserInfo} record.
-	 *
-	 * @param userDetails the user details
-	 */
-	void insertOrUpdateUserInfo(UserInfo userDetails);
-
-	/**
-	 * Return users with SUPERADMIN role
-	 *
-	 * @return
-	 */
-	List<WorkbenchUser> getSuperAdminUsers();
-
-	/**
-	 * Saves or updates the ProjectUserInfo.
-	 *
-	 * @param projectUserInfo the project user info
-	 * @return ProjectUserInfo
-	 */
-	void saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo);
-
-	void saveCropPerson(CropPerson cropPerson);
 
 	Map<Integer, String> getPersonNamesByPersonIds(List<Integer> personIds);
 

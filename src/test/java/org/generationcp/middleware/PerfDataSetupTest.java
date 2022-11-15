@@ -97,7 +97,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		person.setContact("No Contact");
 		person.setLanguage(1);
 		person.setPhone("02121212121");
-		this.userService.addPerson(person);
+		this.workbenchDaoFactory.getPersonDAO().save(person);
 
 		final WorkbenchUser workbenchUser = new WorkbenchUser();
 		workbenchUser.setInstalid(1);
@@ -135,7 +135,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		// this.workbenchDataManager.addProjectUserRole(projectUserRoles);
 
 		final ProjectUserInfo pUserInfo = new ProjectUserInfo(program, workbenchUser);
-		this.userService.saveOrUpdateProjectUserInfo(pUserInfo);
+		this.workbenchDaoFactory.getProjectUserInfoDAO().saveOrUpdate(pUserInfo);
 
 		LOG.info("Workbench program and users created.");
 		return program.getUniqueID();

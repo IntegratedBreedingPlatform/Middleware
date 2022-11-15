@@ -120,7 +120,7 @@ public class DataSetupTest extends IntegrationTestBase {
         if (this.germplasmTestDataGenerator == null) {
             this.daoFactory = new DaoFactory(this.sessionProvder);
             this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
-            this.workbenchDaoFactory = new WorkbenchDaoFactory(this.sessionProvder);
+            this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
         }
     }
 
@@ -186,7 +186,7 @@ public class DataSetupTest extends IntegrationTestBase {
 
         final ProjectUserInfo pUserInfo = new ProjectUserInfo(program,
                 workbenchUser);
-        this.userService.saveOrUpdateProjectUserInfo(pUserInfo);
+        this.workbenchDaoFactory.getProjectUserInfoDAO().saveOrUpdate(pUserInfo);
 
         return program.getUniqueID();
     }

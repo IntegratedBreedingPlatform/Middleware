@@ -13,10 +13,8 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.workbench.CropPerson;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
@@ -74,8 +72,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public WorkbenchUser getUserByFullname(final String fullname) {
-		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUserByFullName(fullname);
+	public UserDto getUserByFullname(final String fullname) {
+		final WorkbenchUser user = this.workbenchDaoFactory.getWorkbenchUserDAO().getUserByFullName(fullname);
+		if (user != null) {
+			return new UserDto(user);
+		}
+		return null;
 	}
 
 	@Override
@@ -107,16 +109,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public WorkbenchUser addUser(final WorkbenchUser user) {
-		try {
-			return this.workbenchDaoFactory.getWorkbenchUserDAO().saveOrUpdate(user);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Error encountered while saving User: userService.addUser(user=" + user + "): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public Integer createUser(final UserDto userDto) {
 
 		// user.access = 0 - Default User
@@ -126,7 +118,7 @@ public class UserServiceImpl implements UserService {
 
 		try {
 			final Integer currentDate = Util.getCurrentDateAsIntegerValue();
-			final Person person = this.createPersonFromDto(userDto, new Person());
+			final Person person = new Person(userDto);
 
 			final WorkbenchUser user = new WorkbenchUser();
 			user.setPerson(person);
@@ -180,7 +172,9 @@ public class UserServiceImpl implements UserService {
 
 		try {
 			user = this.getUserById(userDto.getId());
-			this.createPersonFromDto(userDto, user.getPerson());
+			user.getPerson().setFirstName(userDto.getFirstName());
+			user.getPerson().setLastName(userDto.getLastName());
+			user.getPerson().setEmail(userDto.getEmail());
 
 			user.setName(userDto.getUsername());
 			user.setAssignDate(currentDate);
@@ -275,16 +269,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Person addPerson(final Person person) {
-		try {
-			return this.workbenchDaoFactory.getPersonDAO().saveOrUpdate(person);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Error encountered while saving Person: userService.addPerson(person=" + person + "): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public boolean changeUserPassword(final String username, final String password) {
 		return this.workbenchDaoFactory.getWorkbenchUserDAO().changePassword(username, password);
 	}
@@ -355,46 +339,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void insertOrUpdateUserInfo(final UserInfo userDetails) {
-		this.workbenchDaoFactory.getUserInfoDAO().insertOrUpdateUserInfo(userDetails);
-	}
-
-	private Person createPersonFromDto(final UserDto userDto, final Person person) {
-
-		person.setFirstName(userDto.getFirstName());
-		person.setMiddleName("");
-		person.setLastName(userDto.getLastName());
-		person.setEmail(userDto.getEmail());
-		person.setTitle("-");
-		person.setContact("-");
-		person.setExtension("-");
-		person.setFax("-");
-		person.setInstituteId(0);
-		person.setLanguage(0);
-		person.setNotes("-");
-		person.setPositionName("-");
-		person.setPhone("-");
-		return this.addPerson(person);
-	}
-
-	@Override
-	public void saveOrUpdateProjectUserInfo(final ProjectUserInfo projectUserInfo) {
-		this.workbenchDaoFactory.getProjectUserInfoDAO().merge(projectUserInfo);
-	}
-
-	@Override
-	public void saveCropPerson(final CropPerson cropPerson) {
-		this.workbenchDaoFactory.getCropPersonDAO().saveOrUpdate(cropPerson);
-	}
-
-	@Override
 	public Map<Integer, String> getPersonNamesByPersonIds(final List<Integer> personIds) {
 		return this.workbenchDaoFactory.getPersonDAO().getPersonNamesByPersonIds(personIds);
-	}
-
-	@Override
-	public List<WorkbenchUser> getSuperAdminUsers() {
-		return this.workbenchDaoFactory.getWorkbenchUserDAO().getSuperAdminUsers();
 	}
 
 	@Override

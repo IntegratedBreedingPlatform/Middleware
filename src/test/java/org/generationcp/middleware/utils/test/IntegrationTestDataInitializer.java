@@ -439,7 +439,7 @@ public class IntegrationTestDataInitializer {
 		person.setLanguage(1);
 		person.setPhone("Phone");
 
-		this.userService.addPerson(person);
+		this.workbenchDaoFactory.getPersonDAO().save(person);
 
 		final Role role = new Role(1, "Admin");
 		final RoleType roleType = new RoleType("INSTANCE");
