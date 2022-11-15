@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
-import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
+import org.generationcp.middleware.ruleengine.naming.deprecated.service.DeprecatedProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -18,7 +18,7 @@ import java.util.List;
 public abstract class BaseNamingRuleTest {
 
 	@Resource
-	protected ProcessCodeService processCodeService;
+	protected DeprecatedProcessCodeService processCodeService;
 
 	protected DeprecatedAdvancingSource row;
 

@@ -4,7 +4,7 @@ package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 import junit.framework.Assert;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.ruleengine.RuleException;
-import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeServiceImpl;
+import org.generationcp.middleware.ruleengine.naming.deprecated.impl.DeprecatedProcessCodeServiceImpl;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class DeprecatedSuffixRuleTest extends BaseNamingRuleTest {
 
 	@Before
 	public void setUp() {
-		this.processCodeService = new ProcessCodeServiceImpl();
+		this.processCodeService = new DeprecatedProcessCodeServiceImpl();
 		this.breedingMethodSnameType = 5;
 		this.breedingMethod = new Method();
 		this.breedingMethod.setSnametype(this.breedingMethodSnameType);

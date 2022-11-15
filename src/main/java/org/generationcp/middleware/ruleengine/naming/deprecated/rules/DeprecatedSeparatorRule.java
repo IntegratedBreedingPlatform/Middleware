@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
-import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
+import org.generationcp.middleware.ruleengine.naming.deprecated.service.DeprecatedProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ public class DeprecatedSeparatorRule extends OrderedRule<DeprecatedNamingRuleExe
 		List<String> input = context.getCurrentData();
 		DeprecatedAdvancingSource source = context.getAdvancingSource();
 
-		ProcessCodeService processCodeService = context.getProcessCodeService();
+		DeprecatedProcessCodeService processCodeService = context.getProcessCodeService();
 		String separatorExpression = source.getBreedingMethod().getSeparator();
 
 		if (separatorExpression == null) {

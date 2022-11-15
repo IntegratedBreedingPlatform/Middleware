@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.ruleengine.OrderedRuleExecutionContext;
-import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
+import org.generationcp.middleware.ruleengine.naming.deprecated.service.DeprecatedProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.context.MessageSource;
 
@@ -15,7 +15,7 @@ import java.util.List;
 @Deprecated
 public class DeprecatedNamingRuleExecutionContext extends OrderedRuleExecutionContext {
 
-	private ProcessCodeService processCodeService;
+	private DeprecatedProcessCodeService processCodeService;
 	private DeprecatedAdvancingSource advancingSource;
 	private GermplasmDataManager germplasmDataManager;
 	private List<String> currentData;
@@ -23,7 +23,7 @@ public class DeprecatedNamingRuleExecutionContext extends OrderedRuleExecutionCo
 
 	private List<String> tempData;
 
-	public DeprecatedNamingRuleExecutionContext(List<String> executionOrder, ProcessCodeService processCodeService, DeprecatedAdvancingSource advancingSource,
+	public DeprecatedNamingRuleExecutionContext(List<String> executionOrder, DeprecatedProcessCodeService processCodeService, DeprecatedAdvancingSource advancingSource,
 			GermplasmDataManager germplasmDataManager, List<String> currentData) {
 		super(executionOrder);
 		this.processCodeService = processCodeService;
@@ -38,11 +38,11 @@ public class DeprecatedNamingRuleExecutionContext extends OrderedRuleExecutionCo
 		return this.currentData;
 	}
 
-	public ProcessCodeService getProcessCodeService() {
+	public DeprecatedProcessCodeService getProcessCodeService() {
 		return this.processCodeService;
 	}
 
-	public void setProcessCodeService(ProcessCodeService processCodeService) {
+	public void setProcessCodeService(DeprecatedProcessCodeService processCodeService) {
 		this.processCodeService = processCodeService;
 	}
 

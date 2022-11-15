@@ -1,8 +1,8 @@
 
-package org.generationcp.middleware.ruleengine.naming.impl;
+package org.generationcp.middleware.ruleengine.naming.deprecated.impl;
 
 import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedExpression;
-import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
+import org.generationcp.middleware.ruleengine.naming.deprecated.service.DeprecatedProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.util.ExpressionHelper;
 import org.springframework.stereotype.Service;
@@ -12,12 +12,13 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 @Service
 @Transactional
-public class ProcessCodeServiceImpl implements ProcessCodeService {
+public class DeprecatedProcessCodeServiceImpl implements DeprecatedProcessCodeService {
 
 	@Resource
-	private ProcessCodeFactory factory;
+	private DeprecatedProcessCodeFactory factory;
 
 	@Override
 	public List<String> applyProcessCode(final String currentInput, final String processCode, final DeprecatedAdvancingSource source) {
@@ -32,7 +33,7 @@ public class ProcessCodeServiceImpl implements ProcessCodeService {
 
 		ExpressionHelper.evaluateExpression(processCode, ExpressionHelper.PROCESS_CODE_PATTERN,
 			(capturedText, originalInput, start, end) -> {
-				final DeprecatedExpression expression = ProcessCodeServiceImpl.this.factory.lookup(capturedText);
+				final DeprecatedExpression expression = DeprecatedProcessCodeServiceImpl.this.factory.lookup(capturedText);
 
 				// It's possible for the expression to add more elements to the builders variable.
 				if (expression != null) {

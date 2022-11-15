@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
-import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
+import org.generationcp.middleware.ruleengine.naming.deprecated.service.DeprecatedProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public class DeprecatedSuffixRule extends OrderedRule<DeprecatedNamingRuleExecut
 	public Object runRule(DeprecatedNamingRuleExecutionContext context) throws RuleException {
 		// append a suffix string onto each element of the list - in place
 
-		ProcessCodeService processCodeService = context.getProcessCodeService();
+		DeprecatedProcessCodeService processCodeService = context.getProcessCodeService();
 		DeprecatedAdvancingSource advancingSource = context.getAdvancingSource();
 		String suffix = advancingSource.getBreedingMethod().getSuffix();
 

@@ -3,7 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.deprecated.rules;
 
 import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
-import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
+import org.generationcp.middleware.ruleengine.naming.deprecated.service.DeprecatedProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ public class DeprecatedCountRule extends OrderedRule<DeprecatedNamingRuleExecuti
 	public Object runRule(DeprecatedNamingRuleExecutionContext context) throws RuleException {
 		// create counts first - we need a list in case we have a sequence
 
-		ProcessCodeService service = context.getProcessCodeService();
+		DeprecatedProcessCodeService service = context.getProcessCodeService();
 		DeprecatedAdvancingSource source = context.getAdvancingSource();
 
 		List<String> input = context.getCurrentData();

@@ -1,7 +1,7 @@
 package org.generationcp.middleware.ruleengine.naming.deprecated.expression;
 
 import org.generationcp.middleware.ruleengine.RuleFactory;
-import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
+import org.generationcp.middleware.ruleengine.naming.deprecated.impl.DeprecatedProcessCodeFactory;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +23,7 @@ public class DeprecatedComponentPostProcessorTest {
     private RuleFactory ruleFactory;
 
     @Mock
-    private ProcessCodeFactory processCodeFactory;
+    private DeprecatedProcessCodeFactory processCodeFactory;
 
     @InjectMocks
     private DeprecatedComponentPostProcessor dut;

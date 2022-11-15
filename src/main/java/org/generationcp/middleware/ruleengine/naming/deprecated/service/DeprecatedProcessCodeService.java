@@ -1,11 +1,12 @@
 
-package org.generationcp.middleware.ruleengine.naming.service;
+package org.generationcp.middleware.ruleengine.naming.deprecated.service;
 
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 
 import java.util.List;
 
-public interface ProcessCodeService {
+@Deprecated
+public interface DeprecatedProcessCodeService {
 
 	List<String> applyProcessCode(String currentInput, String processCode, DeprecatedAdvancingSource source);
 }

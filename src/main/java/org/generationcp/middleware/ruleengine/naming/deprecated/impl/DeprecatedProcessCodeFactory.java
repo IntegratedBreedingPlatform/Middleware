@@ -1,12 +1,13 @@
 
-package org.generationcp.middleware.ruleengine.naming.impl;
+package org.generationcp.middleware.ruleengine.naming.deprecated.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedExpression;
 
-public class ProcessCodeFactory {
+@Deprecated
+public class DeprecatedProcessCodeFactory {
 
 	private Map<String, DeprecatedExpression> expressionMap;
 

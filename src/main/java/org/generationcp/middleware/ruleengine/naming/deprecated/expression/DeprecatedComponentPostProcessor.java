@@ -1,7 +1,7 @@
 package org.generationcp.middleware.ruleengine.naming.deprecated.expression;
 
 import org.generationcp.middleware.ruleengine.RulesPostProcessor;
-import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
+import org.generationcp.middleware.ruleengine.naming.deprecated.impl.DeprecatedProcessCodeFactory;
 import org.springframework.beans.BeansException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Deprecated
 public class DeprecatedComponentPostProcessor extends RulesPostProcessor{
 
-    private ProcessCodeFactory processCodeFactory;
+    private DeprecatedProcessCodeFactory processCodeFactory;
 
     @Override
     public Object postProcessAfterInitialization(Object o, String s) throws BeansException {
@@ -30,7 +30,7 @@ public class DeprecatedComponentPostProcessor extends RulesPostProcessor{
     }
 
     @Autowired
-    public void setProcessCodeFactory(ProcessCodeFactory processCodeFactory) {
+    public void setProcessCodeFactory(DeprecatedProcessCodeFactory processCodeFactory) {
         this.processCodeFactory = processCodeFactory;
     }
 }

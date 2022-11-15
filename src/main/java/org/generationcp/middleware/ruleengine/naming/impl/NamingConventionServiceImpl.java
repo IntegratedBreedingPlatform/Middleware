@@ -15,7 +15,7 @@ import org.generationcp.middleware.ruleengine.RulesNotConfiguredException;
 import org.generationcp.middleware.ruleengine.naming.deprecated.rules.DeprecatedEnforceUniqueNameRule;
 import org.generationcp.middleware.ruleengine.naming.deprecated.rules.DeprecatedNamingRuleExecutionContext;
 import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
-import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
+import org.generationcp.middleware.ruleengine.naming.deprecated.service.DeprecatedProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSourceList;
 import org.generationcp.middleware.ruleengine.pojo.ImportedCross;
@@ -53,7 +53,7 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 	private GermplasmDataManager germplasmDataManager;
 
 	@Resource
-	private ProcessCodeService processCodeService;
+	private DeprecatedProcessCodeService processCodeService;
 
 	@Resource
 	private RuleFactory ruleFactory;
