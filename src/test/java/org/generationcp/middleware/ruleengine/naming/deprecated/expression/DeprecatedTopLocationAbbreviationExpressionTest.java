@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class TopDeprecatedLocationAbbreviationExpressionTest extends TestExpression {
+public class DeprecatedTopLocationAbbreviationExpressionTest extends TestExpression {
 
 	@Test
 	public void testLabbrAsPrefix() throws Exception {
