@@ -1,7 +1,7 @@
 package org.generationcp.middleware.ruleengine.coding.expression;
 
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
-import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.newnaming.service.GermplasmNamingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

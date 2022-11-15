@@ -15,7 +15,7 @@
 	<context:property-placeholder location="classpath:test.properties, classpath:crossing.properties" />
 
 
-   	<bean class="org.generationcp.middleware.ruleengine.naming.expression.ComponentPostProcessor">
+   	<bean class="org.generationcp.middleware.ruleengine.newnaming.expression.ComponentPostProcessor">
         <property name="ruleFactory" ref="ruleFactory"/>
 		<property name="processCodeFactory" ref="processCodeFactory" />
     </bean>
@@ -33,17 +33,17 @@
     </bean>
 	<bean id="ruleService" class="org.generationcp.middleware.ruleengine.impl.RulesServiceImpl" />
 
-	<bean id="germplasmNamingService" class="org.generationcp.middleware.ruleengine.naming.impl.GermplasmNamingServiceImpl" />
+	<bean id="germplasmNamingService" class="org.generationcp.middleware.ruleengine.newnaming.impl.GermplasmNamingServiceImpl" />
 
     <!--
             This component scan automatically registers all implementations of the Rule interface into the Spring context.
             In conjunction with the RulesPostProcessor above, this automatically populates the map in the RuleFactory
              -->
-	<context:component-scan base-package="org.generationcp.middleware.ruleengine.naming" />
-	<context:component-scan base-package="org.generationcp.middleware.ruleengine.naming.expression" />
+	<context:component-scan base-package="org.generationcp.middleware.ruleengine.newnaming" />
+	<context:component-scan base-package="org.generationcp.middleware.ruleengine.newnaming.expression" />
 
 	<bean id="processCodeFactory"
-		  class="org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory"
+		  class="org.generationcp.middleware.ruleengine.newnaming.impl.ProcessCodeFactory"
 		  init-method="init"/>
 
 	<!-- Singleton bean as there is nothing request specific in here. -->
