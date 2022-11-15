@@ -1,8 +1,8 @@
 package org.generationcp.middleware.ruleengine;
 
-import org.generationcp.middleware.ruleengine.naming.newexpression.Expression;
-import org.generationcp.middleware.ruleengine.naming.newexpression.FirstExpression;
-import org.generationcp.middleware.ruleengine.naming.newexpression.PaddedSequenceExpression;
+import org.generationcp.middleware.ruleengine.naming.expression.Expression;
+import org.generationcp.middleware.ruleengine.naming.expression.FirstExpression;
+import org.generationcp.middleware.ruleengine.naming.expression.PaddedSequenceExpression;
 import org.junit.Assert;
 import org.junit.Test;
 

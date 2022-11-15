@@ -1,0 +1,150 @@
+package org.generationcp.middleware.ruleengine.naming.expression;
+
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class TestExpression {
+
+	public static final Logger LOG = LoggerFactory.getLogger(TestExpression.class);
+
+	public void printResult(List<StringBuilder> values, DeprecatedAdvancingSource source) {
+		LOG.debug("DESIG = " + source.getGermplasm().getDesig());
+		LOG.debug("RESULTS=");
+		for (StringBuilder value : values) {
+			LOG.debug("\t" + value);
+		}
+	}
+
+	public String buildResult(List<StringBuilder> values) {
+		String result = "";
+		for (StringBuilder value : values) {
+			result = result + value;
+		}
+		return result;
+	}
+
+	public DeprecatedAdvancingSource createAdvancingSourceTestData(final Method method,final ImportedGermplasm germplasm, final String name, final String season,
+		final String studyName) {
+		final List<BasicNameDTO> names = new ArrayList<>();
+		names.add(this.createBasicNameDTO(3, 0, name + "_three"));
+		names.add(this.createBasicNameDTO(5, 0, name + "_five"));
+		names.add(this.createBasicNameDTO(2, 1, name + "_two"));
+
+		final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource(germplasm, names, 2, method, studyName, "1");
+		source.setRootName(name);
+		source.setSeason(season);
+		return source;
+
+	}
+
+	public DeprecatedAdvancingSource createAdvancingSourceTestData(String name, String separator, String prefix, String count, String suffix,
+		boolean isBulking) {
+
+		final Method method = new Method();
+		method.setSeparator(separator);
+		method.setPrefix(prefix);
+		method.setCount(count);
+		method.setSuffix(suffix);
+		if (isBulking) {
+			method.setGeneq(TermId.BULKING_BREEDING_METHOD_CLASS.getId());
+		} else {
+			method.setGeneq(TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
+		}
+
+		final ImportedGermplasm germplasm = new ImportedGermplasm();
+		germplasm.setDesig(name);
+
+		final List<BasicNameDTO> names = new ArrayList<>();
+		names.add(this.createBasicNameDTO(3, 0, name + "_three"));
+		names.add(this.createBasicNameDTO(5, 0, name + "_five"));
+		names.add(this.createBasicNameDTO(2, 1, name + "_two"));
+
+		final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource(germplasm, names, 2, method, "MNL", "1");
+		source.setRootName(name);
+		source.setSeason("Dry");
+		source.setStudyName("NurseryTest");
+		return source;
+	}
+
+	public List<StringBuilder> createInitialValues(DeprecatedAdvancingSource source) {
+		final List<StringBuilder> builders = new ArrayList<>();
+
+		final StringBuilder builder = new StringBuilder();
+		builder.append(source.getGermplasm().getDesig()).append(this.getNonNullValue(source.getBreedingMethod().getSeparator()))
+			.append(this.getNonNullValue(source.getBreedingMethod().getPrefix()))
+			.append(this.getNonNullValue(source.getBreedingMethod().getCount()))
+			.append(this.getNonNullValue(source.getBreedingMethod().getSuffix()));
+		builders.add(builder);
+
+		return builders;
+	}
+
+	public ImportedGermplasm createImportedGermplasm(final Integer entryNumber, final String designation, final String gid,
+		final Integer gpid1, final Integer gpid2,
+		final Integer gnpgs, final Integer mid) {
+		final ImportedGermplasm germplasm = new ImportedGermplasm();
+		germplasm.setEntryNumber(entryNumber);
+		germplasm.setDesig(designation);
+		germplasm.setGid(gid);
+		germplasm.setGpid1(gpid1);
+		germplasm.setGpid2(gpid2);
+		germplasm.setGnpgs(gnpgs);
+		germplasm.setBreedingMethodId(mid);
+		return germplasm;
+	}
+
+	public Method createDerivativeMethod(final String prefix, final String count, final String suffix, final String separator,
+		final boolean isBulking) {
+		return createBreedingMethod(prefix, count, suffix, "DER", 323, "G", "UDM", "Unknown derivative method",
+			"Unknown derivative method in self fertilising species: for storing historic pedigrees", separator, isBulking);
+	}
+
+	public Method createGenerativeMethod(final String prefix, final String count, final String suffix, final String separator,
+		final boolean isBulking) {
+		return createBreedingMethod(prefix, count, suffix, "GEN", 1, "G", "UGM", "Unknown generative method",
+			"Unknown generative method for storing historic pedigrees for self fertilizing species.", separator, isBulking);
+	}
+
+	public Method createBreedingMethod(final String prefix, final String count, final String suffix, final String mType, final Integer mid,
+		final String mgrp, final String mcode, final String mname, final String mdesc, final String separator, final boolean isBulking) {
+		final Method method = new Method();
+		method.setMid(mid);
+		method.setPrefix(prefix);
+		method.setCount(count);
+		method.setSuffix(suffix);
+		method.setMtype(mType);
+		method.setMid(mid);
+		method.setMgrp(mgrp);
+		method.setMcode(mcode);
+		method.setMname(mname);
+		method.setMdesc(mdesc);
+		method.setSeparator(separator);
+		if (isBulking) {
+			method.setGeneq(TermId.BULKING_BREEDING_METHOD_CLASS.getId());
+		} else {
+			method.setGeneq(TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
+		}
+		return method;
+	}
+
+	public String getNonNullValue(String value) {
+		return value != null ? value : "";
+	}
+
+	private BasicNameDTO createBasicNameDTO(final Integer typeId, final Integer nstat, final String value) {
+		final BasicNameDTO name = new BasicNameDTO();
+		name.setGid(1);
+		name.setTypeId(typeId);
+		name.setNstat(nstat);
+		name.setNval(value);
+		return name;
+	}
+}
