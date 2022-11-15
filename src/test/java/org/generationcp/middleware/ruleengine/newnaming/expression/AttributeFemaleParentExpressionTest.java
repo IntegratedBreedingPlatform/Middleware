@@ -1,10 +1,10 @@
-package org.generationcp.middleware.ruleengine.naming.expression;
+package org.generationcp.middleware.ruleengine.newnaming.expression;
 
+import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
-import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -28,10 +28,9 @@ public class AttributeFemaleParentExpressionTest extends TestExpression {
 	AttributeFemaleParentExpression expression = new AttributeFemaleParentExpression();
 
 	private static final Integer VARIABLE_ID = 2000;
-
 	private static final String PREFIX = "[ATTRFP.2000]";
-
 	private static final String COUNT = "[SEQUENCE]";
+	private static final String DESIGNATION = "(AA/ABC)";
 
 	@Test
 	public void testAttributeAsPrefixDerivativeMethod() throws Exception {
@@ -45,12 +44,12 @@ public class AttributeFemaleParentExpressionTest extends TestExpression {
 
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
 
-		final ImportedGermplasm importedGermplasm =
-				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 104, 105, -1, derivativeMethod.getMid());
-		final DeprecatedAdvancingSource source =
-				this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
+		final BasicGermplasmDTO originGermplasm =
+				this.createBasicGermplasmDTO(1000, 104, 105, -1, derivativeMethod.getMid());
+		final AdvancingSource source =
+				this.createAdvancingSourceTestData(originGermplasm, new Method(), derivativeMethod, DESIGNATION, "Dry", 2);
 
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 
 		expression.apply(values, source, PREFIX);
 
@@ -68,11 +67,11 @@ public class AttributeFemaleParentExpressionTest extends TestExpression {
 		Mockito.when(germplasmDataManager.getGermplasmByGID(104)).thenReturn(groupSource);
 
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
-		final ImportedGermplasm importedGermplasm =
-				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 104, 105, -1, derivativeMethod.getMid());
-		final DeprecatedAdvancingSource source =
-				this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final BasicGermplasmDTO originGermplasm =
+				this.createBasicGermplasmDTO(1000, 104, 105, -1, derivativeMethod.getMid());
+		final AdvancingSource source =
+				this.createAdvancingSourceTestData(originGermplasm, new Method(), derivativeMethod, DESIGNATION, "Dry", 2);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 
 		expression.apply(values, source, PREFIX);
 
@@ -86,10 +85,10 @@ public class AttributeFemaleParentExpressionTest extends TestExpression {
 		Mockito.when(germplasmDataManager.getGermplasmByGID(0)).thenReturn(null);
 
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
-		final ImportedGermplasm importedGermplasm = this.createImportedGermplasm(1, "(AA/ABC)", "0", 0, 0, -1, derivativeMethod.getMid());
-		DeprecatedAdvancingSource
-			source = this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
-		List<StringBuilder> values = this.createInitialValues(source);
+		final BasicGermplasmDTO originGermplasm = this.createBasicGermplasmDTO(0, 0, 0, -1, derivativeMethod.getMid());
+		AdvancingSource
+			source = this.createAdvancingSourceTestData(originGermplasm, new Method(), derivativeMethod, DESIGNATION, "Dry", 2);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 		expression.apply(values, source, PREFIX);
 
 		assertThat(values.get(0).toString(), is(equalTo("(AA/ABC)-[SEQUENCE]")));
@@ -105,10 +104,10 @@ public class AttributeFemaleParentExpressionTest extends TestExpression {
 		Mockito.when(germplasmDataManager.getAttributeValue(null, VARIABLE_ID)).thenReturn("");
 
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
-		final ImportedGermplasm importedGermplasm = this.createImportedGermplasm(1, "(AA/ABC)", "0", 0, 0, -1, derivativeMethod.getMid());
-		DeprecatedAdvancingSource
-			source = this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
-		List<StringBuilder> values = this.createInitialValues(source);
+		final BasicGermplasmDTO originGermplasm = this.createBasicGermplasmDTO(0, 0, 0, -1, derivativeMethod.getMid());
+		AdvancingSource
+			source = this.createAdvancingSourceTestData(originGermplasm, new Method(), derivativeMethod, DESIGNATION, "Dry", 2);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 		expression.apply(values, source, PREFIX);
 
 		assertThat(values.get(0).toString(), is(equalTo("(AA/ABC)-[SEQUENCE]")));
@@ -125,11 +124,11 @@ public class AttributeFemaleParentExpressionTest extends TestExpression {
 		Mockito.when(germplasmDataManager.getGermplasmByGID(1000)).thenReturn(groupSource);
 
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
-		final ImportedGermplasm importedGermplasm =
-				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 0, 0, -1, derivativeMethod.getMid());
-		DeprecatedAdvancingSource
-			source = this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
-		List<StringBuilder> values = this.createInitialValues(source);
+		final BasicGermplasmDTO originGermplasm =
+				this.createBasicGermplasmDTO(1000, 0, 0, -1, derivativeMethod.getMid());
+		AdvancingSource
+			source = this.createAdvancingSourceTestData(originGermplasm, new Method(), derivativeMethod, DESIGNATION, "Dry", 2);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 		expression.apply(values, source, PREFIX);
 
 		assertThat(values.get(0).toString(), is(equalTo("(AA/ABC)-[SEQUENCE]")));
@@ -145,13 +144,13 @@ public class AttributeFemaleParentExpressionTest extends TestExpression {
 		Mockito.when(germplasmDataManager.getAttributeValue(groupSource.getGpid1(), VARIABLE_ID)).thenReturn("Mexico");
 		Mockito.when(germplasmDataManager.getGermplasmByGID(1000)).thenReturn(groupSource);
 
+		final Method originGermplasmMethod = this.createGenerativeMethod(PREFIX, COUNT, null, "-", true);
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
-		final ImportedGermplasm importedGermplasm =
-				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 0, 0, -1, derivativeMethod.getMid());
-		DeprecatedAdvancingSource
-			source = this.createAdvancingSourceTestData(derivativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
-		source.setSourceMethod(this.createGenerativeMethod(PREFIX, COUNT, null, "-", true));
-		List<StringBuilder> values = this.createInitialValues(source);
+		final BasicGermplasmDTO originGermplasm =
+				this.createBasicGermplasmDTO(1000, 0, 0, -1, derivativeMethod.getMid());
+		AdvancingSource
+			source = this.createAdvancingSourceTestData(originGermplasm, originGermplasmMethod, derivativeMethod, DESIGNATION, "Dry", 2);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 		expression.apply(values, source, PREFIX);
 
 		assertThat(values.get(0).toString(), is(equalTo("(AA/ABC)-Mexico[SEQUENCE]")));
@@ -163,14 +162,13 @@ public class AttributeFemaleParentExpressionTest extends TestExpression {
 		Mockito.when(germplasmDataManager.getAttributeValue(104, VARIABLE_ID)).thenReturn("Mexico");
 
 		final Method generativeMethod = this.createGenerativeMethod(PREFIX, COUNT, null, "-", true);
-		final ImportedGermplasm importedGermplasm =
-				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 104, 105, -1, generativeMethod.getMid());
-		final DeprecatedAdvancingSource source =
-				this.createAdvancingSourceTestData(generativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
-
+		final BasicGermplasmDTO originGermplasm =
+				this.createBasicGermplasmDTO(1000, 104, 105, -1, generativeMethod.getMid());
+		final AdvancingSource source =
+				this.createAdvancingSourceTestData(originGermplasm, new Method(), generativeMethod, DESIGNATION, "Dry", 2);
 		source.setFemaleGid(104);
 
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 
 		expression.apply(values, source, PREFIX);
 
@@ -181,14 +179,14 @@ public class AttributeFemaleParentExpressionTest extends TestExpression {
 	public void testAttributeAsPrefixWithoutAttributeValueGenerativeMethod() throws Exception {
 		Mockito.when(germplasmDataManager.getAttributeValue(104, VARIABLE_ID)).thenReturn("");
 		final Method generativeMethod = this.createGenerativeMethod(PREFIX, COUNT, null, "-", true);
-		final ImportedGermplasm importedGermplasm =
-				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 104, 105, -1, generativeMethod.getMid());
-		final DeprecatedAdvancingSource source =
-				this.createAdvancingSourceTestData(generativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
+		final BasicGermplasmDTO originGermplasm =
+				this.createBasicGermplasmDTO(1000, 104, 105, -1, generativeMethod.getMid());
+		final AdvancingSource source =
+				this.createAdvancingSourceTestData(originGermplasm, new Method(), generativeMethod, DESIGNATION, "Dry", 2);
 
 		source.setFemaleGid(104);
 
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 
 		expression.apply(values, source, PREFIX);
 
@@ -200,11 +198,11 @@ public class AttributeFemaleParentExpressionTest extends TestExpression {
 
 		Mockito.when(germplasmDataManager.getAttributeValue(0, VARIABLE_ID)).thenReturn("");
 		final Method generativeMethod = this.createGenerativeMethod(PREFIX, COUNT, null, "-", true);
-		final ImportedGermplasm importedGermplasm =
-				this.createImportedGermplasm(1, "(AA/ABC)", "1000", 0, 0, -1, generativeMethod.getMid());
-		DeprecatedAdvancingSource
-			source = this.createAdvancingSourceTestData(generativeMethod, importedGermplasm, "(AA/ABC)", "Dry", "NurseryTest");
-		List<StringBuilder> values = this.createInitialValues(source);
+		final BasicGermplasmDTO originGermplasm =
+				this.createBasicGermplasmDTO(1000, 0, 0, -1, generativeMethod.getMid());
+		AdvancingSource
+			source = this.createAdvancingSourceTestData(originGermplasm, new Method(), generativeMethod, DESIGNATION, "Dry", 2);
+		List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 		expression.apply(values, source, PREFIX);
 
 		assertThat(values.get(0).toString(), is(equalTo("(AA/ABC)-[SEQUENCE]")));

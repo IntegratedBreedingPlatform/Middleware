@@ -487,6 +487,15 @@ public interface FieldbookService {
 	 * @return the names by gids
 	 */
 	@Deprecated
+	Map<Integer, List<Name>> getNamesByGids(List<Integer> gids);
+
+	/**
+	 * Returns a map of Gid, and list of Names.
+	 *
+	 * @param gids
+	 *            the gids
+	 * @return the names by gids
+	 */
 	Map<Integer, List<BasicNameDTO>> getNamesByGids(Set<Integer> gids);
 
 	/**

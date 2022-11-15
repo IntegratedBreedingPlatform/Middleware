@@ -647,6 +647,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public Map<Integer, List<Name>> getNamesByGids(final List<Integer> gids) {
+		return this.daoFactory.getNameDao().getNamesByGidsInMap(gids);
+	}
+
+	@Override
 	public Map<Integer, List<BasicNameDTO>> getNamesByGids(final Set<Integer> gids) {
 		return this.daoFactory.getNameDao().getBasicNamesByGids(new HashSet<>(gids))
 			.stream()

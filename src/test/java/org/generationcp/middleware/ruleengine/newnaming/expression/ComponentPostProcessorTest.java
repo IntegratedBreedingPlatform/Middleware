@@ -1,7 +1,7 @@
-package org.generationcp.middleware.ruleengine.naming.expression;
+package org.generationcp.middleware.ruleengine.newnaming.expression;
 
 import org.generationcp.middleware.ruleengine.RuleFactory;
-import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
+import org.generationcp.middleware.ruleengine.newnaming.impl.ProcessCodeFactory;
 import org.generationcp.middleware.ruleengine.pojo.AbstractAdvancingSource;
 import org.junit.Test;
 import org.junit.runner.RunWith;

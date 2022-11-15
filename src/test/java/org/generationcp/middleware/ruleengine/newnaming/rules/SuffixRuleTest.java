@@ -1,12 +1,13 @@
 
 package org.generationcp.middleware.ruleengine.newnaming.rules;
 
-import junit.framework.Assert;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.ruleengine.newnaming.impl.ProcessCodeServiceImpl;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +26,8 @@ public class SuffixRuleTest extends BaseNamingRuleTest {
 		this.breedingMethod = new Method();
 		this.breedingMethod.setSnametype(this.breedingMethodSnameType);
 		this.breedingMethod.setSuffix("test-suffix");
-		this.row = new DeprecatedAdvancingSource();
-		this.row.setBreedingMethod(this.breedingMethod);
+		this.row = Mockito.mock(AdvancingSource.class, Mockito.CALLS_REAL_METHODS);
+		Mockito.when(this.row.getBreedingMethod()).thenReturn(this.breedingMethod);
 		this.testGermplasmName = "CMT1234-B-3-";
 		this.rule = new SuffixRule();
 	}
@@ -34,7 +35,7 @@ public class SuffixRuleTest extends BaseNamingRuleTest {
 	@Test
 	public void testPrefixGenerationSimple() {
 
-		List<String> input = new ArrayList<String>();
+		List<String> input = new ArrayList();
 		input.add(this.testGermplasmName);
 
 		try {
@@ -44,7 +45,6 @@ public class SuffixRuleTest extends BaseNamingRuleTest {
 		}
 
 		Assert.assertEquals(1, input.size());
-		;
 		Assert.assertEquals("Should return the correct name appended with prefix text", this.testGermplasmName
 				+ this.row.getBreedingMethod().getSuffix(), input.get(0));
 	}

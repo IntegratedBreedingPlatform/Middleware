@@ -3,9 +3,10 @@ package org.generationcp.middleware.ruleengine.newnaming.rules;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +24,8 @@ public class PrefixRuleTest extends BaseNamingRuleTest {
 		this.breedingMethodSnameType = 5;
 		this.breedingMethod = new Method();
 		this.breedingMethod.setSnametype(this.breedingMethodSnameType);
-		this.row = new DeprecatedAdvancingSource();
-		this.row.setBreedingMethod(this.breedingMethod);
+		this.row = Mockito.mock(AdvancingSource.class, Mockito.CALLS_REAL_METHODS);
+		Mockito.when(this.row.getBreedingMethod()).thenReturn(this.breedingMethod);
 		this.testGermplasmName = "CMT1234-";
 		this.rule = new PrefixRule();
 	}
@@ -32,12 +33,12 @@ public class PrefixRuleTest extends BaseNamingRuleTest {
 	@Test
 	public void testPrefixGenerationSimple() {
 		this.breedingMethod.setPrefix("B");
-		List<String> input = new ArrayList<String>();
+		List<String> input = new ArrayList();
 		input.add(this.testGermplasmName);
 
 		try {
 			input = (List<String>) this.rule.runRule(this.createExecutionContext(input));
-		} catch (org.generationcp.middleware.ruleengine.RuleException e) {
+		} catch (final org.generationcp.middleware.ruleengine.RuleException e) {
 			e.printStackTrace();
 		}
 		System.out.println(input.get(0));
@@ -50,11 +51,11 @@ public class PrefixRuleTest extends BaseNamingRuleTest {
 	public void testSeasonCodePrefix() {
 		this.breedingMethod.setPrefix("Wet");
 		this.row.setSeason("Wet");
-		List<String> input = new ArrayList<String>();
+		List<String> input = new ArrayList();
 		input.add(this.testGermplasmName);
 		try {
 			input = (List<String>) this.rule.runRule(this.createExecutionContext(input));
-		} catch (org.generationcp.middleware.ruleengine.RuleException e) {
+		} catch (final org.generationcp.middleware.ruleengine.RuleException e) {
 			e.printStackTrace();
 		}
 		System.out.println(input.get(0));

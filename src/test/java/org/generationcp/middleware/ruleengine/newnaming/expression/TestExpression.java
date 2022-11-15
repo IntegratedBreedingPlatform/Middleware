@@ -1,52 +1,56 @@
-package org.generationcp.middleware.ruleengine.naming.expression;
+package org.generationcp.middleware.ruleengine.newnaming.expression;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
-import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class TestExpression {
 
 	public static final Logger LOG = LoggerFactory.getLogger(TestExpression.class);
 
-	public void printResult(List<StringBuilder> values, DeprecatedAdvancingSource source) {
-		LOG.debug("DESIG = " + source.getGermplasm().getDesig());
+	public void printResult(final List<StringBuilder> values, final AdvancingSource source) {
 		LOG.debug("RESULTS=");
-		for (StringBuilder value : values) {
+		for (final StringBuilder value : values) {
 			LOG.debug("\t" + value);
 		}
 	}
 
-	public String buildResult(List<StringBuilder> values) {
+	public String buildResult(final List<StringBuilder> values) {
 		String result = "";
-		for (StringBuilder value : values) {
-			result = result + value;
+		for (final StringBuilder value : values) {
+			result = new StringBuilder().append(result).append(value).toString();
 		}
 		return result;
 	}
 
-	public DeprecatedAdvancingSource createAdvancingSourceTestData(final Method method,final ImportedGermplasm germplasm, final String name, final String season,
-		final String studyName) {
+	public AdvancingSource createAdvancingSourceTestData(final BasicGermplasmDTO originGermplasm,
+		final Method originGermplasmMethod, final Method method,
+		final String name,
+		final String season, final Integer plantSelected) {
 		final List<BasicNameDTO> names = new ArrayList<>();
 		names.add(this.createBasicNameDTO(3, 0, name + "_three"));
 		names.add(this.createBasicNameDTO(5, 0, name + "_five"));
 		names.add(this.createBasicNameDTO(2, 1, name + "_two"));
 
-		final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource(germplasm, names, 2, method, studyName, "1");
+		final AdvancingSource source = new AdvancingSource(originGermplasm, names, new ObservationUnitRow(), new ObservationUnitRow(),
+			new ArrayList(), method, originGermplasmMethod, new Random().nextInt(), new Random().nextInt(), season,
+			RandomStringUtils.randomAlphabetic(10), plantSelected);
 		source.setRootName(name);
-		source.setSeason(season);
 		return source;
-
 	}
 
-	public DeprecatedAdvancingSource createAdvancingSourceTestData(String name, String separator, String prefix, String count, String suffix,
-		boolean isBulking) {
+	public AdvancingSource createAdvancingSourceTestData(final String name, final String separator, final String prefix, final String count,
+		final String suffix, final boolean isBulking, final Integer plantSelected) {
 
 		final Method method = new Method();
 		method.setSeparator(separator);
@@ -59,26 +63,17 @@ public class TestExpression {
 			method.setGeneq(TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
 		}
 
-		final ImportedGermplasm germplasm = new ImportedGermplasm();
-		germplasm.setDesig(name);
-
-		final List<BasicNameDTO> names = new ArrayList<>();
-		names.add(this.createBasicNameDTO(3, 0, name + "_three"));
-		names.add(this.createBasicNameDTO(5, 0, name + "_five"));
-		names.add(this.createBasicNameDTO(2, 1, name + "_two"));
-
-		final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource(germplasm, names, 2, method, "MNL", "1");
+		final BasicGermplasmDTO germplasm = new BasicGermplasmDTO();
+		final AdvancingSource source = this.createAdvancingSourceTestData(germplasm, new Method(), method, name, "Dry", plantSelected);
 		source.setRootName(name);
-		source.setSeason("Dry");
-		source.setStudyName("NurseryTest");
 		return source;
 	}
 
-	public List<StringBuilder> createInitialValues(DeprecatedAdvancingSource source) {
+	public List<StringBuilder> createInitialValues(final String designation, final AdvancingSource source) {
 		final List<StringBuilder> builders = new ArrayList<>();
 
 		final StringBuilder builder = new StringBuilder();
-		builder.append(source.getGermplasm().getDesig()).append(this.getNonNullValue(source.getBreedingMethod().getSeparator()))
+		builder.append(designation).append(this.getNonNullValue(source.getBreedingMethod().getSeparator()))
 			.append(this.getNonNullValue(source.getBreedingMethod().getPrefix()))
 			.append(this.getNonNullValue(source.getBreedingMethod().getCount()))
 			.append(this.getNonNullValue(source.getBreedingMethod().getSuffix()));
@@ -87,17 +82,15 @@ public class TestExpression {
 		return builders;
 	}
 
-	public ImportedGermplasm createImportedGermplasm(final Integer entryNumber, final String designation, final String gid,
+	public BasicGermplasmDTO createBasicGermplasmDTO(final Integer gid,
 		final Integer gpid1, final Integer gpid2,
 		final Integer gnpgs, final Integer mid) {
-		final ImportedGermplasm germplasm = new ImportedGermplasm();
-		germplasm.setEntryNumber(entryNumber);
-		germplasm.setDesig(designation);
+		final BasicGermplasmDTO germplasm = new BasicGermplasmDTO();
 		germplasm.setGid(gid);
 		germplasm.setGpid1(gpid1);
 		germplasm.setGpid2(gpid2);
 		germplasm.setGnpgs(gnpgs);
-		germplasm.setBreedingMethodId(mid);
+		germplasm.setMethodId(mid);
 		return germplasm;
 	}
 

@@ -1,8 +1,8 @@
-package org.generationcp.middleware.ruleengine.naming.expression;
+package org.generationcp.middleware.ruleengine.newnaming.expression;
 
 import org.generationcp.middleware.ruleengine.ExpressionUtils;
-import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.newnaming.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
+public class PaddedSequenceExpressionTest extends TestExpression {
 
 	private static final String ROOT_NAME = "TESTING";
 	private static final String SEPARATOR = "-";
@@ -49,7 +49,7 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testExpressionRegex() {
-		Assert.assertTrue(CodingPaddedCodingSequenceExpressionTest.PADSEQ.matches(this.expression.getExpressionKey()));
+		Assert.assertTrue(PaddedSequenceExpressionTest.PADSEQ.matches(this.expression.getExpressionKey()));
 		Assert.assertTrue("[PADSEQ.2]".matches(this.expression.getExpressionKey()));
 		Assert.assertTrue("[PADSEQ.23]".matches(this.expression.getExpressionKey()));
 		Assert.assertFalse("[PADSEQ.AB2]".matches(this.expression.getExpressionKey()));
@@ -58,9 +58,9 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testWithNegativeNumberPlantsSelected() {
-		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ, SUFFIX, true);
-		source.setPlantsSelected(-2);
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final Integer plantSelected = -2;
+		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ, SUFFIX, true, plantSelected);
+		final List<StringBuilder> values = this.createInitialValues(ROOT_NAME, source);
 
 		this.expression.apply(values, source, null);
 		// The expression will be replaced with blank string
@@ -70,10 +70,9 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testCaseSensitiveKey() {
-		final DeprecatedAdvancingSource
-			source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ.toLowerCase(), SUFFIX, true);
-		source.setPlantsSelected(PLANTS_SELECTED);
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final AdvancingSource
+			source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ.toLowerCase(), SUFFIX, true, PLANTS_SELECTED);
+		final List<StringBuilder> values = this.createInitialValues(ROOT_NAME, source);
 
 		this.expression.apply(values, source, null);
 		assertEquals(ROOT_NAME + SEPARATOR + PREFIX + "0" + NEXT_NUMBER_FROM_DB + SUFFIX, values.get(0).toString());
@@ -82,12 +81,12 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 	@Test
 	public void testWithNullPlantsSelected() {
 		// final false refers to nonBulking
-		final DeprecatedAdvancingSource source =
-			this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ.toLowerCase(), SUFFIX, false);
-		source.setPlantsSelected(null);
+		final Integer plantSelected = null;
+		final AdvancingSource source =
+			this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ.toLowerCase(), SUFFIX, false, plantSelected);
 		final int currentMaxSequence = 10;
 		source.setCurrentMaxSequence(currentMaxSequence);
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final List<StringBuilder> values = this.createInitialValues(ROOT_NAME, source);
 
 		this.expression.apply(values, source, null);
 		Mockito.verifyZeroInteractions(this.germplasmNamingService);
@@ -97,9 +96,8 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testBulkingWithPlantsSelected() {
-		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ, SUFFIX, true);
-		source.setPlantsSelected(PLANTS_SELECTED);
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ, SUFFIX, true, PLANTS_SELECTED);
+		final List<StringBuilder> values = this.createInitialValues(ROOT_NAME, source);
 
 		this.expression.apply(values, source, null);
 		// Expecting only one iteration for bulking method
@@ -109,11 +107,10 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 	@Test
 	public void testNonBulkingWithPlantsSelected() {
 		// final false refers to nonBulking
-		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ, SUFFIX, false);
-		source.setPlantsSelected(PLANTS_SELECTED);
+		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, PADSEQ, SUFFIX, false, PLANTS_SELECTED);
 		final int currentMaxSequence = 13;
 		source.setCurrentMaxSequence(currentMaxSequence);
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final List<StringBuilder> values = this.createInitialValues(ROOT_NAME, source);
 
 		this.expression.apply(values, source, null);
 		assertEquals(PLANTS_SELECTED.intValue(), values.size());
@@ -133,11 +130,10 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 	@Test
 	public void testApplyWithNumberOfDigitsSpecified() {
 		final Integer numberofDigits = 5;
-		final String processCode = String.format(CodingPaddedCodingSequenceExpressionTest.PADSEQ_WITH_NUMBER, numberofDigits);
-		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, processCode, SUFFIX, false);
-		source.setPlantsSelected(PLANTS_SELECTED);
+		final String processCode = String.format(PaddedSequenceExpressionTest.PADSEQ_WITH_NUMBER, numberofDigits);
+		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, processCode, SUFFIX, false, PLANTS_SELECTED);
 
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final List<StringBuilder> values = this.createInitialValues(ROOT_NAME, source);
 		Mockito.doReturn("000" + NEXT_NUMBER_FROM_DB, "000" + (NEXT_NUMBER_FROM_DB + 1), "000" + (NEXT_NUMBER_FROM_DB + 2),
 			"000" + (NEXT_NUMBER_FROM_DB + 3), "000" + (NEXT_NUMBER_FROM_DB + 4))
 			.when(this.germplasmNamingService).getNumberWithLeadingZeroesAsString(

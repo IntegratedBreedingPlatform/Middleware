@@ -1,4 +1,4 @@
-package org.generationcp.middleware.ruleengine.naming.expression;
+package org.generationcp.middleware.ruleengine.newnaming.expression;
 
 import junit.framework.Assert;
 import org.junit.Test;

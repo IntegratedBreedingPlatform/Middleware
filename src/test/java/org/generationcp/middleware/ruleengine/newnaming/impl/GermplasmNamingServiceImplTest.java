@@ -1,4 +1,4 @@
-package org.generationcp.middleware.ruleengine.naming.impl;
+package org.generationcp.middleware.ruleengine.newnaming.impl;
 
 import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;

@@ -1,8 +1,8 @@
 
-package org.generationcp.middleware.ruleengine.naming.expression;
+package org.generationcp.middleware.ruleengine.newnaming.expression;
 
-import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.newnaming.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class CodingSequenceExpressionTest extends TestExpression {
+public class SequenceExpressionTest extends TestExpression {
 
 	private static final String ROOT_NAME = "GERMPLASM_TEST";
 	private static final String SEPARATOR = "-";
@@ -47,9 +47,9 @@ public class CodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testWithNegativeNumberPlantsSelected() {
-		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE, SUFFIX, true);
-		source.setPlantsSelected(-2);
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final Integer plantSelected = -2;
+		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE, SUFFIX, true, plantSelected);
+		final List<StringBuilder> values = this.createInitialValues(ROOT_NAME, source);
 
 		this.expression.apply(values, source, null);
 		// The SEQUENCE expression will be replaced with blank string
@@ -59,10 +59,9 @@ public class CodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testCaseSensitiveSequence() {
-		final DeprecatedAdvancingSource source =
-			this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE.toLowerCase(), SUFFIX, true);
-		source.setPlantsSelected(PLANTS_SELECTED);
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final AdvancingSource source =
+			this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE.toLowerCase(), SUFFIX, true, PLANTS_SELECTED);
+		final List<StringBuilder> values = this.createInitialValues(ROOT_NAME, source);
 
 		this.expression.apply(values, source, null);
 		assertEquals(ROOT_NAME + SEPARATOR + PREFIX + NEXT_NUMBER_FROM_DB + SUFFIX, values.get(0).toString());
@@ -71,12 +70,12 @@ public class CodingSequenceExpressionTest extends TestExpression {
 	@Test
 	public void testWithNullPlantsSelected() {
 		// final false refers to nonBulking
-		final DeprecatedAdvancingSource source =
-			this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE.toLowerCase(), SUFFIX, false);
-		source.setPlantsSelected(null);
+		final Integer plantSelected = null;
+		final AdvancingSource source =
+			this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE.toLowerCase(), SUFFIX, false, null);
 		final int currentMaxSequence = 10;
 		source.setCurrentMaxSequence(currentMaxSequence);
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final List<StringBuilder> values = this.createInitialValues(ROOT_NAME, source);
 
 		this.expression.apply(values, source, null);
 		Mockito.verifyZeroInteractions(this.germplasmNamingService);
@@ -86,9 +85,8 @@ public class CodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testBulkingWithPlantsSelected() {
-		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE, SUFFIX, true);
-		source.setPlantsSelected(PLANTS_SELECTED);
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE, SUFFIX, true, PLANTS_SELECTED);
+		final List<StringBuilder> values = this.createInitialValues(ROOT_NAME, source);
 
 		this.expression.apply(values, source, null);
 		// Expecting only one iteration for bulking method
@@ -98,11 +96,10 @@ public class CodingSequenceExpressionTest extends TestExpression {
 	@Test
 	public void testNonBulkingWithPlantsSelected() {
 		// final false refers to nonBulking
-		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE, SUFFIX, false);
-		source.setPlantsSelected(PLANTS_SELECTED);
+		final AdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, SEQUENCE, SUFFIX, false, PLANTS_SELECTED);
 		final int currentMaxSequence = 13;
 		source.setCurrentMaxSequence(currentMaxSequence);
-		final List<StringBuilder> values = this.createInitialValues(source);
+		final List<StringBuilder> values = this.createInitialValues(ROOT_NAME, source);
 
 		this.expression.apply(values, source, null);
 		assertEquals(PLANTS_SELECTED.intValue(), values.size());

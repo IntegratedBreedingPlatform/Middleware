@@ -1,12 +1,13 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.newnaming.rules;
 
 import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +24,8 @@ public class RootNameGeneratorRuleTest extends BaseNamingRuleTest {
 		this.breedingMethodSnameType = 5;
 		this.breedingMethod = new Method();
 		this.breedingMethod.setSnametype(this.breedingMethodSnameType);
-		this.row = new DeprecatedAdvancingSource();
-		this.row.setBreedingMethod(this.breedingMethod);
+		this.row = Mockito.mock(AdvancingSource.class, Mockito.CALLS_REAL_METHODS);
+		Mockito.when(this.row.getBreedingMethod()).thenReturn(this.breedingMethod);
 		this.testGermplasmName = "advance-germplasm-name";
 		this.rootNameGeneratorRule = new RootNameGeneratorRule();
 
@@ -40,9 +41,9 @@ public class RootNameGeneratorRuleTest extends BaseNamingRuleTest {
 
 	@Test
 	public void testGetGermplasmRootNameWithTheSameSnameTypeWithMethod() {
-		List<BasicNameDTO> names = new ArrayList<>();
+		final List<BasicNameDTO> names = new ArrayList<>();
 		names.add(this.generateNewName(this.breedingMethodSnameType, 1));
-		this.row.setNames(names);
+		Mockito.when(this.row.getNames()).thenReturn(names);
 		List<String> input = new ArrayList<String>();
 
 		try {
@@ -56,34 +57,4 @@ public class RootNameGeneratorRuleTest extends BaseNamingRuleTest {
 				this.testGermplasmName, input.get(0));
 	}
 
-	// @Test
-	// public void testGetGermplasmRootNameWithTheDifferentSnameTypeWithMethodButWithNstatEqualTo1(){
-	// List<Name> names = new ArrayList<Name>();
-	// names.add(generateNewName(2, 1));
-	// row.setNames(names);
-	// List<String> input = new ArrayList<String>();
-	// try{
-	// rootName = namingConventionService.getGermplasmRootName(breedingMethodSnameType, row);
-	// }catch(RuleException re){
-	// Assert.fail("Should return the correct root name if the methd snametype is equal to the names' type id");
-	// }
-	// Assert.assertEquals("Should return the correct root name if the names' nstat is equal to 1", testGermplasmName, rootName);
-	// }
-
-	// @Test
-	// public void testGetGermplasmRootNameWithTheDifferentSnameTypeWithMethodWithnstatNotEqualTo1(){
-	// List<Name> names = new ArrayList<Name>();
-	// names.add(generateNewName( 2, 0));
-	// row.setNames(names);
-	// row.setGermplasm(new ImportedGermplasm());
-	// boolean throwsException = false;
-	// try{
-	// namingConventionService.getGermplasmRootName(breedingMethodSnameType, row);
-	// }catch(MiddlewareQueryException e){
-	// throwsException = true;
-	// }catch(NoSuchMessageException e){
-	// throwsException = true;
-	// }
-	// Assert.assertTrue("Should throw an exception if there is no germplasm root name retrieved", throwsException);
-	// }
 }

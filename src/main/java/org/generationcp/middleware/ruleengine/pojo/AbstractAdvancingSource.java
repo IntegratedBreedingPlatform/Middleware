@@ -135,8 +135,16 @@ public abstract class AbstractAdvancingSource implements AdvancingSourceAdapter 
 		return maleGid;
 	}
 
+	public void setMaleGid(final int maleGid) {
+		this.maleGid = maleGid;
+	}
+
 	public int getFemaleGid() {
 		return femaleGid;
+	}
+
+	public void setFemaleGid(final int femaleGid) {
+		this.femaleGid = femaleGid;
 	}
 
 	public boolean isForceUniqueNameGeneration() {

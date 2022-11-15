@@ -22,9 +22,6 @@ public class AdvancingSource extends AbstractAdvancingSource {
 
 	private List<Germplasm> advancedGermplasms = new ArrayList<>();
 
-	public AdvancingSource() {
-	}
-
 	public AdvancingSource(final BasicGermplasmDTO originGermplasm, final List<BasicNameDTO> names,
 		final ObservationUnitRow plotObservation,
 		final ObservationUnitRow trialInstanceObservation,
@@ -54,6 +51,7 @@ public class AdvancingSource extends AbstractAdvancingSource {
 		this.currentMaxSequence = 0;
 		this.designationIsPreviewOnly = false;
 	}
+
 
 	public ObservationUnitRow getPlotObservation() {
 		return plotObservation;

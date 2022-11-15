@@ -1,8 +1,7 @@
-
-package org.generationcp.middleware.ruleengine.naming.expression;
+package org.generationcp.middleware.ruleengine.newnaming.expression;
 
 import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -16,7 +15,7 @@ public class BracketsExpressionTest extends TestExpression {
 	@Test
 	public void testBracketsNonCross() {
 		String testRootName = "CMLI452";
-		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(testRootName, "-", null, null, null, false);
+		AdvancingSource source = this.createAdvancingSourceTestData(testRootName, "-", null, null, null, false, 2);
 		source.setRootName(testRootName);
 		List<StringBuilder> builders = new ArrayList<>();
 		builders.add(new StringBuilder(source.getRootName() + BracketsExpression.KEY));
@@ -29,7 +28,7 @@ public class BracketsExpressionTest extends TestExpression {
 	@Test
 	public void testBracketsCross() {
 		String testRootName = "CMLI452 X POSI105";
-		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(testRootName, "-", null, null, null, false);
+		AdvancingSource source = this.createAdvancingSourceTestData(testRootName, "-", null, null, null, false, 2);
 		source.setRootName(testRootName);
 		source.setRootNameType(GermplasmNameType.CROSS_NAME.getUserDefinedFieldID());
 

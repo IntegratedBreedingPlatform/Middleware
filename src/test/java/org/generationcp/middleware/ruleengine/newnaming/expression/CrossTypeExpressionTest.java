@@ -1,24 +1,27 @@
-package org.generationcp.middleware.ruleengine.naming.expression;
+package org.generationcp.middleware.ruleengine.newnaming.expression;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
-import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CrossTypeExpressionTest {
@@ -46,11 +49,9 @@ public class CrossTypeExpressionTest {
 
 	@Test
 	public void testResolveForNurseryWithSingleCrossBreedingMethod(){
-		final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource();
+		final AdvancingSource source = mock(AdvancingSource.class);
 		final Method breedingMethod = this.generateBreedingMethod("Single cross");
-		final ImportedGermplasm importedGermplasm = new ImportedGermplasm();
-		source.setBreedingMethod(breedingMethod);
-		source.setGermplasm(importedGermplasm);
+		Mockito.when(source.getBreedingMethod()).thenReturn(breedingMethod);
 
 		final List<StringBuilder> values = new ArrayList<>();
 		values.add(new StringBuilder(CRSTYP));
@@ -62,11 +63,11 @@ public class CrossTypeExpressionTest {
 
 
 	public void testResolveForNurseryWithDoubleCrossBreedingMethod() {
-		final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource();
+		final AdvancingSource source = mock(AdvancingSource.class);
 		final Method breedingMethod = this.generateBreedingMethod("Double cross");
-		final ImportedGermplasm importedGermplasm = new ImportedGermplasm();
-		source.setBreedingMethod(breedingMethod);
-		source.setGermplasm(importedGermplasm);
+		final BasicGermplasmDTO originGermplasm = new BasicGermplasmDTO();
+		Mockito.when(source.getBreedingMethod()).thenReturn(breedingMethod);
+		Mockito.when(source.getOriginGermplasm()).thenReturn(originGermplasm);
 
 		final List<StringBuilder> values = new ArrayList<>();
 		values.add(new StringBuilder(CRSTYP));
