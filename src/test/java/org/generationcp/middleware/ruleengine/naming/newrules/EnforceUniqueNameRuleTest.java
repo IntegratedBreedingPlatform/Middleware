@@ -1,13 +1,10 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.newrules;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.ruleengine.RuleException;
-import org.generationcp.middleware.ruleengine.naming.newrules.CountRule;
-import org.generationcp.middleware.ruleengine.naming.newrules.EnforceUniqueNameRule;
-import org.generationcp.middleware.ruleengine.naming.newrules.NamingRuleExecutionContext;
 import org.generationcp.middleware.ruleengine.pojo.AdvanceGermplasmChangeDetail;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Assert;

@@ -1,11 +1,10 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.newrules;
 
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.ruleengine.Rule;
 import org.generationcp.middleware.ruleengine.RuleExecutionContext;
-import org.generationcp.middleware.ruleengine.naming.newrules.CountRule;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Assert;
 import org.junit.Before;

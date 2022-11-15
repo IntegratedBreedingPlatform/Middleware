@@ -1,7 +1,6 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.naming.newrules;
 
-import org.generationcp.middleware.ruleengine.naming.newrules.NamingRuleExecutionContext;
 import org.generationcp.middleware.ruleengine.naming.newservice.ProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.runner.RunWith;
