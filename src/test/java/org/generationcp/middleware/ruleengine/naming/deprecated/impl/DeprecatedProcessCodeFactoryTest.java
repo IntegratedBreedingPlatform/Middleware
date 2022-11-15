@@ -1,9 +1,8 @@
-package org.generationcp.middleware.ruleengine.naming.impl;
+package org.generationcp.middleware.ruleengine.naming.deprecated.impl;
 
 import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedFirstExpression;
 import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedSeasonExpression;
 import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedSequenceExpression;
-import org.generationcp.middleware.ruleengine.naming.deprecated.impl.DeprecatedProcessCodeFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
