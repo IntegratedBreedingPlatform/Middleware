@@ -2,7 +2,7 @@ package org.generationcp.middleware.ruleengine.coding.expression;
 
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.ruleengine.ExpressionUtils;
-import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedGermplasmNamingService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class CodingPaddedCodingSequenceExpressionTest {
 	private final NamingConfiguration namingConfiguration = new NamingConfiguration();
 
 	@Mock
-	private GermplasmNamingService germplasmNamingService;
+	private DeprecatedGermplasmNamingService germplasmNamingService;
 
 	@Before
 	public void setup() {

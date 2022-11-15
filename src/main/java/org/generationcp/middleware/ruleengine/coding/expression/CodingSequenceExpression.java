@@ -1,7 +1,7 @@
 package org.generationcp.middleware.ruleengine.coding.expression;
 
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
-import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedGermplasmNamingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,10 +16,10 @@ public class CodingSequenceExpression extends BaseCodingExpression {
 	private static final Pattern PATTERN = Pattern.compile(CodingSequenceExpression.KEY);
 
 	@Autowired
-	protected GermplasmNamingService germplasmNamingService;
+	protected DeprecatedGermplasmNamingService germplasmNamingService;
 
 	// This setter is only used to inject this service only in test
-	public void setGermplasmNamingService(final GermplasmNamingService germplasmNamingService) {
+	public void setGermplasmNamingService(final DeprecatedGermplasmNamingService germplasmNamingService) {
 		this.germplasmNamingService = germplasmNamingService;
 	}
 

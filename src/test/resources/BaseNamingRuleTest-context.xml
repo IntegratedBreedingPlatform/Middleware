@@ -15,7 +15,7 @@
 	<context:property-placeholder location="classpath:test.properties, classpath:crossing.properties" />
 
 
-   	<bean class="org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedComponentPostProcessor">
+   	<bean class="org.generationcp.middleware.ruleengine.namingdeprecated.expression.DeprecatedComponentPostProcessor">
         <property name="ruleFactory" ref="ruleFactory"/>
 		<property name="processCodeFactory" ref="processCodeFactory" />
     </bean>
@@ -33,7 +33,7 @@
     </bean>
 	<bean id="ruleService" class="org.generationcp.middleware.ruleengine.impl.RulesServiceImpl" />
 
-	<bean id="germplasmNamingService" class="org.generationcp.middleware.ruleengine.naming.impl.GermplasmNamingServiceImpl" />
+	<bean id="germplasmNamingService" class="org.generationcp.middleware.ruleengine.namingdeprecated.impl.DeprecatedGermplasmNamingServiceImpl" />
 
     <!--
             This component scan automatically registers all implementations of the Rule interface into the Spring context.
@@ -43,7 +43,7 @@
 	<context:component-scan base-package="org.generationcp.middleware.ruleengine.naming.deprecated.expression" />
 
 	<bean id="processCodeFactory"
-		  class="org.generationcp.middleware.ruleengine.naming.deprecated.impl.DeprecatedProcessCodeFactory"
+		  class="org.generationcp.middleware.ruleengine.namingdeprecated.impl.DeprecatedProcessCodeFactory"
 		  init-method="init"/>
 
 	<!-- Singleton bean as there is nothing request specific in here. -->

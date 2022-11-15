@@ -1,8 +1,8 @@
 package org.generationcp.middleware.ruleengine;
 
-import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedExpression;
-import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedFirstExpression;
-import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedPaddedSequenceExpression;
+import org.generationcp.middleware.ruleengine.namingdeprecated.expression.DeprecatedExpression;
+import org.generationcp.middleware.ruleengine.namingdeprecated.expression.DeprecatedFirstExpression;
+import org.generationcp.middleware.ruleengine.namingdeprecated.expression.DeprecatedPaddedSequenceExpression;
 import org.junit.Assert;
 import org.junit.Test;
 
