@@ -6,16 +6,12 @@ import org.generationcp.middleware.pojos.CropParameter;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CropParameterDAO extends GenericDAO<CropParameter, String> {
-
-	private static final Logger LOG = LoggerFactory.getLogger(CropParameterDAO.class);
 
 	private static final String UPDATE_ENCRYPTED_VARIABLE_QUERY = "UPDATE crop_parameter "
 		+ "SET `encrypted_value` = AES_ENCRYPT(:clearTextValue, UNHEX(SHA2(:secretPassphrase,512)))"
@@ -26,6 +22,7 @@ public class CropParameterDAO extends GenericDAO<CropParameter, String> {
 			+ " FROM crop_parameter c";
 
 	private static final String KEY_FILTER_QUERY = " WHERE c.`key` = :key";
+	public static final String SECRET_PASSPHRASE = "secretPassphrase";
 
 	public CropParameterDAO(final Session session) {
 		super(session);
@@ -34,7 +31,7 @@ public class CropParameterDAO extends GenericDAO<CropParameter, String> {
 	public void updateEncryptedPassword(final String key, final String encryptedValue, final String secretPassphrase) {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(UPDATE_ENCRYPTED_VARIABLE_QUERY);
 		sqlQuery.setParameter("key", key);
-		sqlQuery.setParameter("secretPassphrase", secretPassphrase);
+		sqlQuery.setParameter(SECRET_PASSPHRASE, secretPassphrase);
 		sqlQuery.setParameter("clearTextValue", encryptedValue);
 		sqlQuery.executeUpdate();
 	}
@@ -44,7 +41,13 @@ public class CropParameterDAO extends GenericDAO<CropParameter, String> {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(DECRYPT_VARIABLE_QUERY);
 		sqlQuery.addEntity("c", CropParameter.class);
 		sqlQuery.addScalar("decryptedValue");
-		sqlQuery.setParameter("secretPassphrase", secretPassphrase);
+		sqlQuery.setParameter(SECRET_PASSPHRASE, secretPassphrase);
+
+		if (pageable != null) {
+			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
+			sqlQuery.setMaxResults(pageable.getPageSize());
+		}
+
 		try {
 			final List<Object[]> result = sqlQuery.list();
 			final List<CropParameter> cropParameters = new ArrayList<>();
@@ -60,7 +63,6 @@ public class CropParameterDAO extends GenericDAO<CropParameter, String> {
 			return cropParameters;
 		} catch (final HibernateException e) {
 			final String message = "Error with getAllCropParameters" + e.getMessage();
-			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
@@ -71,7 +73,7 @@ public class CropParameterDAO extends GenericDAO<CropParameter, String> {
 			+ KEY_FILTER_QUERY);
 		sqlQuery.addEntity("c", CropParameter.class);
 		sqlQuery.addScalar("decryptedValue");
-		sqlQuery.setParameter("secretPassphrase", secretPassphrase);
+		sqlQuery.setParameter(SECRET_PASSPHRASE, secretPassphrase);
 		sqlQuery.setParameter("key", key);
 
 		final Object[] result = (Object[]) sqlQuery.uniqueResult();

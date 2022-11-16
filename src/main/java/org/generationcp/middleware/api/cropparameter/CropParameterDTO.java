@@ -17,7 +17,7 @@ public class CropParameterDTO {
 	}
 
 	public String getKey() {
-		return key;
+		return this.key;
 	}
 
 	public void setKey(final String key) {
@@ -25,7 +25,7 @@ public class CropParameterDTO {
 	}
 
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 
 	public void setValue(final String value) {
@@ -33,7 +33,7 @@ public class CropParameterDTO {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(final String description) {

@@ -38,7 +38,7 @@ public class CropParameterServiceImpl implements CropParameterService {
 		if (cropParameter == null) {
 			throw new MiddlewareRequestException("", "error.record.not.found", "key=" + key);
 		}
-		if (request.isEncrypted()) {
+		if (Boolean.TRUE.equals(request.isEncrypted())) {
 			this.daoFactory.getCropParameterDAO().updateEncryptedPassword(key, request.getValue(), this.secretPassphrase);
 		} else {
 			cropParameter.setValue(request.getValue());
