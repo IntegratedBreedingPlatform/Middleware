@@ -203,12 +203,12 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		user.setStatus(0);
 		user.setPerson(person);
 		this.workbenchDaoFactory.getWorkbenchUserDAO().save(user);
-		final UserDto retrievedUser = this.userService.getUserByFullname(user.getPerson().getDisplayName());
+		final UserDto retrievedUser = this.userService.getUserByFullname(user.getPerson().getDisplayName()).get();
 		Assert.assertEquals(user.getUserid(), retrievedUser.getId());
 
 		user.setStatus(1);
 		this.workbenchDaoFactory.getWorkbenchUserDAO().save(user);
-		Assert.assertNull(this.userService.getUserByFullname(user.getPerson().getDisplayName()));
+		Assert.assertFalse(this.userService.getUserByFullname(user.getPerson().getDisplayName()).isPresent());
 	}
 
 	@Test

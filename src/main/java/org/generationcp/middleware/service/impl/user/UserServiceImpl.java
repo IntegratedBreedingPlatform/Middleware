@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -72,12 +73,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDto getUserByFullname(final String fullname) {
-		final WorkbenchUser user = this.workbenchDaoFactory.getWorkbenchUserDAO().getUserByFullName(fullname);
-		if (user != null) {
-			return new UserDto(user);
+	public Optional<UserDto> getUserByFullname(final String fullname) {
+		final Optional<WorkbenchUser> user = this.workbenchDaoFactory.getWorkbenchUserDAO().getUserByFullName(fullname);
+		if (Optional.empty().isPresent()) {
+			return Optional.of(new UserDto(user.get()));
 		}
-		return null;
+		return Optional.empty();
 	}
 
 	@Override

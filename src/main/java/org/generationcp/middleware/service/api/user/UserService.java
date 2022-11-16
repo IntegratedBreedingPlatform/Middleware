@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface UserService {
 
@@ -37,7 +38,7 @@ public interface UserService {
 	 */
 	List<WorkbenchUser> getUserByName(String name, int start, int numOfRows, Operation op);
 
-	UserDto getUserByFullname(String fullname);
+	Optional<UserDto> getUserByFullname(String fullname);
 
 	Long countUsersByFullname(String fullname);
 
