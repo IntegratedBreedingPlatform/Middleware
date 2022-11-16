@@ -8,7 +8,7 @@ public class GermplasmUpdateRequest extends GermplasmImportRequest{
 
 	public GermplasmUpdateRequest(final String accessionNumber, final String acquisitionDate, final String breedingMethodDbId,
 		final String commonCropName,
-		final String countryOfOriginCode, final String defaultDisplayName, final String genus, final String germplasmOrigin,
+		final String countryOfOriginCode, final String defaultDisplayName, final String genus, final GermplasmOrigin germplasmOrigin,
 		final String instituteCode,
 		final String instituteName, final String pedigree, final String seedSource, final String species, final String speciesAuthority,
 		final String subtaxa, final String subtaxaAuthority) {
