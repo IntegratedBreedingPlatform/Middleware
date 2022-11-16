@@ -8,7 +8,7 @@
 		<preConditions onFail="CONTINUE">
             <and>
                 <not>
-                    <foreignKeyConstraintExists foreignKeyName="names_name_type_fk_idx"></foreignKeyConstraintExists>
+                    <foreignKeyConstraintExists foreignKeyName="names_name_type_fk"></foreignKeyConstraintExists>
                 </not>
                 <sqlCheck expectedResult="0">
                     SELECT COUNT(*) FROM names n WHERE n.ntype is null OR NOT EXISTS ( SELECT 1 FROM udflds u WHERE u.fldno = n.ntype);
@@ -16,7 +16,7 @@
             </and>
 		</preConditions>
 		<comment>Add names.ntype foreign key to udflds table</comment>
-		<addForeignKeyConstraint baseTableName="names" baseColumnNames="ntype" constraintName="names_name_type_fk_idx" referencedTableName="udflds"
+		<addForeignKeyConstraint baseTableName="names" baseColumnNames="ntype" constraintName="names_name_type_fk" referencedTableName="udflds"
 								 referencedColumnNames="fldno"/>
 	</changeSet>
 
