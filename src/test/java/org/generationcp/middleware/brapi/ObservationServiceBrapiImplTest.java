@@ -31,6 +31,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
@@ -113,11 +114,14 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 	private String observationUnitDbId;
 	private VariableDTO variableDTO;
 
+	private WorkbenchDaoFactory workbenchDaoFactory;
+
 	@Before
 	public void setUp() {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 
-		this.workbenchTestDataUtil.setUpWorkbench();
+		this.workbenchTestDataUtil.setUpWorkbench(workbenchDaoFactory);
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 			this.crop = this.programService.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
