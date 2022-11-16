@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Optional<UserDto> getUserByFullname(final String fullname) {
 		final Optional<WorkbenchUser> user = this.workbenchDaoFactory.getWorkbenchUserDAO().getUserByFullName(fullname);
-		if (Optional.empty().isPresent()) {
+		if (user.isPresent()) {
 			return Optional.of(new UserDto(user.get()));
 		}
 		return Optional.empty();
