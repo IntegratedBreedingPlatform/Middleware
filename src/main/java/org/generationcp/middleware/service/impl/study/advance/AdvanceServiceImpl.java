@@ -175,9 +175,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 		this.daoFactory.getMethodDAO().getAllMethod().forEach(method -> {
 			breedingMethodsByCode.put(method.getMcode(), method);
 			breedingMethodsById.put(method.getMid(), method);
-
-			// Breeding methods will only be used as read entities, so detaching it from the hibernate session to prevent performance issues later
-			this.daoFactory.getMethodDAO().evict(method);
 		});
 
 		final List<Location> locations = this.getLocationsFromTrialObservationUnits(trialObservations);
@@ -253,6 +250,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final List<Integer> advancedGermplasmGids = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(advancingSources)) {
 			try {
+				// Clearing the hibernate session to prevent performance issue when generating names
+				this.daoFactory.getSessionProvider().getSession().clear();
+
 				// Generating the advanced names
 				this.namingConventionService.generateAdvanceListName(advancingSources);
 			} catch (final RuleException e) {
