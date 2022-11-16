@@ -67,7 +67,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		}
 
 		if (this.workbenchDaoFactory == null) {
-			this.workbenchDaoFactory = new WorkbenchDaoFactory(this.sessionProvder);
+			this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
