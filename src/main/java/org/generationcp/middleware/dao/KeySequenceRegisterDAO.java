@@ -113,7 +113,9 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 				query.executeUpdate();
 			}
 		} else {
-			this.getSession().save(new KeySequenceRegister(keyPrefix, lastSequence));
+			final String sql = "INSERT INTO key_sequence_register (key_prefix, last_used_sequence, optimistic_lock_number) VALUES ('"
+				+ keyPrefix + "', " + lastSequence + ", 0)";
+			this.getSession().createSQLQuery(sql).executeUpdate();
 		}
 	}
 
