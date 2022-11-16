@@ -19,7 +19,6 @@ public class SequenceExpression extends BaseExpression implements Expression {
 	private static final String KEY = "\\[SEQUENCE\\]";
 	private static final Pattern PATTERN = Pattern.compile(SequenceExpression.KEY);
 
-	// TODO: it's possible to refactor to avoid hitting the DB for each line
 	@Autowired
 	protected GermplasmNamingService germplasmNamingService;
 

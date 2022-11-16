@@ -1,12 +1,15 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -16,9 +19,11 @@ public class AttributeMaleParentExpression extends AttributeExpression {
 	public static final String ATTRIBUTE_KEY = "ATTRMP";
 	public static final String PATTERN_KEY = "\\[" + ATTRIBUTE_KEY + "\\.([^\\.]*)\\]";
 
-	// TODO: refactor. Try to avoid hitting the DB for each line
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
+
+	@Autowired
+	private GermplasmService germplasmService;
 
 	@Override
 	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
@@ -42,6 +47,7 @@ public class AttributeMaleParentExpression extends AttributeExpression {
 		for (final StringBuilder value : values) {
 			this.replaceAttributeExpressionWithValue(value, ATTRIBUTE_KEY, variableId, attributeValue);
 		}
+
 	}
 
 	@Override
@@ -50,9 +56,9 @@ public class AttributeMaleParentExpression extends AttributeExpression {
 	}
 
 	protected Integer getSourceParentGID(final Integer gid) {
-		final Germplasm groupSource = this.germplasmDataManager.getGermplasmByGID(gid);
-		if (groupSource != null) {
-			return groupSource.getGpid2();
+		final List<BasicGermplasmDTO> groupSource = this.germplasmService.getBasicGermplasmByGids(Collections.singleton(gid));
+		if (!CollectionUtils.isEmpty(groupSource)) {
+			return groupSource.get(0).getGpid2();
 		} else {
 			return null;
 		}
