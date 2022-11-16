@@ -12,6 +12,7 @@ public class BasicGermplasmDTO {
 	private Integer gnpgs;
 	private Integer mgid;
 	private Integer methodId;
+	private Integer locationId;
 
 	public Integer getGid() {
 		return gid;
@@ -59,6 +60,14 @@ public class BasicGermplasmDTO {
 
 	public void setMethodId(final Integer methodId) {
 		this.methodId = methodId;
+	}
+
+	public Integer getLocationId() {
+		return locationId;
+	}
+
+	public void setLocationId(final Integer locationId) {
+		this.locationId = locationId;
 	}
 
 	@Override

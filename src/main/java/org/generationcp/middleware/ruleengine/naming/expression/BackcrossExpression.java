@@ -15,7 +15,6 @@ public class BackcrossExpression extends BaseExpression {
 	static final String MALE_RECURRENT_SUFFIX = "M";
 	static final String FEMALE_RECURRENT_SUFFIX = "F";
 
-	// TODO: refactor. Try to avoid hitting the DB for each line
 	@Autowired
 	private PedigreeDataManager pedigreeDataManager;
 

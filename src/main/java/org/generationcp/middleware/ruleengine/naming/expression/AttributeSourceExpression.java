@@ -10,7 +10,6 @@ import java.util.List;
 @Component
 public class AttributeSourceExpression extends AttributeExpression {
 
-	// TODO: refactor. Try to avoid hitting the DB for each line
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
 
