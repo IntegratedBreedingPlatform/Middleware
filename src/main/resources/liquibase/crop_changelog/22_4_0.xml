@@ -1,0 +1,60 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="cheryleigh" id="v22.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="crop_parameter" columnName="encrypted_value"/>
+			</not>
+		</preConditions>
+		<comment>Add column 'encrypted_value' to 'crop_parameter' table</comment>
+		<addColumn tableName="crop_parameter">
+			<column name="encrypted_value" type="BLOB" >
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v22.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="crop_parameter" columnName="is_encrypted"/>
+			</not>
+		</preConditions>
+		<comment>Add column 'is_encrypted' to 'crop_parameter' table</comment>
+		<addColumn tableName="crop_parameter">
+			<column name="is_encrypted" type="TINYINT(1) UNSIGNED ZEROFILL" defaultValue="0" >
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+    </changeSet>
+
+	<changeSet author="cheryleigh" id="v22.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from crop_parameter where `key` in ('gigwa_endpoint', 'gigwa_token_endpoint',
+						'gigwa_program_id', 'gigwa_username', 'gigwa_password', 'gigwa_base_url')
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Create crop_parameter entries for GIGWA crop genotyping parameters
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO crop_parameter (`key`, description)
+			VALUES ('gigwa_endpoint', 'Crop genotyping endpoint url');
+			INSERT INTO crop_parameter (`key`, description)
+			VALUES ('gigwa_token_endpoint', 'Crop genotyping token endpoint url');
+			INSERT INTO crop_parameter (`key`, description)
+			VALUES ('gigwa_program_id', 'Crop genotyping program ID');
+			INSERT INTO crop_parameter (`key`, description)
+			VALUES ('gigwa_base_url', 'Crop genotyping base url');
+			INSERT INTO crop_parameter (`key`, description)
+			VALUES ('gigwa_username', 'Crop genotyping username');
+			INSERT INTO crop_parameter (`key`, description, is_encrypted)
+			VALUES ('gigwa_password', 'Password for specified crop genotyping username', 1);
+		</sql>
+	</changeSet>
+</databaseChangeLog>

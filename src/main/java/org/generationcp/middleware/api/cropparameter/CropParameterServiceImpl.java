@@ -4,6 +4,7 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.CropParameter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,13 +20,16 @@ public class CropParameterServiceImpl implements CropParameterService {
 
 	private final DaoFactory daoFactory;
 
+	@Value("${db.encryption.secret.passphrase}")
+	private String secretPassphrase;
+
 	public CropParameterServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
 	public List<CropParameter> getCropParameters(final Pageable pageable) {
-		return this.daoFactory.getCropParameterDAO().getAll(pageable.getPageNumber(), pageable.getPageSize());
+		return this.daoFactory.getCropParameterDAO().getAllCropParameters(pageable, this.secretPassphrase);
 	}
 
 	@Override
@@ -34,12 +38,17 @@ public class CropParameterServiceImpl implements CropParameterService {
 		if (cropParameter == null) {
 			throw new MiddlewareRequestException("", "error.record.not.found", "key=" + key);
 		}
-		cropParameter.setValue(request.getValue());
-		this.daoFactory.getCropParameterDAO().saveOrUpdate(cropParameter);
+		if (request.isEncrypted()) {
+			this.daoFactory.getCropParameterDAO().updateEncryptedPassword(key, request.getValue(), this.secretPassphrase);
+		} else {
+			cropParameter.setValue(request.getValue());
+			this.daoFactory.getCropParameterDAO().saveOrUpdate(cropParameter);
+		}
 	}
 
 	@Override
 	public Optional<CropParameter> getCropParameter(final CropParameterEnum cropParameterEnum) {
-		return ofNullable(this.daoFactory.getCropParameterDAO().getById(cropParameterEnum.getKey()));
+		return ofNullable(this.daoFactory.getCropParameterDAO().getCropParameterById(cropParameterEnum.getKey(), this.secretPassphrase));
 	}
+
 }
