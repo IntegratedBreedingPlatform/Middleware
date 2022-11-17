@@ -1,5 +1,6 @@
 package org.generationcp.middleware.audit;
 
+import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Name;
 import org.junit.Before;
 import org.junit.Test;
@@ -109,7 +110,7 @@ public class NameAuditIntegrationTest extends AuditIntegrationTestBase {
 	protected Map<String, Object> createQueryParams(final Integer modifiedBy, final Date modifiedDate) {
 		final Map<String, Object> queryParams = new LinkedHashMap<>();
 		queryParams.put("gid", new Random().nextInt());
-		queryParams.put("ntype", new Random().nextInt());
+		queryParams.put("ntype", GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID());
 		queryParams.put("nstat", new Random().nextInt());
 		queryParams.put("created_by", new Random().nextInt());
 		queryParams.put("nval", UUID.randomUUID().toString());

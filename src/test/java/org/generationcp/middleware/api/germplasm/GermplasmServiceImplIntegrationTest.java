@@ -2114,7 +2114,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Germplasm targetGermplasm = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
 		// Add ALTERNATE_CROSS_NAME name to the target germplasm
 		final Name altCrossName1 =
-			this.addName(targetGermplasm, GermplasmNameType.ALTERNATE_CROSS_NAME.getUserDefinedFieldID(),
+			this.addName(targetGermplasm, GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(),
 				RandomStringUtils.randomAlphabetic(10), 0,
 				this.creationDate, 1);
 		// Add PUI name to the target germplasm
@@ -2126,7 +2126,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Germplasm germplasmToMerge1 = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
 		// Add ALTERNATE_CROSS_NAME to the germplasm to be merged
 		final Name altCrossName2 =
-			this.addName(germplasmToMerge1, GermplasmNameType.ALTERNATE_CROSS_NAME.getUserDefinedFieldID(),
+			this.addName(germplasmToMerge1, GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(),
 				RandomStringUtils.randomAlphabetic(10), 0,
 				this.creationDate, 1);
 		// Add PUI name to the germplasm to be merged
@@ -2138,7 +2138,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Germplasm germplasmToMerge2 = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
 		// Add ALTERNATE_CROSS_NAME to the germplasm to be merged
 		final Name altCrossName3 =
-			this.addName(germplasmToMerge2, GermplasmNameType.ALTERNATE_CROSS_NAME.getUserDefinedFieldID(),
+			this.addName(germplasmToMerge2, GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(),
 				RandomStringUtils.randomAlphabetic(10), 0,
 				this.creationDate, 1);
 		// Add PUI name to the germplasm to be merged
