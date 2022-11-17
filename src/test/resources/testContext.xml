@@ -402,7 +402,7 @@
 	</bean>
 
 	<bean id="cropGenotypingParameterService" class="org.generationcp.middleware.service.impl.crop.CropGenotypingParameterServiceImpl">
-		<constructor-arg name="workbenchSessionProvider" ref="workbenchSessionProvider"/>
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
 	<bean id="pedigreeServiceBrapi" class="org.generationcp.middleware.api.brapi.PedigreeServiceBrapiImpl">
