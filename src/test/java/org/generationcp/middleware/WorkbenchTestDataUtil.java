@@ -1,9 +1,11 @@
 
 package org.generationcp.middleware;
 
+import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.program.ProgramService;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -44,6 +46,7 @@ public class WorkbenchTestDataUtil {
 	private ProjectActivity testProjectActivity1, testProjectActivity2;
 	private CropType cropType;
 
+
 	public WorkbenchTestDataUtil() {
 		// Do nothing
 	}
@@ -70,13 +73,26 @@ public class WorkbenchTestDataUtil {
 	public WorkbenchUser createTestUserData() {
 		final WorkbenchUser user = new WorkbenchUser();
 		user.setInstalid(1);
-		user.setStatus(1);
+		user.setStatus(0);
 		user.setAccess(1);
 		user.setType(1);
 		user.setName("user_test" + new Random().nextInt());
 		user.setPassword("user_password");
 		final Person person = new Person();
-		person.setId(1);
+		person.setContact(RandomStringUtils.randomAlphabetic(5));
+		person.setEmail(RandomStringUtils.randomAlphabetic(5));
+		person.setExtension(RandomStringUtils.randomAlphabetic(5));
+		person.setFax(RandomStringUtils.randomAlphabetic(5));
+		person.setFirstName(RandomStringUtils.randomAlphabetic(5));
+		person.setLastName(RandomStringUtils.randomAlphabetic(5));
+		person.setInstituteId(RandomUtils.nextInt());
+		person.setLanguage(RandomUtils.nextInt());
+		person.setMiddleName(RandomStringUtils.randomAlphabetic(5));
+		person.setNotes(RandomStringUtils.randomAlphabetic(5));
+		person.setPhone(RandomStringUtils.randomAlphabetic(5));
+		person.setPositionName(RandomStringUtils.randomAlphabetic(5));
+		person.setTitle(RandomStringUtils.randomAlphabetic(5));
+
 		user.setPerson(person);
 		user.setAssignDate(20150101);
 		user.setCloseDate(20150101);
@@ -123,7 +139,7 @@ public class WorkbenchTestDataUtil {
 		return projectActivity;
 	}
 
-	public void setUpWorkbench() {
+	public void setUpWorkbench(final WorkbenchDaoFactory workbenchDaoFactory) {
 		this.commonTestProject = this.createTestProjectData();
 		this.cropType = this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
 		this.commonTestProject.setCropType(this.cropType);
@@ -131,18 +147,15 @@ public class WorkbenchTestDataUtil {
 		crops.add(this.cropType);
 
 		this.testPerson1 = this.createTestPersonData();
-		this.userService.addPerson(this.testPerson1);
 		this.testPerson2 = this.createTestPersonData();
-		this.userService.addPerson(this.testPerson2);
-
 		this.testUser1 = this.createTestUserData();
 		this.testUser1.setPerson(this.testPerson1);
 		this.testPerson1.setCrops(crops);
-		this.userService.addUser(this.testUser1);
+		workbenchDaoFactory.getWorkbenchUserDAO().save(this.testUser1);
 		this.testUser2 = this.createTestUserData();
 		this.testUser2.setPerson(this.testPerson2);
 		this.testPerson2.setCrops(crops);
-		this.userService.addUser(this.testUser2);
+		workbenchDaoFactory.getWorkbenchUserDAO().save(this.testUser2);
 
 		this.commonTestProject.setUserId(this.testUser1.getUserid());
 		this.programService.addProgram(this.commonTestProject);
@@ -157,7 +170,7 @@ public class WorkbenchTestDataUtil {
 		//TODO check if this is needed since we are hardcoding to user id 3
 		userInfo.setUserId(3);
 		userInfo.setLoginCount(5);
-		this.userService.insertOrUpdateUserInfo(userInfo);
+		workbenchDaoFactory.getUserInfoDAO().insertOrUpdateUserInfo(userInfo);
 
 		// Save test users 1 and 2 as members of test program
 		ProjectUserInfo pui = new ProjectUserInfo();
@@ -166,13 +179,13 @@ public class WorkbenchTestDataUtil {
 		pui.setProject(this.commonTestProject);
 		pui.setUser(workbenchUser);
 		pui.setLastOpenDate(new Date());
-		this.userService.saveOrUpdateProjectUserInfo(pui);
+		workbenchDaoFactory.getProjectUserInfoDAO().saveOrUpdate(pui);
 
 		pui = new ProjectUserInfo();
 		pui.setProject(this.commonTestProject);
 		pui.setUser(this.testUser2);
 		pui.setLastOpenDate(new Date());
-		this.userService.saveOrUpdateProjectUserInfo(pui);
+		workbenchDaoFactory.getProjectUserInfoDAO().saveOrUpdate(pui);
 	}
 
 	public Project getCommonTestProject() {

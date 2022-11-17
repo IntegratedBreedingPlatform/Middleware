@@ -2,8 +2,9 @@ package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.api.role.RoleService;
+import org.generationcp.middleware.dao.MethodDAO;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.junit.Assert;
@@ -27,10 +28,13 @@ public class MethodServiceImplTest extends IntegrationTestBase {
 
 	private MethodServiceImpl methodService;
 
+	private WorkbenchDaoFactory workbenchDaoFactory;
+
 	@Before
 	public void setUp() {
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 
-		this.workbenchTestDataUtil.setUpWorkbench();
+		this.workbenchTestDataUtil.setUpWorkbench(workbenchDaoFactory);
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
