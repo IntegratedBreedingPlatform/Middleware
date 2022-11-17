@@ -32,7 +32,7 @@ public class CropParameterDAO extends GenericDAO<CropParameter, String> {
 		super(session);
 	}
 
-	public void updateEncryptedPassword(final String key, final String encryptedValue, final String secretPassphrase) {
+	public void updateEncryptedValue(final String key, final String encryptedValue, final String secretPassphrase) {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(UPDATE_ENCRYPTED_VARIABLE_QUERY);
 		sqlQuery.setParameter("key", key);
 		sqlQuery.setParameter(SECRET_PASSPHRASE, secretPassphrase);
