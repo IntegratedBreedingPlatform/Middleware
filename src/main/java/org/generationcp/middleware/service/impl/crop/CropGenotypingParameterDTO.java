@@ -14,6 +14,7 @@ public class CropGenotypingParameterDTO {
 	private String password;
 	private String programId;
 	private String baseUrl;
+	private String token;
 
 	public String getCropName() {
 		return this.cropName;
@@ -77,6 +78,14 @@ public class CropGenotypingParameterDTO {
 
 	public void setBaseUrl(final String baseUrl) {
 		this.baseUrl = baseUrl;
+	}
+
+	public String getToken() {
+		return this.token;
+	}
+
+	public void setToken(final String token) {
+		this.token = token;
 	}
 
 	@Override

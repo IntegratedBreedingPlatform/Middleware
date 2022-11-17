@@ -10,6 +10,9 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class CropParameterDAO extends GenericDAO<CropParameter, String> {
 
@@ -21,6 +24,7 @@ public class CropParameterDAO extends GenericDAO<CropParameter, String> {
 		"SELECT {c.*}, AES_DECRYPT(`encrypted_value`, UNHEX(SHA2(:secretPassphrase,512))) as decryptedValue "
 			+ " FROM crop_parameter c";
 
+	private static final String SEARCH_FILTER_QUERY = " WHERE lower(c.`key`) like concat('%', lower(:key), '%')";
 	private static final String KEY_FILTER_QUERY = " WHERE c.`key` = :key";
 	public static final String SECRET_PASSPHRASE = "secretPassphrase";
 
@@ -37,11 +41,21 @@ public class CropParameterDAO extends GenericDAO<CropParameter, String> {
 	}
 
 	public List<CropParameter> getAllCropParameters(final Pageable pageable, final String secretPassphrase) {
+		return this.getCropParametersByKeyFilter(pageable, secretPassphrase, null);
+	}
+
+	public List<CropParameter> getCropParametersByKeyFilter(final Pageable pageable, final String secretPassphrase,
+		final String searchFilter) {
+		final boolean hasFilter = StringUtils.isNotBlank(searchFilter);
 		// Get the CropParameter object along with the decrypted password.
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(DECRYPT_VARIABLE_QUERY);
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(DECRYPT_VARIABLE_QUERY
+			+ (hasFilter ? SEARCH_FILTER_QUERY : StringUtils.EMPTY));
 		sqlQuery.addEntity("c", CropParameter.class);
 		sqlQuery.addScalar("decryptedValue");
 		sqlQuery.setParameter(SECRET_PASSPHRASE, secretPassphrase);
+		if (hasFilter) {
+			sqlQuery.setParameter("key", searchFilter);
+		}
 
 		if (pageable != null) {
 			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
@@ -86,5 +100,12 @@ public class CropParameterDAO extends GenericDAO<CropParameter, String> {
 		} else {
 			return null;
 		}
+	}
+
+	public Map<String, CropParameter> getCropParameterMapByKeyFilter(final Pageable pageable, final String secretPassphrase,
+		final String searchFilter) {
+		final List<CropParameter> cropParameters = this.getCropParametersByKeyFilter(pageable, secretPassphrase, searchFilter);
+
+		return cropParameters.stream().collect(Collectors.toMap(CropParameter::getKey, Function.identity()));
 	}
 }
