@@ -485,9 +485,9 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetNamesByGidsAndPrefixes() {
 		final Germplasm germplasm = this.createGermplasm();
-		final Name name1 = NameTestDataInitializer.createName(2016, germplasm.getGid(), "PREF 001");
+		final Name name1 = NameTestDataInitializer.createName(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), germplasm.getGid(), "PREF 001");
 		this.nameDAO.save(name1);
-		final Name name2 = NameTestDataInitializer.createName(2016, germplasm.getGid(), "REF 001");
+		final Name name2 = NameTestDataInitializer.createName(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), germplasm.getGid(), "REF 001");
 		this.nameDAO.save(name2);
 		final List<String> names = this.germplasmDataManager.getNamesByGidsAndPrefixes(Collections.singletonList(germplasm.getGid()), Collections.singletonList("PREF"));
 		Assert.assertEquals(1, names.size());
