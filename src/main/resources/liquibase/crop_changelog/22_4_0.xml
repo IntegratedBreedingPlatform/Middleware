@@ -4,7 +4,23 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="cheryleigh" id="v22.4.0-1">
+	<changeSet author="clarysabel" id="v22.4.0-1">
+		<preConditions onFail="CONTINUE">
+            <and>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="names_name_type_fk"></foreignKeyConstraintExists>
+                </not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM names n WHERE n.ntype is null OR NOT EXISTS ( SELECT 1 FROM udflds u WHERE u.fldno = n.ntype);
+                </sqlCheck>
+            </and>
+		</preConditions>
+		<comment>Add names.ntype foreign key to udflds table</comment>
+		<addForeignKeyConstraint baseTableName="names" baseColumnNames="ntype" constraintName="names_name_type_fk" referencedTableName="udflds"
+								 referencedColumnNames="fldno"/>
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v22.4.0-2">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="crop_parameter" columnName="encrypted_value"/>
@@ -18,7 +34,7 @@
 		</addColumn>
 	</changeSet>
 
-	<changeSet author="cheryleigh" id="v22.4.0-2">
+	<changeSet author="cheryleigh" id="v22.4.0-3">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="crop_parameter" columnName="is_encrypted"/>
@@ -32,7 +48,7 @@
 		</addColumn>
     </changeSet>
 
-	<changeSet author="cheryleigh" id="v22.4.0-3">
+	<changeSet author="cheryleigh" id="v22.4.0-4">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(1) from crop_parameter where `key` in ('gigwa_endpoint', 'gigwa_token_endpoint',

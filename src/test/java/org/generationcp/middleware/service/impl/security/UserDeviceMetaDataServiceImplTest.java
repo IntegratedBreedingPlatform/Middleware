@@ -3,12 +3,14 @@ package org.generationcp.middleware.service.impl.security;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.security.UserDeviceMetaDataDto;
 import org.generationcp.middleware.service.api.security.UserDeviceMetaDataService;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,6 +27,15 @@ public class UserDeviceMetaDataServiceImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
+	private WorkbenchDaoFactory workbenchDaoFactory;
+
+	@Before
+	public void before(){
+		if (workbenchDaoFactory == null) {
+			this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
+		}
+	}
 
 	@Test
 	public void testAddUserDevice() {
@@ -49,8 +60,7 @@ public class UserDeviceMetaDataServiceImplTest extends IntegrationTestBase {
 		final String deviceDetails = RandomStringUtils.randomAlphabetic(10);
 		final String location = RandomStringUtils.randomAlphabetic(10);
 
-		final UserDeviceMetaDataDto userDeviceMetaDataDto =
-			this.userDeviceMetaDataService.addUserDevice(userId, deviceDetails, location);
+		this.userDeviceMetaDataService.addUserDevice(userId, deviceDetails, location);
 
 		final Optional<UserDeviceMetaDataDto> result = this.userDeviceMetaDataService.findUserDevice(userId, deviceDetails, location);
 
@@ -111,12 +121,12 @@ public class UserDeviceMetaDataServiceImplTest extends IntegrationTestBase {
 
 	private WorkbenchUser createTestUser() {
 		final Person person = this.workbenchTestDataUtil.createTestPersonData();
-		this.userService.addPerson(person);
+		this.workbenchDaoFactory.getPersonDAO().save(person);
 		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
 		user.setStatus(0);
 		user.setPerson(person);
 		user.setRoles(new ArrayList<>());
-		return this.userService.addUser(user);
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().save(user);
 	}
 
 }

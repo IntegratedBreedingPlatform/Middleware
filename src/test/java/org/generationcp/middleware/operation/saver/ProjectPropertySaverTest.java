@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
@@ -77,6 +78,8 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 
 	private StudyTestDataInitializer studyTDI;
 
+	private WorkbenchDaoFactory workbenchDaoFactory;
+
 	@Before
 	public void setup() throws Exception {
 		this.studyDataManager = new StudyDataManagerImpl(this.sessionProvder);
@@ -93,7 +96,11 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 		}
 
-		this.workbenchTestDataUtil.setUpWorkbench();
+		if (workbenchDaoFactory == null) {
+			workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
+		}
+
+		this.workbenchTestDataUtil.setUpWorkbench(workbenchDaoFactory);
 
 		final Properties mockProperties = Mockito.mock(Properties.class);
 		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");

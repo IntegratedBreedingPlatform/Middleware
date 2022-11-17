@@ -57,7 +57,6 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
-import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -129,6 +128,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private Project commonTestProject;
 
 	private DaoFactory daoFactory;
+	private WorkbenchDaoFactory workbenchDaoFactory;
 
 	private ExperimentModelSaver experimentModelSaver;
 
@@ -138,13 +138,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 	private CropType crop;
 
-	private StandardVariableSaver standardVariableSaver;
-
 	@Before
 	public void setUp() throws Exception {
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
 
 		this.daoFactory = new DaoFactory(this.sessionProvder);
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 
 		this.manager.setUserService(this.userService);
 
@@ -155,9 +154,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final Optional<DataType> dataTypeOptional = Optional.of(DataType.CATEGORICAL_VARIABLE);
 		Mockito.when(this.variableDataManager.getDataType(Matchers.anyInt())).thenReturn(dataTypeOptional);
 
-		this.standardVariableSaver = new StandardVariableSaver(this.sessionProvder);
-
-		this.workbenchTestDataUtil.setUpWorkbench();
+		this.workbenchTestDataUtil.setUpWorkbench(workbenchDaoFactory);
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
