@@ -112,6 +112,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 	@Resource
 	private GermplasmStudySourceService germplasmStudySourceService;
 
+	@Resource(name = "getCropDatabaseSessionProvider")
+	private HibernateSessionProvider sessionProvider;
+
 	private final DaoFactory daoFactory;
 	private final SeasonDataResolver seasonDataResolver;
 	private final SelectionTraitDataResolver selectionTraitDataResolver;
@@ -251,7 +254,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 		if (!CollectionUtils.isEmpty(advancingSources)) {
 			try {
 				// Clearing the hibernate session to prevent performance issue when generating names
-				this.daoFactory.getSessionProvider().getSession().clear();
+				this.sessionProvider.getSession().clear();
+
+				this.namingConventionService.setSession(this.sessionProvider.getSession());
 
 				// Generating the advanced names
 				this.namingConventionService.generateAdvanceListName(advancingSources);

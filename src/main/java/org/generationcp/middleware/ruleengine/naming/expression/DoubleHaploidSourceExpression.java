@@ -13,7 +13,6 @@ public class DoubleHaploidSourceExpression extends BaseExpression {
 
 	public static final String KEY = "[DHSOURCE]";
 
-	// TODO: it's possible to refactor to avoid hitting the DB for each line
 	@Autowired
 	protected KeySequenceRegisterService keySequenceRegisterService;
 
@@ -36,7 +35,7 @@ public class DoubleHaploidSourceExpression extends BaseExpression {
 				synchronized (DoubleHaploidSourceExpression.class) {
 					final String keyPrefix = value.substring(0, checkIndex + 1);
 					// Get last sequence number for KeyPrefix with synchronization at class level
-					final int lastUsedSequence = this.keySequenceRegisterService.incrementAndGetNextSequence(keyPrefix);
+					final int lastUsedSequence = this.keySequenceRegisterService.incrementAndGetNextSequenceWithoutHibernate(keyPrefix);
 					this.replaceExistingSuffixValue(value, checkIndex + 1);
 					this.replaceExpressionWithValue(value, String.valueOf(lastUsedSequence));
 				}

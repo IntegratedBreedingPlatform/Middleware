@@ -2032,7 +2032,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	public List<BasicGermplasmDTO> getBasicGermplasmByGids(final Set<Integer> gids) {
 
-		final String queryString = "SELECT g.gid, g.gpid1, g.gpid2, g.gnpgs, g.mgid, g.methn as methodId "
+		final String queryString = "SELECT g.gid, g.gpid1, g.gpid2, g.gnpgs, g.mgid, g.methn as methodId, g.glocn as locationId "
 			+ " FROM germplsm g WHERE g.gid IN( :gids ) "
 			+ " AND g.deleted = 0"
 			+ " AND g.grplce = 0";

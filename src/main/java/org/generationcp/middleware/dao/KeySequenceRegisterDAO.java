@@ -34,7 +34,7 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 	}
 
 	// TODO: rename me!
-	public Integer getLastUsedSequenceByPrefixWithoutHibernate(final String keyPrefix){
+	public Integer getByPrefixWithoutHibernate(final String keyPrefix){
 		if (keyPrefix != null) {
 			/*
 			 *  There can be multiple results (eg. same prefix but both null and empty string suffix will be returned from DB)
@@ -61,7 +61,7 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 
 	// TODO: rename me!
 	public int getNextSequenceWithoutHibernate(final String keyPrefix) {
-		final Integer lastUsedSequence = this.getLastUsedSequenceByPrefixWithoutHibernate(keyPrefix);
+		final Integer lastUsedSequence = this.getByPrefixWithoutHibernate(keyPrefix);
 
 		if (lastUsedSequence != null) {
 			return lastUsedSequence + 1;
@@ -84,6 +84,21 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 		}
 	}
 
+//	// TODO: rename me
+	public int incrementAndGetNextSequenceWithoutHibernate(final String keyPrefix) {
+
+		final Integer lastUsedSequence = this.getByPrefixWithoutHibernate(keyPrefix);
+
+		if (lastUsedSequence != null) {
+			final int newLastUsedSequence = lastUsedSequence + 1;
+			this.updateLastSequenceWithoutHibernate(keyPrefix, newLastUsedSequence);
+			return newLastUsedSequence;
+		} else {
+			this.createKeySequenceRegisterWithoutHibernate(keyPrefix, 1);
+			return 1;
+		}
+	}
+
 	public void saveLastSequenceUsed(final String keyPrefix, final Integer lastSequence) {
 
 		final KeySequenceRegister keySequenceRegister = this.getByPrefix(keyPrefix);
@@ -102,20 +117,14 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 	// TODO: rename me!
 	public void saveLastSequenceUsedWithoutHibernate(final String keyPrefix, final Integer lastSequence) {
 
-		final Integer lastUsedSequence = this.getLastUsedSequenceByPrefixWithoutHibernate(keyPrefix);
+		final Integer lastUsedSequence = this.getByPrefixWithoutHibernate(keyPrefix);
 
 		if (lastUsedSequence != null) {
 			if (lastSequence > lastUsedSequence) {
-				final String sql = "UPDATE key_sequence_register SET last_used_sequence = :lastSequence WHERE key_prefix = :keyPrefix";
-				final SQLQuery query = this.getSession().createSQLQuery(sql);
-				query.setParameter("keyPrefix", keyPrefix);
-				query.setParameter("lastSequence", lastSequence);
-				query.executeUpdate();
+				this.updateLastSequenceWithoutHibernate(keyPrefix, lastSequence);
 			}
 		} else {
-			final String sql = "INSERT INTO key_sequence_register (key_prefix, last_used_sequence, optimistic_lock_number) VALUES ('"
-				+ keyPrefix + "', " + lastSequence + ", 0)";
-			this.getSession().createSQLQuery(sql).executeUpdate();
+			this.createKeySequenceRegisterWithoutHibernate(keyPrefix, lastSequence);
 		}
 	}
 
@@ -132,7 +141,20 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 			final String message = "Error with deleteByKeyPrefixes(" + keyPrefixes + ") query from keyPrefixes " + e.getMessage();
 			throw new MiddlewareQueryException(message, e);
 		}
-
-
 	}
+
+	private void updateLastSequenceWithoutHibernate(final String keyPrefix, final Integer lastSequence) {
+		final String sql = "UPDATE key_sequence_register SET last_used_sequence = :lastSequence WHERE key_prefix = :keyPrefix";
+		final SQLQuery query = this.getSession().createSQLQuery(sql);
+		query.setParameter("keyPrefix", keyPrefix);
+		query.setParameter("lastSequence", lastSequence);
+		query.executeUpdate();
+	}
+
+	private void createKeySequenceRegisterWithoutHibernate(final String keyPrefix, final Integer lastSequence) {
+		final String sql = "INSERT INTO key_sequence_register (key_prefix, last_used_sequence, optimistic_lock_number) VALUES ('"
+			+ keyPrefix + "', " + lastSequence + ", 0)";
+		this.getSession().createSQLQuery(sql).executeUpdate();
+	}
+
 }
