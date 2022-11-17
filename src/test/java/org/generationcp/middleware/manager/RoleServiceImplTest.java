@@ -45,8 +45,9 @@ public class RoleServiceImplTest extends IntegrationTestBase {
 
 	@Before
 	public void beforeTest() {
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 
-		this.workbenchTestDataUtil.setUpWorkbench();
+		this.workbenchTestDataUtil.setUpWorkbench(workbenchDaoFactory);
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
@@ -55,8 +56,6 @@ public class RoleServiceImplTest extends IntegrationTestBase {
 		if (this.testUser1 == null) {
 			this.testUser1 = this.workbenchTestDataUtil.getTestUser1();
 		}
-
-		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 	}
 
 	@Test

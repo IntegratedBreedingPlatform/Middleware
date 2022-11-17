@@ -14,6 +14,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
@@ -61,12 +62,15 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 	private GermplasmListDAO germplasmListDAO;
 	private CropType crop;
 
+	private WorkbenchDaoFactory workbenchDaoFactory;
+
 	@Before
 	public void setUp() throws Exception {
 		this.fieldbookService = new FieldbookServiceImpl(this.sessionProvder);
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 
-		this.workbenchTestDataUtil.setUpWorkbench();
+		this.workbenchTestDataUtil.setUpWorkbench(workbenchDaoFactory);
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();

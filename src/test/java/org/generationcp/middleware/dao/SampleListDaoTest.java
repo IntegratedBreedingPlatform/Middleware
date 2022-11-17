@@ -2,6 +2,8 @@ package org.generationcp.middleware.dao;
 
 import com.google.common.collect.Ordering;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.role.RoleService;
+import org.generationcp.middleware.api.role.RoleServiceImpl;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
@@ -17,8 +19,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.api.role.RoleServiceImpl;
-import org.generationcp.middleware.api.role.RoleService;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
@@ -71,12 +72,14 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	private UserService userService;
 
 	private DaoFactory daoFactory;
+	private WorkbenchDaoFactory workbenchDaoFactory;
 
 	public static final String ROOT_FOLDER = "Samples";
 
 	@Before
 	public void setUp() throws Exception {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 
 		this.sampleListDao = this.daoFactory.getSampleListDao();
 		this.sampleDao = this.daoFactory.getSampleDao();
@@ -350,7 +353,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 			workbenchUser.setName(ADMIN);
 			workbenchUser.setUserid(null);
 			workbenchUser.setPerson(person);
-			this.userService.addUser(workbenchUser);
+			this.workbenchDaoFactory.getWorkbenchUserDAO().save(workbenchUser);
 		}
 
 		return workbenchUser;
