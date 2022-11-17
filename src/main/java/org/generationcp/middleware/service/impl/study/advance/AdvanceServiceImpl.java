@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.generator.SeedSourceGenerator;
+import org.generationcp.middleware.ruleengine.naming.context.AdvanceContext;
 import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
@@ -69,6 +70,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -147,7 +149,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 			return new ArrayList<>();
 		}
 
-		// TODO: check why is returning 0 for study 42756
 		final List<ObservationUnitRow> trialObservations =
 			this.getTrialObservations(studyId, environmentDataset.getDatasetId(), request.getInstanceIds());
 
@@ -158,6 +159,11 @@ public class AdvanceServiceImpl implements AdvanceService {
 			this.getStudyEnvironmentVariables(studyVariables, environmentDataset.getVariables());
 		// TODO: review a better way to obtain this variables
 		final List<MeasurementVariable> studyVariates = this.getStudyVariates(environmentDataset.getVariables());
+
+		// Set stuff to context
+		AdvanceContext.setStudyId(studyId);
+		AdvanceContext.setEnvironmentDatasetId(environmentDataset.getDatasetId());
+		AdvanceContext.setStudyEnvironmentVariables(studyEnvironmentVariables);
 
 		// Getting data related at study level
 		final String seasonStudyLevel = this.seasonDataResolver.resolveStudyLevelData(studyEnvironmentVariables);
@@ -214,16 +220,19 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 			// If study is Trial, then setting data if trial instance is not null
 			final Integer trialInstanceNumber = row.getTrialInstance();
-			final ObservationUnitRow trialInstanceObservation = (trialInstanceNumber != null) ?
-				this.trialInstanceObservationsResolver
-					.setTrialInstanceObservations(trialInstanceNumber, trialObservations, studyInstancesByInstanceNumber) : null;
+			final ObservationUnitRow trialInstanceObservation =
+				this.getTrialInstanceObservations(trialInstanceNumber,
+					() -> this.trialInstanceObservationsResolver
+						.getTrialInstanceObservations(trialInstanceNumber, trialObservations, studyInstancesByInstanceNumber));
+
+			// To prevent a NPE in the future, filter the observations variables that don't have a variableId assigned, like PARENT_OBS_UNIT_ID
+			row.setVariables(this.filterNullObservations(row.getVariables()));
 
 			// Creates the advancing source. This object will be useful for expressions used later when the names are being generated
 			final AdvancingSource advancingSource =
 				new AdvancingSource(originGermplasm, namesByGids.get(row.getGid()), row, trialInstanceObservation,
-					studyEnvironmentVariables,
 					breedingMethod, breedingMethodsById.get(originGermplasm.getMethodId()),
-					studyId, environmentDataset.getDatasetId(), seasonStudyLevel, selectionTraitStudyLevel, plantsSelected);
+					seasonStudyLevel, selectionTraitStudyLevel, plantsSelected);
 
 			// Resolves data related to season, selection trait and location for environment and plot
 			this.resolveEnvironmentAndPlotLevelData(environmentDataset.getDatasetId(), plotDataset.getDatasetId(),
@@ -310,8 +319,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 					selectionNumber.incrementAndGet();
 				});
-
-				// TODO: create study source
 			});
 		}
 
@@ -430,6 +437,24 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.resolveEnvironmentLevelData(environmentDatasetId, selectionTraitRequest, source, plotDataVariablesByTermId);
 		this.selectionTraitDataResolver
 			.resolvePlotLevelData(plotDatasetId, selectionTraitRequest, source, row, plotDataVariablesByTermId);
+	}
+
+	private ObservationUnitRow getTrialInstanceObservations(final Integer trialInstanceNumber,
+		final Supplier<ObservationUnitRow> trialObservationsSupplier) {
+		if (trialInstanceNumber == null) {
+			return null;
+		}
+
+		final ObservationUnitRow trialObservations = trialObservationsSupplier.get();
+		// To prevent a NPE in the future, filter the observations variables that don't have a variableId assigned, like PARENT_OBS_UNIT_ID
+		trialObservations.setVariables(this.filterNullObservations(trialObservations.getVariables()));
+		return trialObservations;
+	}
+
+	private Map<String, ObservationUnitData> filterNullObservations(final Map<String, ObservationUnitData> observations) {
+		return observations.entrySet().stream()
+			.filter(entry -> Objects.nonNull(entry.getValue()) && Objects.nonNull(entry.getValue().getVariableId()))
+			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	private void createAdvancedGermplasm(final CropType cropType, final AdvancingSource advancingSource) {
@@ -568,13 +593,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 			seedSourceSelectionNumber = String.valueOf(selectionNumber);
 		}
 
-		// To prevent a NPE, filter the observations variables that they don't have a variableId assigned, like PARENT_OBS_UNIT_ID
-		final List<ObservationUnitData> plotObservations =
-			row.getVariables().values().stream().filter(observationUnitData -> Objects.nonNull(observationUnitData.getVariableId()))
-				.collect(
-					Collectors.toList());
 		return this.seedSourceGenerator
-			.generateSeedSource(plotObservations, studyEnvironmentVariables, seedSourceSelectionNumber, plotNumber,
+			.generateSeedSource(row.getVariables().values(), studyEnvironmentVariables, seedSourceSelectionNumber, plotNumber,
 				studyName, sampleNo, locationNameByIds, studyInstancesByInstanceNumber,
 				environmentVariables);
 	}

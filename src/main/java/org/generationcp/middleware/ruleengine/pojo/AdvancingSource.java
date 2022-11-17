@@ -8,9 +8,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AdvancingSource {
 
@@ -21,13 +19,6 @@ public class AdvancingSource {
 	// TODO: besides data processors, this is only being used by BreedersCrossIDExpression. Please, try to remove it from there.
 	//This will be used if we have trail
 	private ObservationUnitRow trialInstanceObservation;
-
-	// Setting conditions for Breeders Cross ID
-	private List<MeasurementVariable> conditions;
-
-	// TODO: these properties should be passed by a context or whatever
-	private Integer studyId;
-	private Integer environmentDatasetId;
 
 	private Method breedingMethod;
 	private Method sourceMethod;
@@ -55,9 +46,8 @@ public class AdvancingSource {
 	public AdvancingSource(final BasicGermplasmDTO originGermplasm, final List<BasicNameDTO> names,
 		final ObservationUnitRow plotObservation,
 		final ObservationUnitRow trialInstanceObservation,
-		final List<MeasurementVariable> studyEnvironmentVariables,
 		final Method breedingMethod,
-		final Method sourceMethod, final Integer studyId, final Integer environmentDatasetId,
+		final Method sourceMethod,
 		final String season, final String selectionTraitValue,
 		final Integer plantSelected) {
 
@@ -65,10 +55,6 @@ public class AdvancingSource {
 		this.names = names;
 		this.plotObservation = plotObservation;
 		this.trialInstanceObservation = trialInstanceObservation;
-		this.conditions = studyEnvironmentVariables;
-
-		this.studyId = studyId;
-		this.environmentDatasetId = environmentDatasetId;
 
 		this.breedingMethod = breedingMethod;
 		this.sourceMethod = sourceMethod;
@@ -95,18 +81,6 @@ public class AdvancingSource {
 
 	public ObservationUnitRow getTrialInstanceObservation() {
 		return trialInstanceObservation;
-	}
-
-	public List<MeasurementVariable> getConditions() {
-		return conditions;
-	}
-
-	public Integer getStudyId() {
-		return studyId;
-	}
-
-	public Integer getEnvironmentDatasetId() {
-		return environmentDatasetId;
 	}
 
 	public Method getBreedingMethod() {

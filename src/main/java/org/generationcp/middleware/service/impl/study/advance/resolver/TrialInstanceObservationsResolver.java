@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class TrialInstanceObservationsResolver {
 
-	public ObservationUnitRow setTrialInstanceObservations(final Integer trialInstanceNumber,
+	public ObservationUnitRow getTrialInstanceObservations(final Integer trialInstanceNumber,
 		final List<ObservationUnitRow> trialObservations,
 		final Map<Integer, StudyInstance> studyInstancesByInstanceNumber) {
 

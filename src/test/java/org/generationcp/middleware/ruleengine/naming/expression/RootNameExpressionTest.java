@@ -15,7 +15,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 public class RootNameExpressionTest extends TestExpression {
 
@@ -71,7 +70,7 @@ public class RootNameExpressionTest extends TestExpression {
 
 		final AdvancingSource source =
 			new AdvancingSource(new BasicGermplasmDTO(), names, new ObservationUnitRow(), new ObservationUnitRow(),
-				new ArrayList(), new Method(), new Method(), new Random().nextInt(), new Random().nextInt(), null,
+				new Method(), new Method(), null,
 				RandomStringUtils.randomAlphabetic(10), 2);
 		source.getBreedingMethod().setSnametype(10);
 		for (final String nameString : input) {
@@ -109,7 +108,7 @@ public class RootNameExpressionTest extends TestExpression {
 
 		final AdvancingSource source =
 			new AdvancingSource(new BasicGermplasmDTO(), names, new ObservationUnitRow(), new ObservationUnitRow(),
-				new ArrayList(), new Method(), new Method(), new Random().nextInt(), new Random().nextInt(), null,
+				new Method(), new Method(), null,
 				RandomStringUtils.randomAlphabetic(10), 2);
 
 		// Set the snametype to null
@@ -132,7 +131,7 @@ public class RootNameExpressionTest extends TestExpression {
 
 		final AdvancingSource source =
 			new AdvancingSource(new BasicGermplasmDTO(), names, new ObservationUnitRow(), new ObservationUnitRow(),
-				new ArrayList(), method, new Method(), new Random().nextInt(), new Random().nextInt(), null,
+				method, new Method(), null,
 				RandomStringUtils.randomAlphabetic(10), 2);
 		source.setRootName("Germplasm");
 		return source;

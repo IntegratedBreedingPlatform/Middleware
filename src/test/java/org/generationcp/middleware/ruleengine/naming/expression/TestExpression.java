@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class TestExpression {
 
@@ -43,7 +42,7 @@ public class TestExpression {
 		names.add(this.createBasicNameDTO(2, 1, name + "_two"));
 
 		final AdvancingSource source = new AdvancingSource(originGermplasm, names, new ObservationUnitRow(), new ObservationUnitRow(),
-			new ArrayList(), method, originGermplasmMethod, new Random().nextInt(), new Random().nextInt(), season,
+			method, originGermplasmMethod, season,
 			RandomStringUtils.randomAlphabetic(10), plantSelected);
 		source.setRootName(name);
 		return source;
