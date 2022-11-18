@@ -280,8 +280,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 				// Clearing the hibernate session to prevent performance issue when generating names
 				this.sessionProvider.getSession().clear();
 
-				this.namingConventionService.setSession(this.sessionProvider.getSession());
-
 				// Generating the advanced names
 				this.namingConventionService.generateAdvanceListName(advancingSources);
 			} catch (final RuleException e) {
