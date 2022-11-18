@@ -15,12 +15,14 @@ import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmStudySourceType;
@@ -114,6 +116,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 	@Resource
 	private GermplasmStudySourceService germplasmStudySourceService;
 
+	@Resource
+	private OntologyVariableDataManager ontologyVariableDataManager;
+
 	@Resource(name = "getCropDatabaseSessionProvider")
 	private HibernateSessionProvider sessionProvider;
 
@@ -149,9 +154,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 			return new ArrayList<>();
 		}
 
-		final List<ObservationUnitRow> trialObservations =
-			this.getTrialObservations(studyId, environmentDataset.getDatasetId(), request.getInstanceIds());
-
 		final List<MeasurementVariable> studyVariables =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(studyId, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 		// TODO: review a better way to obtain this variables
@@ -159,11 +161,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 			this.getStudyEnvironmentVariables(studyVariables, environmentDataset.getVariables());
 		// TODO: review a better way to obtain this variables
 		final List<MeasurementVariable> studyVariates = this.getStudyVariates(environmentDataset.getVariables());
-
-		// Set stuff to context
-		AdvanceContext.setStudyId(studyId);
-		AdvanceContext.setEnvironmentDatasetId(environmentDataset.getDatasetId());
-		AdvanceContext.setStudyEnvironmentVariables(studyEnvironmentVariables);
 
 		// Getting data related at study level
 		final String seasonStudyLevel = this.seasonDataResolver.resolveStudyLevelData(studyEnvironmentVariables);
@@ -174,10 +171,25 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId =
 			plotDataset.getVariables().stream().collect(Collectors.toMap(MeasurementVariable::getTermId, variable -> variable));
+		final Map<Integer, MeasurementVariable> environmentVariablesByTermId =
+			environmentDataset.getVariables().stream().collect(Collectors.toMap(MeasurementVariable::getTermId, variable -> variable));
 
-		final Map<Integer, StudyInstance> studyInstancesByInstanceNumber =
-			this.studyInstanceService.getStudyInstances(studyId).stream()
-				.collect(Collectors.toMap(StudyInstance::getInstanceNumber, i -> i));
+		final List<StudyInstance> studyInstances = this.studyInstanceService.getStudyInstances(studyId);
+		final Map<Integer, StudyInstance> studyInstancesByInstanceNumber = studyInstances.stream()
+			.collect(Collectors.toMap(StudyInstance::getInstanceNumber, i -> i));
+
+		final Map<String, String> locationsNamesByIds = this.studyInstanceService.getStudyInstances(studyId).stream()
+			.collect(Collectors.toMap(studyInstance -> String.valueOf(studyInstance.getLocationId()),
+				StudyInstance::getLocationName));
+
+		final Map<Integer, Variable> variablesByTermIds = this.getVariablesByTermIds();
+
+		// Setting stuff to context.
+		AdvanceContext.setStudyEnvironmentVariables(studyEnvironmentVariables);
+		AdvanceContext.setStudyInstancesByInstanceNumber(studyInstancesByInstanceNumber);
+		AdvanceContext.setLocationsNamesByIds(locationsNamesByIds);
+		AdvanceContext.setEnvironmentVariablesByTermId(environmentVariablesByTermId);
+		AdvanceContext.setVariablesByTermId(variablesByTermIds);
 
 		final Map<String, Method> breedingMethodsByCode = new HashMap<>();
 		final Map<Integer, Method> breedingMethodsById = new HashMap<>();
@@ -185,6 +197,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 			breedingMethodsByCode.put(method.getMcode(), method);
 			breedingMethodsById.put(method.getMid(), method);
 		});
+
+		final List<ObservationUnitRow> trialObservations =
+			this.getTrialObservations(studyId, environmentDataset.getDatasetId(), request.getInstanceIds());
 
 		final List<Location> locations = this.getLocationsFromTrialObservationUnits(trialObservations);
 		final Map<Integer, Location> locationsByLocationId =
@@ -397,6 +412,18 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.stream()
 			.map(variable -> new MeasurementVariableDto(variable.getTermId(), variable.getName()))
 			.collect(Collectors.toList());
+	}
+
+	private Map<Integer, Variable> getVariablesByTermIds() {
+		final HashMap<Integer, Variable> variablesByTermId = new HashMap<>();
+		variablesByTermId.put(TermId.HABITAT_DESIGNATION.getId(), this.getVariableByTermId(TermId.HABITAT_DESIGNATION.getId()));
+		variablesByTermId.put(TermId.PROJECT_PREFIX.getId(), this.getVariableByTermId(TermId.PROJECT_PREFIX.getId()));
+		variablesByTermId.put(TermId.SEASON_VAR.getId(), this.getVariableByTermId(TermId.SEASON_VAR.getId()));
+		return variablesByTermId;
+	}
+
+	private Variable getVariableByTermId(final Integer termId) {
+		return this.ontologyVariableDataManager.getVariable(ContextHolder.getCurrentProgramOptional().get(), termId, true);
 	}
 
 	private List<Location> getLocationsFromTrialObservationUnits(

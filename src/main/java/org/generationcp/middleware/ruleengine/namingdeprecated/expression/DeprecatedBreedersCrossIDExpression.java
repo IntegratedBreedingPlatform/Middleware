@@ -1,6 +1,6 @@
 package org.generationcp.middleware.ruleengine.namingdeprecated.expression;
 
-import org.generationcp.middleware.ruleengine.generator.BreedersCrossIDGenerator;
+import org.generationcp.middleware.ruleengine.generator.DeprecatedBreedersCrossIDGenerator;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import static org.generationcp.middleware.service.api.dataset.ObservationUnitUti
 public class DeprecatedBreedersCrossIDExpression extends DeprecatedBaseExpression {
 
 	@Autowired
-	private BreedersCrossIDGenerator breedersCrossIDGenerator;
+	private DeprecatedBreedersCrossIDGenerator breedersCrossIDGenerator;
 
 	public static final String KEY = "[CIMCRS]";
 
