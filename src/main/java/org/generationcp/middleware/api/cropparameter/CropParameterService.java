@@ -1,7 +1,6 @@
 package org.generationcp.middleware.api.cropparameter;
 
 import org.generationcp.middleware.pojos.CropParameter;
-import org.generationcp.middleware.service.impl.crop.CropGenotypingParameterDTO;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -15,5 +14,5 @@ public interface CropParameterService {
 
 	Optional<CropParameter> getCropParameter(CropParameterEnum cropParameterEnum);
 
-	Optional<CropGenotypingParameterDTO> getCropGenotypingParameter(String cropName);
+	public List<CropParameter> getCropParametersByGroupName(String groupName);
 }

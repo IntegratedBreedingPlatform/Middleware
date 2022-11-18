@@ -50,6 +50,20 @@
 
 	<changeSet author="cheryleigh" id="v22.4.0-4">
 		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="crop_parameter" columnName="group_name"/>
+			</not>
+		</preConditions>
+		<comment>Add column 'group_name' to 'crop_parameter' table</comment>
+		<addColumn tableName="crop_parameter">
+			<column name="group_name" type="varchar(255)" >
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+    </changeSet>
+
+	<changeSet author="cheryleigh" id="v22.4.0-5">
+		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(1) from crop_parameter where `key` in ('gigwa_endpoint', 'gigwa_token_endpoint',
 						'gigwa_program_id', 'gigwa_username', 'gigwa_password', 'gigwa_base_url')
@@ -59,18 +73,18 @@
 			Create crop_parameter entries for GIGWA crop genotyping parameters
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			INSERT INTO crop_parameter (`key`, description)
-			VALUES ('gigwa_endpoint', 'Crop genotyping endpoint url');
-			INSERT INTO crop_parameter (`key`, description)
-			VALUES ('gigwa_token_endpoint', 'Crop genotyping token endpoint url');
-			INSERT INTO crop_parameter (`key`, description)
-			VALUES ('gigwa_program_id', 'Crop genotyping program ID');
-			INSERT INTO crop_parameter (`key`, description)
-			VALUES ('gigwa_base_url', 'Crop genotyping base url');
-			INSERT INTO crop_parameter (`key`, description)
-			VALUES ('gigwa_username', 'Crop genotyping username');
-			INSERT INTO crop_parameter (`key`, description, is_encrypted)
-			VALUES ('gigwa_password', 'Password for specified crop genotyping username', 1);
+			INSERT INTO crop_parameter (`key`, description, group_name)
+			VALUES ('gigwa_endpoint', 'Crop genotyping endpoint url', 'gigwa');
+			INSERT INTO crop_parameter (`key`, description, group_name)
+			VALUES ('gigwa_token_endpoint', 'Crop genotyping token endpoint url', 'gigwa');
+			INSERT INTO crop_parameter (`key`, description, group_name)
+			VALUES ('gigwa_program_id', 'Crop genotyping program ID', 'gigwa');
+			INSERT INTO crop_parameter (`key`, description, group_name)
+			VALUES ('gigwa_base_url', 'Crop genotyping base url', 'gigwa');
+			INSERT INTO crop_parameter (`key`, description, group_name)
+			VALUES ('gigwa_username', 'Crop genotyping username', 'gigwa');
+			INSERT INTO crop_parameter (`key`, description, is_encrypted, group_name)
+			VALUES ('gigwa_password', 'Password for specified crop genotyping username', 1, 'gigwa');
 		</sql>
 	</changeSet>
 </databaseChangeLog>

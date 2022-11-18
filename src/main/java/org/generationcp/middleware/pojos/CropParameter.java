@@ -33,6 +33,9 @@ public class CropParameter {
 	@Column(name = "is_encrypted", columnDefinition = "TINYINT")
 	private Boolean isEncrypted;
 
+	@Column(name = "group_name")
+	private String groupName;
+
 	@Transient
 	private String encryptedValue;
 
@@ -74,6 +77,14 @@ public class CropParameter {
 
 	public void setIsEncrypted(final Boolean encrypted) {
 		this.isEncrypted = encrypted;
+	}
+
+	public String getGroupName() {
+		return this.groupName;
+	}
+
+	public void setGroupName(final String groupName) {
+		this.groupName = groupName;
 	}
 
 	@Override
