@@ -38,6 +38,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -184,7 +185,9 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 			+ " OR l.liststatus IS NULL)";
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@TableGenerator(name = "germplasmIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
+		pkColumnValue = "germplsm", allocationSize = 500)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "germplasmIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "gid")
 	@XmlElement(name = "gid")
