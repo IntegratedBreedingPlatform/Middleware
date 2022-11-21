@@ -73,12 +73,12 @@ public class CropParameterDAO extends GenericDAO<CropParameter, String> {
 			}
 			return cropParameters;
 		} catch (final HibernateException e) {
-			final String message = "Error with getAllCropParameters" + e.getMessage();
+			final String message = "Error with getCropParametersByGroupName" + e.getMessage();
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public CropParameter getCropParameterById(final String key, final String secretPassphrase) {
+	public CropParameter getCropParameterByKey(final String key, final String secretPassphrase) {
 		// Get the CropParameter object along with the decrypted password.
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(DECRYPT_VARIABLE_QUERY
 			+ KEY_FILTER_QUERY);

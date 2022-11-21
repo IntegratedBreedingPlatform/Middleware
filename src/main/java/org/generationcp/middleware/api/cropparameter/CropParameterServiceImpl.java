@@ -48,7 +48,7 @@ public class CropParameterServiceImpl implements CropParameterService {
 
 	@Override
 	public Optional<CropParameter> getCropParameter(final CropParameterEnum cropParameterEnum) {
-		return ofNullable(this.daoFactory.getCropParameterDAO().getCropParameterById(cropParameterEnum.getKey(), this.secretPassphrase));
+		return ofNullable(this.daoFactory.getCropParameterDAO().getCropParameterByKey(cropParameterEnum.getKey(), this.secretPassphrase));
 	}
 
 	@Override
