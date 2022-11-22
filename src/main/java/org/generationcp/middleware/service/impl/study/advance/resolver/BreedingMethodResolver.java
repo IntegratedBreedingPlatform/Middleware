@@ -33,10 +33,8 @@ public class BreedingMethodResolver {
 		return breedingMethodsById.get(breedingMethodId);
 	}
 
-	// TODO: why it is asking for BREEDING_METHOD_VARIATE and BREEDING_METHOD_VARIATE_TEXT? Is it due to backward compatibility?
 	private Integer getBreedingMethodId(final Integer methodVariateId, final ObservationUnitRow plotObservation,
 		final Map<String, Method> breedingMethodsByCode) {
-		// TODO: the user can select BREEDING_METHOD_VARIATE as variate variable ???
 		if (TermId.BREEDING_METHOD_VARIATE.getId() == methodVariateId) {
 			return AdvanceUtils.getIntegerValue(plotObservation.getVariableValueByVariableId(methodVariateId));
 		} else if (TermId.BREEDING_METHOD_VARIATE_TEXT.getId() == methodVariateId

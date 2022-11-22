@@ -1,6 +1,5 @@
 package org.generationcp.middleware.ruleengine.pojo;
 
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -16,7 +15,6 @@ public class AdvancingSource {
 	private List<BasicNameDTO> names;
 	private ObservationUnitRow plotObservation;
 
-	// TODO: besides data processors, this is only being used by BreedersCrossIDExpression. Please, try to remove it from there.
 	//This will be used if we have trail
 	private ObservationUnitRow trialInstanceObservation;
 

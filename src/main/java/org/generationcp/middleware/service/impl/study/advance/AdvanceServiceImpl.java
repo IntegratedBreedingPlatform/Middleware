@@ -506,7 +506,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 			advancedGermplasm.setReferenceId(0);
 			advancedGermplasm.setGrplce(0);
 
-			// TODO: check if it's really necessary to do this or we can set it the mgid value directly
 			// check to see if a group ID (MGID) exists in the parent for this Germplasm, and set newly created germplasm if part of a
 			// group ( > 0 )
 			if (originGermplasm.getMgid() != null && originGermplasm.getMgid() > 0) {
