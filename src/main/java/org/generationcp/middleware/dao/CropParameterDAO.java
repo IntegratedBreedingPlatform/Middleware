@@ -67,7 +67,7 @@ public class CropParameterDAO extends GenericDAO<CropParameter, String> {
 				final CropParameter cropParameter = (CropParameter) row[0];
 				final byte[] passwordBytes = (byte[]) row[1];
 				if (passwordBytes != null && cropParameter.isEncrypted()) {
-					cropParameter.setValue(new String(passwordBytes));
+					cropParameter.setEncryptedValue(new String(passwordBytes));
 				}
 				cropParameters.add(cropParameter);
 			}

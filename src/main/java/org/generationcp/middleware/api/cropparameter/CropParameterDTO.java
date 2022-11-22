@@ -11,9 +11,10 @@ public class CropParameterDTO {
 
 	public CropParameterDTO(final CropParameter cropParameter) {
 		this.key = cropParameter.getKey();
-		this.value = cropParameter.getValue();
 		this.description = cropParameter.getDescription();
 		this.isEncrypted = cropParameter.isEncrypted();
+		this.value = Boolean.TRUE.equals(this.isEncrypted) ? cropParameter.getEncryptedValue() :
+			cropParameter.getValue();
 	}
 
 	public String getKey() {
