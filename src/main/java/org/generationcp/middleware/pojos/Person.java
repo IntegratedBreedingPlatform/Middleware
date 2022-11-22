@@ -14,6 +14,7 @@ package org.generationcp.middleware.pojos;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.annotations.Fetch;
@@ -100,6 +101,22 @@ public class Person implements Comparable<Person>, Serializable {
 	public Person() {
 	}
 
+	public Person(final UserDto userDto) {
+		this.firstName = userDto.getFirstName();
+		this.middleName = "";
+		this.lastName = userDto.getLastName();
+		this.email = userDto.getEmail();
+		this.title = "-";
+		this.contact = "-";
+		this.extension = "-";
+		this.fax  = "-";
+		this.instituteId = 0;
+		this.language = 0;
+		this.notes = "-";
+		this.positionName = "-";
+		this.phone = "-";
+	}
+
 	public Person(final String firstName, final String middleName, final String lastName) {
 		this.firstName = firstName;
 		this.middleName = middleName;
@@ -111,30 +128,6 @@ public class Person implements Comparable<Person>, Serializable {
 		this.firstName = firstName;
 		this.middleName = middleName;
 		this.lastName = lastName;
-	}
-
-	/**
-	 * Create a copy of this Person object. Note that this method does not copy the {@link Person#id} field.
-	 * 
-	 * @return the copy of this Person object.
-	 */
-	public Person copy() {
-		final Person person = new Person();
-		person.setFirstName(this.firstName);
-		person.setLastName(this.lastName);
-		person.setMiddleName(this.middleName);
-		person.setInstituteId(this.instituteId);
-		person.setTitle(this.title);
-		person.setPositionName(this.positionName);
-		person.setLanguage(this.language);
-		person.setPhone(this.phone);
-		person.setExtension(this.extension);
-		person.setFax(this.fax);
-		person.setEmail(this.email);
-		person.setNotes(this.notes);
-		person.setContact(this.contact);
-
-		return person;
 	}
 
 	public Integer getId() {

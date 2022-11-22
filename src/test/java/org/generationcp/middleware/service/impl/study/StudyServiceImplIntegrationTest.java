@@ -9,6 +9,7 @@ import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -50,13 +51,15 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	private CropType crop;
 	private Project commonTestProject;
 	private WorkbenchUser testUser;
+	private WorkbenchDaoFactory workbenchDaoFactory;
 	private DaoFactory daoFactory;
 
 	@Before
 	public void setUp() {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 
-		this.workbenchTestDataUtil.setUpWorkbench();
+		this.workbenchTestDataUtil.setUpWorkbench(workbenchDaoFactory);
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 			this.crop = this.programService.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();

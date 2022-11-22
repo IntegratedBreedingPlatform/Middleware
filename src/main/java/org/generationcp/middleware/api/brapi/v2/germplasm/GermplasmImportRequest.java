@@ -53,7 +53,7 @@ public class GermplasmImportRequest {
 	private List<ExternalReferenceDTO> externalReferences;
 	private String genus;
 	private String germplasmName;
-	private String germplasmOrigin;
+	private GermplasmOrigin germplasmOrigin;
 	private String germplasmPUI;
 	private String germplasmPreprocessing;
 	private String instituteCode;
@@ -73,7 +73,7 @@ public class GermplasmImportRequest {
 
 	public GermplasmImportRequest(final String accessionNumber, final String acquisitionDate, final String breedingMethodDbId,
 		final String commonCropName,
-		final String countryOfOriginCode, final String defaultDisplayName, final String genus, final String germplasmOrigin,
+		final String countryOfOriginCode, final String defaultDisplayName, final String genus, final GermplasmOrigin germplasmOrigin,
 		final String instituteCode,
 		final String instituteName, final String pedigree, final String seedSource, final String species, final String speciesAuthority,
 		final String subtaxa, final String subtaxaAuthority) {
@@ -199,11 +199,11 @@ public class GermplasmImportRequest {
 		this.germplasmName = germplasmName;
 	}
 
-	public String getGermplasmOrigin() {
+	public GermplasmOrigin getGermplasmOrigin() {
 		return this.germplasmOrigin;
 	}
 
-	public void setGermplasmOrigin(final String germplasmOrigin) {
+	public void setGermplasmOrigin(final GermplasmOrigin germplasmOrigin) {
 		this.germplasmOrigin = germplasmOrigin;
 	}
 

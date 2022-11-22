@@ -96,30 +96,6 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		+ "       p.project_id = :projectId "
 		+ "    GROUP BY users.userid";
 
-	//User with access to a program is the union of:
-	//1. Users with Instance role
-	//2. Users with crop role and no program role assigned
-	//3. Users with explicit access to the program via program role
-	public static final String GET_ACTIVE_USER_IDS_WITH_ACCESS_TO_A_PROGRAM =
-		"select distinct u.userid " //
-			+ "from users u " //
-			+ "       inner join crop_persons cp on cp.personid = u.personid " //
-			+ "       inner join users_roles ur on ur.userid = u.userid " //
-			+ "       inner join role r on ur.role_id = r.id " //
-			+ "       left join workbench_project wp on ur.workbench_project_id = wp.project_id " //
-			+ "where ((role_type_id = " + RoleType.INSTANCE.getId() + ") " //
-			+ "  || (role_type_id = " + RoleType.CROP.getId()
-			+ " and ur.crop_name = cp.crop_name and not exists(SELECT distinct p1.project_id " //
-			+ "                                      FROM workbench_project p1 " //
-			+ "                                             INNER JOIN " //
-			+ "                                      users_roles ur1 ON ur1.workbench_project_id = p1.project_id " //
-			+ "                                             INNER JOIN role r1 ON ur1.role_id = r1.id " //
-			+ "                                      where r1.role_type_id = " + RoleType.PROGRAM.getId() //
-			+ "                                        AND ur1.crop_name = cp.crop_name AND ur1.userid = u.userid) "
-			//
-			+ "    || (role_type_id= " + RoleType.PROGRAM.getId() + " and wp.project_id = :projectId))) and " //
-			+ "  u.ustatus = 0 and cp.crop_name = (select wpi.crop_type from workbench_project wpi where wpi.project_id = :projectId) ";
-
 	public static final String GET_BY_NAME_USING_EQUAL = "getUserByNameUsingEqual";
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
 	public static final String GET_BY_FULLNAME = "getByFullName";
@@ -166,7 +142,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	@Transient
 	private Boolean isnew = false;
 
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "personid")
 	@NotFound(action = NotFoundAction.IGNORE)
 	private Person person;
