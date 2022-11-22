@@ -10,47 +10,33 @@
 
 package org.generationcp.middleware.api.role;
 
-import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.service.api.user.RoleDto;
+import org.generationcp.middleware.service.api.user.RoleGeneratorInput;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RoleService {
+
 
 	/**
 	 * Close the sessionProvider
 	 */
 	void close();
 
-	/**
-	 * Returns list of roles filtered according to roleSearchDto
-	 *
-	 * @return
-	 */
-	List<Role> getRoles(RoleSearchDto roleSearchDto);
+	List<RoleDto> getRoles(RoleSearchDto roleSearchDto);
 
-	/**
-	 * Save role
-	 *
-	 * @param role
-	 * @return Role
-	 */
-	Role saveRole(Role role);
+	RoleDto saveRole(RoleGeneratorInput dto);
 
-	/**
-	 * Get role by name
-	 *
-	 * @param name
-	 * @return Role
-	 */
-	Role getRoleByName(String name);
+	RoleDto updateRole(RoleGeneratorInput roleGeneratorInput);
 
-	/**
-	 * Get role by id
-	 *
-	 * @param id
-	 * @return Role
-	 */
-	Role getRoleById(Integer id);
+	Optional<RoleDto> getRoleByName(String name);
+
+	Optional<RoleDto> getRoleById(Integer id);
+
+	Optional<RoleDto> getRoleWithUsers (Integer id);
+
+	boolean isRoleInUse(Integer roleId);
 
 }

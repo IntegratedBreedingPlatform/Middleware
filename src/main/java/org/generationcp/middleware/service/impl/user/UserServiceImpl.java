@@ -356,11 +356,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<WorkbenchUser> getUsersWithRole(final int roleId) {
-		return this.workbenchDaoFactory.getUserRoleDao().getUsersByRoleId(roleId);
-	}
-
-	@Override
 	public List<ProgramMemberDto> getProgramMembers(
 		final String programUUID, final ProgramMembersSearchRequest searchRequest,
 		final Pageable pageable) {

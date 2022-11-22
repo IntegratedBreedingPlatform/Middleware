@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleDto;
+import org.generationcp.middleware.service.api.user.RoleTypeDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -228,7 +229,7 @@ public class WorkbenchTestDataUtil {
 		userdto.setLastName(lastName);
 		final UserRoleDto userRoleDto = new UserRoleDto(1,
 			new RoleDto(1, "Admin", "",
-				"instance", true, true,
+				new RoleTypeDto(1, "instance"), true, true,
 				true), null,
 			null, null);
 		final List<UserRoleDto> userRoleDtos = new ArrayList<>();

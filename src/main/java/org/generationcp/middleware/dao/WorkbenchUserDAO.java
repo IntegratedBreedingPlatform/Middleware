@@ -10,6 +10,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleDto;
+import org.generationcp.middleware.service.api.user.RoleTypeDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.hibernate.Criteria;
@@ -378,7 +379,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			for (final Map<String, Object> item : queryResults) {
 				final RoleDto roleDto = new RoleDto((Integer) item
 					.get(ProgramMembersQuery.ROLE_ID), (String) item.get(ProgramMembersQuery.ROLE_NAME),
-					(String) item.get(ProgramMembersQuery.ROLE_DESCRIPTION), (String) item.get(ProgramMembersQuery.ROLE_TYPE_NAME),
+					(String) item.get(ProgramMembersQuery.ROLE_DESCRIPTION), new RoleTypeDto((Integer) item.get(ProgramMembersQuery.ROLE_TYPE_ID), (String) item.get(ProgramMembersQuery.ROLE_TYPE_NAME)),
 					(Boolean) item.get(ProgramMembersQuery.ROLE_ACTIVE), null, null);
 				final ProgramMemberDto programMemberDto =
 					new ProgramMemberDto((Integer) item.get(ProgramMembersQuery.USER_ID), (String) item.get(ProgramMembersQuery.USERNAME),

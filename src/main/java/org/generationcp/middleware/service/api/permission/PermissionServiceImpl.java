@@ -6,8 +6,10 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.RoleTypePermission;
+import org.generationcp.middleware.service.api.user.RoleTypeDto;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -56,15 +58,21 @@ public class PermissionServiceImpl implements PermissionService {
 	}
 
 	@Override
-	public Permission getPermissionById(final Integer permissionId) {
-		return this.workbenchDaoFactory.getPermissionDAO().getById(permissionId);
+	public List<PermissionDto> getPermissionsDtoByIds(final Set<Integer> permissionIds) {
+		final List<PermissionDto> permissionDtoList = new ArrayList<>();
+		this.workbenchDaoFactory.getPermissionDAO().getPermissions(permissionIds).forEach( p -> {
+			final PermissionDto permissionDto = new PermissionDto(p);
+			//load role types
+			final List<RoleTypeDto> roleTypeDtos = new ArrayList<>();
+			p.getRoleTypePermissions().forEach(rtp -> {
+				roleTypeDtos.add(new RoleTypeDto(rtp.getRoleType()));
+			});
+			permissionDto.setRoleTypes(roleTypeDtos);
+			permissionDtoList.add(permissionDto);
+		}
+		);
+		return permissionDtoList;
 	}
-
-	@Override
-	public List<Permission> getAllPermissions() {
-		return this.workbenchDaoFactory.getPermissionDAO().getAll();
-	}
-
 	@Override
 	public List<Permission> getPermissionsByIds(final Set<Integer> permissionIds) {
 		return this.workbenchDaoFactory.getPermissionDAO().getPermissions(permissionIds);

@@ -21,6 +21,7 @@ public class ProgramMembersQuery {
 	public static String ROLE_ID = "roleid";
 	public static String ROLE_NAME = "rolename";
 	public static String ROLE_DESCRIPTION = "roledescription";
+	public static String ROLE_TYPE_ID = "roletypeid";
 	public static String ROLE_TYPE_NAME = "roletype";
 	public static String ROLE_ACTIVE = "roleactive";
 
@@ -60,7 +61,9 @@ public class ProgramMembersQuery {
 	private static final String PROGRAM_MEMBERS_SELECT_CLAUSE =
 		" distinct u.userid as " + USER_ID + ",  u.uname as " + USERNAME + ", p.fname as " + FIRST_NAME + ", " //
 			+ "p.lname as " + LAST_NAME + ", p.pemail as " + EMAIL + ", " //
-			+ "r.id as " + ROLE_ID + ", r.name as " + ROLE_NAME + ", r.description as " + ROLE_DESCRIPTION + ", rt.name as " //
+			+ "r.id as " + ROLE_ID + ", r.name as " + ROLE_NAME + ", r.description as " + ROLE_DESCRIPTION //
+			+ ", rt.role_type_id as " + ROLE_TYPE_ID +
+			", rt.name as " //
 			+ ROLE_TYPE_NAME + ", r.active as " + ROLE_ACTIVE;
 
 	private static final String DEFAULT_SORT_EXPRESSION = " order by rt.role_type_id asc, r.name asc ";

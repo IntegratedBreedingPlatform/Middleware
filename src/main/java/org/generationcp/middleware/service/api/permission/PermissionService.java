@@ -12,13 +12,11 @@ public interface PermissionService {
 
 	List<PermissionDto> getPermissionLinks(final Integer userId, final String cropName, final Integer programId);
 
-	Permission getPermissionById(Integer permissionId);
+	PermissionDto getPermissionTree(Integer roleTypeId);
 
-	List<Permission> getAllPermissions();
+	List<PermissionDto> getPermissionsDtoByIds(Set<Integer> permissionIds);
 
 	List<Permission> getPermissionsByIds(Set<Integer> permissionIds);
-
-	PermissionDto getPermissionTree(Integer roleTypeId);
 
 	/**
 	 * Close the sessionProvider

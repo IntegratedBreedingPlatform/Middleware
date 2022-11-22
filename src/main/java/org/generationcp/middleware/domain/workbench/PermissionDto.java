@@ -3,6 +3,7 @@ package org.generationcp.middleware.domain.workbench;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.generationcp.middleware.pojos.workbench.Permission;
+import org.generationcp.middleware.service.api.user.RoleTypeDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -19,6 +20,9 @@ public class PermissionDto {
 	private String description;
 
 	private Integer parentId;
+
+	@JsonIgnore
+	private List<RoleTypeDto> roleTypes;
 
 	@JsonIgnore
 	private Integer workbenchCategoryLinkId;
@@ -98,6 +102,14 @@ public class PermissionDto {
 
 	public void addChild(final PermissionDto permissionDto) {
 		this.children.add(permissionDto);
+	}
+
+	public List<RoleTypeDto> getRoleTypes() {
+		return roleTypes;
+	}
+
+	public void setRoleTypes(final List<RoleTypeDto> roleTypes) {
+		this.roleTypes = roleTypes;
 	}
 
 	@Override
