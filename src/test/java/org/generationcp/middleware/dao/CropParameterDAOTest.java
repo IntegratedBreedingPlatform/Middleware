@@ -52,14 +52,14 @@ public class CropParameterDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllCropParameters() {
-		List<CropParameter> cropParamList = this.cropParameterDAO.getAllCropParameters(new PageRequest(0, 10), SECRET_PHRASE);
+		final List<CropParameter> cropParamList = this.cropParameterDAO.getAllCropParameters(new PageRequest(0, 10), SECRET_PHRASE);
 		MatcherAssert.assertThat("Expected list of crop parameters size > zero",
 			cropParamList != null && cropParamList.size() > 0);
 	}
 
 	@Test
 	public void testGetCropParametersByGroupName() {
-		List<CropParameter> cropParamList = this.cropParameterDAO.getCropParametersByGroupName(new PageRequest(0, 10), SECRET_PHRASE,
+		final List<CropParameter> cropParamList = this.cropParameterDAO.getCropParametersByGroupName(new PageRequest(0, 10), SECRET_PHRASE,
 			TEST_GROUP_NAME);
 		MatcherAssert.assertThat("Expected list of crop parameters size = 2 given the group name",
 			cropParamList != null && cropParamList.size() == 2);
@@ -67,7 +67,7 @@ public class CropParameterDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetCropParameterByKey() {
-		CropParameter cropParameter = this.cropParameterDAO.getCropParameterByKey(TEST_PARAM_KEY, SECRET_PHRASE);
+		final CropParameter cropParameter = this.cropParameterDAO.getCropParameterByKey(TEST_PARAM_KEY, SECRET_PHRASE);
 		Assert.assertNotNull(cropParameter);
 		Assert.assertEquals(this.cropParameterTest.getValue(), cropParameter.getValue());
 	}
@@ -78,7 +78,7 @@ public class CropParameterDAOTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().refresh(this.cropParameterEncrypted);
 		this.cropParameterDAO.updateEncryptedValue(TEST_ENCRYPTED_PARAM_KEY, TEST_ENCRYPTED_PARAM_VALUE, SECRET_PHRASE);
 
-		CropParameter cropParameter = this.cropParameterDAO.getCropParameterByKey(TEST_ENCRYPTED_PARAM_KEY, SECRET_PHRASE);
+		final CropParameter cropParameter = this.cropParameterDAO.getCropParameterByKey(TEST_ENCRYPTED_PARAM_KEY, SECRET_PHRASE);
 		Assert.assertNotNull(cropParameter);
 		Assert.assertEquals(TEST_ENCRYPTED_PARAM_VALUE, cropParameter.getEncryptedValue());
 	}
