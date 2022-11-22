@@ -1,7 +1,6 @@
 package org.generationcp.middleware.service.api.permission;
 
 import org.generationcp.middleware.domain.workbench.PermissionDto;
-import org.generationcp.middleware.pojos.workbench.Permission;
 
 import java.util.List;
 import java.util.Set;
@@ -15,8 +14,6 @@ public interface PermissionService {
 	PermissionDto getPermissionTree(Integer roleTypeId);
 
 	List<PermissionDto> getPermissionsDtoByIds(Set<Integer> permissionIds);
-
-	List<Permission> getPermissionsByIds(Set<Integer> permissionIds);
 
 	/**
 	 * Close the sessionProvider

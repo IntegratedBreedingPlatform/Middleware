@@ -9,6 +9,7 @@ import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @AutoProperty
 public class PermissionDto {
@@ -22,7 +23,7 @@ public class PermissionDto {
 	private Integer parentId;
 
 	@JsonIgnore
-	private List<RoleTypeDto> roleTypes;
+	private Map<RoleTypeDto, Boolean> roleTypeSelectableMap;
 
 	@JsonIgnore
 	private Integer workbenchCategoryLinkId;
@@ -104,12 +105,13 @@ public class PermissionDto {
 		this.children.add(permissionDto);
 	}
 
-	public List<RoleTypeDto> getRoleTypes() {
-		return roleTypes;
+	public Map<RoleTypeDto, Boolean> getRoleTypeSelectableMap() {
+		return roleTypeSelectableMap;
 	}
 
-	public void setRoleTypes(final List<RoleTypeDto> roleTypes) {
-		this.roleTypes = roleTypes;
+	public void setRoleTypeSelectableMap(
+		final Map<RoleTypeDto, Boolean> roleTypeSelectableMap) {
+		this.roleTypeSelectableMap = roleTypeSelectableMap;
 	}
 
 	@Override

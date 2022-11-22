@@ -4,14 +4,15 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
-import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.RoleTypePermission;
 import org.generationcp.middleware.service.api.user.RoleTypeDto;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Transactional
@@ -62,21 +63,17 @@ public class PermissionServiceImpl implements PermissionService {
 		final List<PermissionDto> permissionDtoList = new ArrayList<>();
 		this.workbenchDaoFactory.getPermissionDAO().getPermissions(permissionIds).forEach( p -> {
 			final PermissionDto permissionDto = new PermissionDto(p);
-			//load role types
-			final List<RoleTypeDto> roleTypeDtos = new ArrayList<>();
+			final Map<RoleTypeDto, Boolean> roleTypeDtoSelectableMap = new HashMap<>();
 			p.getRoleTypePermissions().forEach(rtp -> {
-				roleTypeDtos.add(new RoleTypeDto(rtp.getRoleType()));
+				roleTypeDtoSelectableMap.putIfAbsent(new RoleTypeDto(rtp.getRoleType()), rtp.getSelectable());
 			});
-			permissionDto.setRoleTypes(roleTypeDtos);
+			permissionDto.setRoleTypeSelectableMap(roleTypeDtoSelectableMap);
 			permissionDtoList.add(permissionDto);
 		}
 		);
 		return permissionDtoList;
 	}
-	@Override
-	public List<Permission> getPermissionsByIds(final Set<Integer> permissionIds) {
-		return this.workbenchDaoFactory.getPermissionDAO().getPermissions(permissionIds);
-	}
+
 
 	@Override
 	public PermissionDto getPermissionTree(final Integer roleTypeId) {
