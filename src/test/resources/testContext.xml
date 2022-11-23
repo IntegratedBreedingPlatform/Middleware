@@ -401,10 +401,6 @@
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
-	<bean id="cropGenotypingParameterService" class="org.generationcp.middleware.service.impl.crop.CropGenotypingParameterServiceImpl">
-		<constructor-arg name="workbenchSessionProvider" ref="workbenchSessionProvider"/>
-	</bean>
-
 	<bean id="pedigreeServiceBrapi" class="org.generationcp.middleware.api.brapi.PedigreeServiceBrapiImpl">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
