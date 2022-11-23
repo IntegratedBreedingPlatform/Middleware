@@ -20,7 +20,6 @@ import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
@@ -57,6 +56,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
+import org.hibernate.SQLQuery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -100,7 +100,6 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 	private CVTermDao cvTermDao;
 	private ProjectPropertyDao projectPropertyDao;
-	private ProjectDAO workbenchProjectDao;
 	private CvTermPropertyDao cvTermPropertyDao;
 
 	private DmsProject study;
@@ -180,11 +179,6 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.projectPropertyDao.setSession(this.sessionProvder.getSession());
 		}
 
-		if (this.workbenchProjectDao == null) {
-			this.workbenchProjectDao = new ProjectDAO();
-			this.workbenchProjectDao.setSession(this.workbenchSessionProvider.getSession());
-		}
-
 		if (this.commonTestProject == null) {
 			this.commonTestProject = new Project();
 			this.commonTestProject.setProjectName("Project " + RandomStringUtils.randomAlphanumeric(10));
@@ -192,7 +186,19 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.commonTestProject.setUniqueID(UUID.randomUUID().toString());
 			this.commonTestProject.setLastOpenDate(new Date());
 			this.commonTestProject.setCropType(new CropType("maize"));
-			this.workbenchProjectDao.save(this.commonTestProject);
+
+			SQLQuery insertQuery = this.sessionProvder.getSession().createSQLQuery("INSERT INTO workbench.workbench_project("
+				+ " project_id, user_id, project_name, start_date, project_uuid, crop_type, last_open_date)"
+				+ " values (:project_id, :user_id, :project_name, :start_date, "
+				+ " :project_uuid, :crop_type, :last_open_date)");
+			insertQuery.setParameter("project_id", this.commonTestProject.getProjectId())
+				.setParameter("user_id", this.commonTestProject.getUserId())
+				.setParameter("project_name", this.commonTestProject.getProjectName())
+				.setParameter("start_date", this.commonTestProject.getStartDate())
+				.setParameter("project_uuid", this.commonTestProject.getUniqueID())
+				.setParameter("crop_type", this.commonTestProject.getCropType())
+				.setParameter("last_open_date", this.commonTestProject.getLastOpenDate());
+			insertQuery.executeUpdate();
 		}
 
 		if (this.study == null) {
@@ -456,6 +462,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		// Search by program
 		final ObservationUnitSearchRequestDTO dto = new ObservationUnitSearchRequestDTO();
 		dto.setProgramDbIds(Collections.singletonList(uniqueID));
+		dto.setProgramNames(Collections.singletonList(this.commonTestProject.getProjectName()));
 		final List<ObservationUnitDto> results = this.phenotypeDao.searchObservationUnits(1000, 0, dto);
 		Assert.assertNotNull(results);
 		Assert.assertEquals(NO_OF_GERMPLASM * 2, results.size());
