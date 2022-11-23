@@ -6,6 +6,7 @@ import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -43,16 +44,12 @@ public class PermissionDAOTest extends IntegrationTestBase {
 
 	@Autowired
 	private UserService userService;
-	
-	private PermissionDAO permissionDAO;
-	private UserRoleDao userRoleDao;
-	private RoleDAO roleDAO;
-	private RoleTypeDAO roleTypeDAO;
+
+	private WorkbenchDaoFactory workbenchDaoFactory;
 
 	private Role programAdminRole;
 	private Role cropAdminRole;
 	private Role instanceAdminRole;
-	private ProjectDAO workbenchProjectDao;
 	private CropType cropType;
 	private Project project1;
 	private Project project2;
@@ -61,30 +58,14 @@ public class PermissionDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		this.workbenchTestDataUtil.setUpWorkbench();
-		
-		if (this.permissionDAO == null) {
-			this.permissionDAO = new PermissionDAO();
-			this.permissionDAO.setSession(this.workbenchSessionProvider.getSession());
+		if (workbenchDaoFactory==null){
+			this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 		}
 
-		if (this.roleTypeDAO == null) {
-			this.roleTypeDAO = new RoleTypeDAO();
-			this.roleTypeDAO.setSession(this.workbenchSessionProvider.getSession());
-		}
-
-		if (this.userRoleDao == null) {
-			this.userRoleDao = new UserRoleDao();
-			this.userRoleDao.setSession(this.workbenchSessionProvider.getSession());
-		}
-
-		if (this.roleDAO == null) {
-			this.roleDAO = new RoleDAO();
-			this.roleDAO.setSession(this.workbenchSessionProvider.getSession());
-		}
+		this.workbenchTestDataUtil.setUpWorkbench(workbenchDaoFactory);
 
 		final org.generationcp.middleware.pojos.workbench.RoleType cropRoleType =
-			roleTypeDAO.getById(org.generationcp.middleware.domain.workbench.RoleType.CROP.getId());
+			this.workbenchDaoFactory.getRoleTypeDAO().getById(org.generationcp.middleware.domain.workbench.RoleType.CROP.getId());
 		this.cropAdminRole = new Role();
 		this.cropAdminRole.setName("Test Crop Role " + nextInt());
 		this.cropAdminRole.setRoleType(cropRoleType);
@@ -93,12 +74,12 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		this.cropPermission.setPermissionId(nextInt());
 		this.cropPermission.setName(randomAlphabetic(10));
 		this.cropPermission.setDescription(randomAlphabetic(10));
-		this.permissionDAO.save(this.cropPermission);
+		this.workbenchDaoFactory.getPermissionDAO().save(this.cropPermission);
 		this.cropAdminRole.getPermissions().add(this.cropPermission);
-		roleDAO.saveOrUpdate(this.cropAdminRole);
+		this.workbenchDaoFactory.getRoleDAO().saveOrUpdate(this.cropAdminRole);
 
 		final RoleType programAdminRoleType =
-			roleTypeDAO.getById(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.getId());
+			this.workbenchDaoFactory.getRoleTypeDAO().getById(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.getId());
 		this.programAdminRole = new Role();
 		this.programAdminRole.setName("Test Program Role " + nextInt());
 		this.programAdminRole.setRoleType(programAdminRoleType);
@@ -107,24 +88,19 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		this.programPermission.setPermissionId(nextInt());
 		this.programPermission.setName(randomAlphabetic(10));
 		this.programPermission.setDescription(randomAlphabetic(10));
-		this.permissionDAO.save(this.programPermission);
+		this.workbenchDaoFactory.getPermissionDAO().save(this.programPermission);
 		this.programAdminRole.getPermissions().add(this.programPermission);
-		roleDAO.saveOrUpdate(this.programAdminRole);
+		this.workbenchDaoFactory.getRoleDAO().saveOrUpdate(this.programAdminRole);
 
 		final org.generationcp.middleware.pojos.workbench.RoleType instanceRoleType =
-			roleTypeDAO.getById(org.generationcp.middleware.domain.workbench.RoleType.INSTANCE.getId());
+			this.workbenchDaoFactory.getRoleTypeDAO().getById(org.generationcp.middleware.domain.workbench.RoleType.INSTANCE.getId());
 		this.instanceAdminRole = new Role();
 		this.instanceAdminRole.setName("Test Instance Role " + nextInt());
 		this.instanceAdminRole.setRoleType(instanceRoleType);
 		this.instanceAdminRole.setActive(true);
 		this.instanceAdminRole.getPermissions().add(this.cropPermission);
 		this.instanceAdminRole.getPermissions().add(this.programPermission);
-		roleDAO.saveOrUpdate(this.instanceAdminRole);
-
-		if (this.workbenchProjectDao == null) {
-			this.workbenchProjectDao = new ProjectDAO();
-			this.workbenchProjectDao.setSession(this.workbenchSessionProvider.getSession());
-		}
+		this.workbenchDaoFactory.getRoleDAO().saveOrUpdate(this.instanceAdminRole);
 
 		if (this.cropType == null) {
 			this.cropType = this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.name());
@@ -147,16 +123,16 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		final WorkbenchUser admin = this.workbenchTestDataUtil.createTestUserData();
 		admin.setName("admin " + RandomStringUtils.randomAlphanumeric(5));
 		admin.setRoles(Collections.emptyList());
-		this.userService.addUser(admin);
+		this.workbenchDaoFactory.getWorkbenchUserDAO().save(admin);
 
 		final UserRole adminUserRole = new UserRole();
 		adminUserRole.setUser(admin);
 		adminUserRole.setRole(this.instanceAdminRole);
-		userRoleDao.saveOrUpdate(adminUserRole);
+		this.workbenchDaoFactory.getUserRoleDao().saveOrUpdate(adminUserRole);
 
 		this.workbenchSessionProvider.getSession().flush();
 
-		final List<PermissionDto> permissions = this.permissionDAO
+		final List<PermissionDto> permissions = this.workbenchDaoFactory.getPermissionDAO()
 			.getPermissions(admin.getUserid(), null, null);
 
 		assertThat("should have all permissions", permissions, hasItems(
@@ -171,17 +147,17 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		final WorkbenchUser cropAdmin = this.workbenchTestDataUtil.createTestUserData();
 		cropAdmin.setName("CropAdmin " + RandomStringUtils.randomAlphanumeric(5));
 		cropAdmin.setRoles(Collections.emptyList());
-		this.userService.addUser(cropAdmin);
+		this.workbenchDaoFactory.getWorkbenchUserDAO().save(cropAdmin);
 
 		final UserRole cropUserRole = new UserRole();
 		cropUserRole.setUser(cropAdmin);
 		cropUserRole.setRole(this.cropAdminRole);
 		cropUserRole.setCropType(this.cropType);
-		userRoleDao.saveOrUpdate(cropUserRole);
+		this.workbenchDaoFactory.getUserRoleDao().saveOrUpdate(cropUserRole);
 
 		this.workbenchSessionProvider.getSession().flush();
 
-		final List<PermissionDto> permissions = this.permissionDAO
+		final List<PermissionDto> permissions = this.workbenchDaoFactory.getPermissionDAO()
 			.getPermissions(cropAdmin.getUserid(), this.cropType.getCropName(), null);
 
 		assertThat(permissions, hasSize(1));
@@ -196,24 +172,24 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		final WorkbenchUser programAdmin = this.workbenchTestDataUtil.createTestUserData();
 		programAdmin.setName("ProgramAdmin " + RandomStringUtils.randomAlphanumeric(5));
 		programAdmin.setRoles(Collections.emptyList());
-		this.userService.addUser(programAdmin);
+		this.workbenchDaoFactory.getWorkbenchUserDAO().save(programAdmin);
 
 		final UserRole cropUserRole = new UserRole();
 		cropUserRole.setUser(programAdmin);
 		cropUserRole.setRole(this.cropAdminRole);
 		cropUserRole.setCropType(this.cropType);
-		userRoleDao.saveOrUpdate(cropUserRole);
+		this.workbenchDaoFactory.getUserRoleDao().saveOrUpdate(cropUserRole);
 		
 		final UserRole programUserRole = new UserRole();
 		programUserRole.setUser(programAdmin);
 		programUserRole.setRole(this.programAdminRole);
 		programUserRole.setCropType(this.cropType);
 		programUserRole.setWorkbenchProject(this.project1);
-		userRoleDao.saveOrUpdate(programUserRole);
+		this.workbenchDaoFactory.getUserRoleDao().saveOrUpdate(programUserRole);
 
 		this.workbenchSessionProvider.getSession().flush();
 
-		final List<PermissionDto> permissions = this.permissionDAO
+		final List<PermissionDto> permissions = this.workbenchDaoFactory.getPermissionDAO()
 			.getPermissions(programAdmin.getUserid(), this.cropType.getCropName(), this.project1.getProjectId().intValue());
 
 		assertThat("should have both crop and program permissions", permissions, hasItems(
@@ -221,7 +197,7 @@ public class PermissionDAOTest extends IntegrationTestBase {
 			Matchers.hasProperty("id", is(this.programPermission.getPermissionId()))
 		));
 
-		final List<PermissionDto> permissionsForProject2 = this.permissionDAO
+		final List<PermissionDto> permissionsForProject2 = this.workbenchDaoFactory.getPermissionDAO()
 			.getPermissions(programAdmin.getUserid(), this.cropType.getCropName(), this.project2.getProjectId().intValue());
 
 		assertThat("should not have access to other programs", permissionsForProject2, empty());

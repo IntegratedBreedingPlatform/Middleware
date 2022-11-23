@@ -8,7 +8,6 @@ import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
@@ -34,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Transactional
 public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
@@ -167,22 +167,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<WorkbenchUser> getSuperAdminUsers() {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
-			criteria.createAlias("roles", "roles");
-			criteria.createAlias("roles.role", "role");
-			criteria.add(Restrictions.eq("role.name", Role.SUPERADMIN));
-			return criteria.list();
-
-		} catch (final HibernateException e) {
-			final String message = "Error with getSuperAdminUsers query from WorkbenchUserDAO: " + e.getMessage();
-			WorkbenchUserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	public List<WorkbenchUser> getUsers(final List<Integer> userIds) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
@@ -259,11 +243,12 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
 	}
 
-	public WorkbenchUser getUserByFullName(final String fullname) {
+	public Optional<WorkbenchUser> getUserByFullName(final String fullname) {
 		try {
 			final Query query = this.getSession().getNamedQuery(WorkbenchUser.GET_BY_FULLNAME);
 			query.setParameter("fullname", fullname);
-			return (WorkbenchUser) query.uniqueResult();
+			final WorkbenchUser user = (WorkbenchUser) query.uniqueResult();
+			return (user != null) ? Optional.of(user) : Optional.empty();
 		} catch (final HibernateException e) {
 			final String message = "Error with getUserByFullName query from User: " + e.getMessage();
 			WorkbenchUserDAO.LOG.error(message, e);

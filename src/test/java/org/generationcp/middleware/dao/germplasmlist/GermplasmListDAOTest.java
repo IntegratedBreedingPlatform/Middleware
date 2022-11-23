@@ -7,12 +7,12 @@ import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
-import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -79,7 +79,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	private Project commonTestProject;
 
 	private DaoFactory daoFactory;
-	private StudyTestDataInitializer studyTDI;
+	private WorkbenchDaoFactory workbenchDaoFactory;
 
 	private CropType cropType;
 
@@ -96,6 +96,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 
 		this.germplasmListDAO = new GermplasmListDAO();
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
@@ -116,18 +117,15 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		this.createGermplasmListData(this.list, this.germplasm);
 
-		this.workbenchTestDataUtil.setUpWorkbench();
+		this.workbenchTestDataUtil.setUpWorkbench(workbenchDaoFactory);
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 		}
 
 		final StudyDataManagerImpl studyDataManager = new StudyDataManagerImpl(this.sessionProvder);
-		this.studyTDI = new StudyTestDataInitializer(studyDataManager, this.ontologyManager, this.commonTestProject,
-			this.sessionProvder);
-
-
 	}
+
 
 	@Test
 	public void testCountByName() {

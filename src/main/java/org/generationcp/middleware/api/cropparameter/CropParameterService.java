@@ -13,4 +13,6 @@ public interface CropParameterService {
 	void modifyCropParameter(String key, CropParameterPatchRequestDTO request);
 
 	Optional<CropParameter> getCropParameter(CropParameterEnum cropParameterEnum);
+
+	public List<CropParameter> getCropParametersByGroupName(String groupName);
 }
