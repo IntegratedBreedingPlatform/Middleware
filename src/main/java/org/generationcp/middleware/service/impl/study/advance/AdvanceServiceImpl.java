@@ -488,13 +488,13 @@ public class AdvanceServiceImpl implements AdvanceService {
 			final BasicGermplasmDTO originGermplasm = advancingSource.getOriginGermplasm();
 			final Germplasm advancedGermplasm = new Germplasm();
 			if (originGermplasm.getGpid1() == 0 || (advancingSource.getSourceMethod() != null && advancingSource.getSourceMethod()
-				.isDerivative())) {
+				.isGenerative())) {
 				advancedGermplasm.setGpid1(originGermplasm.getGid());
 			} else {
 				advancedGermplasm.setGpid1(originGermplasm.getGpid1());
 			}
 
-			advancedGermplasm.setGpid2(-1);
+			advancedGermplasm.setGpid2(originGermplasm.getGid());
 			advancedGermplasm.setGnpgs(-1);
 
 			final Integer locationId = advancingSource.getHarvestLocationId();

@@ -94,7 +94,7 @@ public abstract class CategoricalKeyCodeResolverBase implements KeyComponentValu
 	}
 
 	private Variable getVariableByTermId(final Integer termId) {
-		if (AdvanceContext.getVariablesByTermId().containsKey(termId)) {
+		if (AdvanceContext.getVariablesByTermId() != null && AdvanceContext.getVariablesByTermId().containsKey(termId)) {
 			return AdvanceContext.getVariablesByTermId().get(termId);
 		}
 		return this.ontologyVariableDataManager.getVariable(ContextHolder.getCurrentProgramOptional().orElse(null),termId, true);
