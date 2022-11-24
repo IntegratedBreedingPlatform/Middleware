@@ -3,35 +3,12 @@ package org.generationcp.middleware.api.study;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.util.List;
-
 @AutoProperty
-public class AdvanceStudyRequest {
-
-	// Represents the selected instance ids
-	private List<Integer> instanceIds;
-	private List<String> selectedReplications;
+public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 
 	private BreedingMethodSelectionRequest breedingMethodSelectionRequest;
 	private LineSelectionRequest lineSelectionRequest;
 	private BulkingRequest bulkingRequest;
-	private SelectionTraitRequest selectionTraitRequest;
-
-	public List<Integer> getInstanceIds() {
-		return instanceIds;
-	}
-
-	public void setInstanceIds(final List<Integer> instanceIds) {
-		this.instanceIds = instanceIds;
-	}
-
-	public List<String> getSelectedReplications() {
-		return selectedReplications;
-	}
-
-	public void setSelectedReplications(final List<String> selectedReplications) {
-		this.selectedReplications = selectedReplications;
-	}
 
 	public BreedingMethodSelectionRequest getBreedingMethodSelectionRequest() {
 		return breedingMethodSelectionRequest;
@@ -58,12 +35,9 @@ public class AdvanceStudyRequest {
 		this.bulkingRequest = bulkingRequest;
 	}
 
-	public SelectionTraitRequest getSelectionTraitRequest() {
-		return selectionTraitRequest;
-	}
-
-	public void setSelectionTraitRequest(final SelectionTraitRequest selectionTraitRequest) {
-		this.selectionTraitRequest = selectionTraitRequest;
+	@Override
+	public <T> T accept(final AdvanceRequestVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
@@ -129,7 +103,7 @@ public class AdvanceStudyRequest {
 
 	/**
 	 * If the breedingMethodId corresponds to a bulking method or if the methodVariateId was selected, then the BulkingRequest must has data
-	 *  for all plots selected or the variate that defines which plots were selected
+	 * for all plots selected or the variate that defines which plots were selected
 	 * must be set
 	 */
 	@AutoProperty
@@ -208,45 +182,6 @@ public class AdvanceStudyRequest {
 			return Pojomatic.equals(this, o);
 		}
 
-	}
-
-
-	@AutoProperty
-	public static class SelectionTraitRequest {
-
-		private Integer datasetId;
-		private Integer variableId;
-
-		public Integer getDatasetId() {
-			return datasetId;
-		}
-
-		public void setDatasetId(final Integer datasetId) {
-			this.datasetId = datasetId;
-		}
-
-		public Integer getVariableId() {
-			return variableId;
-		}
-
-		public void setVariableId(final Integer variableId) {
-			this.variableId = variableId;
-		}
-
-		@Override
-		public int hashCode() {
-			return Pojomatic.hashCode(this);
-		}
-
-		@Override
-		public String toString() {
-			return Pojomatic.toString(this);
-		}
-
-		@Override
-		public boolean equals(final Object o) {
-			return Pojomatic.equals(this, o);
-		}
 	}
 
 }

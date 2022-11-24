@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.study.advance;
 
+import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 
 import java.util.List;
@@ -13,5 +14,13 @@ public interface AdvanceService {
 	 * @return a {@link List} of the advanced gids
 	 */
 	List<Integer> advanceStudy(Integer studyId, AdvanceStudyRequest request);
+
+	/**
+	 *
+	 * @param studyId
+	 * @param request
+	 * @return {@link List} of the advanced gids
+	 */
+	List<Integer> advanceSamples(Integer studyId, AdvanceSampledPlantsRequest request);
 
 }

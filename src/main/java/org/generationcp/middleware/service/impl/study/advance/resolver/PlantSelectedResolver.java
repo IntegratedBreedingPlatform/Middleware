@@ -20,7 +20,7 @@ public class PlantSelectedResolver {
 	 * @param isBulkMethod
 	 * @return
 	 */
-	public Integer resolvePlantSelected(final AdvanceStudyRequest request, final ObservationUnitRow plotObservation,
+	public Integer resolveAdvanceStudyPlantSelected(final AdvanceStudyRequest request, final ObservationUnitRow plotObservation,
 		final Map<String, Method> breedingMethodsByCode, final boolean isBulkMethod) {
 
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =

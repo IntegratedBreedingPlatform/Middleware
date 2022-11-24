@@ -43,7 +43,7 @@ public class TestExpression {
 
 		final AdvancingSource source = new AdvancingSource(originGermplasm, names, new ObservationUnitRow(), new ObservationUnitRow(),
 			method, originGermplasmMethod, season,
-			RandomStringUtils.randomAlphabetic(10), plantSelected);
+			RandomStringUtils.randomAlphabetic(10), plantSelected, null);
 		source.setRootName(name);
 		return source;
 	}

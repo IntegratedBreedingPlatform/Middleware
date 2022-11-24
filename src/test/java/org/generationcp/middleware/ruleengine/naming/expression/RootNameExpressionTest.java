@@ -71,7 +71,7 @@ public class RootNameExpressionTest extends TestExpression {
 		final AdvancingSource source =
 			new AdvancingSource(new BasicGermplasmDTO(), names, new ObservationUnitRow(), new ObservationUnitRow(),
 				new Method(), new Method(), null,
-				RandomStringUtils.randomAlphabetic(10), 2);
+				RandomStringUtils.randomAlphabetic(10), 2, null);
 		source.getBreedingMethod().setSnametype(10);
 		for (final String nameString : input) {
 			System.out.println("INPUT = " + nameString);
@@ -109,7 +109,7 @@ public class RootNameExpressionTest extends TestExpression {
 		final AdvancingSource source =
 			new AdvancingSource(new BasicGermplasmDTO(), names, new ObservationUnitRow(), new ObservationUnitRow(),
 				new Method(), new Method(), null,
-				RandomStringUtils.randomAlphabetic(10), 2);
+				RandomStringUtils.randomAlphabetic(10), 2, null);
 
 		// Set the snametype to null
 		source.getBreedingMethod().setSnametype(null);
@@ -132,7 +132,7 @@ public class RootNameExpressionTest extends TestExpression {
 		final AdvancingSource source =
 			new AdvancingSource(new BasicGermplasmDTO(), names, new ObservationUnitRow(), new ObservationUnitRow(),
 				method, new Method(), null,
-				RandomStringUtils.randomAlphabetic(10), 2);
+				RandomStringUtils.randomAlphabetic(10), 2, null);
 		source.setRootName("Germplasm");
 		return source;
 	}

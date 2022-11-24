@@ -46,7 +46,7 @@ public class PlantSelectedResolverTest {
 
 		final Integer plantSelected =
 			this.plantSelectedResolver
-				.resolvePlantSelected(advanceStudyRequest, Mockito.mock(ObservationUnitRow.class), new HashMap<>(), isBulkMethod);
+				.resolveAdvanceStudyPlantSelected(advanceStudyRequest, Mockito.mock(ObservationUnitRow.class), new HashMap<>(), isBulkMethod);
 		assertThat(plantSelected, is(givenLinesSelected));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -80,7 +80,7 @@ public class PlantSelectedResolverTest {
 		Mockito.when(observationUnitRow.getVariableValueByVariableId(lineVariateId)).thenReturn(expectedLinesSelected.toString());
 
 		final Integer plantSelected =
-			this.plantSelectedResolver.resolvePlantSelected(advanceStudyRequest, observationUnitRow, new HashMap<>(), isBulkMethod);
+			this.plantSelectedResolver.resolveAdvanceStudyPlantSelected(advanceStudyRequest, observationUnitRow, new HashMap<>(), isBulkMethod);
 		assertThat(plantSelected, is(expectedLinesSelected));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -111,7 +111,7 @@ public class PlantSelectedResolverTest {
 		);
 
 		final Integer plantSelected =
-			this.plantSelectedResolver.resolvePlantSelected(advanceStudyRequest, new ObservationUnitRow(), new HashMap<>(), isBulkMethod);
+			this.plantSelectedResolver.resolveAdvanceStudyPlantSelected(advanceStudyRequest, new ObservationUnitRow(), new HashMap<>(), isBulkMethod);
 		assertThat(plantSelected, is(1));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -148,7 +148,7 @@ public class PlantSelectedResolverTest {
 		Mockito.when(observationUnitRow.getVariableValueByVariableId(plotVariateId)).thenReturn(linesSelected.toString());
 
 		final Integer plantSelected =
-			this.plantSelectedResolver.resolvePlantSelected(advanceStudyRequest, observationUnitRow, new HashMap<>(), isBulkMethod);
+			this.plantSelectedResolver.resolveAdvanceStudyPlantSelected(advanceStudyRequest, observationUnitRow, new HashMap<>(), isBulkMethod);
 		assertThat(plantSelected, is(1));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -184,7 +184,7 @@ public class PlantSelectedResolverTest {
 		Mockito.when(observationUnitRow.getVariableValueByVariableId(plotVariateId)).thenReturn(null);
 
 		final Integer plantSelected =
-			this.plantSelectedResolver.resolvePlantSelected(advanceStudyRequest, observationUnitRow, new HashMap<>(), isBulkMethod);
+			this.plantSelectedResolver.resolveAdvanceStudyPlantSelected(advanceStudyRequest, observationUnitRow, new HashMap<>(), isBulkMethod);
 		assertThat(plantSelected, is(0));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -218,7 +218,7 @@ public class PlantSelectedResolverTest {
 
 		final Map<String, Method> breedingMethodsByCode = new HashMap<>();
 		final Integer plantSelected =
-			this.plantSelectedResolver.resolvePlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
+			this.plantSelectedResolver.resolveAdvanceStudyPlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
 		assertNull(plantSelected);
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -257,7 +257,7 @@ public class PlantSelectedResolverTest {
 		breedingMethodsByCode.put(plotBreedingMethodCode, breedingMethod);
 
 		final Integer plantSelected =
-			this.plantSelectedResolver.resolvePlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
+			this.plantSelectedResolver.resolveAdvanceStudyPlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
 		assertThat(plantSelected, is(expectedLinesSelected));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -298,7 +298,7 @@ public class PlantSelectedResolverTest {
 		breedingMethodsByCode.put(plotBreedingMethodCode, breedingMethod);
 
 		final Integer plantSelected =
-			this.plantSelectedResolver.resolvePlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
+			this.plantSelectedResolver.resolveAdvanceStudyPlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
 		assertThat(plantSelected, is(expectedLinesSelected));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -339,7 +339,7 @@ public class PlantSelectedResolverTest {
 		breedingMethodsByCode.put(plotBreedingMethodCode, breedingMethod);
 
 		final Integer plantSelected =
-			this.plantSelectedResolver.resolvePlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
+			this.plantSelectedResolver.resolveAdvanceStudyPlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
 		assertThat(plantSelected, is(1));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -383,7 +383,7 @@ public class PlantSelectedResolverTest {
 		breedingMethodsByCode.put(plotBreedingMethodCode, breedingMethod);
 
 		final Integer plantSelected =
-			this.plantSelectedResolver.resolvePlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
+			this.plantSelectedResolver.resolveAdvanceStudyPlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
 		assertThat(plantSelected, is(1));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
@@ -426,7 +426,7 @@ public class PlantSelectedResolverTest {
 		breedingMethodsByCode.put(plotBreedingMethodCode, breedingMethod);
 
 		final Integer plantSelected =
-			this.plantSelectedResolver.resolvePlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
+			this.plantSelectedResolver.resolveAdvanceStudyPlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
 		assertThat(plantSelected, is(0));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();

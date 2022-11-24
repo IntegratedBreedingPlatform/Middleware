@@ -28,6 +28,7 @@ public class AdvancingSource {
 	private Integer harvestLocationId;
 
 	private Integer plantsSelected;
+	private List<Integer> sampleNumbers;
 
 	private String rootName;
 	private Integer rootNameType;
@@ -47,7 +48,7 @@ public class AdvancingSource {
 		final Method breedingMethod,
 		final Method sourceMethod,
 		final String season, final String selectionTraitValue,
-		final Integer plantSelected) {
+		final Integer plantSelected, final List<Integer> sampleNumbers) {
 
 		this.originGermplasm = originGermplasm;
 		this.names = names;
@@ -59,6 +60,7 @@ public class AdvancingSource {
 		this.season = season;
 		this.selectionTraitValue = selectionTraitValue;
 		this.plantsSelected = plantSelected;
+		this.sampleNumbers = sampleNumbers;
 
 		// We are setting this properties due to keep backward compatibility with the AdvancingSource of the old advance process
 		this.locationAbbreviation = "";
@@ -123,6 +125,10 @@ public class AdvancingSource {
 
 	public Integer getPlantsSelected() {
 		return plantsSelected;
+	}
+
+	public List<Integer> getSampleNumbers() {
+		return sampleNumbers;
 	}
 
 	public String getRootName() {
