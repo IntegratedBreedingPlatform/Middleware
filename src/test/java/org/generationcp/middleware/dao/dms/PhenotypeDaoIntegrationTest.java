@@ -187,6 +187,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.commonTestProject.setLastOpenDate(new Date());
 			this.commonTestProject.setCropType(new CropType("maize"));
 
+			// manual query needed to force syncing of workbench table in crop session used by the tests (workaround for search obs unit by program)
 			SQLQuery insertQuery = this.sessionProvder.getSession().createSQLQuery("INSERT INTO workbench.workbench_project("
 				+ " project_id, user_id, project_name, start_date, project_uuid, crop_type, last_open_date)"
 				+ " values (:project_id, :user_id, :project_name, :start_date, "
