@@ -57,7 +57,6 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	private static final List<TermId> GERMPLASM_VARIABLES =	Arrays.asList(TermId.GID, TermId.DESIG);
 	private static final List<TermId> PLOT_VARIABLES = Arrays.asList(TermId.PLOT_NO, TermId.REP_NO);
 	private static final List<TermId> ENTRY_DETAIL_VARIABLES = Arrays.asList(TermId.ENTRY_TYPE, TermId.ENTRY_NO);
-	private static final String GERMPLASM_PREFIX = "GERMPLASM_PREFIX";
 	public static final String LOCATION_ID = "9011";
 
 	@Autowired
@@ -97,7 +96,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, daoFactory);
 		}
 
 		this.studyTDI =

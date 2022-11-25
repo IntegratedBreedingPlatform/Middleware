@@ -40,7 +40,7 @@ public class StudyEntryObservationServiceImplIntegrationTest extends Integration
 	@Before
 	public void setUp() {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, this.daoFactory);
 	}
 
 	@Test

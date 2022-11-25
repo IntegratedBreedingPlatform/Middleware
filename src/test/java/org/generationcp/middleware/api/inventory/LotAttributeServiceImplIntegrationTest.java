@@ -63,7 +63,7 @@ public class LotAttributeServiceImplIntegrationTest extends IntegrationTestBase 
 		this.creationDate = "20201212";
 
 		this.lotDAO = this.daoFactory.getLotDao();
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, this.daoFactory);
 
 		this.cropType = new CropType();
 		this.cropType.setUseUUID(false);

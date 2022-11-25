@@ -85,7 +85,7 @@ public class LotDAOTest extends IntegrationTestBase {
 		this.germplasmListDAO = this.daoFactory.getGermplasmListDAO();
 		this.countryDAO = this.daoFactory.getCountryDao();
 		this.transactionDAO = this.daoFactory.getTransactionDAO();
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, this.daoFactory);
 
 		this.cropType = new CropType();
 		this.cropType.setUseUUID(false);

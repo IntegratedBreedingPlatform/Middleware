@@ -57,7 +57,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, this.daoFactory);
 		}
 
 		if (CollectionUtils.isEmpty(this.gids)) {

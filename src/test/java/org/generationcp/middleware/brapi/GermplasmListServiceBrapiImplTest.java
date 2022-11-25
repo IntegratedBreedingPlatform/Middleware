@@ -62,7 +62,7 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 	@Before
 	public void setUp() {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, this.daoFactory);
 		this.userId = this.findAdminUser();
 		final GermplasmListTestDataInitializer germplasmListTestDataInitializer = new GermplasmListTestDataInitializer();
 		final GermplasmList germplasmList = germplasmListTestDataInitializer

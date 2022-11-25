@@ -2692,6 +2692,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			0, germplasm.getGdate());
 		this.daoFactory.getAttributeDAO()
 			.save(attribute);
+		this.sessionProvder.getSession().flush();
 		this.daoFactory.getAttributeDAO().refresh(attribute);
 
 		assertNotNull(attribute.getCreatedDate());

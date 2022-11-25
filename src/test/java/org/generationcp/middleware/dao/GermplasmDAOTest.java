@@ -110,7 +110,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, this.daoFactory);
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		if (!this.testDataSetup) {
 			this.updateInventory();

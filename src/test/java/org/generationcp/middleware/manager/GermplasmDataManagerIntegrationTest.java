@@ -120,7 +120,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, this.daoFactory);
 		}
 
 		if (this.commonTestProject == null) {
@@ -504,6 +504,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		attr.setAdate(20180206);
 
 		this.daoFactory.getAttributeDAO().saveOrUpdate(attr);
+		this.sessionProvder.getSession().flush();
 		this.daoFactory.getAttributeDAO().refresh(attr);
 		return attr;
 	}

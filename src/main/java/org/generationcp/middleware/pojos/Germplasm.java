@@ -16,6 +16,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NotFound;
@@ -243,6 +244,7 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	private Integer mgid;
 
 	@OneToMany(mappedBy = "germplasm", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@BatchSize(size = 5000)
 	private List<Name> names = new ArrayList<>();
 
 	@Type(type = "org.hibernate.type.NumericBooleanType")

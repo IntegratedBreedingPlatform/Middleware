@@ -888,8 +888,8 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
 		germplasm.setBibref(reference);
 		this.daoFactory.getGermplasmDao().save(germplasm);
-		this.daoFactory.getGermplasmDao().refresh(germplasm);
 		this.sessionProvder.getSession().flush();
+		this.daoFactory.getGermplasmDao().refresh(germplasm);
 
 		assertThat(germplasm.getCreatedBy(), is(this.userId));
 		assertNotNull(germplasm.getCreatedBy());
