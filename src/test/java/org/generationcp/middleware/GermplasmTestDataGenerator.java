@@ -38,6 +38,8 @@ public class GermplasmTestDataGenerator {
 		germplasm.getNames().add(preferredName);
 		this.daoFactory.getGermplasmDao().save(germplasm);
 
+		this.sessionProvider.getSession().flush();
+
 		return germplasm.getGid();
 	}
 

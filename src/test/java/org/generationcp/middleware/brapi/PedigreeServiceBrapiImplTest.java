@@ -73,6 +73,8 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final Attribute attribute1 = this.addAttribute(germplasm_A, "Attribute1", RandomStringUtils.randomAlphabetic(10));
 		final Attribute attribute2 = this.addAttribute(germplasm_A, "Attribute2", RandomStringUtils.randomAlphabetic(10));
 
+		this.sessionProvder.getSession().flush();
+
 		final PedigreeNodeSearchRequest pedigreeNodeSearchRequest = new PedigreeNodeSearchRequest();
 		// Include full pedigree tree
 		pedigreeNodeSearchRequest.setIncludeFullTree(false);

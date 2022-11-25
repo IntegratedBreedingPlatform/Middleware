@@ -52,8 +52,6 @@ public class AttributeDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setup() {
-		final Session session = this.sessionProvder.getSession();
-
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 
 		if (this.germplasmTestDataGenerator == null) {
@@ -114,6 +112,8 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		this.daoFactory.getAttributeDAO().saveOrUpdate(this.attribute1);
 		this.daoFactory.getAttributeDAO().saveOrUpdate(this.attribute2);
 		this.daoFactory.getAttributeDAO().saveOrUpdate(this.attribute3);
+
+		this.sessionProvder.getSession().flush();
 	}
 
 	@Test
@@ -293,6 +293,9 @@ public class AttributeDAOTest extends IntegrationTestBase {
 
 		final Set<String> gids = result.stream().map(GermplasmDTO::getGid).collect(Collectors.toSet());
 		final List<Integer> gidsList = gids.stream().map(s -> Integer.valueOf(s)).collect(Collectors.toList());
+
+		this.sessionProvder.getSession().flush();
+
 		final List<Variable> variables = this.daoFactory.getAttributeDAO().getGermplasmAttributeVariables(gidsList, null);
 		Assert.assertEquals(1, variables.size());
 		Assert.assertTrue(variables.stream().allMatch(cVTerm -> cVTerm.getName().equalsIgnoreCase(NOTE_ATTRIBUTE.toUpperCase())));

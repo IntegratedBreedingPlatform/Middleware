@@ -1153,6 +1153,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Map<Integer, GermplasmImportResponseDto> response =
 			this.germplasmService.importGermplasm(ContextHolder.getCurrentCrop(), this.programUUID, germplasmImportRequestDto);
 
+		this.sessionProvder.getSession().flush();
+
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
 		assertThat(response.get(this.clientId).getGids().size(), is(this.clientId));
