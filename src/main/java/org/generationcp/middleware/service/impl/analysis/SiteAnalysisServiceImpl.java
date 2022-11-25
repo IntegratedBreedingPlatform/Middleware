@@ -276,7 +276,6 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		return cvTerm.getName();
 	}
 
-	//TODO check everything that's calling this if variable is obsolete IBP-6057
 	private void addProjectProperty(final DmsProject meansDataset, final Integer variableId, final String variableName,
 		final VariableType variableType, final Integer rank) {
 		final ProjectProperty projectProperty = new ProjectProperty();
