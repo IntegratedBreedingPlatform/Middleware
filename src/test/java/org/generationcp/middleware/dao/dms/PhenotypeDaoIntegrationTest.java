@@ -18,13 +18,14 @@ import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLeve
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -36,6 +37,8 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
@@ -53,9 +56,11 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
+import org.hibernate.SQLQuery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,8 +78,11 @@ import static org.hamcrest.Matchers.is;
 public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 	private static final int NO_OF_GERMPLASM = 5;
+	public static final String ENVIRONMENT_DESCRIPTION = "1";
 
 	private PhenotypeDao phenotypeDao;
+
+	private LocationDAO locationDAO;
 
 	private GeolocationDao geolocationDao;
 
@@ -92,7 +100,6 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 	private CVTermDao cvTermDao;
 	private ProjectPropertyDao projectPropertyDao;
-	private ProjectDAO workbenchProjectDao;
 	private CvTermPropertyDao cvTermPropertyDao;
 
 	private DmsProject study;
@@ -103,6 +110,14 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	private CropType crop;
 	private Project commonTestProject;
 	private List<Germplasm> germplasm;
+	private Integer commonLocationId;
+	private String commonLocationName;
+
+	private StudyDataManagerImpl manager;
+	private StudyTestDataInitializer studyTDI;
+
+	@Autowired
+	private OntologyDataManager ontologyManager;
 
 	@Before
 	public void setUp() throws Exception {
@@ -115,6 +130,10 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		if (this.geolocationDao == null) {
 			this.geolocationDao = new GeolocationDao();
 			this.geolocationDao.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.locationDAO == null) {
+			this.locationDAO = new LocationDAO(this.sessionProvder.getSession());
 		}
 
 		if (this.geolocPropDao == null) {
@@ -160,11 +179,6 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.projectPropertyDao.setSession(this.sessionProvder.getSession());
 		}
 
-		if (this.workbenchProjectDao == null) {
-			this.workbenchProjectDao = new ProjectDAO();
-			this.workbenchProjectDao.setSession(this.workbenchSessionProvider.getSession());
-		}
-
 		if (this.commonTestProject == null) {
 			this.commonTestProject = new Project();
 			this.commonTestProject.setProjectName("Project " + RandomStringUtils.randomAlphanumeric(10));
@@ -172,7 +186,20 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.commonTestProject.setUniqueID(UUID.randomUUID().toString());
 			this.commonTestProject.setLastOpenDate(new Date());
 			this.commonTestProject.setCropType(new CropType("maize"));
-			this.workbenchProjectDao.save(this.commonTestProject);
+
+			// manual query needed to force syncing of workbench table in crop session used by the tests (workaround for search obs unit by program)
+			SQLQuery insertQuery = this.sessionProvder.getSession().createSQLQuery("INSERT INTO workbench.workbench_project("
+				+ " project_id, user_id, project_name, start_date, project_uuid, crop_type, last_open_date)"
+				+ " values (:project_id, :user_id, :project_name, :start_date, "
+				+ " :project_uuid, :crop_type, :last_open_date)");
+			insertQuery.setParameter("project_id", this.commonTestProject.getProjectId())
+				.setParameter("user_id", this.commonTestProject.getUserId())
+				.setParameter("project_name", this.commonTestProject.getProjectName())
+				.setParameter("start_date", this.commonTestProject.getStartDate())
+				.setParameter("project_uuid", this.commonTestProject.getUniqueID())
+				.setParameter("crop_type", this.commonTestProject.getCropType())
+				.setParameter("last_open_date", this.commonTestProject.getLastOpenDate());
+			insertQuery.executeUpdate();
 		}
 
 		if (this.study == null) {
@@ -198,6 +225,14 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		}
 
 		this.experiments = new HashMap<>();
+
+		this.studyTDI =
+			new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject,
+				this.sessionProvder);
+		if (this.commonLocationId == null) {
+			this.commonLocationName = "Location " + RandomStringUtils.randomAlphanumeric(10);
+			this.commonLocationId = this.studyTDI.addTestLocation(this.commonLocationName);
+		}
 	}
 
 	private DmsProject createStudy() {
@@ -428,6 +463,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		// Search by program
 		final ObservationUnitSearchRequestDTO dto = new ObservationUnitSearchRequestDTO();
 		dto.setProgramDbIds(Collections.singletonList(uniqueID));
+		dto.setProgramNames(Collections.singletonList(this.commonTestProject.getProjectName()));
 		final List<ObservationUnitDto> results = this.phenotypeDao.searchObservationUnits(1000, 0, dto);
 		Assert.assertNotNull(results);
 		Assert.assertEquals(NO_OF_GERMPLASM * 2, results.size());
@@ -447,9 +483,10 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			Assert.assertEquals(experimentModel.getGeoLocation().getLocationId().toString(), result.getStudyDbId());
 		}
 
-		// Search by Study ID
+		// Search by Study
 		final ObservationUnitSearchRequestDTO dto2 = new ObservationUnitSearchRequestDTO();
 		dto2.setTrialDbIds(Collections.singletonList(study2.getProjectId().toString()));
+		dto2.setTrialNames(Collections.singletonList(study2.getName()));
 		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countObservationUnits(dto2));
 
 		final List<ObservationUnitDto> study2ObservationUnits = this.phenotypeDao.searchObservationUnits(1000, 1, dto2);
@@ -460,6 +497,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 		final ObservationUnitSearchRequestDTO dto2Study1 = new ObservationUnitSearchRequestDTO();
 		dto2Study1.setTrialDbIds(Collections.singletonList(this.study.getProjectId().toString()));
+		dto2Study1.setTrialNames(Collections.singletonList(this.study.getName()));
 		final List<ObservationUnitDto> study1ObservationUnits = this.phenotypeDao.searchObservationUnits(1000, 1, dto2Study1);
 		study1ObservationUnits.forEach(observationUnitDto -> {
 			Assert.assertThat(observationUnitDto.getObservationUnitPosition().getObservationLevel().getLevelName(),
@@ -469,16 +507,20 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		// Search by Geolocation ID
 		final ObservationUnitSearchRequestDTO dto3 = new ObservationUnitSearchRequestDTO();
 		dto3.setStudyDbIds(Collections.singletonList(environment1.toString()));
+		dto3.setStudyNames(Collections.singletonList(this.study.getName() + "_" + ENVIRONMENT_DESCRIPTION));
 		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countObservationUnits(dto3));
 
 		// Search by Trait
 		final ObservationUnitSearchRequestDTO dto4 = new ObservationUnitSearchRequestDTO();
 		dto4.setObservationVariableDbIds(Collections.singletonList(this.trait.getCvTermId().toString()));
+		dto4.setObservationVariableNames(Collections.singletonList(this.trait.getName()));
 		Assert.assertEquals(NO_OF_GERMPLASM * 2, this.phenotypeDao.countObservationUnits(dto4));
 
 		// Search by germplasm uuid
 		final ObservationUnitSearchRequestDTO dto5 = new ObservationUnitSearchRequestDTO();
 		dto5.setGermplasmDbIds(Arrays.asList(this.germplasm.get(0).getGermplasmUUID(), this.germplasm.get(1).getGermplasmUUID()));
+		dto5.setGermplasmNames(
+			Arrays.asList(this.germplasm.get(0).getPreferredName().getNval(), this.germplasm.get(1).getPreferredName().getNval()));
 		// # of GUUIDs in filter x 2# of studies
 		Assert.assertEquals(2 * 2, this.phenotypeDao.countObservationUnits(dto5));
 
@@ -488,6 +530,12 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		dto6.setObservationLevels(Arrays.asList(new ObservationLevelRelationship(null, null,
 			ObservationLevelEnum.PLOT.getLevelName(), null)));
 		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countObservationUnits(dto6));
+
+		// Search by Location
+		final ObservationUnitSearchRequestDTO dto7 = new ObservationUnitSearchRequestDTO();
+		dto7.setLocationDbIds(Collections.singletonList(this.commonLocationId.toString()));
+		dto7.setLocationNames(Collections.singletonList(this.commonLocationName));
+		Assert.assertEquals(NO_OF_GERMPLASM * 2, this.phenotypeDao.countObservationUnits(dto7));
 	}
 
 	private DmsProject createDataset(final String name, final String programUUID, final int datasetType, final DmsProject parent,
@@ -525,15 +573,16 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	private Integer createEnvironmentData(final DmsProject project, final Integer numberOfReps, final List<Integer> traitIds,
 		final boolean isWithValue) {
 		this.phenotypes = new ArrayList<>();
+
 		final Geolocation geolocation = new Geolocation();
-		geolocation.setDescription("1");
+		geolocation.setDescription(ENVIRONMENT_DESCRIPTION);
 		this.geolocationDao.saveOrUpdate(geolocation);
 
 		final GeolocationProperty prop = new GeolocationProperty();
 		prop.setGeolocation(geolocation);
 		prop.setType(TermId.LOCATION_ID.getId());
 		prop.setRank(1);
-		prop.setValue(geolocation.getLocationId().toString());
+		prop.setValue(this.commonLocationId.toString());
 		this.geolocPropDao.save(prop);
 
 		for (final Germplasm germplasm : this.germplasm) {
@@ -591,7 +640,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	public void testCountByVariableIdAndValue() {
 		this.createEnvironmentData(1, true);
 
-		final long phenotypeCount = this.phenotypeDao.countByVariableIdAndValue(this.trait.getCvTermId(), this.phenotypes.get(0).getValue());
+		final long phenotypeCount =
+			this.phenotypeDao.countByVariableIdAndValue(this.trait.getCvTermId(), this.phenotypes.get(0).getValue());
 		Assert.assertThat(phenotypeCount, is(1L));
 	}
 
