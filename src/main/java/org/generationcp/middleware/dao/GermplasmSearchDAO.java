@@ -68,6 +68,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	public static final String METHOD_ID = "METHOD_ID";
 
 	public static final String GID = ColumnLabels.GID.getName();
+	public static final String GERMLASM_UUID = ColumnLabels.GERMPLASM_UUID.getName();
 	public static final String GROUP_ID = ColumnLabels.GROUP_ID.getName();
 	public static final String STOCK_IDS = ColumnLabels.STOCKID.getName();
 	public static final String AVAIL_LOTS = ColumnLabels.AVAILABLE_INVENTORY.getName();
@@ -487,6 +488,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		final StringBuilder selectClause = new StringBuilder();
 		selectClause.append("SELECT g.*, \n" //
 			// name ordering: preferred name > latest > oldest
+			+ " g.germplsm_uuid AS `" + GermplasmSearchDAO.GERMLASM_UUID + "`, \n" //
 			+ " Group_concat(DISTINCT allNames.nval ORDER BY allNames.nstat = 1 desc, allNames.ndate desc SEPARATOR ', ') AS `"
 			+ GermplasmSearchDAO.NAMES + "`, \n"  //
 			+ " g.mgid AS `" + GermplasmSearchDAO.GROUP_ID + "`, \n" //
