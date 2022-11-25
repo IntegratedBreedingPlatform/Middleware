@@ -28,6 +28,13 @@ public class ObservationUnitSearchRequestDTO extends SearchRequestDto {
 	private List<String> externalReferenceIDs;
 	private List<String> externalReferenceSources;
 
+	private List<String> germplasmNames;
+	private List<String> locationNames;
+	private List<String> observationVariableNames;
+	private List<String> studyNames;
+	private List<String> trialNames;
+	private List<String> programNames;
+
 
 	// v1 only fields
 	@JsonIgnore
@@ -205,6 +212,54 @@ public class ObservationUnitSearchRequestDTO extends SearchRequestDto {
 
 	public void setObservationLevel(final String observationLevel) {
 		this.observationLevel = observationLevel;
+	}
+
+	public List<String> getGermplasmNames() {
+		return this.germplasmNames;
+	}
+
+	public void setGermplasmNames(final List<String> germplasmNames) {
+		this.germplasmNames = germplasmNames;
+	}
+
+	public List<String> getLocationNames() {
+		return this.locationNames;
+	}
+
+	public void setLocationNames(final List<String> locationNames) {
+		this.locationNames = locationNames;
+	}
+
+	public List<String> getObservationVariableNames() {
+		return this.observationVariableNames;
+	}
+
+	public void setObservationVariableNames(final List<String> observationVariableNames) {
+		this.observationVariableNames = observationVariableNames;
+	}
+
+	public List<String> getStudyNames() {
+		return this.studyNames;
+	}
+
+	public void setStudyNames(final List<String> studyNames) {
+		this.studyNames = studyNames;
+	}
+
+	public List<String> getTrialNames() {
+		return this.trialNames;
+	}
+
+	public void setTrialNames(final List<String> trialNames) {
+		this.trialNames = trialNames;
+	}
+
+	public List<String> getProgramNames() {
+		return this.programNames;
+	}
+
+	public void setProgramNames(final List<String> programNames) {
+		this.programNames = programNames;
 	}
 
 	@Override

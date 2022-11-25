@@ -78,8 +78,11 @@ public class PhenotypeQuery {
 		+ "   INNER JOIN projectprop pp ON pp.project_id = p.project_id " //
 		+ "                             AND pp.variable_id = ph.observable_id " //
 		+ "                             AND pp.type_id = " + VariableType.TRAIT.getId() //
-		+ " WHERE ph.nd_experiment_id = nde.nd_experiment_id AND cvt.cvterm_id in (:cvTermIds))" //
+		+ " WHERE ph.nd_experiment_id = nde.nd_experiment_id" //
 		;
+	// The following are just suffixes of above subquery. always append ) after to complete the statement
+	public static final String TERM_ID_FILTER = " AND cvt.cvterm_id in (:cvTermIds)";
+	public static final String TERM_NAME_FILTER = " AND cvt.name in (:cvTermNames)";
 
 	public static final String TREATMENT_FACTORS_SEARCH_OBSERVATIONS = "SELECT DISTINCT "
 		+ "CVT.NAME AS factor, "
