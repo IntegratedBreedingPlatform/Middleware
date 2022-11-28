@@ -68,7 +68,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 	public void setup() {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, daoFactory);
 
 	}
 

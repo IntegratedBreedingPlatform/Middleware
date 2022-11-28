@@ -355,6 +355,9 @@ public class StudyTestDataInitializer {
 			stockModel.setProject(new DmsProject(studyId));
 
 			final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
+
+			this.sessionProvider.getSession().flush();
+
 			final String designation = germplasm.findPreferredName().getNval();
 
 			final VariableList variableList =
