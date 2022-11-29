@@ -21,38 +21,37 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UpdateLabelPrintingPresetsTask implements liquibase.change.custom.CustomTaskChange {
+public class UpdatePresetsTask implements liquibase.change.custom.CustomTaskChange {
 
+	private static final List<String> TOOL_SECTIONS = Arrays.asList(
+		"DATASET_LABEL_PRINTING_PRESET", "LOT_LABEL_PRINTING_PRESET",
+		"GERMPLASM_LABEL_PRINTING_PRESET", "GERMPLASM_LIST_LABEL_PRINTING_PRESET",
+		"STUDY_ENTRIES_LABEL_PRINTING_PRESET");
+
+	private static final String UPDATE_PRESET = "update program_preset set configuration = '%s' where program_preset_id = %s";
 	private static final Integer MAX_FIELD_STATIC_ID = 63;
 	private ObjectMapper jacksonMapper;
 
 	@Override
 	public void execute(final Database database) throws CustomChangeException {
 
-		final List<String> tool_sections = Arrays.asList(
-			"DATASET_LABEL_PRINTING_PRESET", "LOT_LABEL_PRINTING_PRESET",
-			"GERMPLASM_LABEL_PRINTING_PRESET", "GERMPLASM_LIST_LABEL_PRINTING_PRESET",
-			"STUDY_ENTRIES_LABEL_PRINTING_PRESET");
-
 		this.jacksonMapper = new ObjectMapper();
 		this.jacksonMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
-		JdbcConnection dbConn = null;
 		Statement selectStatement = null;
 		Statement updateStatement = null;
 
 		try {
-			dbConn = (JdbcConnection) database.getConnection();
-			dbConn.setAutoCommit(false);
+			final JdbcConnection dbConn = (JdbcConnection) database.getConnection();
 			selectStatement = dbConn.createStatement();
 			updateStatement = dbConn.createStatement();
 
 			ResultSet rs = selectStatement.executeQuery(
 				"SELECT * FROM program_preset where tool_section in (" +
-					tool_sections.stream().collect(Collectors.joining("','", "'", "'"))
+					UpdatePresetsTask.TOOL_SECTIONS.stream().collect(Collectors.joining("','", "'", "'"))
 					+ ")");
 
 			while (rs.next()) {
-				final String program_preset_id = rs.getString("program_preset_id");
+				final String programPresetId = rs.getString("program_preset_id");
 				final String configuration = rs.getString("configuration");
 
 				try {
@@ -74,11 +73,10 @@ public class UpdateLabelPrintingPresetsTask implements liquibase.change.custom.C
 						labelPrintingPresetDTO.getBarcodeSetting().setBarcodeFields(barCodeFields);
 					}
 
-					final String UpdatedConfiguration =
+					final String updatedConfiguration =
 						this.jacksonMapper.writerWithView(PresetDTO.View.Configuration.class).writeValueAsString(labelPrintingPresetDTO);
 
-					final String updateSql = String.format(//
-						"update program_preset set configuration = '%s' where program_preset_id = %s", UpdatedConfiguration, program_preset_id);
+					final String updateSql = String.format(UpdatePresetsTask.UPDATE_PRESET, updatedConfiguration, programPresetId);
 					updateStatement.execute(updateSql);
 				} catch (IOException e1) {
 					dbConn.rollback();
@@ -100,7 +98,7 @@ public class UpdateLabelPrintingPresetsTask implements liquibase.change.custom.C
 	}
 
 	private String concatenateFieldTypeName(final String fieldId) {
-		if (Integer.valueOf(fieldId) > UpdateLabelPrintingPresetsTask.MAX_FIELD_STATIC_ID) {
+		if (Integer.valueOf(fieldId) > UpdatePresetsTask.MAX_FIELD_STATIC_ID) {
 			return "VARIABLE_" + fieldId;
 		} else {
 			return "STATIC_" + fieldId;

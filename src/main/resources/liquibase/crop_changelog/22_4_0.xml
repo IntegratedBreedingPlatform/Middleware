@@ -98,7 +98,7 @@
 			</sqlCheck>
 		</preConditions>
 		<comment>Update label printing presets to define ids as STATIC or VARIABLE.</comment>
-		<customChange class="org.generationcp.middleware.liquibase.UpdateLabelPrintingPresetsTask">
+		<customChange class="org.generationcp.middleware.liquibase.UpdatePresetsTask">
 		</customChange>
 	</changeSet>
 </databaseChangeLog>
