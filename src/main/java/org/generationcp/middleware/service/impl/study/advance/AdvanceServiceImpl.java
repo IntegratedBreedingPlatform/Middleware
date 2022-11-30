@@ -50,8 +50,6 @@ import org.generationcp.middleware.service.api.study.advance.AdvanceService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceInput;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
-import org.generationcp.middleware.service.impl.study.advance.resolver.BreedingMethodResolver;
-import org.generationcp.middleware.service.impl.study.advance.resolver.PlantSelectedResolver;
 import org.generationcp.middleware.service.impl.study.advance.resolver.TrialInstanceObservationsResolver;
 import org.generationcp.middleware.service.impl.study.advance.resolver.level.LocationDataResolver;
 import org.generationcp.middleware.service.impl.study.advance.resolver.level.SeasonDataResolver;
@@ -91,10 +89,11 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	// TODO: move to common constants
 	private static final String DATE_TIME_FORMAT = "yyyyMMdd";
-	private static final String PLOT_NUMBER_VARIABLE_NAME = "PLOT_NUMBER_AP_text";
-	private static final String TRIAL_INSTANCE_VARIABLE_NAME = "INSTANCE_NUMBER_AP_text";
-	private static final String REP_NUMBER_VARIABLE_NAME = "REP_NUMBER_AP_text";
-	private static final String PLANT_NUMBER_VARIABLE_NAME = "PLANT_NUMBER_AP_text";
+
+	public static final String PLOT_NUMBER_VARIABLE_NAME = "PLOT_NUMBER_AP_text";
+	public static final String TRIAL_INSTANCE_VARIABLE_NAME = "INSTANCE_NUMBER_AP_text";
+	public static final String REP_NUMBER_VARIABLE_NAME = "REP_NUMBER_AP_text";
+	public static final String PLANT_NUMBER_VARIABLE_NAME = "PLANT_NUMBER_AP_text";
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
 
@@ -131,24 +130,20 @@ public class AdvanceServiceImpl implements AdvanceService {
 	@Resource
 	private StudyDataManager studyDataManager;
 
-	@Resource(name = "getCropDatabaseSessionProvider")
 	private HibernateSessionProvider sessionProvider;
-
 	private final DaoFactory daoFactory;
+
 	private final SeasonDataResolver seasonDataResolver;
 	private final SelectionTraitDataResolver selectionTraitDataResolver;
 	private final LocationDataResolver locationDataResolver;
-	private final BreedingMethodResolver breedingMethodResolver;
-	private final PlantSelectedResolver plantSelectedResolver;
 	private final TrialInstanceObservationsResolver trialInstanceObservationsResolver;
 
 	public AdvanceServiceImpl(final HibernateSessionProvider sessionProvider) {
+		this.sessionProvider = sessionProvider;
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.seasonDataResolver = new SeasonDataResolver();
 		this.selectionTraitDataResolver = new SelectionTraitDataResolver();
 		this.locationDataResolver = new LocationDataResolver();
-		this.breedingMethodResolver = new BreedingMethodResolver();
-		this.plantSelectedResolver = new PlantSelectedResolver();
 		this.trialInstanceObservationsResolver = new TrialInstanceObservationsResolver();
 	}
 
@@ -191,7 +186,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Map<Integer, StudyInstance> studyInstancesByInstanceNumber = studyInstances.stream()
 			.collect(Collectors.toMap(StudyInstance::getInstanceNumber, i -> i));
 
-		final Map<String, String> locationsNamesByIds = this.studyInstanceService.getStudyInstances(studyId).stream()
+		final Map<String, String> locationsNamesByIds = studyInstances.stream()
 			.collect(Collectors.toMap(studyInstance -> String.valueOf(studyInstance.getLocationId()),
 				StudyInstance::getLocationName));
 

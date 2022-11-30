@@ -54,7 +54,10 @@
         <property name="breedersCrossIDStudy" value="${breeders.cross.id.study}" />
 	</bean>
 
-    <bean id="breedersCrossIDGenerator" class="org.generationcp.middleware.ruleengine.generator.DeprecatedBreedersCrossIDGenerator">
+    <bean id="deprecatedBreedersCrossIDGenerator" class="org.generationcp.middleware.ruleengine.generator.DeprecatedBreedersCrossIDGenerator">
+	</bean>
+
+	<bean id="breedersCrossIDGenerator" class="org.generationcp.middleware.ruleengine.generator.BreedersCrossIDGenerator">
 	</bean>
 
 	<bean id="messageSource"
