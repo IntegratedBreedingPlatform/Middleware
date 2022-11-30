@@ -1,5 +1,6 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -7,11 +8,13 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -24,6 +27,9 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 	@Mock
 	private GermplasmDataManager germplasmDataManager;
 
+	@Mock
+	private GermplasmService germplasmService;
+
 	@InjectMocks
 	AttributeMaleParentExpression expression = new AttributeMaleParentExpression();
 
@@ -35,12 +41,12 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 	@Test
 	public void testAttributeAsPrefixDerivativeMethod() throws Exception {
 
-		final Germplasm groupSource = new Germplasm();
 		final int maleParentGidOfGroupSource = 103;
+		final BasicGermplasmDTO groupSource = new BasicGermplasmDTO();
 		groupSource.setGpid2(maleParentGidOfGroupSource);
 
 		Mockito.when(germplasmDataManager.getAttributeValue(maleParentGidOfGroupSource, VARIABLE_ID)).thenReturn("Mexico");
-		Mockito.when(germplasmDataManager.getGermplasmByGID(104)).thenReturn(groupSource);
+		Mockito.when(germplasmService.getBasicGermplasmByGids(ArgumentMatchers.anySet())).thenReturn(Arrays.asList(groupSource));
 
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
 		final BasicGermplasmDTO BasicGermplasmDTO =
@@ -57,12 +63,12 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 	@Test
 	public void testAttributeAsPrefixWithoutAttributeValueDerivativeMethod() throws Exception {
 
-		final Germplasm groupSource = new Germplasm();
 		final int maleParentGidOfGroupSource = 103;
+		final BasicGermplasmDTO groupSource = new BasicGermplasmDTO();
 		groupSource.setGpid2(maleParentGidOfGroupSource);
 
 		Mockito.when(germplasmDataManager.getAttributeValue(maleParentGidOfGroupSource, VARIABLE_ID)).thenReturn("");
-		Mockito.when(germplasmDataManager.getGermplasmByGID(104)).thenReturn(groupSource);
+		Mockito.when(germplasmService.getBasicGermplasmByGids(ArgumentMatchers.anySet())).thenReturn(Arrays.asList(groupSource));
 
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
 		final BasicGermplasmDTO originGermplasm =
@@ -79,12 +85,8 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 	@Test
 	public void testAttributeAsPrefixGpid2UnknownDerivativeMethod() throws Exception {
 
-		final Germplasm groupSource = new Germplasm();
-		final int maleParentGidOfGroupSource = 103;
-		groupSource.setGpid2(maleParentGidOfGroupSource);
-
 		Mockito.when(germplasmDataManager.getAttributeValue(null, VARIABLE_ID)).thenReturn("");
-		Mockito.when(germplasmDataManager.getGermplasmByGID(0)).thenReturn(null);
+		Mockito.when(germplasmService.getBasicGermplasmByGids(ArgumentMatchers.anySet())).thenReturn(null);
 
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
 		final BasicGermplasmDTO originGermplasm = this.createBasicGermplasmDTO(0, 0, 0, -1, derivativeMethod.getMid());
@@ -118,12 +120,12 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 	@Test
 	public void testAttributeAsPrefixDerivativeMethodWithUnknownSourceGpid1andGpid2() throws Exception {
 
-		final Germplasm groupSource = new Germplasm();
+		final BasicGermplasmDTO groupSource = new BasicGermplasmDTO();
 		groupSource.setGpid1(0);
 		groupSource.setGpid2(0);
 
 		Mockito.when(germplasmDataManager.getAttributeValue(groupSource.getGpid2(), VARIABLE_ID)).thenReturn("");
-		Mockito.when(germplasmDataManager.getGermplasmByGID(1000)).thenReturn(groupSource);
+		Mockito.when(germplasmService.getBasicGermplasmByGids(ArgumentMatchers.anySet())).thenReturn(Arrays.asList(groupSource));
 
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);
 		final BasicGermplasmDTO originGermplasm =
@@ -139,12 +141,12 @@ public class AttributeMaleParentExpressionTest extends TestExpression {
 	@Test
 	public void testAttributeAsPrefixDerivativeMethodWithSourceGermplasmIsGenerative() throws Exception {
 
-		final Germplasm groupSource = new Germplasm();
+		final BasicGermplasmDTO groupSource = new BasicGermplasmDTO();
 		groupSource.setGpid1(1002);
 		groupSource.setGpid2(1003);
 
 		Mockito.when(germplasmDataManager.getAttributeValue(groupSource.getGpid2(), VARIABLE_ID)).thenReturn("Mexico");
-		Mockito.when(germplasmDataManager.getGermplasmByGID(1000)).thenReturn(groupSource);
+		Mockito.when(germplasmService.getBasicGermplasmByGids(ArgumentMatchers.anySet())).thenReturn(Arrays.asList(groupSource));
 
 		final Method originGermplasmMethod = this.createGenerativeMethod(PREFIX, COUNT, null, "-", true);
 		final Method derivativeMethod = this.createDerivativeMethod(PREFIX, COUNT, null, "-", true);

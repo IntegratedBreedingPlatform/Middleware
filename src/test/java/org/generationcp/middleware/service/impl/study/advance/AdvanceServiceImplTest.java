@@ -467,7 +467,6 @@ public class AdvanceServiceImplTest extends IntegrationTestBase {
 		assertThat(advancedGermplasmMethod.getMid(), is(selectedMethod.getMid()));
 
 		assertThat(germplasm.getGnpgs(), is(-1));
-		assertThat(germplasm.getGpid1(), is(this.parentGermplasm.getGid()));
 		assertThat(germplasm.getGpid2(), is(expectedGipd2));
 
 		assertThat(germplasm.getCreatedBy(), is(this.findAdminUser()));
