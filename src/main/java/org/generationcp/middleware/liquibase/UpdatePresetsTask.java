@@ -30,7 +30,9 @@ public class UpdatePresetsTask implements liquibase.change.custom.CustomTaskChan
 
 	private static final String UPDATE_PRESET = "update program_preset set configuration = '%s' where program_preset_id = %s";
 	private static final Integer MAX_FIELD_STATIC_ID = 63;
+	private static final Integer MAX_FIXED_TYPE_INDEX = 10000;
 	private ObjectMapper jacksonMapper;
+	private JdbcConnection dbConn;
 
 	@Override
 	public void execute(final Database database) throws CustomChangeException {
@@ -41,11 +43,11 @@ public class UpdatePresetsTask implements liquibase.change.custom.CustomTaskChan
 		Statement updateStatement = null;
 
 		try {
-			final JdbcConnection dbConn = (JdbcConnection) database.getConnection();
+			this.dbConn = (JdbcConnection) database.getConnection();
 			selectStatement = dbConn.createStatement();
 			updateStatement = dbConn.createStatement();
 
-			ResultSet rs = selectStatement.executeQuery(
+			final ResultSet rs = selectStatement.executeQuery(
 				"SELECT * FROM program_preset where tool_section in (" +
 					UpdatePresetsTask.TOOL_SECTIONS.stream().collect(Collectors.joining("','", "'", "'"))
 					+ ")");
@@ -58,9 +60,14 @@ public class UpdatePresetsTask implements liquibase.change.custom.CustomTaskChan
 					final LabelPrintingPresetDTO labelPrintingPresetDTO =
 						this.jacksonMapper.readValue(configuration, LabelPrintingPresetDTO.class);
 					final List<List<String>> selectedFields = new ArrayList<>();
+					final Statement finalSelectStatement = selectStatement;
 					labelPrintingPresetDTO.getSelectedFields().stream().forEach(list -> {
 						selectedFields.add(list.stream().map((fieldId) -> {
-							return this.concatenateFieldTypeName(fieldId);
+							try {
+								return this.concatenateFieldTypeName(fieldId);
+							} catch (Exception e) {
+								throw new RuntimeException(e);
+							}
 						}).collect(Collectors.toList()));
 					});
 
@@ -68,7 +75,11 @@ public class UpdatePresetsTask implements liquibase.change.custom.CustomTaskChan
 					if (!labelPrintingPresetDTO.getBarcodeSetting().isAutomaticBarcode()) {
 						final List<String> barCodeFields = labelPrintingPresetDTO.getBarcodeSetting().getBarcodeFields().stream()
 							.map((fieldId) -> {
-								return this.concatenateFieldTypeName(fieldId);
+								try {
+									return this.concatenateFieldTypeName(fieldId);
+								} catch (Exception e) {
+									throw new RuntimeException(e);
+								}
 							}).collect(Collectors.toList());
 						labelPrintingPresetDTO.getBarcodeSetting().setBarcodeFields(barCodeFields);
 					}
@@ -97,12 +108,30 @@ public class UpdatePresetsTask implements liquibase.change.custom.CustomTaskChan
 
 	}
 
-	private String concatenateFieldTypeName(final String fieldId) {
-		if (Integer.valueOf(fieldId) > UpdatePresetsTask.MAX_FIELD_STATIC_ID) {
-			return "VARIABLE_" + fieldId;
-		} else {
+	private String concatenateFieldTypeName(final String fieldId) throws SQLException, DatabaseException, CustomChangeException {
+		final Integer id = Integer.valueOf(fieldId);
+		if (id <= UpdatePresetsTask.MAX_FIELD_STATIC_ID) {
 			return "STATIC_" + fieldId;
+		} else if (isAVariable(id)) {
+			return "VARIABLE_" + fieldId;
+		} else if (isAVariable(id - UpdatePresetsTask.MAX_FIXED_TYPE_INDEX)) {
+			return "VARIABLE_" + (id - UpdatePresetsTask.MAX_FIXED_TYPE_INDEX);
+		} else if (isAName(id - UpdatePresetsTask.MAX_FIXED_TYPE_INDEX)) {
+			return "NAME_" + (id - UpdatePresetsTask.MAX_FIXED_TYPE_INDEX);
 		}
+		throw new CustomChangeException("The field Id " + fieldId + " was not recognized as an any type of FieldType");
+	}
+
+	private boolean isAVariable(final Integer fieldId) throws SQLException, DatabaseException {
+		final Statement selectStatement = this.dbConn.createStatement();
+		final ResultSet rs = selectStatement.executeQuery("SELECT * FROM CVTERM WHERE CVTERM_ID = " + fieldId);
+		return rs.next();
+	}
+
+	private boolean isAName(final Integer fieldId) throws SQLException, DatabaseException  {
+		final Statement selectStatement = this.dbConn.createStatement();
+		final ResultSet rs = selectStatement.executeQuery("SELECT * FROM udflds WHERE ftable='NAMES' AND ftype='NAME' and fldno = " + fieldId);
+		return rs.next();
 	}
 
 	@Override
