@@ -801,7 +801,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
 			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id "
 			+ "	LEFT JOIN stock s ON s.stock_id = nde.stock_id "
-			+ " INNER JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1"
+			+ " LEFT JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1"
 			+ " LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id "
 			+ " LEFT JOIN cvterm cvterm_entry_variable ON (cvterm_entry_variable.cvterm_id = sp.type_id) "
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
