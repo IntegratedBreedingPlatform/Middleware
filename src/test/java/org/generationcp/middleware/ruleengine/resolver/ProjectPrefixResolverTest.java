@@ -8,13 +8,12 @@ import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.ruleengine.naming.context.AdvanceContext;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
@@ -45,8 +44,10 @@ public class ProjectPrefixResolverTest {
 		final TermSummary categories = new TermSummary(PROJECT_CATEGORY_ID, PROJECT_CATEGORY_VALUE, PROJECT_CATEGORY_VALUE);
 		seasonScale.addCategory(categories);
 		variable.setScale(seasonScale);
-		Mockito.when(this.ontologyVariableDataManager.getVariable(ArgumentMatchers.eq(PROGRAM_UUID),
-			ArgumentMatchers.eq(TermId.PROJECT_PREFIX.getId()), ArgumentMatchers.eq(true))).thenReturn(variable);
+
+		final Map<Integer, Variable> variablesByTermId = new HashMap<>();
+		variablesByTermId.put(TermId.PROJECT_PREFIX.getId(), variable);
+		AdvanceContext.setVariablesByTermId(variablesByTermId);
 	}
 
 	@Test

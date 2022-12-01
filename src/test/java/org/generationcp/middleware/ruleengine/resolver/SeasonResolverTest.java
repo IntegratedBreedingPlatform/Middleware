@@ -1,32 +1,24 @@
 package org.generationcp.middleware.ruleengine.resolver;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
 import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.ruleengine.naming.context.AdvanceContext;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import javax.annotation.Nullable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,13 +48,17 @@ public class SeasonResolverTest {
 		ContextHolder.setCurrentCrop("maize");
 		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 
-		final Variable seasonVariable = new Variable();
-		final Scale seasonScale = new Scale();
 		final TermSummary seasonCategory = new TermSummary(SEASON_CATEGORY_ID, SEASON_CATEGORY_NAME_VALUE, SEASON_CATEGORY_DESCRIPTION_VALUE);
+		final Scale seasonScale = new Scale();
 		seasonScale.addCategory(seasonCategory);
+
+		final Variable seasonVariable = new Variable();
 		seasonVariable.setScale(seasonScale);
-		Mockito.when(this.ontologyVariableDataManager.getVariable(ArgumentMatchers.eq(PROGRAM_UUID),
-			ArgumentMatchers.eq(TermId.SEASON_VAR.getId()), ArgumentMatchers.eq(true))).thenReturn(seasonVariable);
+
+		final Map<Integer, Variable> variablesByTermId = new HashMap<>();
+		variablesByTermId.put(TermId.SEASON_VAR.getId(), seasonVariable);
+		AdvanceContext.setVariablesByTermId(variablesByTermId);
+
 		this.valueReferenceTestDataInitializer = new ValueReferenceTestDataInitializer();
 	}
 

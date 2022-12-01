@@ -8,13 +8,12 @@ import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.ruleengine.naming.context.AdvanceContext;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
@@ -45,8 +44,10 @@ public class HabitatDesignationResolverTest {
 		final TermSummary categories = new TermSummary(HABITAT_CATEGORY_ID, HABITAT_CATEGORY_VALUE, HABITAT_CATEGORY_VALUE);
 		seasonScale.addCategory(categories);
 		variable.setScale(seasonScale);
-		Mockito.when(this.ontologyVariableDataManager.getVariable(ArgumentMatchers.eq(PROGRAM_UUID),
-			ArgumentMatchers.eq(TermId.HABITAT_DESIGNATION.getId()), ArgumentMatchers.eq(true))).thenReturn(variable);
+
+		final Map<Integer, Variable> variablesByTermId = new HashMap<>();
+		variablesByTermId.put(TermId.HABITAT_DESIGNATION.getId(), variable);
+		AdvanceContext.setVariablesByTermId(variablesByTermId);
 	}
 
 	@Test
