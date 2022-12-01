@@ -19,6 +19,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class UpdatePresetsTask implements liquibase.change.custom.CustomTaskChange {
@@ -48,8 +49,8 @@ public class UpdatePresetsTask implements liquibase.change.custom.CustomTaskChan
 			updateStatement = dbConn.createStatement();
 
 			final ResultSet rs = selectStatement.executeQuery(
-				"SELECT * FROM program_preset where tool_section in (" +
-					UpdatePresetsTask.TOOL_SECTIONS.stream().collect(Collectors.joining("','", "'", "'"))
+				"SELECT * FROM program_preset where configuration  not like '%VARIABLE%' and configuration not like '%STATIC%' "
+					+ "and tool_section in (" + UpdatePresetsTask.TOOL_SECTIONS.stream().collect(Collectors.joining("','", "'", "'"))
 					+ ")");
 
 			while (rs.next()) {
@@ -68,7 +69,7 @@ public class UpdatePresetsTask implements liquibase.change.custom.CustomTaskChan
 							} catch (Exception e) {
 								throw new RuntimeException(e);
 							}
-						}).collect(Collectors.toList()));
+						}).filter(Objects::nonNull).collect(Collectors.toList()));
 					});
 
 					labelPrintingPresetDTO.setSelectedFields(selectedFields);
@@ -80,7 +81,7 @@ public class UpdatePresetsTask implements liquibase.change.custom.CustomTaskChan
 								} catch (Exception e) {
 									throw new RuntimeException(e);
 								}
-							}).collect(Collectors.toList());
+							}).filter(Objects::nonNull).collect(Collectors.toList());
 						labelPrintingPresetDTO.getBarcodeSetting().setBarcodeFields(barCodeFields);
 					}
 
@@ -108,30 +109,34 @@ public class UpdatePresetsTask implements liquibase.change.custom.CustomTaskChan
 
 	}
 
-	private String concatenateFieldTypeName(final String fieldId) throws SQLException, DatabaseException, CustomChangeException {
+	private String concatenateFieldTypeName(final String fieldId) throws SQLException, DatabaseException {
 		final Integer id = Integer.valueOf(fieldId);
 		if (id <= UpdatePresetsTask.MAX_FIELD_STATIC_ID) {
-			return "STATIC_" + fieldId;
-		} else if (isAVariable(id)) {
-			return "VARIABLE_" + fieldId;
-		} else if (isAVariable(id - UpdatePresetsTask.MAX_FIXED_TYPE_INDEX)) {
+			return "STATIC_" + id;
+		} else if (isVariable(id)) {
+			return "VARIABLE_" + id;
+		} else if (isVariable(id - UpdatePresetsTask.MAX_FIXED_TYPE_INDEX)) {
 			return "VARIABLE_" + (id - UpdatePresetsTask.MAX_FIXED_TYPE_INDEX);
-		} else if (isAName(id - UpdatePresetsTask.MAX_FIXED_TYPE_INDEX)) {
+		} else if (isName(id - UpdatePresetsTask.MAX_FIXED_TYPE_INDEX)) {
 			return "NAME_" + (id - UpdatePresetsTask.MAX_FIXED_TYPE_INDEX);
 		}
-		throw new CustomChangeException("The field Id " + fieldId + " was not recognized as an any type of FieldType");
+		return null;
 	}
 
-	private boolean isAVariable(final Integer fieldId) throws SQLException, DatabaseException {
+	private boolean isVariable(final Integer fieldId) throws SQLException, DatabaseException {
 		final Statement selectStatement = this.dbConn.createStatement();
 		final ResultSet rs = selectStatement.executeQuery("SELECT * FROM CVTERM WHERE CVTERM_ID = " + fieldId);
-		return rs.next();
+		final boolean isVariable = rs.next();
+		selectStatement.close();
+		return isVariable;
 	}
 
-	private boolean isAName(final Integer fieldId) throws SQLException, DatabaseException  {
+	private boolean isName(final Integer fieldId) throws SQLException, DatabaseException  {
 		final Statement selectStatement = this.dbConn.createStatement();
 		final ResultSet rs = selectStatement.executeQuery("SELECT * FROM udflds WHERE ftable='NAMES' AND ftype='NAME' and fldno = " + fieldId);
-		return rs.next();
+		final boolean isName = rs.next();
+		selectStatement.close();
+		return isName;
 	}
 
 	@Override
