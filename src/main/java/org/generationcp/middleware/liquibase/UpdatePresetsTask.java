@@ -49,7 +49,7 @@ public class UpdatePresetsTask implements liquibase.change.custom.CustomTaskChan
 			updateStatement = dbConn.createStatement();
 
 			final ResultSet rs = selectStatement.executeQuery(
-				"SELECT * FROM program_preset where configuration  not like '%VARIABLE%' and configuration not like '%STATIC%' "
+				"SELECT * FROM program_preset where (configuration  not like '%VARIABLE%' and configuration not like '%STATIC%') "
 					+ "and tool_section in (" + UpdatePresetsTask.TOOL_SECTIONS.stream().collect(Collectors.joining("','", "'", "'"))
 					+ ")");
 
@@ -131,7 +131,7 @@ public class UpdatePresetsTask implements liquibase.change.custom.CustomTaskChan
 		return isVariable;
 	}
 
-	private boolean isName(final Integer fieldId) throws SQLException, DatabaseException  {
+	private boolean isName(final Integer fieldId) throws SQLException, DatabaseException {
 		final Statement selectStatement = this.dbConn.createStatement();
 		final ResultSet rs = selectStatement.executeQuery("SELECT * FROM udflds WHERE ftable='NAMES' AND ftype='NAME' and fldno = " + fieldId);
 		final boolean isName = rs.next();
