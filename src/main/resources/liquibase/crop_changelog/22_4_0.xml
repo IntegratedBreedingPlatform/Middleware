@@ -91,7 +91,7 @@
 	<changeSet author="cuenyad" id="v22.4.0-6">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
-				select count(1) FROM program_preset where configuration like '%VARIABLE%' or '%STATIC%'
+				select count(1) FROM program_preset where configuration like '%VARIABLE%' and configuration like '%STATIC%'
                     and tool_section in ('DATASET_LABEL_PRINTING_PRESET', 'LOT_LABEL_PRINTING_PRESET',
 										 'GERMPLASM_LABEL_PRINTING_PRESET', 'GERMPLASM_LIST_LABEL_PRINTING_PRESET',
 										 'STUDY_ENTRIES_LABEL_PRINTING_PRESET');
