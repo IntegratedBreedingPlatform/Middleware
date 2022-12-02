@@ -55,7 +55,6 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -164,25 +163,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public Study getStudy(final int studyId) {
 		// not using the variable type
 		return this.studyDataManager.getStudy(studyId, false);
-	}
-
-	@Override
-	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds, final Boolean isBreedingLocation) {
-		if (isBreedingLocation == null) {
-			return this.getFavoriteLocationByLocationIDs(locationIds);
-		}
-
-		if (isBreedingLocation) {
-			return this.locationService.getAllBreedingLocations(locationIds);
-		}
-
-		return this.locationService.getAllSeedingLocations(locationIds);
-
-	}
-
-	@Override
-	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds) {
-		return this.locationService.getLocationsByIDs(locationIds);
 	}
 
 	@Override
@@ -676,20 +656,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Method getMethodByName(final String name) {
 		return this.getGermplasmDataManager().getMethodByName(name);
-	}
-
-	@Override
-	public List<Integer> getFavoriteProjectLocationIds(final String programUUID) {
-		final List<ProgramFavorite> favList =
-				this.getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
-		final List<Integer> favoriteList = new ArrayList<>();
-		if (favList != null && !favList.isEmpty()) {
-			for (final ProgramFavorite fav : favList) {
-				favoriteList.add(fav.getEntityId());
-
-			}
-		}
-		return favoriteList;
 	}
 
 	@Override
