@@ -1,4 +1,4 @@
-package org.generationcp.middleware.liquibase;
+package org.generationcp.middleware.liquibase.tasks.v23;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
