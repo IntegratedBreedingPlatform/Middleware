@@ -3,11 +3,13 @@ package org.generationcp.middleware.service.impl.analysis;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -47,8 +49,11 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 			.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), VariableType.ENVIRONMENT_DETAIL)
 			.put(TermId.LOCATION_ID.getId(), VariableType.ENVIRONMENT_DETAIL).build();
 	public static final String LOCATION_NAME = "LOCATION_NAME";
+	public static final String DELIMITER = ", ";
 
 	private final DaoFactory daoFactory;
+
+	public static final String OBSOLETE_VARIABLE_ERROR = "variableName specified marked as obsolete: ";
 
 	public SiteAnalysisServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -62,8 +67,9 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 			meansImportRequest.getData().stream().map(o -> o.getValues().keySet()).flatMap(Set::stream).collect(Collectors.toSet());
 		final Map<String, CVTerm> analysisVariablesMap =
 			new CaseInsensitiveMap(
-				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisVariableNames, CvId.VARIABLES, true).stream().collect(Collectors.toMap(
-					CVTerm::getName, Function.identity())));
+				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisVariableNames, CvId.VARIABLES, true).stream()
+					.collect(Collectors.toMap(
+						CVTerm::getName, Function.identity())));
 
 		// Create means dataset
 		final DmsProject meansDataset = this.createDataset(study, DatasetTypeEnum.MEANS_DATA, "-MEANS");
@@ -230,11 +236,26 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		// Retrieve the germplasm descriptor variables from PLOT dataset and copy it to the means dataset
 		final Map<Integer, String> germplasmDescriptorsMap =
 			this.daoFactory.getProjectPropertyDAO().getGermplasmDescriptors(meansDataset.getStudy().getProjectId());
+		final String obsoleteDescriptors =
+			this.daoFactory.getCvTermDao().getByIds(new ArrayList<>(germplasmDescriptorsMap.keySet())).stream()
+				.filter(CVTerm::isObsolete).map(CVTerm::getName).collect(Collectors.joining(DELIMITER));
+		if (StringUtils.isNotEmpty(obsoleteDescriptors)) {
+			throw new MiddlewareException(OBSOLETE_VARIABLE_ERROR + obsoleteDescriptors);
+		}
+
 		for (final Map.Entry<Integer, String> entry : germplasmDescriptorsMap.entrySet()) {
 			this.addProjectProperty(meansDataset, entry.getKey(), entry.getValue(), VariableType.GERMPLASM_DESCRIPTOR,
 				rank.incrementAndGet());
 		}
 
+		final Set<CVTerm> obsoleteAnalysisVariables = analaysisVariablesMap.entrySet().stream()
+			.filter(entry -> entry.getValue().isObsolete())
+			.map(Map.Entry::getValue)
+			.collect(Collectors.toSet());
+		if (!obsoleteAnalysisVariables.isEmpty()) {
+			throw new MiddlewareException(OBSOLETE_VARIABLE_ERROR + obsoleteAnalysisVariables.stream()
+				.map(CVTerm::getName).collect(Collectors.joining(DELIMITER)));
+		}
 		for (final Map.Entry<String, CVTerm> entry : analaysisVariablesMap.entrySet()) {
 			this.addProjectProperty(meansDataset, entry.getValue().getCvTermId(), entry.getValue().getName(), VariableType.ANALYSIS,
 				rank.incrementAndGet());
@@ -259,14 +280,23 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 				.map(ProjectProperty::getVariableId).collect(
 					Collectors.toSet());
 
-		for (final Map.Entry<String, CVTerm> entry : analaysisSummaryVariablesMap.entrySet()) {
-			// Only add variables not yet exist in the dataset.
-			if (!entry.getValue().isObsolete() && !existingVariablesInDataset.contains(entry.getValue().getCvTermId())) {
-				this.addProjectProperty(summaryStatisticDataset, entry.getValue().getCvTermId(), entry.getValue().getName(),
-					VariableType.ANALYSIS_SUMMARY,
-					rank.incrementAndGet());
-			}
+		// Only add variables not yet exist in the dataset.
+		final Set<CVTerm> variablesToAddInDataset = analaysisSummaryVariablesMap.entrySet().stream()
+			.filter(entry -> !existingVariablesInDataset.contains(entry.getValue().getCvTermId()))
+			.map(Map.Entry::getValue)
+			.collect(Collectors.toSet());
+
+		final String obsoleteVariables = variablesToAddInDataset.stream()
+			.filter(CVTerm::isObsolete).map(CVTerm::getName).collect(Collectors.joining(DELIMITER));
+		if (StringUtils.isNotEmpty(obsoleteVariables)) {
+			throw new MiddlewareException(OBSOLETE_VARIABLE_ERROR + obsoleteVariables);
 		}
+
+		variablesToAddInDataset.forEach(entry -> {
+			this.addProjectProperty(summaryStatisticDataset, entry.getCvTermId(), entry.getName(),
+				VariableType.ANALYSIS_SUMMARY,
+				rank.incrementAndGet());
+		});
 	}
 
 	private String resolveAlias(final CVTerm cvTerm) {
