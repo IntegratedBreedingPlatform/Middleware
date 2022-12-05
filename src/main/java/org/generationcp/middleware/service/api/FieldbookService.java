@@ -116,16 +116,6 @@ public interface FieldbookService {
 	List<DatasetReference> getDatasetReferences(int studyId);
 
 	/**
-	 * Gets the favorite location by project id.
-	 *
-	 * @param locationIds
-	 *            the location ids
-	 * @param filtered
-	 * @return the favorite locations based on the given project id
-	 */
-	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds, Boolean filtered);
-
-	/**
 	 * Gets the study.
 	 *
 	 * @param studyId
@@ -522,15 +512,6 @@ public interface FieldbookService {
 	Method getMethodByName(String name);
 
 	/**
-	 * Gets the favorite project location ids.
-	 *
-	 * @param programUUID
-	 *            - unique id of program
-	 * @return the favorite project location ids
-	 */
-	List<Integer> getFavoriteProjectLocationIds(String programUUID);
-
-	/**
 	 * Saves germplasm list crosses types. ListData items are always added to
 	 * the database, before saving the germplasm list.
 	 *
@@ -561,8 +542,6 @@ public interface FieldbookService {
 	StandardVariable getStandardVariableByName(String name, String programUUID);
 
 	Location getLocationByName(String locationName, Operation op);
-
-	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
 
 	List<Location> getAllLocations();
 
