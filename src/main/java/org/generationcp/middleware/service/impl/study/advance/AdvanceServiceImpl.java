@@ -240,14 +240,17 @@ public class AdvanceServiceImpl implements AdvanceService {
 			// Get the selected breeding method
 			final Method breedingMethod = request.accept(new GetBreedingMethodVisitor(row, breedingMethodsById, breedingMethodsByCode));
 
+			if (breedingMethod == null || breedingMethod.isBulkingMethod() == null) {
+				return;
+			}
+
 			// Get the sample numbers
 			final List<Integer> sampleNumbers = request.accept(new GetSampleNumbersVisitor(row.getObservationUnitId(), samplesByExperimentId));
 
 			// Get the number of selected plants
 			final Integer plantsSelected = request.accept(new GetPlantSelectedVisitor(row, breedingMethodsByCode, breedingMethod, sampleNumbers));
 
-			if (originGermplasm == null || breedingMethod == null || breedingMethod.isBulkingMethod() == null || plantsSelected == null
-				|| plantsSelected <= 0) {
+			if (originGermplasm == null || plantsSelected == null || plantsSelected <= 0) {
 				return;
 			}
 
