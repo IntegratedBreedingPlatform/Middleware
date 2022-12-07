@@ -12,6 +12,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -52,8 +53,6 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 	public static final String DELIMITER = ", ";
 
 	private final DaoFactory daoFactory;
-
-	public static final String OBSOLETE_VARIABLE_ERROR = "variableName specified marked as obsolete: ";
 
 	public SiteAnalysisServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -240,7 +239,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 			this.daoFactory.getCvTermDao().getByIds(new ArrayList<>(germplasmDescriptorsMap.keySet())).stream()
 				.filter(CVTerm::isObsolete).map(CVTerm::getName).collect(Collectors.joining(DELIMITER));
 		if (StringUtils.isNotEmpty(obsoleteDescriptors)) {
-			throw new MiddlewareException(OBSOLETE_VARIABLE_ERROR + obsoleteDescriptors);
+			throw new MiddlewareException("",  ErrorCode.ERROR_OBSOLETE_VARIABLES, obsoleteDescriptors);
 		}
 
 		for (final Map.Entry<Integer, String> entry : germplasmDescriptorsMap.entrySet()) {
@@ -253,7 +252,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 			.map(Map.Entry::getValue)
 			.collect(Collectors.toSet());
 		if (!obsoleteAnalysisVariables.isEmpty()) {
-			throw new MiddlewareException(OBSOLETE_VARIABLE_ERROR + obsoleteAnalysisVariables.stream()
+			throw new MiddlewareException("", ErrorCode.ERROR_OBSOLETE_VARIABLES, obsoleteAnalysisVariables.stream()
 				.map(CVTerm::getName).collect(Collectors.joining(DELIMITER)));
 		}
 		for (final Map.Entry<String, CVTerm> entry : analaysisVariablesMap.entrySet()) {
@@ -289,14 +288,14 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		final String obsoleteVariables = variablesToAddInDataset.stream()
 			.filter(CVTerm::isObsolete).map(CVTerm::getName).collect(Collectors.joining(DELIMITER));
 		if (StringUtils.isNotEmpty(obsoleteVariables)) {
-			throw new MiddlewareException(OBSOLETE_VARIABLE_ERROR + obsoleteVariables);
+			throw new MiddlewareException("",  ErrorCode.ERROR_OBSOLETE_VARIABLES, obsoleteVariables);
 		}
 
-		variablesToAddInDataset.forEach(entry -> {
+		variablesToAddInDataset.forEach(entry ->
 			this.addProjectProperty(summaryStatisticDataset, entry.getCvTermId(), entry.getName(),
 				VariableType.ANALYSIS_SUMMARY,
-				rank.incrementAndGet());
-		});
+				rank.incrementAndGet())
+		);
 	}
 
 	private String resolveAlias(final CVTerm cvTerm) {
