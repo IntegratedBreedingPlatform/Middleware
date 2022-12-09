@@ -153,7 +153,7 @@ public class CVTerm implements Serializable {
 	}
 
 	public Boolean isObsolete() {
-		return this.isObsolete != null && this.isObsolete > 0;
+		return this.isObsolete > 0;
 	}
 
 	public void setIsObsolete(final Boolean isObsolete) {
