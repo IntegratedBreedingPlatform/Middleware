@@ -193,13 +193,15 @@
 		<property name="daoFactory" ref="daoFactory"/>
     </bean>
 
-
     <bean id="cropSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
 		<constructor-arg name="sessionFactory" ref="IBDBV2_MAIZE_MERGED_SessionFactory"/>
 		<aop:scoped-proxy proxy-target-class="false"/>
     </bean>
 
 	<bean id="workbenchTestDataUtil" class="org.generationcp.middleware.WorkbenchTestDataUtil">
+    </bean>
+
+	<bean id="PresetMapper" class="org.generationcp.middleware.preset.PresetMapper">
     </bean>
 
 	<bean id="trialEnvironmentBuilder" factory-bean="managerFactory"
