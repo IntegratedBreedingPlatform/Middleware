@@ -368,6 +368,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			query.addScalar(ProgramMembersQuery.ROLE_ID);
 			query.addScalar(ProgramMembersQuery.ROLE_NAME);
 			query.addScalar(ProgramMembersQuery.ROLE_DESCRIPTION);
+			query.addScalar(ProgramMembersQuery.ROLE_TYPE_ID);
 			query.addScalar(ProgramMembersQuery.ROLE_TYPE_NAME);
 			query.addScalar(ProgramMembersQuery.ROLE_ACTIVE);
 
