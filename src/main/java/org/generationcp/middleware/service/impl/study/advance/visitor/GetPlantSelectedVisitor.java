@@ -2,7 +2,7 @@ package org.generationcp.middleware.service.impl.study.advance.visitor;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.study.AdvanceRequestVisitor;
-import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
+import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -33,7 +33,7 @@ public class GetPlantSelectedVisitor implements AdvanceRequestVisitor<Integer> {
 	}
 
 	@Override
-	public Integer visit(final AdvanceSampledPlantsRequest request) {
+	public Integer visit(final AdvanceSamplesRequest request) {
 		return CollectionUtils.isEmpty(this.sampleNumbers) ? null : this.sampleNumbers.size();
 	}
 

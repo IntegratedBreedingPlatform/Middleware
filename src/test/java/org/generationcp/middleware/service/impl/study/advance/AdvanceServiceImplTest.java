@@ -8,7 +8,7 @@ import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
-import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
+import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
@@ -272,7 +272,7 @@ public class AdvanceServiceImplTest extends IntegrationTestBase {
 
 		final Method notBulkingMethod = this.createMethod(false);
 
-		final AdvanceSampledPlantsRequest advanceSampledPlantsRequest = new AdvanceSampledPlantsRequest();
+		final AdvanceSamplesRequest advanceSampledPlantsRequest = new AdvanceSamplesRequest();
 		advanceSampledPlantsRequest.setBreedingMethodId(notBulkingMethod.getMid());
 		final List<Integer> advancedGermplasmGids = this.advanceService.advanceSamples(this.studyId, advanceSampledPlantsRequest);
 		assertThat(advancedGermplasmGids, hasSize(1));

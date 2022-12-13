@@ -1,7 +1,7 @@
 package org.generationcp.middleware.service.impl.study.advance.visitor;
 
 import org.generationcp.middleware.api.study.AdvanceRequestVisitor;
-import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
+import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -31,7 +31,7 @@ public class GetBreedingMethodVisitor implements AdvanceRequestVisitor<Method> {
 	}
 
 	@Override
-	public Method visit(final AdvanceSampledPlantsRequest request) {
+	public Method visit(final AdvanceSamplesRequest request) {
 		return this.breedingMethodsById.get(request.getBreedingMethodId());
 	}
 

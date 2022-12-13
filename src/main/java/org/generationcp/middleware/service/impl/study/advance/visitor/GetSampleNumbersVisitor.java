@@ -2,7 +2,7 @@ package org.generationcp.middleware.service.impl.study.advance.visitor;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.study.AdvanceRequestVisitor;
-import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
+import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 
@@ -28,7 +28,7 @@ public class GetSampleNumbersVisitor implements AdvanceRequestVisitor<List<Integ
 	}
 
 	@Override
-	public List<Integer> visit(final AdvanceSampledPlantsRequest request) {
+	public List<Integer> visit(final AdvanceSamplesRequest request) {
 		final List<SampleDTO> sampleDTOS = this.samplesByExperimentId.get(this.experimentId);
 		if (CollectionUtils.isEmpty(sampleDTOS)) {
 			return new ArrayList<>();

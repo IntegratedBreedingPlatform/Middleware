@@ -4,7 +4,7 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class AdvanceSampledPlantsRequest extends AbstractAdvanceRequest {
+public class AdvanceSamplesRequest extends AbstractAdvanceRequest {
 
 	/**
 	 * This is the id of the breeding method if the user has selected advancing using the same breeding method for all lines

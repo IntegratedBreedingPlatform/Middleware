@@ -1,7 +1,7 @@
 package org.generationcp.middleware.service.impl.study.advance.visitor;
 
 import org.generationcp.middleware.api.study.AdvanceRequestVisitor;
-import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
+import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -26,7 +26,7 @@ public class GetExperimentSamplesVisitor implements AdvanceRequestVisitor<Map<In
 	}
 
 	@Override
-	public Map<Integer, List<SampleDTO>> visit(final AdvanceSampledPlantsRequest request) {
+	public Map<Integer, List<SampleDTO>> visit(final AdvanceSamplesRequest request) {
 		return this.studyDataManager.getExperimentSamplesDTOMap(this.studyId);
 	}
 
