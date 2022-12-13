@@ -6,7 +6,7 @@ import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.study.AdvanceRequest;
-import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
+import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -153,7 +153,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 	}
 
 	@Override
-	public List<Integer> advanceSamples(final Integer studyId, final AdvanceSampledPlantsRequest request) {
+	public List<Integer> advanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
 		return this.advance(studyId, request);
 	}
 
@@ -188,7 +188,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 		final Map<String, String> locationsNamesByIds = studyInstances.stream()
 			.collect(Collectors.toMap(studyInstance -> String.valueOf(studyInstance.getLocationId()),
-				StudyInstance::getLocationName));
+				StudyInstance::getLocationName, (locationName1, locationName2) -> locationName1));
 
 		final Map<Integer, Variable> variablesByTermIds = this.getVariablesByTermIds();
 
@@ -245,10 +245,12 @@ public class AdvanceServiceImpl implements AdvanceService {
 			}
 
 			// Get the sample numbers
-			final List<Integer> sampleNumbers = request.accept(new GetSampleNumbersVisitor(row.getObservationUnitId(), samplesByExperimentId));
+			final List<Integer> sampleNumbers =
+				request.accept(new GetSampleNumbersVisitor(row.getObservationUnitId(), samplesByExperimentId));
 
 			// Get the number of selected plants
-			final Integer plantsSelected = request.accept(new GetPlantSelectedVisitor(row, breedingMethodsByCode, breedingMethod, sampleNumbers));
+			final Integer plantsSelected =
+				request.accept(new GetPlantSelectedVisitor(row, breedingMethodsByCode, breedingMethod, sampleNumbers));
 
 			if (originGermplasm == null || plantsSelected == null || plantsSelected <= 0) {
 				return;
@@ -294,7 +296,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 			final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 			final Map<String, String> locationNameByIds =
-				locations.stream().collect(Collectors.toMap(location -> String.valueOf(location.getLocid()), Location::getLname));
+				locations.stream().collect(Collectors.toMap(location -> String.valueOf(location.getLocid()), Location::getLname,
+					(locationName1, locationName2) -> locationName1));
 
 			final Integer plotCodeVariableId = this.germplasmService.getPlotCodeField().getId();
 			final Integer plotNumberVariableId = this.getVariableId(PLOT_NUMBER_VARIABLE_NAME);
