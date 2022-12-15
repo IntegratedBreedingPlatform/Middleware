@@ -15,9 +15,4 @@ public interface PermissionService {
 
 	List<PermissionDto> getPermissionsDtoByIds(Set<Integer> permissionIds);
 
-	/**
-	 * Close the sessionProvider
-	 */
-	void close();
-
 }

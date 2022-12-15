@@ -21,7 +21,6 @@ import org.generationcp.middleware.service.api.user.RoleGeneratorInput;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,8 +37,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class RoleServiceImpl implements RoleService {
 
-	private HibernateSessionProvider sessionProvider;
-
 	private WorkbenchDaoFactory workbenchDaoFactory;
 
 	@Autowired
@@ -50,19 +47,7 @@ public class RoleServiceImpl implements RoleService {
 	}
 
 	public RoleServiceImpl(final HibernateSessionProvider sessionProvider) {
-		this.sessionProvider = sessionProvider;
 		this.workbenchDaoFactory = new WorkbenchDaoFactory(sessionProvider);
-	}
-
-	public Session getCurrentSession() {
-		return this.sessionProvider.getSession();
-	}
-
-	@Override
-	public void close() {
-		if (this.sessionProvider != null) {
-			this.sessionProvider.close();
-		}
 	}
 
 	@Override

@@ -18,12 +18,10 @@ import java.util.Set;
 @Transactional
 public class PermissionServiceImpl implements PermissionService {
 
-	private HibernateSessionProvider sessionProvider;
 	private WorkbenchDaoFactory workbenchDaoFactory;
 
 	public PermissionServiceImpl(final HibernateSessionProvider sessionProvider) {
-		this.sessionProvider = sessionProvider;
-		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.sessionProvider);
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(sessionProvider);
 	}
 
 	public PermissionServiceImpl() {
@@ -102,10 +100,4 @@ public class PermissionServiceImpl implements PermissionService {
 		}
 	}
 
-	@Override
-	public void close() {
-		if (this.sessionProvider != null) {
-			this.sessionProvider.close();
-		}
-	}
 }

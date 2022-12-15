@@ -19,12 +19,6 @@ import java.util.Optional;
 
 public interface RoleService {
 
-
-	/**
-	 * Close the sessionProvider
-	 */
-	void close();
-
 	List<RoleDto> getRoles(RoleSearchDto roleSearchDto);
 
 	RoleDto saveRole(RoleGeneratorInput dto);
