@@ -9,7 +9,7 @@
                  SELECT count(*) FROM release_note where version = '23.0'
              </sqlCheck>
  		</preConditions>
-         <comment>Add release note for version 21.0</comment>
+         <comment>Add release note for version 23.0</comment>
  		<sql dbms="mysql" splitStatements="true">
  			-- Disable release note for v22
 			UPDATE release_note SET enabled = 0 WHERE version = '22.0';
