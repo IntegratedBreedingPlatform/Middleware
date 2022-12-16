@@ -76,7 +76,7 @@ public class StudySearchDAOQuery {
 
 	private static final String COUNT_EXPRESSION = " COUNT(1) ";
 
-	static SQLQueryBuilder getSelectQuery(final String programUUID, final StudySearchRequest request, final Pageable pageable) {
+	static SQLQueryBuilder getSelectQuery(final StudySearchRequest request, final Pageable pageable) {
 		final String baseQuery =
 			String.format(BASE_QUERY, SELECT_EXPRESSION, SELF_JOIN_QUERY + STUDY_TYPE_JOIN_QUERY + WORKBENCH_USER_JOIN_QUERY);
 		final SQLQueryBuilder sqlQueryBuilder = new SQLQueryBuilder(baseQuery);
@@ -86,7 +86,7 @@ public class StudySearchDAOQuery {
 		return sqlQueryBuilder;
 	}
 
-	static SQLQueryBuilder getCountQuery(final String programUUID, final StudySearchRequest request) {
+	static SQLQueryBuilder getCountQuery(final StudySearchRequest request) {
 		final String countQueryJoins = getCountQueryJoins(request);
 		final String baseQuery = String.format(BASE_QUERY, COUNT_EXPRESSION, countQueryJoins);
 		final SQLQueryBuilder sqlQueryBuilder = new SQLQueryBuilder(baseQuery);

@@ -2070,12 +2070,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<StudySearchResponse> searchStudies(final String programUUID, final StudySearchRequest request, final Pageable pageable) {
-		final SQLQueryBuilder queryBuilder = StudySearchDAOQuery.getSelectQuery(programUUID, request, pageable);
+		final SQLQueryBuilder queryBuilder = StudySearchDAOQuery.getSelectQuery(request, pageable);
 		queryBuilder.setParameter("programUUID", programUUID);
 
 		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
 		queryBuilder.addParamsToQuery(query);
 
+		query.addScalar(StudySearchDAOQuery.STUDY_ID_ALIAS);
 		query.addScalar(StudySearchDAOQuery.STUDY_NAME_ALIAS);
 		query.addScalar(StudySearchDAOQuery.STUDY_TYPE_NAME_ALIAS);
 		query.addScalar(StudySearchDAOQuery.LOCKED_ALIAS, BooleanType.INSTANCE);
@@ -2091,7 +2092,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public long countSearchStudies(final String programUUID, final StudySearchRequest request) {
-		final SQLQueryBuilder queryBuilder = StudySearchDAOQuery.getCountQuery(programUUID, request);
+		final SQLQueryBuilder queryBuilder = StudySearchDAOQuery.getCountQuery(request);
 		queryBuilder.setParameter("programUUID", programUUID);
 
 		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
