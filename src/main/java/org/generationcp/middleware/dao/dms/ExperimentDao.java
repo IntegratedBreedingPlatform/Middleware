@@ -936,7 +936,9 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCK;
 			} else if (VariableType.GERMPLASM_DESCRIPTOR.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP;
-			} else if (VariableType.TRAIT.getId() == variableTypeId || VariableType.ANALYSIS.getId() == variableTypeId
+			} else if (VariableType.TRAIT.getId() == variableTypeId
+				|| VariableType.ANALYSIS.getId() == variableTypeId
+				|| VariableType.ANALYSIS_SUMMARY.getId() == variableTypeId
 				|| VariableType.ENVIRONMENT_CONDITION.getId() == variableTypeId
 				|| VariableType.SELECTION_METHOD.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_PHENOTYPE;
