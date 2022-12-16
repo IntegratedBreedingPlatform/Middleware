@@ -14,9 +14,11 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
+import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.util.CommonQueryConstants;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -33,6 +35,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -40,13 +43,13 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.api.study.ExperimentalDesign;
-import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.FormulaUtils;
+import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -2001,6 +2004,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return count.intValue() == datasetIds.size();
 	}
 
+	@Deprecated
 	public List<StudyDTO> filterStudies(final String programUUID, final StudySearchRequest studySearchRequest, final Pageable pageable) {
 
 		final ProjectionList projectionList = Projections.projectionList();
@@ -2020,13 +2024,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return criteria.list();
 	}
 
+	@Deprecated
 	public long countFilteredStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
 		final Criteria criteria = this.getBaseFilteredStudiesCriteria(programUUID);
 		this.addStudySearchFilters(criteria, studySearchRequest);
 		criteria.setProjection(Projections.rowCount());
 		return (Long) criteria.uniqueResult();
 	}
-
+	@Deprecated
 	private Criteria getBaseFilteredStudiesCriteria(final String programUUID) {
 		return this.getSession().createCriteria(this.getPersistentClass())
 			.createAlias("studyType", "studyType")
@@ -2037,9 +2042,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.setResultTransformer(Transformers.aliasToBean(StudyDTO.class));
 	}
 
+	@Deprecated
 	private void addStudySearchFilters(final Criteria criteria, final StudySearchRequest request) {
-		if (!StringUtils.isEmpty(request.getStudyName())) {
-			criteria.add(Restrictions.like("name", "%" + request.getStudyName() + "%"));
+		final SqlTextFilter studyNameFilter = request.getStudyNameFilter();
+		if (studyNameFilter != null && !studyNameFilter.isEmpty()) {
+			criteria.add(Restrictions.like("name", "%" + studyNameFilter.getValue() + "%"));
 		}
 	}
 
@@ -2061,4 +2068,36 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
+	public List<StudySearchResponse> searchStudies(final String programUUID, final StudySearchRequest request, final Pageable pageable) {
+		final SQLQueryBuilder queryBuilder = StudySearchDAOQuery.getSelectQuery(programUUID, request, pageable);
+		queryBuilder.setParameter("programUUID", programUUID);
+
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		queryBuilder.addParamsToQuery(query);
+
+		query.addScalar(StudySearchDAOQuery.STUDY_NAME_ALIAS);
+		query.addScalar(StudySearchDAOQuery.STUDY_TYPE_NAME_ALIAS);
+		query.addScalar(StudySearchDAOQuery.LOCKED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(StudySearchDAOQuery.STUDY_OWNER_ALIAS);
+		query.addScalar(StudySearchDAOQuery.START_DATE_ALIAS);
+		query.addScalar(StudySearchDAOQuery.PARENT_FOLDER_NAME_ALIAS);
+		query.addScalar(StudySearchDAOQuery.OBJECTIVE_ALIAS);
+		query.setResultTransformer(Transformers.aliasToBean(StudySearchResponse.class));
+
+		GenericDAO.addPaginationToSQLQuery(query, pageable);
+
+		return (List<StudySearchResponse>) query.list();
+	}
+
+	public long countSearchStudies(final String programUUID, final StudySearchRequest request) {
+		final SQLQueryBuilder queryBuilder = StudySearchDAOQuery.getCountQuery(programUUID, request);
+		queryBuilder.setParameter("programUUID", programUUID);
+
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		queryBuilder.addParamsToQuery(query);
+
+		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
 }

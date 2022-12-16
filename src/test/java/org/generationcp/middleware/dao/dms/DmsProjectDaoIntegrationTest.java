@@ -22,6 +22,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Sample;
@@ -599,7 +600,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		this.assertStudyDTO(filterStudiesResponse2.get(1), study2.getProjectId(), study2.getName(), programUUID);
 
 		final StudySearchRequest studySearchRequest3 = new StudySearchRequest();
-		studySearchRequest3.setStudyName("a new");
+		studySearchRequest3.setStudyNameFilter(new SqlTextFilter("a new", SqlTextFilter.Type.CONTAINS));
 
 		assertThat(this.dmsProjectDao.countFilteredStudies(programUUID, studySearchRequest3), is(1L));
 

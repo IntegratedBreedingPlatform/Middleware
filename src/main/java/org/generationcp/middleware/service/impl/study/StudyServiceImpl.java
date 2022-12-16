@@ -10,6 +10,7 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
+import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -187,6 +188,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public void deleteNameTypeFromStudies(final Integer nameTypeId) {
 		this.daoFactory.getProjectPropertyDAO().deleteNameTypeFromStudies(nameTypeId);
+	}
+
+	@Override
+	public List<StudySearchResponse> searchStudies(final String programUUID, final StudySearchRequest studySearchRequest, final Pageable pageable) {
+		return this.daoFactory.getDmsProjectDAO().searchStudies(programUUID, studySearchRequest, pageable);
+	}
+
+	@Override
+	public long countSearchStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
+		return this.daoFactory.getDmsProjectDAO().countSearchStudies(programUUID, studySearchRequest);
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
