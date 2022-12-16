@@ -413,44 +413,41 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 				}
 
 				Integer rank = properties.size() + 1;
-				if (DataType.PERSON == dataType) {
-					// Special handling for COOPERATOR and PI_NAME variable. Whenever COOPERATOR and PI_NAME variables are added to the study,
-					// The system should automatically add their corresponding ID variable (i.e. COOPERATOR_ID and PI_ID).
+
+				// Skip COOPERATOR_ID and PI_ID
+				if (TermId.COOPERATOOR_ID.getId() == measurementVariable.getTermId()
+					|| TermId.PI_ID.getId() == measurementVariable.getTermId())
+					return;
+
+				if (TermId.COOPERATOR.getId() == measurementVariable.getTermId()) {
+					// Special handling for COOPERATOR. When COOPERATOR variable is added to the study,
+					// The system should automatically add its corresponding pair ID variable (i.e. COOPERATOR_ID).
 					final String personFullName = entry.getValue();
 					// Find the person by full name
 					final Optional<Person> personOptional =
 						this.getPersonByFullName(cropName, personFullName);
-					if (TermId.COOPERATOR.getId() == measurementVariable.getTermId()) {
-						if (personOptional.isPresent()) {
-							// Store the name of the person as COOPERATOR variable in projectprop
-							properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
-								personFullName, rank, TermId.COOPERATOR.getId(), entry.getKey()));
-							// Store the id of the person as COOPERATOR_ID variable in projectprop
-							properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
-								personOptional.get().getId().toString(), ++rank, TermId.COOPERATOOR_ID.getId(), entry.getKey()));
-						} else {
-							// Add the COOPERATOR and COOPERATOOR_ID with an empty value if person is not existing or not valid for the crop
-							properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
-								"", rank, TermId.COOPERATOR.getId(), entry.getKey()));
-							properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
-								"", ++rank, TermId.COOPERATOOR_ID.getId(), entry.getKey()));
-						}
-					} else if (TermId.PI_NAME.getId() == measurementVariable.getTermId()) {
-						if (personOptional.isPresent()) {
-							// Store the name of the person as PI_NAME variable in projectprop
-							properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
-								personFullName, rank, TermId.PI_NAME.getId(), entry.getKey()));
-							// Store the name of the person as PI_ID variable in projectprop
-							properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
-								personOptional.get().getId().toString(), ++rank, TermId.PI_ID.getId(), entry.getKey()));
-						} else {
-							// Add the PI_NAME and PI_ID with an empty value if person is not existing or not valid for the crop
-							properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
-								"", rank, TermId.PI_NAME.getId(), entry.getKey()));
-							properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
-								"", ++rank, TermId.PI_ID.getId(), entry.getKey()));
-						}
-					}
+					// Store the name of the person as COOPERATOR variable in projectprop
+					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
+						personOptional.isPresent() ? personFullName : StringUtils.EMPTY, rank, TermId.COOPERATOR.getId(),
+						entry.getKey()));
+					// Store the id of the person as COOPERATOR_ID variable in projectprop
+					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
+						personOptional.isPresent() ? personOptional.get().getId().toString() : StringUtils.EMPTY, ++rank,
+						TermId.COOPERATOOR_ID.getId(), entry.getKey()));
+				} else if (TermId.PI_NAME.getId() == measurementVariable.getTermId()) {
+					// Special handling for PI_NAME variable. When PI_NAME variables is added to the study,
+					// The system should automatically add its corresponding pair ID variable (i.e. PI_NAME_ID).
+					final String personFullName = entry.getValue();
+					// Find the person by full name
+					final Optional<Person> personOptional =
+						this.getPersonByFullName(cropName, personFullName);
+					// Store the name of the person as PI_NAME variable in projectprop
+					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
+						personOptional.isPresent() ? personFullName : StringUtils.EMPTY, rank, TermId.PI_NAME.getId(), entry.getKey()));
+					// Store the name of the person as PI_ID variable in projectprop
+					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
+						personOptional.isPresent() ? personOptional.get().getId().toString() : StringUtils.EMPTY, ++rank,
+						TermId.PI_ID.getId(), entry.getKey()));
 				} else if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
 					// Add the study setting with value if the value provided is valid.
 					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
@@ -628,5 +625,23 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 
 	public void setDaoFactory(final DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
+	}
+
+	public void setWorkbenchDaoFactory(final WorkbenchDaoFactory workbenchDaoFactory) {
+		this.workbenchDaoFactory = workbenchDaoFactory;
+	}
+
+	public void setVariableDataValidatorFactory(
+		final VariableDataValidatorFactory variableDataValidatorFactory) {
+		this.variableDataValidatorFactory = variableDataValidatorFactory;
+	}
+
+	public void setExperimentModelGenerator(
+		final ExperimentModelGenerator experimentModelGenerator) {
+		this.experimentModelGenerator = experimentModelGenerator;
+	}
+
+	public void setStudyDataManager(final StudyDataManager studyDataManager) {
+		this.studyDataManager = studyDataManager;
 	}
 }
