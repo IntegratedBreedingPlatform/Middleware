@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.impl.study;
 
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -25,6 +26,7 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 		project.setName(folderName);
 		project.setDescription(folderName);
 		project.setObjective(folderName);
+		project.setCreatedBy(ContextHolder.getLoggedInUserId().toString());
 		return this.daoFactory.getDmsProjectDAO().save(project).getProjectId();
 	}
 
@@ -36,4 +38,11 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 		project.setObjective(newFolderName);
 		return this.daoFactory.getDmsProjectDAO().update(project).getProjectId();
 	}
+
+	@Override
+	public void deleteStudyFolder(final Integer folderId) {
+		final DmsProject project = this.daoFactory.getDmsProjectDAO().getById(folderId);
+		this.daoFactory.getDmsProjectDAO().makeTransient(project);
+	}
+
 }

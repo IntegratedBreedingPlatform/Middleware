@@ -2120,7 +2120,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		criteria.setResultTransformer(Transformers.aliasToBean(FolderReference.class));
 
 		return Optional.ofNullable((FolderReference) criteria.uniqueResult());
-
 	}
 
 }

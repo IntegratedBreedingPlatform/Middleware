@@ -436,4 +436,8 @@
 		<constructor-arg ref="workbenchSessionProvider"/>
 	</bean>
 
+	<bean id="studyTreeService" class="org.generationcp.middleware.service.impl.study.StudyTreeServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
 </beans>
