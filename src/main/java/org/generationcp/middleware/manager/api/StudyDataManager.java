@@ -352,6 +352,7 @@ public interface StudyDataManager {
 	 * @param programUUID   the program UUID
 	 * @return true, if successful
 	 */
+	@Deprecated
 	boolean renameSubFolder(String newFolderName, int folderId, String programUUID);
 
 	/**
