@@ -341,7 +341,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 				users.add(new UserDto((Integer) item.get(ProgramEligibleUsersQuery.USER_ID),
 					(String) item.get(ProgramEligibleUsersQuery.USERNAME),
 					(String) item.get(ProgramEligibleUsersQuery.FIRST_NAME), (String) item.get(ProgramEligibleUsersQuery.LAST_NAME), null,
-					"true", (String) item.get(ProgramEligibleUsersQuery.EMAIL)));
+					Boolean.TRUE, (String) item.get(ProgramEligibleUsersQuery.EMAIL)));
 			}
 			return users;
 

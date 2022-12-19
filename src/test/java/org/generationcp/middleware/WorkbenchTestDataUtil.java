@@ -237,7 +237,7 @@ public class WorkbenchTestDataUtil {
 		userdto.setPassword("fwgtrgrehgewsdsdeferhkjlkjSli");
 		final String email = RandomStringUtils.randomAlphanumeric(24);
 		userdto.setEmail("test" + email + "@leafnode.io");
-		userdto.setStatus("true");
+		userdto.setActive(Boolean.TRUE);
 		return userdto;
 	}
 

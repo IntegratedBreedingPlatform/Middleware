@@ -27,7 +27,7 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 	private String firstName;
 	private String lastName;
 	private List<UserRoleDto> userRoles;
-	private String status;
+	private Boolean active;
 	private String email;
 
 	@JsonIgnore
@@ -44,17 +44,17 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.email = "";
 
 		this.username = "";
-		this.status = "true";
+		this.active = Boolean.TRUE;
 	}
 
 	public UserDto(final Integer userId, final String username, final String firstName, final String lastName, final List<UserRoleDto> userRoles,
-		final String status, final String email) {
+		final Boolean active, final String email) {
 		this.id = userId;
 		this.username = username;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userRoles = userRoles;
-		this.status = status;
+		this.active = active;
 		this.email = email;
 	}
 
@@ -78,7 +78,7 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 			}
 
 		}
-		this.setStatus(workbenchUser.getStatus() == 0 ? "true" : "false");
+		this.setActive(workbenchUser.getStatus() == 0 ? Boolean.TRUE : Boolean.FALSE);
 		this.setUsername(workbenchUser.getName());
 		this.setMultiFactorAuthenticationEnabled(workbenchUser.isMultiFactorAuthenticationEnabled());
 	}
@@ -115,12 +115,12 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.lastName = lastName;
 	}
 
-	public String getStatus() {
-		return this.status;
+	public Boolean getActive() {
+		return active;
 	}
 
-	public void setStatus(final String status) {
-		this.status = status;
+	public void setActive(final Boolean active) {
+		this.active = active;
 	}
 
 	public String getEmail() {
@@ -155,7 +155,7 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		result = prime * result + (this.userRoles == null ? 0 : this.userRoles.hashCode());
 
 		result = prime * result + (this.email == null ? 0 : this.email.hashCode());
-		result = prime * result + (this.status == null ? 0 : this.status.hashCode());
+		result = prime * result + (this.active == null ? 0 : this.active.hashCode());
 
 		result = prime * result + this.id;
 		return result;
