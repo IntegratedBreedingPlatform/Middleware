@@ -5,11 +5,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
+import org.generationcp.middleware.api.brapi.TrialServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.api.role.RoleService;
+import org.generationcp.middleware.dao.CropPersonDAO;
+import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -17,6 +19,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.StudyExternalReference;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -26,14 +29,17 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.service.api.user.ContactVariable;
+import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -44,12 +50,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
-	@Autowired
-	private TrialServiceBrapi trialServiceBrapi;
+	private TrialServiceBrapiImpl trialServiceBrapi;
 
 	@Autowired
 	private RoleService roleService;
@@ -60,6 +66,15 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	@Autowired
 	private ProgramService programService;
 
+	@Autowired
+	private VariableDataValidatorFactory variableDataValidatorFactory;
+
+	@Autowired
+	private ExperimentModelGenerator experimentModelGenerator;
+
+	@Autowired
+	private StudyDataManager studyDataManager;
+
 	private DaoFactory daoFactory;
 	private WorkbenchDaoFactory workbenchDaoFactory;
 	private IntegrationTestDataInitializer testDataInitializer;
@@ -69,11 +84,20 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	private DmsProject study;
 	private ExperimentModel studyExperiment;
 
-
 	@Before
 	public void setUp() {
+
 		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
+		this.workbenchDaoFactory = Mockito.spy(new WorkbenchDaoFactory(this.workbenchSessionProvider));
+
+		this.trialServiceBrapi = new TrialServiceBrapiImpl(this.sessionProvder, this.workbenchSessionProvider);
+		this.trialServiceBrapi.setExperimentModelGenerator(this.experimentModelGenerator);
+		this.trialServiceBrapi.setVariableDataValidatorFactory(this.variableDataValidatorFactory);
+		this.trialServiceBrapi.setStudyDataManager(this.studyDataManager);
+		this.trialServiceBrapi.setWorkbenchDaoFactory(this.workbenchDaoFactory);
+		this.trialServiceBrapi.setDaoFactory(this.daoFactory);
+		this.trialServiceBrapi.setWorkbenchDaoFactory(this.workbenchDaoFactory);
+
 		this.workbenchTestDataUtil.setUpWorkbench(this.workbenchDaoFactory);
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
@@ -420,7 +444,8 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		importRequest1.setAdditionalInfo(settingsMap);
 
 		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid());
+			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+				this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
@@ -447,7 +472,6 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
 		final CVTerm categoricalVariable = this.testDataInitializer.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues);
 
-
 		final Map<String, String> settingsMap = Maps.newHashMap();
 		settingsMap.put(numericVariable.getName(), RandomStringUtils.randomAlphabetic(30));
 		settingsMap.put(dateTimeVariable.getName(), "2021-05-01");
@@ -455,7 +479,8 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		importRequest1.setAdditionalInfo(settingsMap);
 
 		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid());
+			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+				this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
@@ -465,7 +490,8 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(3, projectProperties.size());
 		Assert.assertTrue(projectProperties.stream().filter(pp -> pp.getAlias().equals(numericVariable.getName())).findAny().isPresent());
 		Assert.assertTrue(projectProperties.stream().filter(pp -> pp.getAlias().equals(dateTimeVariable.getName())).findAny().isPresent());
-		Assert.assertTrue(projectProperties.stream().filter(pp -> pp.getAlias().equals(categoricalVariable.getName())).findAny().isPresent());
+		Assert.assertTrue(
+			projectProperties.stream().filter(pp -> pp.getAlias().equals(categoricalVariable.getName())).findAny().isPresent());
 	}
 
 	@Test
@@ -500,10 +526,284 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		importRequest1.setAdditionalInfo(settingsMap);
 
 		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid());
+			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+				this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
+		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
+	}
+
+	@Test
+	public void testSaveStudy_WithCooperatorVariable() {
+		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
+		importRequest1.setStartDate("2019-01-01");
+		importRequest1.setEndDate("2020-12-31");
+		importRequest1.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
+
+		final Map<String, String> settingsMap = Maps.newHashMap();
+
+		final CVTerm cooperatorVariable = this.daoFactory.getCvTermDao().getById(TermId.COOPERATOR.getId());
+		final CVTerm cooperatorIdVariable = this.daoFactory.getCvTermDao().getById(TermId.COOPERATOOR_ID.getId());
+
+		final WorkbenchUser user = this.workbenchDaoFactory.getWorkbenchUserDAO().getById(1);
+		settingsMap
+			.put(cooperatorVariable.getName(), user.getPerson().getDisplayName());
+		settingsMap
+			.put(cooperatorIdVariable.getName(), "");
+
+		importRequest1.setAdditionalInfo(settingsMap);
+
+		final List<StudySummary> savedStudies =
+			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+				this.testUser.getUserid());
+
+		Assert.assertEquals(1, savedStudies.size());
+		final StudySummary study1 = savedStudies.get(0);
+
+		Assert.assertEquals(user.getPerson().getDisplayName(), study1.getAdditionalInfo().get(cooperatorVariable.getName()));
+		Assert.assertEquals("1", study1.getAdditionalInfo().get(cooperatorIdVariable.getName()));
+	}
+
+	@Test
+	public void testSaveStudy_WithCooperatorVariable_PersonDoesNotExist() {
+		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
+		importRequest1.setStartDate("2019-01-01");
+		importRequest1.setEndDate("2020-12-31");
+		importRequest1.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
+
+		final Map<String, String> settingsMap = Maps.newHashMap();
+
+		final CVTerm cooperatorVariable = this.daoFactory.getCvTermDao().getById(TermId.COOPERATOR.getId());
+		final CVTerm cooperatorIdVariable = this.daoFactory.getCvTermDao().getById(TermId.COOPERATOOR_ID.getId());
+
+		final String personFullName = RandomStringUtils.randomAlphabetic(10);
+		settingsMap
+			.put(cooperatorVariable.getName(), personFullName);
+		settingsMap
+			.put(cooperatorIdVariable.getName(), "1");
+
+		importRequest1.setAdditionalInfo(settingsMap);
+
+		final List<StudySummary> savedStudies =
+			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+				this.testUser.getUserid());
+		Assert.assertEquals(1, savedStudies.size());
+		final StudySummary study1 = savedStudies.get(0);
+
+		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
+	}
+
+	@Test
+	public void testSaveStudy_WithCooperatorVariable_PersonMultipleMatches() {
+		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
+		importRequest1.setStartDate("2019-01-01");
+		importRequest1.setEndDate("2020-12-31");
+		importRequest1.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
+
+		final Map<String, String> settingsMap = Maps.newHashMap();
+
+		final WorkbenchUserDAO workbenchUserDAO = Mockito.mock(WorkbenchUserDAO.class);
+		Mockito.doReturn(workbenchUserDAO).when(this.workbenchDaoFactory).getWorkbenchUserDAO();
+		Mockito.when(workbenchUserDAO.countUsersByFullName(this.testUser.getPerson().getDisplayName())).thenReturn(2l);
+
+		final CVTerm cooperatorVariable = this.daoFactory.getCvTermDao().getById(TermId.COOPERATOR.getId());
+		final CVTerm cooperatorIdVariable = this.daoFactory.getCvTermDao().getById(TermId.COOPERATOOR_ID.getId());
+
+		settingsMap
+			.put(cooperatorVariable.getName(), this.testUser.getPerson().getDisplayName());
+		settingsMap
+			.put(cooperatorIdVariable.getName(), "");
+
+		importRequest1.setAdditionalInfo(settingsMap);
+
+		final List<StudySummary> savedStudies =
+			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+				this.testUser.getUserid());
+		Assert.assertEquals(1, savedStudies.size());
+		final StudySummary study1 = savedStudies.get(0);
+
+		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
+	}
+
+	@Test
+	public void testSaveStudy_WithCooperatorVariable_PersonExistButNoAccessToCrop() {
+		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
+		importRequest1.setStartDate("2019-01-01");
+		importRequest1.setEndDate("2020-12-31");
+		importRequest1.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
+
+		final Map<String, String> settingsMap = Maps.newHashMap();
+
+		final WorkbenchUserDAO workbenchUserDAO = Mockito.mock(WorkbenchUserDAO.class);
+		final CropPersonDAO cropPersonDAO = Mockito.mock(CropPersonDAO.class);
+		Mockito.doReturn(workbenchUserDAO).when(this.workbenchDaoFactory).getWorkbenchUserDAO();
+		Mockito.doReturn(cropPersonDAO).when(this.workbenchDaoFactory).getCropPersonDAO();
+		Mockito.when(workbenchUserDAO.countUsersByFullName(this.testUser.getPerson().getDisplayName())).thenReturn(1l);
+		Mockito.when(workbenchUserDAO.getUserByFullName(this.testUser.getPerson().getDisplayName())).thenReturn(Optional.of(this.testUser));
+		Mockito.when(cropPersonDAO.getByCropNameAndPersonId(this.testUser.getPerson().getDisplayName(), this.testUser.getPerson().getId()))
+			.thenReturn(null);
+
+		final CVTerm cooperatorVariable = this.daoFactory.getCvTermDao().getById(TermId.COOPERATOR.getId());
+		final CVTerm cooperatorIdVariable = this.daoFactory.getCvTermDao().getById(TermId.COOPERATOOR_ID.getId());
+
+		settingsMap
+			.put(cooperatorVariable.getName(), this.testUser.getPerson().getDisplayName());
+		settingsMap
+			.put(cooperatorIdVariable.getName(), "");
+
+		importRequest1.setAdditionalInfo(settingsMap);
+
+		final List<StudySummary> savedStudies =
+			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+				this.testUser.getUserid());
+		Assert.assertEquals(1, savedStudies.size());
+		final StudySummary study1 = savedStudies.get(0);
+
+		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
+	}
+
+	@Test
+	public void testSaveStudy_WithPrincipalInvestigatorVariable() {
+		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
+		importRequest1.setStartDate("2019-01-01");
+		importRequest1.setEndDate("2020-12-31");
+		importRequest1.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
+
+		final Map<String, String> settingsMap = Maps.newHashMap();
+
+		final CVTerm piNameVariable = this.daoFactory.getCvTermDao().getById(TermId.PI_NAME.getId());
+		final CVTerm piNameIDVariable = this.daoFactory.getCvTermDao().getById(TermId.PI_ID.getId());
+
+		final WorkbenchUser user = this.workbenchDaoFactory.getWorkbenchUserDAO().getById(1);
+		settingsMap
+			.put(piNameVariable.getName(), user.getPerson().getDisplayName());
+		settingsMap
+			.put(piNameIDVariable.getName(), "1");
+
+		importRequest1.setAdditionalInfo(settingsMap);
+
+		final List<StudySummary> savedStudies =
+			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+				this.testUser.getUserid());
+		Assert.assertEquals(1, savedStudies.size());
+		final StudySummary study1 = savedStudies.get(0);
+
+		Assert.assertEquals(user.getPerson().getDisplayName(), study1.getAdditionalInfo().get(piNameVariable.getName()));
+		Assert.assertEquals("1", study1.getAdditionalInfo().get(piNameIDVariable.getName()));
+	}
+
+	@Test
+	public void testSaveStudy_WithPrincipalInvestigatorVariable_PersonDoesNotExist() {
+		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
+		importRequest1.setStartDate("2019-01-01");
+		importRequest1.setEndDate("2020-12-31");
+		importRequest1.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
+
+		final Map<String, String> settingsMap = Maps.newHashMap();
+
+		final CVTerm piNameVariable = this.daoFactory.getCvTermDao().getById(TermId.PI_NAME.getId());
+		final CVTerm piNameIDVariable = this.daoFactory.getCvTermDao().getById(TermId.PI_ID.getId());
+
+		final String personFullName = RandomStringUtils.randomAlphabetic(10);
+		settingsMap
+			.put(piNameVariable.getName(), personFullName);
+		settingsMap
+			.put(piNameIDVariable.getName(), "1");
+
+		importRequest1.setAdditionalInfo(settingsMap);
+
+		final List<StudySummary> savedStudies =
+			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+				this.testUser.getUserid());
+		Assert.assertEquals(1, savedStudies.size());
+		final StudySummary study1 = savedStudies.get(0);
+
+		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
+	}
+
+	@Test
+	public void testSaveStudy_WithPrincipalInvestigatorVariable_PersonMultipleMatches() {
+		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
+		importRequest1.setStartDate("2019-01-01");
+		importRequest1.setEndDate("2020-12-31");
+		importRequest1.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
+
+		final Map<String, String> settingsMap = Maps.newHashMap();
+
+		final WorkbenchUserDAO workbenchUserDAO = Mockito.mock(WorkbenchUserDAO.class);
+		Mockito.doReturn(workbenchUserDAO).when(this.workbenchDaoFactory).getWorkbenchUserDAO();
+		Mockito.when(workbenchUserDAO.countUsersByFullName(this.testUser.getPerson().getDisplayName())).thenReturn(2l);
+
+		final CVTerm piNameVariable = this.daoFactory.getCvTermDao().getById(TermId.PI_NAME.getId());
+		final CVTerm piNameIDVariable = this.daoFactory.getCvTermDao().getById(TermId.PI_ID.getId());
+
+		settingsMap
+			.put(piNameVariable.getName(), this.testUser.getPerson().getDisplayName());
+		settingsMap
+			.put(piNameIDVariable.getName(), "1");
+
+		importRequest1.setAdditionalInfo(settingsMap);
+
+		final List<StudySummary> savedStudies =
+			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+				this.testUser.getUserid());
+		Assert.assertEquals(1, savedStudies.size());
+		final StudySummary study1 = savedStudies.get(0);
+
+		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
+	}
+
+	@Test
+	public void testSaveStudy_WithPrincipalInvestigatorVariable_PersonExistButNoAccessToCrop() {
+		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
+		importRequest1.setStartDate("2019-01-01");
+		importRequest1.setEndDate("2020-12-31");
+		importRequest1.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
+
+		final Map<String, String> settingsMap = Maps.newHashMap();
+
+		final WorkbenchUserDAO workbenchUserDAO = Mockito.mock(WorkbenchUserDAO.class);
+		final CropPersonDAO cropPersonDAO = Mockito.mock(CropPersonDAO.class);
+		Mockito.doReturn(workbenchUserDAO).when(this.workbenchDaoFactory).getWorkbenchUserDAO();
+		Mockito.doReturn(cropPersonDAO).when(this.workbenchDaoFactory).getCropPersonDAO();
+		Mockito.when(workbenchUserDAO.countUsersByFullName(this.testUser.getPerson().getDisplayName())).thenReturn(1l);
+		Mockito.when(workbenchUserDAO.getUserByFullName(this.testUser.getPerson().getDisplayName())).thenReturn(Optional.of(this.testUser));
+		Mockito.when(cropPersonDAO.getByCropNameAndPersonId(this.testUser.getPerson().getDisplayName(), this.testUser.getPerson().getId()))
+			.thenReturn(null);
+
+		final CVTerm piNameVariable = this.daoFactory.getCvTermDao().getById(TermId.PI_NAME.getId());
+		final CVTerm piNameIDVariable = this.daoFactory.getCvTermDao().getById(TermId.PI_ID.getId());
+
+		settingsMap
+			.put(piNameVariable.getName(), this.testUser.getPerson().getDisplayName());
+		settingsMap
+			.put(piNameIDVariable.getName(), "1");
+
+		importRequest1.setAdditionalInfo(settingsMap);
+
+		final List<StudySummary> savedStudies =
+			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+				this.testUser.getUserid());
+		Assert.assertEquals(1, savedStudies.size());
+		final StudySummary study1 = savedStudies.get(0);
+
 		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
 	}
 
@@ -552,6 +852,5 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDatasetDeleted, "2", location1);
 		this.testDataInitializer.createTestExperiment(deletedStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
 	}
-
 
 }
