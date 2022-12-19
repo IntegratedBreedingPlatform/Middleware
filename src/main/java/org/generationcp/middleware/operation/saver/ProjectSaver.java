@@ -93,6 +93,7 @@ public class ProjectSaver extends Saver {
 	/**
 	 * Saves a folder. Creates an entry in project table
 	 */
+	@Deprecated
 	public DmsProject saveFolder(final int parentId, final String name, final String description, final String programUUID, final String objective) {
 		final DmsProject project = new DmsProject();
 		project.setProgramUUID(programUUID);

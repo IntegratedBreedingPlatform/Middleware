@@ -5,10 +5,12 @@ import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.api.study.StudySearchResponse;
+import org.generationcp.middleware.domain.dms.FolderReference;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface StudyService {
 
@@ -61,5 +63,7 @@ public interface StudyService {
 	List<StudySearchResponse> searchStudies(String programUUID, StudySearchRequest studySearchRequest, Pageable pageable);
 
 	long countSearchStudies(String programUUID, StudySearchRequest studySearchRequest);
+
+	Optional<FolderReference> getFolderByParentAndName(Integer parentId, String folderName, String programUUID);
 
 }

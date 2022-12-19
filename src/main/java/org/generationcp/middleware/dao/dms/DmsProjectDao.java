@@ -82,6 +82,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -2099,6 +2100,27 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		queryBuilder.addParamsToQuery(query);
 
 		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
+	public Optional<FolderReference> getFolderByParentAndName(final Integer parentId, final String folderName, final String programUUID) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("parent.projectId", parentId));
+		criteria.add(Restrictions.eq("name", folderName));
+		criteria.add(Restrictions.eq("programUUID", programUUID));
+		criteria.add(Restrictions.isNull("studyType"));
+		criteria.add(Restrictions.eq("deleted", false));
+
+		final ProjectionList projectionList = Projections.projectionList();
+		projectionList.add(Projections.property("projectId"), "id");
+		projectionList.add(Projections.property("name"), "name");
+		projectionList.add(Projections.property("description"), "description");
+		projectionList.add(Projections.property("programUUID"), "programUUID");
+		projectionList.add(Projections.property("parent.projectId"), "parentFolderId");
+		criteria.setProjection(projectionList);
+		criteria.setResultTransformer(Transformers.aliasToBean(FolderReference.class));
+
+		return Optional.ofNullable((FolderReference) criteria.uniqueResult());
+
 	}
 
 }

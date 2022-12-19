@@ -18,6 +18,7 @@ import org.generationcp.middleware.data.initializer.SampleListTestDataInitialize
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -57,6 +58,7 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -609,6 +611,28 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		this.assertStudyDTO(filterStudiesResponse3.get(0), study1.getProjectId(), study1.getName(), programUUID);
 	}
 
+	@Test
+	public void getFolderByParentAndName() {
+		final String programUUID = UUID.randomUUID().toString();
+		final String studyName = RandomStringUtils.randomAlphabetic(10);
+		final DmsProject study = this.createProject(studyName, programUUID, true);
+		assertFalse(this.dmsProjectDao.getFolderByParentAndName(study.getParent().getProjectId(), studyName, programUUID).isPresent());
+
+		final DmsProject folderAnotherProgram = this.createProject(studyName, UUID.randomUUID().toString(), false);
+		assertFalse(this.dmsProjectDao.getFolderByParentAndName(folderAnotherProgram.getParent().getProjectId(), studyName, programUUID).isPresent());
+
+		final DmsProject folder = this.createProject(studyName, programUUID, false);
+		final java.util.Optional<FolderReference> optionalFolder =
+			this.dmsProjectDao.getFolderByParentAndName(folder.getParent().getProjectId(), studyName, programUUID);
+		assertTrue(optionalFolder.isPresent());
+		final FolderReference expectedFolder = optionalFolder.get();
+		assertThat(expectedFolder.getId(), is(folder.getProjectId()));
+		assertThat(expectedFolder.getName(), is(folder.getName()));
+		assertThat(expectedFolder.getDescription(), is(folder.getDescription()));
+		assertThat(expectedFolder.getProgramUUID(), is(programUUID));
+		assertThat(expectedFolder.getParentFolderId(), is(folder.getParent().getProjectId()));
+	}
+
 	private void assertStudyDTO(final StudyDTO studyDTO, final Integer studyId, final String name, final String programUUID) {
 		assertNotNull(studyDTO);
 		assertThat(studyDTO.getStudyId(), is(studyId));
@@ -626,14 +650,15 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		project.setName(name);
 		project.setDescription(name + RandomStringUtils.randomAlphabetic(20));
 		project.setProgramUUID(programUUID);
+
+		final DmsProject parent = new DmsProject();
+		parent.setProjectId(DmsProject.SYSTEM_FOLDER_ID);
+		project.setParent(parent);
+
 		if (isStudy) {
 			final StudyType studyType = new StudyType();
 			studyType.setStudyTypeId(STUDY_TYPE_ID);
 			project.setStudyType(studyType);
-
-			final DmsProject parent = new DmsProject();
-			parent.setProjectId(DmsProject.SYSTEM_FOLDER_ID);
-			project.setParent(parent);
 
 			project.setObjective(RandomStringUtils.randomAlphabetic(20));
 			project.setStartDate("20190101");

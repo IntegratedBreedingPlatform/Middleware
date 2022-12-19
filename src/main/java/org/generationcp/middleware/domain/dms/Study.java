@@ -53,6 +53,8 @@ public class Study implements Serializable {
 
 	private Boolean locked;
 
+	private boolean isFolder;
+
 	public Study() {
 	}
 
@@ -234,6 +236,14 @@ public class Study implements Serializable {
 
 	public void setLocked(final Boolean locked) {
 		this.locked = locked;
+	}
+
+	public boolean isFolder() {
+		return isFolder;
+	}
+
+	public void setFolder(final boolean folder) {
+		isFolder = folder;
 	}
 
 	@Override

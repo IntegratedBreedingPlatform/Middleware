@@ -11,6 +11,7 @@ import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.api.study.StudySearchResponse;
+import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -28,6 +29,7 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -198,6 +200,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public long countSearchStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
 		return this.daoFactory.getDmsProjectDAO().countSearchStudies(programUUID, studySearchRequest);
+	}
+
+	@Override
+	public Optional<FolderReference> getFolderByParentAndName(final Integer parentId, final String folderName, final String programUUID) {
+		return this.daoFactory.getDmsProjectDAO().getFolderByParentAndName(parentId, folderName, programUUID);
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
