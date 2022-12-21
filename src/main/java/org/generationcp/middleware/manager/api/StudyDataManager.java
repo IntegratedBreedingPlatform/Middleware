@@ -74,6 +74,7 @@ public interface StudyDataManager {
 	 */
 	Integer getStudyIdByNameAndProgramUUID(String studyName, String programUUID);
 
+	// TODO: move to StudyTreeService
 	/**
 	 * Returns list of root or top-level folders and studies.
 	 *
@@ -82,6 +83,7 @@ public interface StudyDataManager {
 	 */
 	List<Reference> getRootFolders(String programUUID);
 
+	// TODO: move to StudyTreeService
 	/**
 	 * Returns list of children of a folder given its ID.
 	 *
