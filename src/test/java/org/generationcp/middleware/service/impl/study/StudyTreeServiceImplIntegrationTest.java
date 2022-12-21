@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Random;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -59,10 +58,28 @@ public class StudyTreeServiceImplIntegrationTest extends IntegrationTestBase {
 		assertNull(deletedFolder);
 
 		// Should create a folder with the updated name because the previous was deleted
-		final Integer newFolderId2 = this.studyTreeService.createStudyTreeFolder(DmsProject.SYSTEM_FOLDER_ID, updatedFolderName, PROGRAM_UUID);
+		final Integer newFolderId2 =
+			this.studyTreeService.createStudyTreeFolder(DmsProject.SYSTEM_FOLDER_ID, updatedFolderName, PROGRAM_UUID);
 
 		final DmsProject newFolder2 = this.dmsProjectDao.getById(newFolderId2);
 		this.assertFolder(newFolder2, updatedFolderName);
+	}
+
+	@Test
+	public void moveStudyFolder_OK() {
+		final Integer newFolderId =
+			this.studyTreeService.createStudyTreeFolder(DmsProject.SYSTEM_FOLDER_ID, RandomStringUtils.randomAlphabetic(10), PROGRAM_UUID);
+
+		final DmsProject newFolder = this.dmsProjectDao.getById(newFolderId);
+		assertThat(newFolder.getParent().getProjectId(), is(DmsProject.SYSTEM_FOLDER_ID));
+
+		final Integer newParentFolderId =
+			this.studyTreeService.createStudyTreeFolder(DmsProject.SYSTEM_FOLDER_ID, RandomStringUtils.randomAlphabetic(10), PROGRAM_UUID);
+		final Integer movedFolderId = this.studyTreeService.moveStudyFolder(newFolderId, newParentFolderId);
+		final DmsProject movedFolder = this.dmsProjectDao.getById(movedFolderId);
+		assertNotNull(movedFolder);
+		assertNotNull(movedFolder.getParent());
+		assertThat(movedFolder.getParent().getProjectId(), is(newParentFolderId));
 	}
 
 	private void assertFolder(final DmsProject folder, final String name) {

@@ -45,4 +45,12 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 		this.daoFactory.getDmsProjectDAO().makeTransient(project);
 	}
 
+	@Override
+	public Integer moveStudyFolder(final int folderId, final int newParentFolderId) {
+		final DmsProject folderToMove = this.daoFactory.getDmsProjectDAO().getById(folderId);
+		final DmsProject newParentFolder = this.daoFactory.getDmsProjectDAO().getById(newParentFolderId);
+		folderToMove.setParent(newParentFolder);
+		return this.daoFactory.getDmsProjectDAO().saveOrUpdate(folderToMove).getProjectId();
+	}
+
 }
