@@ -75,7 +75,7 @@ public class StudyTreeServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final Integer newParentFolderId =
 			this.studyTreeService.createStudyTreeFolder(DmsProject.SYSTEM_FOLDER_ID, RandomStringUtils.randomAlphabetic(10), PROGRAM_UUID);
-		final Integer movedFolderId = this.studyTreeService.moveStudyFolder(newFolderId, newParentFolderId);
+		final Integer movedFolderId = this.studyTreeService.moveStudyNode(newFolderId, newParentFolderId);
 		final DmsProject movedFolder = this.dmsProjectDao.getById(movedFolderId);
 		assertNotNull(movedFolder);
 		assertNotNull(movedFolder.getParent());

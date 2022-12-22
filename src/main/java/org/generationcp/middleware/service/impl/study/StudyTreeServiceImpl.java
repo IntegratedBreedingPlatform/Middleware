@@ -46,8 +46,8 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 	}
 
 	@Override
-	public Integer moveStudyFolder(final int folderId, final int newParentFolderId) {
-		final DmsProject folderToMove = this.daoFactory.getDmsProjectDAO().getById(folderId);
+	public Integer moveStudyNode(final int itemId, final int newParentFolderId) {
+		final DmsProject folderToMove = this.daoFactory.getDmsProjectDAO().getById(itemId);
 		final DmsProject newParentFolder = this.daoFactory.getDmsProjectDAO().getById(newParentFolderId);
 		folderToMove.setParent(newParentFolder);
 		return this.daoFactory.getDmsProjectDAO().saveOrUpdate(folderToMove).getProjectId();
