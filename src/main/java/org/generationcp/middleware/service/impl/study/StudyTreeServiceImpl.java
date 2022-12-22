@@ -12,9 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class StudyTreeServiceImpl implements StudyTreeService {
 
+	private final HibernateSessionProvider sessionProvider;
 	private final DaoFactory daoFactory;
 
 	public StudyTreeServiceImpl(final HibernateSessionProvider sessionProvider) {
+		this.sessionProvider = sessionProvider;
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
@@ -50,7 +52,11 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 		final DmsProject folderToMove = this.daoFactory.getDmsProjectDAO().getById(itemId);
 		final DmsProject newParentFolder = this.daoFactory.getDmsProjectDAO().getById(newParentFolderId);
 		folderToMove.setParent(newParentFolder);
-		return this.daoFactory.getDmsProjectDAO().saveOrUpdate(folderToMove).getProjectId();
+
+		this.daoFactory.getDmsProjectDAO().saveOrUpdate(folderToMove);
+		this.sessionProvider.getSession().flush();
+
+		return folderToMove.getProjectId();
 	}
 
 }
