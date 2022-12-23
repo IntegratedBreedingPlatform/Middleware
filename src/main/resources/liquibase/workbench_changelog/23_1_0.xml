@@ -1,0 +1,59 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	<changeSet author="cuenyad" id="v23.1.0-1">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="1">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'BROWSE_STUDIES' AND P.PARENT_ID = (SELECT PERMISSION_ID FROM PERMISSION WHERE NAME = 'STUDIES');
+             </sqlCheck>
+ 		</preConditions>
+         <comment>Browse Studies permission migration</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @browse_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'BROWSE_STUDIES');
+			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
+
+			# Set Manage Studies permission as a parent of Browse Studies permission
+			UPDATE permission SET parent_id = @mg_studies_permission_id WHERE name = 'BROWSE_STUDIES';
+
+			# Create roles_affected_temporary table
+			CREATE TEMPORARY TABLE roles_affected_temporary (
+				role_id int(11) not null
+			);
+
+			# Migrate permission cases.
+
+			# Insert role_id in the Temporary table where a role_id has MANAGE_STUDIES and BROWSE_STUDIES.
+			INSERT INTO roles_affected_temporary (role_id)
+			    SELECT DISTINCT(rp.role_id)
+			    	FROM role_permission rp INNER JOIN  permission p ON rp.permission_id = p.permission_id
+						WHERE p.name IN ('MANAGE_STUDIES' , 'BROWSE_STUDIES')
+							GROUP BY rp.role_id
+							HAVING COUNT(DISTINCT p.permission_id) = 2;
+
+			# Delete BROWSE_STUDIES permission for each role_id from roles_affected_temporary table
+			DELETE FROM role_permission where permission_id = @browse_studies_permission_id
+				and role_id in (SELECT rp.role_id FROM roles_affected_temporary rp);
+
+			# Remove ids from roles_affected_temporary table.
+			DELETE FROM roles_affected_temporary;
+
+			# Insert role_id in the temporary table where a role_id has any permission inherited from MANAGE_STUDIES.
+			INSERT INTO roles_affected_temporary (role_id)
+			    SELECT DISTINCT(rp.role_id)
+			    	FROM role_permission rp INNER JOIN  permission p ON rp.permission_id = p.permission_id
+						WHERE p.name IN ('MS_MANAGE_OBSERVATION_UNITS' , 'MS_CREATE_LOTS', 'MS_WITHDRAW_INVENTORY',
+						                 'MS_CREATE_PENDING_WITHDRAWALS','MS_CREATE_CONFIRMED_WITHDRAWALS',
+						                 'MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES')
+							GROUP BY rp.role_id;
+
+			# Insert BROWSE_STUDIES permission for each role_id from roles_affected_temporary table.
+			INSERT INTO role_permission(role_id, permission_id)
+			SELECT rp.role_id, @browse_studies_permission_id FROM roles_affected_temporary rp;
+
+			# Delete roles_affected_temporary table.
+			DROP TABLE roles_affected_temporary;
+ 		</sql>
+ 	</changeSet>
+</databaseChangeLog>
