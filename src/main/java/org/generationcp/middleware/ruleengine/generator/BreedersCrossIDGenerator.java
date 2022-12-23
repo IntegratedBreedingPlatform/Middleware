@@ -22,6 +22,7 @@ import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +69,8 @@ public class BreedersCrossIDGenerator {
 					}
 				});
 
-		final Collection<ObservationUnitData> observations = observationUnitRow.getVariables().values();
+		final Collection<ObservationUnitData> observations =
+			(observationUnitRow == null) ? new ArrayList<>() : observationUnitRow.getVariables().values();
 		final Map<KeyComponent, KeyComponentValueResolver> keyComponentValueResolvers = new HashMap<>();
 		keyComponentValueResolvers.put(KeyComponent.PROJECT_PREFIX,
 			new ProjectPrefixResolver(this.ontologyVariableDataManager, conditions, observations,

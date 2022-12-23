@@ -17,7 +17,7 @@ public class ProjectPrefixResolver extends CategoricalKeyCodeResolverBase {
 	private static final Logger LOG = LoggerFactory.getLogger(ProjectPrefixResolver.class);
 
 	public ProjectPrefixResolver(final OntologyVariableDataManager ontologyVariableDataManager,
-		final List<MeasurementVariable> studyEnvironmentVariables, Collection<ObservationUnitData> observations,
+		final List<MeasurementVariable> studyEnvironmentVariables, final Collection<ObservationUnitData> observations,
 		final Map<Integer, MeasurementVariable> measurementVariableByTermId) {
 
 		super(ontologyVariableDataManager, studyEnvironmentVariables, observations, measurementVariableByTermId);
