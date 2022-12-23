@@ -46,4 +46,19 @@
 								      AND r.permission_id IN (SELECT permission_id FROM permission WHERE name IN ('BROWSE_STUDIES')));
  		</sql>
  	</changeSet>
+
+	<changeSet author="lkovacic" id="v23.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(*) FROM workbench_tool WHERE name = 'study_manager_fieldbook_web' AND path = '/Fieldbook/TrialManager';
+			</sqlCheck>
+		</preConditions>
+		<comment>Change several tool paths</comment>
+		<sql dbms="mysql" splitStatements="true">
+		  UPDATE workbench_tool wt1
+			INNER JOIN workbench_tool wt2 ON wt1.tool_id = wt2.tool_id AND wt2.name = 'study_manager_fieldbook_web'
+		  SET wt1.path = '/ibpworkbench/controller/jhipster#study-manager', wt1.version = '23.1';
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
