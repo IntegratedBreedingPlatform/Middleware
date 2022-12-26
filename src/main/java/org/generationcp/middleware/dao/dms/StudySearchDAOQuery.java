@@ -48,10 +48,13 @@ public class StudySearchDAOQuery {
 
 	static final String STUDY_ID_ALIAS = "studyId";
 	static final String STUDY_NAME_ALIAS = "studyName";
+	static final String STUDY_DESCRIPTION_ALIAS = "studyDescription";
 	static final String STUDY_TYPE_NAME_ALIAS = "studyTypeName";
 	static final String LOCKED_ALIAS = "locked";
 	static final String STUDY_OWNER_ALIAS = "ownerName";
 	static final String START_DATE_ALIAS = "startDate";
+	static final String END_DATE_ALIAS = "endDate";
+	static final String UPDATE_DATE_ALIAS = "updateDate";
 	static final String PARENT_FOLDER_NAME_ALIAS = "parentFolderName";
 	static final String OBJECTIVE_ALIAS = "objective";
 
@@ -62,10 +65,13 @@ public class StudySearchDAOQuery {
 
 	private final static String SELECT_EXPRESSION = " study.project_id AS " + STUDY_ID_ALIAS + ", "
 		+ " study.name AS " + STUDY_NAME_ALIAS + ", "
+		+ " study.description AS " + STUDY_DESCRIPTION_ALIAS + ", "
 		+ " studyType.label AS " + STUDY_TYPE_NAME_ALIAS + ", "
 		+ " study.locked AS " + LOCKED_ALIAS + ", "
 		+ " user.uname AS " + STUDY_OWNER_ALIAS + ", "
 		+ " STR_TO_DATE (convert(study.start_date,char), '%Y%m%d') AS " + START_DATE_ALIAS + ", "
+		+ " STR_TO_DATE (convert(study.end_date,char), '%Y%m%d') AS " + END_DATE_ALIAS + ", "
+		+ " STR_TO_DATE (convert(study.study_update,char), '%Y%m%d') AS " + UPDATE_DATE_ALIAS + ", "
 		+ " inn.name AS " + PARENT_FOLDER_NAME_ALIAS + ", "
 		+ " study.objective AS " + OBJECTIVE_ALIAS;
 
@@ -106,6 +112,11 @@ public class StudySearchDAOQuery {
 	}
 
 	private static void addFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request) {
+		if (!CollectionUtils.isEmpty(request.getStudyIds())) {
+			sqlQueryBuilder.setParameter("studyIds", request.getStudyIds());
+			sqlQueryBuilder.append(" AND study.project IN (:studyIds ) ");
+		}
+
 		final SqlTextFilter studyNameFilter = request.getStudyNameFilter();
 		if (studyNameFilter != null && !studyNameFilter.isEmpty()) {
 			final String value = studyNameFilter.getValue();

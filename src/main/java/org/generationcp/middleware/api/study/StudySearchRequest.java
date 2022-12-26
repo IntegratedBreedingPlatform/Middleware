@@ -11,6 +11,7 @@ import java.util.List;
 @AutoProperty
 public class StudySearchRequest {
 
+	private List<Integer> studyIds;
 	private SqlTextFilter studyNameFilter;
 	private List<Integer> studyTypeIds;
 	private Boolean locked;
@@ -23,6 +24,14 @@ public class StudySearchRequest {
 
 	private String parentFolderName;
 	private String objective;
+
+	public List<Integer> getStudyIds() {
+		return studyIds;
+	}
+
+	public void setStudyIds(final List<Integer> studyIds) {
+		this.studyIds = studyIds;
+	}
 
 	public SqlTextFilter getStudyNameFilter() {
 		return studyNameFilter;

@@ -10,10 +10,13 @@ public class StudySearchResponse {
 
 	private Integer studyId;
 	private String studyName;
+	private String description;
 	private String studyTypeName;
 	private boolean locked;
 	private String ownerName;
 	private Date startDate;
+	private Date endDate;
+	private Date updateDate;
 	private String parentFolderName;
 	private String objective;
 
@@ -31,6 +34,14 @@ public class StudySearchResponse {
 
 	public void setStudyName(final String studyName) {
 		this.studyName = studyName;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
 	}
 
 	public String getStudyTypeName() {
@@ -63,6 +74,22 @@ public class StudySearchResponse {
 
 	public void setStartDate(final Date startDate) {
 		this.startDate = startDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(final Date endDate) {
+		this.endDate = endDate;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(final Date updateDate) {
+		this.updateDate = updateDate;
 	}
 
 	public String getParentFolderName() {
