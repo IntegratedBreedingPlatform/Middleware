@@ -351,6 +351,7 @@ public interface FieldbookService {
 	 *            the dataset id
 	 * @return the long
 	 */
+	@Deprecated
 	long countStocks(int datasetId);
 
 	/**
@@ -360,6 +361,7 @@ public interface FieldbookService {
 	 *            the dataset id
 	 * @return true, if successful
 	 */
+	@Deprecated
 	boolean hasFieldLayout(int datasetId);
 
 	/**
@@ -409,6 +411,7 @@ public interface FieldbookService {
 	 *            the variate ids
 	 * @return the int
 	 */
+	@Deprecated
 	int countVariatesWithData(int datasetId, List<Integer> variateIds);
 
 	/**
