@@ -48,7 +48,7 @@ public class StudySearchDAOQuery {
 
 	static final String STUDY_ID_ALIAS = "studyId";
 	static final String STUDY_NAME_ALIAS = "studyName";
-	static final String STUDY_DESCRIPTION_ALIAS = "studyDescription";
+	static final String STUDY_DESCRIPTION_ALIAS = "description";
 	static final String STUDY_TYPE_NAME_ALIAS = "studyTypeName";
 	static final String LOCKED_ALIAS = "locked";
 	static final String STUDY_OWNER_ALIAS = "ownerName";
@@ -70,7 +70,7 @@ public class StudySearchDAOQuery {
 		+ " study.locked AS " + LOCKED_ALIAS + ", "
 		+ " user.uname AS " + STUDY_OWNER_ALIAS + ", "
 		+ " STR_TO_DATE (convert(study.start_date,char), '%Y%m%d') AS " + START_DATE_ALIAS + ", "
-		+ " STR_TO_DATE (convert(study.end_date,char), '%Y%m%d') AS " + END_DATE_ALIAS + ", "
+		+ " CASE WHEN study.end_date = '' THEN null ELSE ((STR_TO_DATE(convert(study.end_date, char), '%Y%m%d'))) END as " + END_DATE_ALIAS + ", "
 		+ " STR_TO_DATE (convert(study.study_update,char), '%Y%m%d') AS " + UPDATE_DATE_ALIAS + ", "
 		+ " inn.name AS " + PARENT_FOLDER_NAME_ALIAS + ", "
 		+ " study.objective AS " + OBJECTIVE_ALIAS;
@@ -114,7 +114,7 @@ public class StudySearchDAOQuery {
 	private static void addFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request) {
 		if (!CollectionUtils.isEmpty(request.getStudyIds())) {
 			sqlQueryBuilder.setParameter("studyIds", request.getStudyIds());
-			sqlQueryBuilder.append(" AND study.project IN (:studyIds ) ");
+			sqlQueryBuilder.append(" AND study.project_id IN (:studyIds) ");
 		}
 
 		final SqlTextFilter studyNameFilter = request.getStudyNameFilter();
