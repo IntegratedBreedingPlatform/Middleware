@@ -306,6 +306,7 @@ public class WorkbookBuilder extends Builder {
 		return projPropRoleMap;
 	}
 
+	@Deprecated
 	public Workbook createStudyVariableSettings(final int id) {
 		final Workbook workbook = new Workbook();
 		final Study study = this.getStudyBuilder().createStudy(id);

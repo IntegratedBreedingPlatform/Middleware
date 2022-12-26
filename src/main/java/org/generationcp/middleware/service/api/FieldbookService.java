@@ -227,6 +227,7 @@ public interface FieldbookService {
 	 * @return the nursery variable settings
 	 */
 
+	@Deprecated
 	Workbook getStudyVariableSettings(int id);
 	/**
 	 * Gets the germplasms.
