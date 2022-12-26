@@ -9,9 +9,12 @@ import com.google.common.collect.Maps;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudyDetailsDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.api.study.StudySearchResponse;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -20,24 +23,32 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.Service;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
+import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
 
 	@Resource
 	private StudyDataManager studyDataManager;
+
+	@Resource
+	private DatasetService datasetService;
 
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 
@@ -71,7 +82,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public Map<Integer, String> getGenericGermplasmDescriptors(final int studyIdentifier) {
 
-		final Map<Integer, String> allGermplasmDescriptors = this.daoFactory.getProjectPropertyDAO().getGermplasmDescriptors(studyIdentifier);
+		final Map<Integer, String> allGermplasmDescriptors =
+			this.daoFactory.getProjectPropertyDAO().getGermplasmDescriptors(studyIdentifier);
 		/**
 		 * Fixed descriptors are the ones that are NOT stored in stockprop or nd_experimentprop. We dont need additional joins to props
 		 * table for these as they are available in columns in main entity (e.g. stock or nd_experiment) tables.
@@ -99,7 +111,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		 */
 		final List<Integer> fixedDesignFactors =
 			Lists.newArrayList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId(), TermId.ROW.getId(),
-				TermId.COL.getId(), TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId(),TermId.OBS_UNIT_ID.getId());
+				TermId.COL.getId(), TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId(), TermId.OBS_UNIT_ID.getId());
 		final Map<Integer, String> additionalDesignFactors = Maps.newHashMap();
 
 		for (final Map.Entry<Integer, String> designFactor : allDesignFactors.entrySet()) {
@@ -193,7 +205,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<StudySearchResponse> searchStudies(final String programUUID, final StudySearchRequest studySearchRequest, final Pageable pageable) {
+	public List<StudySearchResponse> searchStudies(final String programUUID, final StudySearchRequest studySearchRequest,
+		final Pageable pageable) {
 		return this.daoFactory.getDmsProjectDAO().searchStudies(programUUID, studySearchRequest, pageable);
 	}
 
@@ -207,6 +220,54 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return this.daoFactory.getDmsProjectDAO().getFolderByParentAndName(parentId, folderName, programUUID);
 	}
 
+	@Override
+	public StudyDetailsDTO getStudyDetails(final String programUUID, final Integer studyId) {
+		final StudySearchRequest studySearchRequest = new StudySearchRequest();
+		studySearchRequest.setStudyIds(Arrays.asList(studyId));
+		final List<StudySearchResponse> searchResponse = this.searchStudies(programUUID, studySearchRequest, new PageRequest(0, 1));
+		final StudySearchResponse studyData = searchResponse.get(0);
+
+		final StudyDetailsDTO studyDetailsDTO = new StudyDetailsDTO();
+		studyDetailsDTO.setId(studyData.getStudyId());
+		studyDetailsDTO.setName(studyData.getStudyName());
+		studyDetailsDTO.setDescription(studyData.getDescription());
+		studyDetailsDTO.setObjective(studyData.getObjective());
+		studyDetailsDTO.setCreatedByName(studyData.getOwnerName());
+		studyDetailsDTO.setStartDate(studyData.getStartDate());
+		studyDetailsDTO.setEndDate(studyData.getEndDate());
+		studyDetailsDTO.setLastUpdateDate(studyData.getUpdateDate());
+
+		// TODO: I added a method to retrieve a dataset with its variables in New Advance process implementation: https://github.com/IntegratedBreedingPlatform/Middleware/blob/0bbe6823d1c72f1cd4b3b14cd62f4e3c4e55fa8f/src/main/java/org/generationcp/middleware/service/api/dataset/DatasetService.java#L149
+		final DatasetDTO plotDataset =
+			this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId())).get(0);
+		// TODO: Also added a variableTypeResolver: https://github.com/IntegratedBreedingPlatform/Middleware/blob/0bbe6823d1c72f1cd4b3b14cd62f4e3c4e55fa8f/src/main/java/org/generationcp/middleware/service/impl/dataset/DatasetServiceImpl.java#L686
+		final List<Integer> observationDatasetVariableTypes = DatasetServiceImpl.OBSERVATION_DATASET_VARIABLE_TYPES;
+		plotDataset.setVariables(this.daoFactory.getDmsProjectDAO()
+			.getObservationSetVariables(plotDataset.getDatasetId(), observationDatasetVariableTypes));
+
+		// TODO: same here as above
+		final DatasetDTO environmentDataset =
+			this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId())).get(0);
+		final List<Integer> environmentDatasetVariableTypes = DatasetServiceImpl.ENVIRONMENT_DATASET_VARIABLE_TYPES;
+		environmentDataset.setVariables(this.daoFactory.getDmsProjectDAO()
+			.getObservationSetVariables(plotDataset.getDatasetId(), environmentDatasetVariableTypes));
+
+		final long numberOfEntries = this.daoFactory.getExperimentDao().countStocksByDatasetId(plotDataset.getDatasetId());
+		studyDetailsDTO.setNumberOfEntries((int) numberOfEntries);
+
+		final long numberOfPlots = this.daoFactory.getExperimentDao().count(plotDataset.getDatasetId());
+		studyDetailsDTO.setNumberOfPlots((int) numberOfPlots);
+
+		final boolean hasFieldLayout = this.daoFactory.getExperimentDao().hasFieldLayout(plotDataset.getDatasetId());
+		studyDetailsDTO.setHasFieldLayout(hasFieldLayout);
+
+		final List<Integer> variableIds = plotDataset.getVariables().stream().map(MeasurementVariable::getTermId).collect(Collectors.toList());
+		final int numberOfVariablesWithData = this.studyDataManager.countVariatesWithData(plotDataset.getDatasetId(), variableIds);
+		studyDetailsDTO.setNumberOfVariablesWithData(numberOfVariablesWithData);
+
+		return studyDetailsDTO;
+	}
+
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
 	}
@@ -215,4 +276,5 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public void setDaoFactory(final DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
 	}
+
 }

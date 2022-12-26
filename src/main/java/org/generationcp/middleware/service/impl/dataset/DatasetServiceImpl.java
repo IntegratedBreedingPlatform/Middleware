@@ -119,11 +119,11 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.GERMPLASM_ATTRIBUTE.getId(),
 		VariableType.GERMPLASM_PASSPORT.getId());
 
-	protected static final List<Integer> ENVIRONMENT_DATASET_VARIABLE_TYPES = Lists.newArrayList(
+	public static final List<Integer> ENVIRONMENT_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.ENVIRONMENT_DETAIL.getId(),
 		VariableType.ENVIRONMENT_CONDITION.getId());
 
-	protected static final List<Integer> OBSERVATION_DATASET_VARIABLE_TYPES = Lists.newArrayList(
+	public static final List<Integer> OBSERVATION_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.OBSERVATION_UNIT.getId(),
 		VariableType.TRAIT.getId(),
 		VariableType.SELECTION_METHOD.getId(),

@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.api.study;
 
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudyDetailsDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.domain.dms.FolderReference;
@@ -65,5 +66,7 @@ public interface StudyService {
 	long countSearchStudies(String programUUID, StudySearchRequest studySearchRequest);
 
 	Optional<FolderReference> getFolderByParentAndName(Integer parentId, String folderName, String programUUID);
+
+	StudyDetailsDTO getStudyDetails(final String programUUID, Integer studyId);
 
 }
