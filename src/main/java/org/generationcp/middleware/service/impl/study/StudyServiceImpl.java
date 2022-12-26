@@ -264,6 +264,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final List<Integer> variableIds = plotDataset.getVariables().stream().map(MeasurementVariable::getTermId).collect(Collectors.toList());
 		final int numberOfVariablesWithData = this.studyDataManager.countVariatesWithData(plotDataset.getDatasetId(), variableIds);
 		studyDetailsDTO.setNumberOfVariablesWithData(numberOfVariablesWithData);
+		studyDetailsDTO.setTotalVariablesWithData(variableIds.size());
 
 		return studyDetailsDTO;
 	}

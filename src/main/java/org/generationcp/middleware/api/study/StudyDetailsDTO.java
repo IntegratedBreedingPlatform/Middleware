@@ -21,6 +21,7 @@ public class StudyDetailsDTO {
 	private Integer numberOfPlots;
 	private boolean hasFieldLayout;
 	private Integer numberOfVariablesWithData;
+	private Integer totalVariablesWithData;
 
 //	private List<VariableDetails> studySettings;
 
@@ -118,6 +119,14 @@ public class StudyDetailsDTO {
 
 	public void setNumberOfVariablesWithData(final Integer numberOfVariablesWithData) {
 		this.numberOfVariablesWithData = numberOfVariablesWithData;
+	}
+
+	public Integer getTotalVariablesWithData() {
+		return totalVariablesWithData;
+	}
+
+	public void setTotalVariablesWithData(final Integer totalVariablesWithData) {
+		this.totalVariablesWithData = totalVariablesWithData;
 	}
 
 	@Override
