@@ -39,6 +39,7 @@ import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -358,14 +359,19 @@ public class StudyServiceImpl extends Service implements StudyService {
 		studyDetailsDTO.setEnvironmentDetails(environmentDetails);
 		studyDetailsDTO.setNumberOfEnvironments((int) this.daoFactory.getExperimentDao().count(environmentDataset.getDatasetId()));
 
-		final ExperimentalDesignVariable experimentalDesignVariable = new ExperimentalDesignVariable(experimentalDesignVariables);
-		studyDetailsDTO.setExperimentalDesignDetail(experimentalDesignVariable);
+		final int experimentalDesignValue;
+		if (!CollectionUtils.isEmpty(experimentalDesignVariables)) {
+			final ExperimentalDesignVariable experimentalDesignVariable = new ExperimentalDesignVariable(experimentalDesignVariables);
+			studyDetailsDTO.setExperimentalDesignDetail(experimentalDesignVariable);
+			experimentalDesignValue =
+				experimentalDesignVariable.getExperimentalDesign() == null ? 0 :
+					Integer.parseInt(experimentalDesignVariable.getExperimentalDesign().getValue());
+		} else {
+			experimentalDesignValue = 0;
+		}
 
 		final Optional<MeasurementVariable> entryTypeVariable =
 			this.filterVariableByTermId(plotDataset.getVariables(), TermId.ENTRY_TYPE.getId());
-		final int experimentalDesignValue =
-			experimentalDesignVariable.getExperimentalDesign() == null ? 0 :
-				Integer.parseInt(experimentalDesignVariable.getExperimentalDesign().getValue());
 		final Optional<Long> nonReplicatedEntriesCount = this.getNonReplicatedEntriesCount(studyId, experimentalDesignValue);
 		final long numberOfChecks =
 			this.getCountNumberOfChecks(studyId, experimentalDesignValue, entryTypeVariable.get(), nonReplicatedEntriesCount);
