@@ -358,7 +358,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		studyDetailsDTO.setEnvironmentDetails(environmentDetails);
 		studyDetailsDTO.setNumberOfEnvironments((int) this.daoFactory.getExperimentDao().count(environmentDataset.getDatasetId()));
 
-		// TODO: Using the existing ExperimentalDesignVariable. Should I implement a new one?
 		final ExperimentalDesignVariable experimentalDesignVariable = new ExperimentalDesignVariable(experimentalDesignVariables);
 		studyDetailsDTO.setExperimentalDesignDetail(experimentalDesignVariable);
 
