@@ -61,7 +61,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	// TODO: what are we gonna do with the ff variablesIds? This one is: AppConstants.EXP_DESIGN_VARIABLES
 	private static final List<Integer> EXP_DESIGN_VARIABLES =
 		Arrays.asList(8135, 8131, 8842, 8132, 8133, 8134, 8136, 8137, 8138, 8139, 8142, 8165, 8831, 8411, 8412, 8413);
-	private static final List<Integer> FACTOR_IDS = Arrays.asList(8230, 8210, 8220, 8000, 8581, 8582);
+	private static final List<Integer> FACTOR_IDS = Arrays.asList(8230, 8210, 8220, 8000, 8200, 8581, 8582);
 
 	@Resource
 	private StudyDataManager studyDataManager;
