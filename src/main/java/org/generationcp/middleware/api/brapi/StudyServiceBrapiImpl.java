@@ -450,12 +450,14 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 			// Support adding of TRAIT and SELECTION_METHOD variables to the plot dataset for now.
 			variablesMap.forEach((variableId, variable) -> {
-				if (!existingVariablesOfPlotDataset.containsKey(variableId) && variableTypesOfVariables.get(variableId)
-					.contains(VariableType.TRAIT)) {
-					this.addProjectPropertyToDataset(plotDataset, variable, VariableType.TRAIT);
-				} else if (!existingVariablesOfPlotDataset.containsKey(variableId) && variableTypesOfVariables.get(variableId)
-					.contains(VariableType.SELECTION_METHOD)) {
-					this.addProjectPropertyToDataset(plotDataset, variable, VariableType.SELECTION_METHOD);
+				if (!variable.isObsolete()) {
+					if (!existingVariablesOfPlotDataset.containsKey(variableId) && variableTypesOfVariables.get(variableId)
+						.contains(VariableType.TRAIT)) {
+						this.addProjectPropertyToDataset(plotDataset, variable, VariableType.TRAIT);
+					} else if (!existingVariablesOfPlotDataset.containsKey(variableId) && variableTypesOfVariables.get(variableId)
+						.contains(VariableType.SELECTION_METHOD)) {
+						this.addProjectPropertyToDataset(plotDataset, variable, VariableType.SELECTION_METHOD);
+					}
 				}
 			});
 

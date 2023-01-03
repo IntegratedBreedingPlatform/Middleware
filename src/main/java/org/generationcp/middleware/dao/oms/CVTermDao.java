@@ -115,6 +115,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	protected static final String VARIABLE_CATEGORY_ID = "categoryId";
 	protected static final String VARIABLE_CATEGORY_NAME = "categoryName";
 	protected static final String VARIABLE_CATEGORY_DESCRIPTION = "categoryDefinition";
+	protected static final String VARIABLE_IS_OBSOLETE = "obsolete";
 	// parameters
 	public static final String VARIABLE_TYPE_NAMES = "variableTypeNames";
 
@@ -2002,7 +2003,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				+ " category.definition AS " + VARIABLE_CATEGORY_DESCRIPTION + ", "  //
 				+ " vo.alias  as " + VARIABLE_ALIAS + ", "  //
 				+ " vo.expected_min as " + VARIABLE_EXPECTED_MIN + ", "  //
-				+ " vo.expected_max as " + VARIABLE_EXPECTED_MAX //
+				+ " vo.expected_max as " + VARIABLE_EXPECTED_MAX + ", " //
+				+ " variable.is_obsolete as " + VARIABLE_IS_OBSOLETE //
 				+ " from cvterm variable " //
 				+ " inner join cvtermprop cpvartype on cpvartype.type_id = " + TermId.VARIABLE_TYPE.getId() //
 				+ "                                 and variable.cvterm_id = cpvartype.cvterm_id " //
@@ -2052,6 +2054,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			sqlQuery.addScalar(VARIABLE_CATEGORY_ID);
 			sqlQuery.addScalar(VARIABLE_CATEGORY_NAME);
 			sqlQuery.addScalar(VARIABLE_CATEGORY_DESCRIPTION);
+			sqlQuery.addScalar(VARIABLE_IS_OBSOLETE);
 
 			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) sqlQuery.list();
 
@@ -2088,6 +2091,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					variable.setAlias(alias);
 					variable.setMinValue(expectedMin);
 					variable.setMaxValue(expectedMax);
+
+					final Boolean isObsolete = (Integer) item.get(VARIABLE_IS_OBSOLETE) > 0;
+					variable.setObsolete(isObsolete);
 
 					variables.put(variableId, variable);
 				}

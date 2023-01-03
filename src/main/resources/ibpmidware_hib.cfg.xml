@@ -91,7 +91,6 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNoteUser"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.feedback.Feedback"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.feedback.FeedbackUser"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.CropGenotypingParameter"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.security.OneTimePassword"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.security.UserDeviceMetaData"/>
 

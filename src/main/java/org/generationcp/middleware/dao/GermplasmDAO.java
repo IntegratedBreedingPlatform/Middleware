@@ -608,13 +608,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	public List<PedigreeNodeDTO> searchPedigreeNodes(final PedigreeNodeSearchRequest pedigreeNodeSearchRequest, final Pageable pageable) {
 
-		// TODO pagination IBP-6075
-		// No pagination for now for searching the root germplasm
-		// This is to make sure that all the specified germplasm in search will be processed for pedigree/ancestral extraction.
 		final GermplasmSearchRequest germplasmSearchRequest = this.convertToGermplasmSearchRequest(pedigreeNodeSearchRequest);
 		final SQLQuery filterQuery = this.getSession().createSQLQuery(this.buildFilterGermplasmQuery(germplasmSearchRequest));
 		this.addGermplasmSearchParameters(new SqlQueryParamBuilder(filterQuery), germplasmSearchRequest);
-
+		addPaginationToSQLQuery(filterQuery, pageable);
 
 		// Use Set to make sure there will be no duplicates
 		final Set<PedigreeNodeDTO> pedigreeNodesToReturn = new HashSet<>();

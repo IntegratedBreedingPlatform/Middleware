@@ -186,11 +186,14 @@
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="workbenchDaoFactory" class="org.generationcp.middleware.manager.WorkbenchDaoFactory">
+		<constructor-arg name="sessionProvider" ref="workbenchSessionProvider"/>
+    </bean>
+
 	 <bean id="studyService" class="org.generationcp.middleware.service.impl.study.StudyServiceImpl">
 		<property name="sessionProvider" ref="cropSessionProvider"/>
 		<property name="daoFactory" ref="daoFactory"/>
     </bean>
-
 
     <bean id="cropSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
 		<constructor-arg name="sessionFactory" ref="IBDBV2_MAIZE_MERGED_SessionFactory"/>
@@ -198,6 +201,9 @@
     </bean>
 
 	<bean id="workbenchTestDataUtil" class="org.generationcp.middleware.WorkbenchTestDataUtil">
+    </bean>
+
+	<bean id="PresetMapper" class="org.generationcp.middleware.preset.PresetMapper">
     </bean>
 
 	<bean id="trialEnvironmentBuilder" factory-bean="managerFactory"
@@ -315,6 +321,7 @@
 	<bean id="trialServiceBrapi" class="org.generationcp.middleware.api.brapi.TrialServiceBrapiImpl">
 		<property name="sessionProvider" ref="cropSessionProvider"/>
 		<property name="daoFactory" ref="daoFactory"/>
+		<property name="workbenchDaoFactory" ref="workbenchDaoFactory"/>
 	</bean>
 
 	<bean id="variableServiceBrapi" class="org.generationcp.middleware.api.brapi.VariableServiceBrapiImpl">
@@ -397,10 +404,6 @@
 
 	<bean id="siteAnalysisService" class="org.generationcp.middleware.service.impl.analysis.SiteAnalysisServiceImpl">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
-	</bean>
-
-	<bean id="cropGenotypingParameterService" class="org.generationcp.middleware.service.impl.crop.CropGenotypingParameterServiceImpl">
-		<constructor-arg name="workbenchSessionProvider" ref="workbenchSessionProvider"/>
 	</bean>
 
 	<bean id="pedigreeServiceBrapi" class="org.generationcp.middleware.api.brapi.PedigreeServiceBrapiImpl">

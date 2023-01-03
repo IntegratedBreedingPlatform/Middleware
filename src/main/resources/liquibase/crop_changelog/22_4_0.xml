@@ -20,4 +20,85 @@
 								 referencedColumnNames="fldno"/>
 	</changeSet>
 
+	<changeSet author="cheryleigh" id="v22.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="crop_parameter" columnName="encrypted_value"/>
+			</not>
+		</preConditions>
+		<comment>Add column 'encrypted_value' to 'crop_parameter' table</comment>
+		<addColumn tableName="crop_parameter">
+			<column name="encrypted_value" type="BLOB" >
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v22.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="crop_parameter" columnName="is_encrypted"/>
+			</not>
+		</preConditions>
+		<comment>Add column 'is_encrypted' to 'crop_parameter' table</comment>
+		<addColumn tableName="crop_parameter">
+			<column name="is_encrypted" type="TINYINT(1) UNSIGNED ZEROFILL" defaultValue="0" >
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+    </changeSet>
+
+	<changeSet author="cheryleigh" id="v22.4.0-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="crop_parameter" columnName="group_name"/>
+			</not>
+		</preConditions>
+		<comment>Add column 'group_name' to 'crop_parameter' table</comment>
+		<addColumn tableName="crop_parameter">
+			<column name="group_name" type="varchar(255)" >
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+    </changeSet>
+
+	<changeSet author="cheryleigh" id="v22.4.0-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from crop_parameter where `key` in ('gigwa_endpoint', 'gigwa_token_endpoint',
+						'gigwa_program_id', 'gigwa_username', 'gigwa_password', 'gigwa_base_url')
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Create crop_parameter entries for GIGWA crop genotyping parameters
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO crop_parameter (`key`, description, group_name)
+			VALUES ('gigwa_endpoint', 'Crop genotyping endpoint url', 'gigwa');
+			INSERT INTO crop_parameter (`key`, description, group_name)
+			VALUES ('gigwa_token_endpoint', 'Crop genotyping token endpoint url', 'gigwa');
+			INSERT INTO crop_parameter (`key`, description, group_name)
+			VALUES ('gigwa_program_id', 'Crop genotyping program ID', 'gigwa');
+			INSERT INTO crop_parameter (`key`, description, group_name)
+			VALUES ('gigwa_base_url', 'Crop genotyping base url', 'gigwa');
+			INSERT INTO crop_parameter (`key`, description, group_name)
+			VALUES ('gigwa_username', 'Crop genotyping username', 'gigwa');
+			INSERT INTO crop_parameter (`key`, description, is_encrypted, group_name)
+			VALUES ('gigwa_password', 'Password for specified crop genotyping username', 1, 'gigwa');
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v22.4.0-6">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) FROM program_preset where (configuration like '%VARIABLE%' or configuration like '%STATIC%')
+                    and tool_section in ('DATASET_LABEL_PRINTING_PRESET', 'LOT_LABEL_PRINTING_PRESET',
+										 'GERMPLASM_LABEL_PRINTING_PRESET', 'GERMPLASM_LIST_LABEL_PRINTING_PRESET',
+										 'STUDY_ENTRIES_LABEL_PRINTING_PRESET');
+			</sqlCheck>
+		</preConditions>
+		<comment>Update label printing presets to define ids as STATIC or VARIABLE.</comment>
+		<customChange class="org.generationcp.middleware.liquibase.tasks.v23.UpdatePresetsTask">
+		</customChange>
+	</changeSet>
 </databaseChangeLog>

@@ -19,8 +19,10 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.StudyExternalReference;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -29,7 +31,9 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.pojos.workbench.CropPerson;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -78,14 +82,16 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 
 	private HibernateSessionProvider sessionProvider;
 	private DaoFactory daoFactory;
+	private WorkbenchDaoFactory workbenchDaoFactory;
 	private StudyMeasurements studyMeasurements;
-
 
 	public TrialServiceBrapiImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
 	}
-	public TrialServiceBrapiImpl(final HibernateSessionProvider sessionProvider) {
+
+	public TrialServiceBrapiImpl(final HibernateSessionProvider sessionProvider, final HibernateSessionProvider workbenchSessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
+		this.workbenchDaoFactory = new WorkbenchDaoFactory(workbenchSessionProvider);
 		this.sessionProvider = sessionProvider;
 		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
 	}
@@ -281,11 +287,12 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 			this.daoFactory.getCvTermDao().getVariablesByNamesAndVariableType(studyDetailVariableNames, VariableType.STUDY_DETAIL);
 		final Map<String, MeasurementVariable> variableSynonymsMap =
 			this.daoFactory.getCvTermDao().getVariablesBySynonymsAndVariableType(studyDetailVariableNames, VariableType.STUDY_DETAIL);
-		final Map<Integer, List<ValueReference>> categoricalVariablesMap = this.collectCategoricalVariables(variableNamesMap, variableSynonymsMap);
+		final Map<Integer, List<ValueReference>> categoricalVariablesMap =
+			this.collectCategoricalVariables(variableNamesMap, variableSynonymsMap);
 
 		for (final TrialImportRequestDTO trialImportRequestDto : trialImportRequestDtoList) {
 			final DmsProject study = this.createStudy(userId, studyTypeByName, trialImportRequestDto);
-			this.setStudySettings(trialImportRequestDto, study, variableNamesMap, variableSynonymsMap, categoricalVariablesMap);
+			this.setStudySettings(cropName, trialImportRequestDto, study, variableNamesMap, variableSynonymsMap, categoricalVariablesMap);
 			this.setStudyExternalReferences(trialImportRequestDto, study);
 			this.daoFactory.getDmsProjectDAO().save(study);
 
@@ -307,13 +314,15 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		final Map<String, MeasurementVariable> variableSynonymsMap) {
 		final List<Integer> categoricalVariableIds = new ArrayList<>();
 		categoricalVariableIds.addAll(
-			variableNamesMap.values().stream().filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
+			variableNamesMap.values().stream()
+				.filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(
-				Collectors.toList()));
+					Collectors.toList()));
 		categoricalVariableIds.addAll(
-			variableSynonymsMap.values().stream().filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
+			variableSynonymsMap.values().stream()
+				.filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(
-				Collectors.toList()));
+					Collectors.toList()));
 		return this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(categoricalVariableIds);
 	}
 
@@ -382,7 +391,7 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		return dataset;
 	}
 
-	private void setStudySettings(final TrialImportRequestDTO trialImportRequestDto, final DmsProject study,
+	private void setStudySettings(final String cropName, final TrialImportRequestDTO trialImportRequestDto, final DmsProject study,
 		final Map<String, MeasurementVariable> variableNamesMap, final Map<String, MeasurementVariable> variableSynonymsMap,
 		final Map<Integer, List<ValueReference>> categoricalValuesMap) {
 		// Set contacts to study settings map
@@ -398,11 +407,48 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 				final DataType dataType = DataType.getById(measurementVariable.getDataTypeId());
 				final java.util.Optional<VariableValueValidator> dataValidator =
 					this.variableDataValidatorFactory.getValidator(dataType);
+
 				if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
 					measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
 				}
-				final Integer rank = properties.size() + 1;
-				if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
+
+				Integer rank = properties.size() + 1;
+
+				// Skip COOPERATOR_ID and PI_ID
+				if (TermId.COOPERATOOR_ID.getId() == measurementVariable.getTermId()
+					|| TermId.PI_ID.getId() == measurementVariable.getTermId())
+					return;
+
+				if (TermId.COOPERATOR.getId() == measurementVariable.getTermId()) {
+					// Special handling for COOPERATOR. When COOPERATOR variable is added to the study,
+					// The system should automatically add its corresponding pair ID variable (i.e. COOPERATOR_ID).
+					final String personFullName = entry.getValue();
+					// Find the person by full name
+					final Optional<Person> personOptional =
+						this.getPersonByFullName(cropName, personFullName);
+					// Store the name of the person as COOPERATOR variable in projectprop
+					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
+						personOptional.isPresent() ? personFullName : StringUtils.EMPTY, rank, TermId.COOPERATOR.getId(),
+						entry.getKey()));
+					// Store the id of the person as COOPERATOR_ID variable in projectprop
+					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
+						personOptional.isPresent() ? personOptional.get().getId().toString() : StringUtils.EMPTY, ++rank,
+						TermId.COOPERATOOR_ID.getId(), entry.getKey()));
+				} else if (TermId.PI_NAME.getId() == measurementVariable.getTermId()) {
+					// Special handling for PI_NAME variable. When PI_NAME variables is added to the study,
+					// The system should automatically add its corresponding pair ID variable (i.e. PI_NAME_ID).
+					final String personFullName = entry.getValue();
+					// Find the person by full name
+					final Optional<Person> personOptional =
+						this.getPersonByFullName(cropName, personFullName);
+					// Store the name of the person as PI_NAME variable in projectprop
+					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
+						personOptional.isPresent() ? personFullName : StringUtils.EMPTY, rank, TermId.PI_NAME.getId(), entry.getKey()));
+					// Store the name of the person as PI_ID variable in projectprop
+					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
+						personOptional.isPresent() ? personOptional.get().getId().toString() : StringUtils.EMPTY, ++rank,
+						TermId.PI_ID.getId(), entry.getKey()));
+				} else if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
 					// Add the study setting with value if the value provided is valid.
 					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
 						measurementVariable.getValue(), rank, measurementVariable.getTermId(), entry.getKey()));
@@ -421,7 +467,7 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		if (!CollectionUtils.isEmpty(trialImportRequestDTO.getContacts())) {
 			// Limitation of BMS ontology, is we can only store add variable once as study setting so we can only save one set of contact variables
 			final Optional<ContactDto>
-				contactDto = trialImportRequestDTO.getContacts().stream().filter(c->StringUtils.isNotEmpty(c.getName())).findFirst();
+				contactDto = trialImportRequestDTO.getContacts().stream().filter(c -> StringUtils.isNotEmpty(c.getName())).findFirst();
 			if (contactDto.isPresent()) {
 				trialImportRequestDTO.getAdditionalInfo().put(ContactVariable.CONTACT_NAME.getName(), contactDto.get().getName());
 				trialImportRequestDTO.getAdditionalInfo().put(ContactVariable.CONTACT_EMAIL.getName(), contactDto.get().getEmail());
@@ -492,7 +538,7 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 	private Map<Integer, List<ValueReference>> getCategoricalValuesMap(final Map<Integer, List<ProjectProperty>> propsMap) {
 		final List<Integer> studySettingVariableIds = new ArrayList<>();
 		propsMap.values().stream().forEach(propList ->
-				studySettingVariableIds.addAll(propList.stream().map(ProjectProperty::getVariableId).collect(Collectors.toList()))
+			studySettingVariableIds.addAll(propList.stream().map(ProjectProperty::getVariableId).collect(Collectors.toList()))
 		);
 		return this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(studySettingVariableIds);
 	}
@@ -554,6 +600,24 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		return startDate;
 	}
 
+	Optional<Person> getPersonByFullName(final String cropName, final String fullName) {
+		final long count = this.workbenchDaoFactory.getWorkbenchUserDAO().countUsersByFullName(fullName);
+		// Find the exact person by full name, if there are multiple matches, just return empty result.
+		if (count == 1) {
+			final Optional<WorkbenchUser> result = this.workbenchDaoFactory.getWorkbenchUserDAO().getUserByFullName(fullName);
+			if (result.isPresent()) {
+				// Check if the user has access to the crop
+				final CropPerson cropPerson =
+					this.workbenchDaoFactory.getCropPersonDAO().getByCropNameAndPersonId(cropName, result.get().getPerson().getId());
+				if (cropPerson != null) {
+					return Optional.of(result.get().getPerson());
+				}
+				return Optional.empty();
+			}
+		}
+		return Optional.empty();
+	}
+
 	// Setters used for tests only
 	public void setSessionProvider(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
@@ -561,5 +625,23 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 
 	public void setDaoFactory(final DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;
+	}
+
+	public void setWorkbenchDaoFactory(final WorkbenchDaoFactory workbenchDaoFactory) {
+		this.workbenchDaoFactory = workbenchDaoFactory;
+	}
+
+	public void setVariableDataValidatorFactory(
+		final VariableDataValidatorFactory variableDataValidatorFactory) {
+		this.variableDataValidatorFactory = variableDataValidatorFactory;
+	}
+
+	public void setExperimentModelGenerator(
+		final ExperimentModelGenerator experimentModelGenerator) {
+		this.experimentModelGenerator = experimentModelGenerator;
+	}
+
+	public void setStudyDataManager(final StudyDataManager studyDataManager) {
+		this.studyDataManager = studyDataManager;
 	}
 }
