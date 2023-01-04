@@ -21,29 +21,23 @@
 
 			# Delete BROWSE_STUDIES permission for each role_id that has MANAGE_STUDIES, and BROWSE_STUDIES
 			DELETE role_permission FROM role_permission
-				WHERE permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name in ('BROWSE_STUDIES'))
-					AND role_id IN (SELECT subA.role_id FROM (SELECT rp.role_id AS role_id FROM role_permission rp
-										WHERE rp.role_id IN ( SELECT subB.rid FROM (
-											SELECT rp.role_id AS rid FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
-												WHERE p.name in ('MANAGE_STUDIES' , 'BROWSE_STUDIES')
-													GROUP BY rp.role_id
-                                                    HAVING COUNT(DISTINCT p.permission_id) = 2) AS subB ) ) AS subA
-									);
+				WHERE permission_id = @browse_studies_permission_id
+					AND role_id IN ( SELECT subB.rid FROM ( SELECT rp.role_id AS rid FROM role_permission rp
+			    								INNER JOIN permission p ON rp.permission_id = p.permission_id
+                                                	WHERE p.name in ('MANAGE_STUDIES' , 'BROWSE_STUDIES')
+                                                		GROUP BY rp.role_id
+                                                		HAVING COUNT(DISTINCT p.permission_id) = 2) AS subB );
 
 			# Insert BROWSE_STUDIES permission for each role_id that has any permission inherited from MANAGE_STUDIES and has not the BROWSE_STUDIES permission.
 			INSERT INTO role_permission(role_id, permission_id)
 			SELECT DISTINCT(rp.role_id), @browse_studies_permission_id FROM role_permission rp
-			WHERE rp.role_id IN (
-				SELECT sub.rid FROM (SELECT rp.role_id AS rid FROM role_permission rp
-										INNER JOIN permission p ON rp.permission_id = p.permission_id
+			WHERE rp.role_id IN (SELECT rp.role_id AS rid
+			                     FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
 									 		WHERE p.name IN ('MS_MANAGE_OBSERVATION_UNITS','MS_CREATE_LOTS','MS_WITHDRAW_INVENTORY',
-													  'MS_CREATE_PENDING_WITHDRAWALS','MS_CREATE_CONFIRMED_WITHDRAWALS',
-													  'MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES')
-									 GROUP BY rp.role_id) AS sub
-								)
-				AND NOT EXISTS (SELECT 1 FROM role_permission r
-								WHERE rp.role_id = r.role_id
-								      AND r.permission_id IN (SELECT permission_id FROM permission WHERE name IN ('BROWSE_STUDIES')));
+												  'MS_CREATE_PENDING_WITHDRAWALS','MS_CREATE_CONFIRMED_WITHDRAWALS',
+												  'MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES')
+								 GROUP BY rp.role_id)
+				AND NOT EXISTS (SELECT 1 FROM role_permission r WHERE rp.role_id = r.role_id AND r.permission_id = @browse_studies_permission_id);
  		</sql>
  	</changeSet>
 
