@@ -23,10 +23,9 @@
 			DELETE role_permission FROM role_permission
 				WHERE permission_id = @browse_studies_permission_id
 					AND role_id IN ( SELECT subB.rid FROM ( SELECT rp.role_id AS rid FROM role_permission rp
-			    								INNER JOIN permission p ON rp.permission_id = p.permission_id
-                                                	WHERE p.name in ('MANAGE_STUDIES' , 'BROWSE_STUDIES')
+                                                	WHERE rp.permission_id in (@browse_studies_permission_id , @mg_studies_permission_id)
                                                 		GROUP BY rp.role_id
-                                                		HAVING COUNT(DISTINCT p.permission_id) = 2) AS subB );
+                                                		HAVING COUNT(DISTINCT rp.permission_id) = 2) AS subB );
 
 			# Insert BROWSE_STUDIES permission for each role_id that has any permission inherited from MANAGE_STUDIES and has not the BROWSE_STUDIES permission.
 			INSERT INTO role_permission(role_id, permission_id)
