@@ -6,6 +6,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.study.StudyDTO;
@@ -16,6 +17,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.ExperimentalDesignVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.TreatmentVariable;
@@ -230,12 +232,18 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<StudySearchResponse> searchStudies(final String programUUID, final StudySearchRequest studySearchRequest,
 		final Pageable pageable) {
-		return this.daoFactory.getDmsProjectDAO().searchStudies(programUUID, studySearchRequest, pageable);
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds =
+			this.getCategoricalValueReferenceIdsByVariablesIds(studySearchRequest.getStudySettings());
+		return this.daoFactory.getDmsProjectDAO()
+			.searchStudies(programUUID, studySearchRequest, categoricalValueReferenceIdsByVariablesIds, pageable);
 	}
 
 	@Override
 	public long countSearchStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
-		return this.daoFactory.getDmsProjectDAO().countSearchStudies(programUUID, studySearchRequest);
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds =
+			this.getCategoricalValueReferenceIdsByVariablesIds(studySearchRequest.getStudySettings());
+		return this.daoFactory.getDmsProjectDAO()
+			.countSearchStudies(programUUID, studySearchRequest, categoricalValueReferenceIdsByVariablesIds);
 	}
 
 	@Override
@@ -423,6 +431,22 @@ public class StudyServiceImpl extends Service implements StudyService {
 				Collections.singletonList(SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId())));
 		}
 		return Optional.empty();
+	}
+
+	private Map<Integer, List<Integer>> getCategoricalValueReferenceIdsByVariablesIds(final Map<Integer, String> variableFilter) {
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds = new HashMap<>();
+		if (!CollectionUtils.isEmpty(variableFilter)) {
+			final List<Integer> variableIds = new ArrayList<>(variableFilter.keySet());
+			final Map<Integer, List<ValueReference>> categoricalVariablesMap =
+				this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(variableIds);
+
+			final Map<Integer, List<Integer>> studySettingsCategoricalValueReferenceIds =
+				categoricalVariablesMap.entrySet().stream().filter(entry -> !StringUtils.isEmpty(variableFilter.get(entry.getKey())))
+					.collect(Collectors.toMap(Map.Entry::getKey,
+						entry -> entry.getValue().stream().map(Reference::getId).collect(Collectors.toList())));
+			categoricalValueReferenceIdsByVariablesIds.putAll(studySettingsCategoricalValueReferenceIds);
+		}
+		return categoricalValueReferenceIdsByVariablesIds;
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {

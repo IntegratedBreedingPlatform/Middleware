@@ -2032,6 +2032,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		criteria.setProjection(Projections.rowCount());
 		return (Long) criteria.uniqueResult();
 	}
+
 	@Deprecated
 	private Criteria getBaseFilteredStudiesCriteria(final String programUUID) {
 		return this.getSession().createCriteria(this.getPersistentClass())
@@ -2070,8 +2071,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
-	public List<StudySearchResponse> searchStudies(final String programUUID, final StudySearchRequest request, final Pageable pageable) {
-		final SQLQueryBuilder queryBuilder = StudySearchDAOQuery.getSelectQuery(request, pageable);
+	public List<StudySearchResponse> searchStudies(final String programUUID, final StudySearchRequest request,
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final Pageable pageable) {
+		final SQLQueryBuilder queryBuilder =
+			StudySearchDAOQuery.getSelectQuery(request, categoricalValueReferenceIdsByVariablesIds, pageable);
 		queryBuilder.setParameter("programUUID", programUUID);
 
 		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
@@ -2095,8 +2098,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return (List<StudySearchResponse>) query.list();
 	}
 
-	public long countSearchStudies(final String programUUID, final StudySearchRequest request) {
-		final SQLQueryBuilder queryBuilder = StudySearchDAOQuery.getCountQuery(request);
+	public long countSearchStudies(final String programUUID, final StudySearchRequest request,
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds) {
+		final SQLQueryBuilder queryBuilder = StudySearchDAOQuery.getCountQuery(request, categoricalValueReferenceIdsByVariablesIds);
 		queryBuilder.setParameter("programUUID", programUUID);
 
 		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());

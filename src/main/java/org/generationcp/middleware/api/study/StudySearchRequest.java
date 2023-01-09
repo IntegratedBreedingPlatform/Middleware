@@ -6,7 +6,9 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @AutoProperty
 public class StudySearchRequest {
@@ -24,6 +26,8 @@ public class StudySearchRequest {
 
 	private String parentFolderName;
 	private String objective;
+
+	private Map<Integer, String> studySettings = new HashMap<>();
 
 	public List<Integer> getStudyIds() {
 		return studyIds;
@@ -95,6 +99,14 @@ public class StudySearchRequest {
 
 	public void setObjective(final String objective) {
 		this.objective = objective;
+	}
+
+	public Map<Integer, String> getStudySettings() {
+		return studySettings;
+	}
+
+	public void setStudySettings(final Map<Integer, String> studySettings) {
+		this.studySettings = studySettings;
 	}
 
 	@Override
