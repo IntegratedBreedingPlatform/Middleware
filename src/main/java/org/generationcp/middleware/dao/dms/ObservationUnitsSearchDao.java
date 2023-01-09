@@ -40,6 +40,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integer> {
 
@@ -74,11 +75,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		" LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0 AND groupSourceName.nstat = 1 ";
 	private static final String LOCATION_JOIN = " LEFT JOIN nd_geolocationprop gprop on gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = " + TermId.LOCATION_ID.getId()
 		+ " LEFT JOIN location loc on loc.locid = gprop.value ";
-	private static final String GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN = " LEFT JOIN atributs %1$s ON s.dbxref_id = %1$s.gid AND %1$s.atype = %2$s ";
 	private static final String BREEDING_METHODS_ABBR_JOIN =
 		"LEFT JOIN methods m ON m.mid = g.methn ";
-
-	private static final String GERMPLASM_NAME_JOIN = " LEFT JOIN names %1$s ON s.dbxref_id = %1$s.gid AND %1$s.ntype = %2$s ";
 
 	static {
 		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
@@ -150,7 +148,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "			and tr.trntype = " + TransactionType.WITHDRAWAL.getId() +  "  and tr.trnstat != " + TransactionStatus.CANCELLED.getIntValue()
 			+ "			inner join ims_lot lot on lot.lotid = tr.lotid \n"
 			+ "        WHERE ndt.nd_experiment_id = nde.nd_experiment_id), '-') ) AS 'STOCK_ID'");
-		mainVariablesMap.put(FILE_COUNT, 
+		mainVariablesMap.put(FILE_COUNT,
 			"(select count(1) from file_metadata fm where fm.nd_experiment_id = nde.nd_experiment_id) as '" + FILE_COUNT + "'");
 		mainVariablesMap.put(FILE_TERM_IDS, "(select group_concat(fcvt.cvterm_id separator ',') from file_metadata fm "
 			+ " inner join file_metadata_cvterm fcvt on fm.file_id = fcvt.file_metadata_id"
@@ -162,11 +160,50 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final ObservationUnitsSearchDTO.Filter filter) {
 
 		try {
-			final StringBuilder sql = new StringBuilder("select count(*) as totalObservationUnits from "
-				+ "nd_experiment nde "
-				+ "    inner join project p on p.project_id = nde.project_id "
-				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id "
-				+ "    left join stock s ON s.stock_id = nde.stock_id "
+
+			final StringBuilder sql = new StringBuilder("SELECT COUNT(1) as totalObservationUnits FROM ( ");
+
+			sql.append("SELECT ");
+
+			final List<String> columns = new ArrayList<>();
+
+			columns.add("nde.nd_experiment_id ");
+			if (filter != null && filter.getFilteredTextValues() != null && !filter.getFilteredTextValues().isEmpty()) {
+				filter.getFilteredTextValues()
+					.entrySet()
+					.stream()
+					.filter(mapEntry -> {
+						final String variableType = filter.getVariableTypeMap().get(mapEntry.getKey());
+						return VariableType.GERMPLASM_ATTRIBUTE.name().equals(variableType)
+							|| VariableType.GERMPLASM_PASSPORT.name().equals(variableType);
+					}).forEach(mapEntry -> {
+						final String alias = this.formatVariableAlias(mapEntry.getKey());
+						columns.add(
+							String.format("(SELECT aval FROM atributs WHERE gid = s.dbxref_id AND atype = %1$s) AS %2$s",
+								mapEntry.getKey(),
+								alias));
+					});
+
+				filter.getFilteredTextValues()
+					.entrySet()
+					.stream()
+					.filter(mapEntry -> {
+						final String variableType = filter.getVariableTypeMap().get(mapEntry.getKey());
+						return variableType == null;
+					}).forEach(mapEntry -> {
+						final String alias = this.formatNameAlias(mapEntry.getKey());
+						columns.add(
+							String.format("(SELECT nval FROM names WHERE gid = s.dbxref_id AND ntype = %1$s) AS %2$s", mapEntry.getKey(),
+								alias));
+					});
+			}
+
+			sql.append(columns.stream().collect(Collectors.joining(", ")));
+
+			sql.append(" FROM nd_experiment nde "
+				+ "    INNER JOIN project p on p.project_id = nde.project_id "
+				+ "    INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id "
+				+ "    LEFT JOIN stock s ON s.stock_id = nde.stock_id "
 				// FIXME won't work for sub-sub-obs
 				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
 
@@ -189,6 +226,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			if (filter != null) {
 				this.addFilters(sql, filter, draftMode);
 			}
+
+			this.addHavingClause(sql, filter);
+
+			sql.append(") T ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			addQueryParams(query, filter);
@@ -340,31 +381,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (this.checkFilterContainsFactor(filter, TermId.BREEDING_METHOD_ABBR.getId())) {
 			joins.add(BREEDING_METHODS_ABBR_JOIN);
 		}
-
-		filter.getFilteredTextValues()
-			.entrySet()
-			.stream()
-			.filter(mapEntry -> {
-				final String variableType = filter.getVariableTypeMap().get(mapEntry.getKey());
-				return VariableType.GERMPLASM_ATTRIBUTE.name().equals(variableType)
-					|| VariableType.GERMPLASM_PASSPORT.name().equals(variableType);
-			}).forEach(mapEntry -> {
-				final String alias = this.formatVariableAlias(mapEntry.getKey());
-				final String join = String.format(GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN, alias, mapEntry.getKey());
-				joins.add(join);
-			});
-
-		filter.getFilteredTextValues()
-			.entrySet()
-			.stream()
-			.filter(mapEntry -> {
-				final String variableType = filter.getVariableTypeMap().get(mapEntry.getKey());
-				return variableType == null;
-			}).forEach(mapEntry -> {
-				final String alias = this.formatNameAlias(mapEntry.getKey());
-				final String join = String.format(GERMPLASM_NAME_JOIN, alias, mapEntry.getKey());
-				joins.add(join);
-			});
 
 		joins.forEach(sql::append);
 	}
@@ -764,14 +780,19 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (!CollectionUtils.isEmpty(searchDto.getPassportAndAttributes())) {
 			for (final MeasurementVariableDto measurementVariable : searchDto.getPassportAndAttributes()) {
 				final String alias = this.formatVariableAlias(measurementVariable.getId());
-				columns.add(String.format("%1$s.aval AS %1$s", alias));
+				columns.add(
+					String.format("(SELECT aval FROM atributs WHERE gid = s.dbxref_id AND atype = %1$s) AS %2$s",
+						measurementVariable.getId(),
+						alias));
 			}
 		}
 
 		if (!CollectionUtils.isEmpty(searchDto.getNameTypes())) {
 			for (final MeasurementVariableDto measurementVariable : searchDto.getNameTypes()) {
 				final String alias = this.formatNameAlias(measurementVariable.getId());
-				columns.add(String.format("%1$s.nval AS %1$s", alias));
+				columns.add(
+					String.format("(SELECT nval FROM names WHERE gid = s.dbxref_id AND ntype = %1$s) AS %2$s", measurementVariable.getId(),
+						alias));
 			}
 		}
 
@@ -784,6 +805,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		this.addFilters(sql, searchDto.getFilter(), searchDto.getDraftMode());
 
 		sql.append(" GROUP BY nde.nd_experiment_id ");
+
+		this.addHavingClause(sql, searchDto.getFilter());
 
 		if (noFilterVariables) {
 			this.addOrder(sql, searchDto, observationUnitNoName, plotNoName, pageable);
@@ -818,7 +841,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			// FIXME won't work for sub-sub-obs
 			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
 
-		this.addSelectQueryJoins(sql, searchDto.getGenericGermplasmDescriptors(), searchDto.getPassportAndAttributes(), searchDto.getNameTypes(),
+		this.addSelectQueryJoins(sql, searchDto.getGenericGermplasmDescriptors(),
 			searchDto.getFilter());
 
 		sql.append(" WHERE p.project_id = :datasetId ");
@@ -833,7 +856,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private void addSelectQueryJoins(final StringBuilder sql, final List<String> genericGermplasmDescriptors,
-		final List<MeasurementVariableDto> passportAndAttributes, final List<MeasurementVariableDto> names,
 		final ObservationUnitsSearchDTO.Filter filter) {
 		final Set<String> joins = new LinkedHashSet<>();
 
@@ -860,22 +882,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (this.checkFilterContainsFactor(filter, TermId.LOCATION_ID.getId())) {
 			joins.add(LOCATION_JOIN);
-		}
-
-		if (!CollectionUtils.isEmpty(passportAndAttributes)) {
-			passportAndAttributes.forEach(measurementVariableDto -> {
-				final String alias = this.formatVariableAlias(measurementVariableDto.getId());
-				final String join = String.format(GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN, alias, measurementVariableDto.getId());
-				joins.add(join);
-			});
-		}
-
-		if (!CollectionUtils.isEmpty(names)) {
-			names.forEach(measurementVariableDto -> {
-				final String alias = this.formatNameAlias(measurementVariableDto.getId());
-				final String join = String.format(GERMPLASM_NAME_JOIN, alias, measurementVariableDto.getId());
-				joins.add(join);
-			});
 		}
 
 		joins.forEach(sql::append);
@@ -980,6 +986,48 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ ", `" + orderColumn + "` " + direction);
 	}
 
+	private void addHavingClause(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter) {
+
+		if (filter == null) {
+			return;
+		}
+
+		if (filter.getFilteredTextValues() != null && !filter.getFilteredTextValues().isEmpty()) {
+
+			final List<String> havingConditions = new ArrayList<>();
+			for (final String variableId : filter.getFilteredTextValues().keySet()) {
+
+				if (variableId != null && REMOVE_FILTERS.contains(Integer.valueOf(variableId))) {
+					continue;
+				}
+
+				final String variableType = filter.getVariableTypeMap().get(variableId);
+
+				if (null == variableType) {
+					final String alias = this.formatNameAlias(variableId);
+					havingConditions.add(String.format(" %s LIKE :%s_text ", alias, variableId));
+					continue;
+				}
+				if (VariableType.GERMPLASM_PASSPORT.name().equals(variableType)
+					|| VariableType.GERMPLASM_ATTRIBUTE.name()
+					.equals(variableType)) {
+					final String alias = this.formatVariableAlias(variableId);
+					havingConditions.add(String.format(" %s LIKE :%s_text ", alias, variableId));
+					continue;
+				}
+			}
+
+			if (!CollectionUtils.isEmpty(havingConditions)) {
+				sql.append(" HAVING ");
+				sql.append(havingConditions.stream().collect(Collectors.joining(" AND ")));
+			}
+
+
+
+		}
+
+	}
+
 	private void appendVariableIdAndOperationToFilterQuery(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter,
 		final String filterByDraftOrValue, final Set<String> variableIds, final boolean performLikeOperation) {
 		final Integer variableId = filter.getVariableId();
@@ -1038,9 +1086,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId()
 			// get the numericals whose value is not within bounds
 			// cast strings to decimal (+ 0) to compare
-			+ "          then ph2." + filterByDraftOrValue + " + 0 < scaleMinRange.value " 
+			+ "          then ph2." + filterByDraftOrValue + " + 0 < scaleMinRange.value "
 			+ "            or ph2." + filterByDraftOrValue + " + 0 > scaleMaxRange.value "
-			+ "            or ph2." + filterByDraftOrValue + " + 0 < vo.expected_min " 
+			+ "            or ph2." + filterByDraftOrValue + " + 0 < vo.expected_min "
 			+ "            or ph2." + filterByDraftOrValue + " + 0 > vo.expected_max "
 			+ "        else false "
 			+ "        end "
@@ -1083,18 +1131,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			if (SUM_OF_SAMPLES_ID.equals(variableId) || String.valueOf(TermId.STOCK_ID.getId()).equals(variableId)) {
 				sql.append(") ");
 			}
-			return;
-		}
-
-		if (null == variableType) {
-			final String alias = this.formatNameAlias(variableId);
-			sql.append(String.format(" AND %s.nval LIKE :%s_text", alias, variableId));
-			return;
-		}
-
-		if (VariableType.GERMPLASM_PASSPORT.name().equals(variableType) || VariableType.GERMPLASM_ATTRIBUTE.name().equals(variableType)) {
-			final String alias = this.formatVariableAlias(variableId);
-			sql.append(String.format(" AND %s.aval LIKE :%s_text", alias, variableId));
 			return;
 		}
 
