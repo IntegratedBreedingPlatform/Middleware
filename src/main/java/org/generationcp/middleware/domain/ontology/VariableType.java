@@ -9,7 +9,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Variable Type of a Variable. Ontology variable can have zero or more variable types associated to it.
@@ -97,6 +99,10 @@ public enum VariableType {
 
 	public static VariableType getById(final Integer id) {
 		return VariableType.byId.get(id);
+	}
+
+	public static List<VariableType> getByIds(final List<Integer> ids) {
+		return ids.stream().map(VariableType.byId::get).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
 	public static VariableType getByName(final String name) {

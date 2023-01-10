@@ -35,6 +35,7 @@ public interface OntologyVariableDataManager {
 	 * @param variableFilter have filter data that needs to be applied
 	 * @return List<Variable>
 	 */
+	@Deprecated
 	List<Variable> getWithFilter(VariableFilter variableFilter);
 
 	/**
