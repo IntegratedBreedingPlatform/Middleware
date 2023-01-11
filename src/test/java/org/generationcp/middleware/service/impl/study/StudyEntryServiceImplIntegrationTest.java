@@ -5,12 +5,15 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -23,6 +26,8 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
@@ -32,10 +37,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -54,6 +61,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 	private static final String ENTRYCODE = "ENTRYCODE-";
 	private static final String CROSS = "ABC/XYZ-";
 	private static final String SEEDSOURCE = "SEEDSOURCE-";
+	private static final String ACCNO = "ACCNO";
 
 	@Autowired
 	private StudyEntryService service;
@@ -64,11 +72,20 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private DaoFactory daoFactory;
 
+	@Autowired
+	private GermplasmListManager germplasmListManager;
+
+	@Autowired
+	private GermplasmListService germplasmListService;
+
+	@Autowired
+	private DatasetService studyDatasetService;
+
 	@Before
 	public void setup() {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 
 	}
 
@@ -331,6 +348,59 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		}
 	}
 
+	@Test
+	public void updatePlotDatasetProperties_shouldAddNameType() {
+		final DmsProject study = this.createStudyWithGermplasmListAsociated();
+
+		final List<StudyEntryColumnDTO> columns =
+			this.service.getStudyEntryColumns(study.getProjectId(), null);
+		final StudyEntryColumnDTO aCCNONameTypeColumn =
+			columns.stream().filter(column -> //
+					column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO) && column.getTypeId() == null)
+				.findFirst().get();
+
+		Assert.assertFalse(aCCNONameTypeColumn.isSelected());
+
+		final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO = new PlotDatasetPropertiesDTO();
+		plotDatasetPropertiesDTO.setNameTypeIds(Arrays.asList(1));
+		plotDatasetPropertiesDTO.setVariableIds(Collections.emptyList());
+		this.studyDatasetService.updatePlotDatasetProperties(study.getProjectId(), plotDatasetPropertiesDTO, null);
+
+		final List<StudyEntryColumnDTO> updatedColumns =
+			this.service.getStudyEntryColumns(study.getProjectId(), null);
+
+		final StudyEntryColumnDTO selectedACCNONameTypeColumn = updatedColumns.stream().filter(column -> //
+				column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO) && column.getTypeId() == null)
+			.findFirst().get();
+		Assert.assertTrue(selectedACCNONameTypeColumn.isSelected());
+	}
+
+	@Test
+	public void testUpdatePlotDatasetProperties_shouldRemoveNameType(){
+		final DmsProject study = this.createStudyWithGermplasmListAsociated();
+
+		final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO = new PlotDatasetPropertiesDTO();
+		plotDatasetPropertiesDTO.setNameTypeIds(Arrays.asList(1));
+		plotDatasetPropertiesDTO.setVariableIds(Collections.emptyList());
+		this.studyDatasetService.updatePlotDatasetProperties(study.getProjectId(), plotDatasetPropertiesDTO, null);
+
+		final List<StudyEntryColumnDTO> columns = this.service.getStudyEntryColumns(study.getProjectId(), null);
+		StudyEntryColumnDTO aCCNONameTypeColumn =
+			columns.stream().filter( column -> //
+					column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO) && column.getTypeId() == null)
+				.findFirst().get();
+
+		Assert.assertTrue(aCCNONameTypeColumn.isSelected());
+
+		plotDatasetPropertiesDTO.setNameTypeIds(Collections.emptyList());
+		this.studyDatasetService.updatePlotDatasetProperties(study.getProjectId(), plotDatasetPropertiesDTO, null);
+		final List<StudyEntryColumnDTO> Updatedcolumns = this.service.getStudyEntryColumns(study.getProjectId(), null);
+
+		aCCNONameTypeColumn =
+			Updatedcolumns.stream().filter(column -> column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO ) && column.getTypeId() == null).findFirst().get();
+		Assert.assertFalse(aCCNONameTypeColumn.isSelected());
+	}
+
 	private void verifyStudyEntryDetails(final Integer gid, final int index, final StudyEntryDto dto) {
 		Assert.assertEquals(index, dto.getEntryNumber().intValue());
 		Assert.assertEquals(GERMPLASM_PREFERRED_NAME_PREFIX + index, dto.getDesignation());
@@ -406,7 +476,18 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getProjectPropertyDAO().save(entryNoProp);
 		this.daoFactory.getProjectPropertyDAO().save(crossProp);
 		this.daoFactory.getProjectPropertyDAO().save(entryTypeProp);
+		this.sessionProvder.getSession().refresh(plotDataset);
+		return study;
+	}
 
+	private DmsProject createStudyWithGermplasmListAsociated() {
+		final DmsProject study = this.createStudy();
+
+		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final Integer[] gids = this.germplasmTestDataGenerator.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, "PREFF", parentGermplasm);
+
+		final Integer listId = this.createGermplasmList(null, gids);
+		this.service.saveStudyEntries(study.getProjectId(), listId);
 		return study;
 	}
 
@@ -451,6 +532,27 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(entryPropertyData.getVariableId(), is(termId.getId()));
 		assertThat(entryPropertyData.getValue(), is(value));
 		assertThat(entryPropertyData.getCategoricalValueId(), is(categoricalValueId));
+	}
+
+	public Integer createGermplasmList(final String programUUID, final Integer[] gids) {
+		final int randomInt = new Random().nextInt(100);
+
+		// Germplasm list
+		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt,
+			Long.valueOf(20141014), "LST", 1, "Test Germplasm List", null, 1);
+
+		this.germplasmListManager.addGermplasmList(germplasmList);
+		germplasmList.setProgramUUID(programUUID);
+
+		// Germplasm list data
+		final List<GermplasmListData> germplasmListData = new ArrayList<>();
+		for (int i = 0; i < DataSetupTest.NUMBER_OF_GERMPLASM; i++) {
+			germplasmListData.add(new GermplasmListData(null, germplasmList, gids[i], i,
+				DataSetupTest.GERMPLSM_PREFIX + i + " Source",
+				DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));
+		}
+		this.germplasmListService.addGermplasmListData(germplasmListData);
+		return germplasmList.getId();
 	}
 
 }
