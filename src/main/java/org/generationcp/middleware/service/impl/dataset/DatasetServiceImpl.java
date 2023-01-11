@@ -1466,7 +1466,7 @@ public class DatasetServiceImpl implements DatasetService {
 			.collect(Collectors.toList());
 
 		final List<Integer> newNameTypeIds = plotDatasetPropertiesDTO.getNameTypeIds().stream()
-			.filter(nameTypeId -> !namTypeIds.contains(nameTypeId)).collect(Collectors.toList());
+			.filter(nameTypeId -> !nameTypeIds.contains(nameTypeId)).collect(Collectors.toList());
 
 		if (!CollectionUtils.isEmpty(newNameTypeIds)) {
 			final AtomicInteger nextRank =
@@ -1486,7 +1486,7 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(plotDataset.getProjectId(), removeVariableIds);
 		}
 
-		final List<Integer> nameTypeIdsToRemove = namTypeIds.stream()
+		final List<Integer> nameTypeIdsToRemove = nameTypeIds.stream()
 			.filter(nameTypeId -> !plotDatasetPropertiesDTO.getNameTypeIds().contains(nameTypeId)).collect(Collectors.toList());
 
 		if (!CollectionUtils.isEmpty(nameTypeIdsToRemove)) {
