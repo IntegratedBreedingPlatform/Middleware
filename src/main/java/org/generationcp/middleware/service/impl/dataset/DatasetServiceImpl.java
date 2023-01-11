@@ -1457,12 +1457,8 @@ public class DatasetServiceImpl implements DatasetService {
 				});
 		}
 
-		final List<Integer> namTypeIds = plotDataset.getProperties()
-			.stream()
-			.filter(projectProperty -> projectProperty.getTypeId() == null  &&
-				projectProperty.getVariableId() == null  &&
-				projectProperty.getNameFldno() != null)
-			.map(ProjectProperty::getNameFldno)
+		final List<GermplasmNameTypeDTO> existingNameTypes = this.getDatasetNameTypes(plotDataset.getProjectId());
+		final List<Integer> nameTypeIds = existingNameTypes.stream().map(GermplasmNameTypeDTO::getId)
 			.collect(Collectors.toList());
 
 		final List<Integer> newNameTypeIds = plotDatasetPropertiesDTO.getNameTypeIds().stream()
