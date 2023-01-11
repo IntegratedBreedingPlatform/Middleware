@@ -211,7 +211,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	 *             objects must be valid.
 	 * @return Returns the ids of the {@code GermplasmListData} records inserted in the database.
 	 */
-	private List<GermplasmListData> addGermplasmListData(final List<GermplasmListData> data) {
+	@Override
+	public List<GermplasmListData> addGermplasmListData(final List<GermplasmListData> data) {
 
 		final List<GermplasmListData> idGermplasmListDataSaved = new ArrayList<>();
 		try {

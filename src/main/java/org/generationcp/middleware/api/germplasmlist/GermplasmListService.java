@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -98,4 +99,12 @@ public interface GermplasmListService {
 
 	Map<Integer, Map<Integer, String>> getObservationValuesByListAndVariableIds(Integer listId, Set<Integer> variableIds);
 
+	/**
+	 * Inserts a list of multiple {@code GermplasmListData} objects into the database.
+	 *
+	 * @param data - A list of {@code GermplasmListData} objects to be persisted to the database. {@code GermplasmListData}
+	 *             objects must be valid.
+	 * @return Returns the ids of the {@code GermplasmListData} records inserted in the database.
+	 */
+	List<GermplasmListData> addGermplasmListData(List<GermplasmListData> data);
 }
