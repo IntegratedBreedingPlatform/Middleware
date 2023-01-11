@@ -6,7 +6,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.study.StudyDTO;
@@ -234,6 +233,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final Pageable pageable) {
 		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds =
 			this.getCategoricalValueReferenceIdsByVariablesIds(studySearchRequest.getStudySettings());
+		final boolean areCategoricalVariablesNotMatching =
+			categoricalValueReferenceIdsByVariablesIds.values().stream().anyMatch(CollectionUtils::isEmpty);
+		if (areCategoricalVariablesNotMatching) {
+			return new ArrayList<>();
+		}
 		return this.daoFactory.getDmsProjectDAO()
 			.searchStudies(programUUID, studySearchRequest, categoricalValueReferenceIdsByVariablesIds, pageable);
 	}
@@ -242,6 +246,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public long countSearchStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
 		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds =
 			this.getCategoricalValueReferenceIdsByVariablesIds(studySearchRequest.getStudySettings());
+		final boolean areCategoricalVariablesNotMatching =
+			categoricalValueReferenceIdsByVariablesIds.values().stream().anyMatch(CollectionUtils::isEmpty);
+		if (areCategoricalVariablesNotMatching) {
+			return 0;
+		}
 		return this.daoFactory.getDmsProjectDAO()
 			.countSearchStudies(programUUID, studySearchRequest, categoricalValueReferenceIdsByVariablesIds);
 	}
@@ -434,19 +443,27 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	private Map<Integer, List<Integer>> getCategoricalValueReferenceIdsByVariablesIds(final Map<Integer, String> variableFilter) {
-		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds = new HashMap<>();
+		final Map<Integer, List<Integer>> studySettingsCategoricalValueReferenceIds = new HashMap<>();
 		if (!CollectionUtils.isEmpty(variableFilter)) {
-			final List<Integer> variableIds = new ArrayList<>(variableFilter.keySet());
 			final Map<Integer, List<ValueReference>> categoricalVariablesMap =
-				this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(variableIds);
+				this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(new ArrayList<>(variableFilter.keySet()));
 
-			final Map<Integer, List<Integer>> studySettingsCategoricalValueReferenceIds =
-				categoricalVariablesMap.entrySet().stream().filter(entry -> !StringUtils.isEmpty(variableFilter.get(entry.getKey())))
-					.collect(Collectors.toMap(Map.Entry::getKey,
-						entry -> entry.getValue().stream().map(Reference::getId).collect(Collectors.toList())));
-			categoricalValueReferenceIdsByVariablesIds.putAll(studySettingsCategoricalValueReferenceIds);
+			// Try to find value references that contains the search text
+			for (final Map.Entry<Integer, List<ValueReference>> entry : categoricalVariablesMap.entrySet()) {
+				final List<Integer> valueReferenceIds =
+					studySettingsCategoricalValueReferenceIds.computeIfAbsent(entry.getKey(), k -> new ArrayList<>());
+				final List<Integer> matchingValueReferenceIds = entry.getValue().stream()
+					.filter(valueReference -> valueReference.getDescription() != null && valueReference.getDescription().toLowerCase()
+						.contains(variableFilter.get(entry.getKey()).toLowerCase()))
+					.map(Reference::getId)
+					.collect(Collectors.toList());
+				if (CollectionUtils.isEmpty(matchingValueReferenceIds)) {
+					break;
+				}
+				valueReferenceIds.addAll(matchingValueReferenceIds);
+			}
 		}
-		return categoricalValueReferenceIdsByVariablesIds;
+		return studySettingsCategoricalValueReferenceIds;
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {

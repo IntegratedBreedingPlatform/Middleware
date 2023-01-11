@@ -195,25 +195,16 @@ public class StudySearchDAOQuery {
 				final String tableName = "studySetting_" + key;
 				final String studySettingIdParameter = "studySetting_" + key;
 				sqlQueryBuilder.setParameter(studySettingIdParameter, key);
-				sqlQueryBuilder.append(" AND " + tableName + ".variable_id = :" + studySettingIdParameter);
-
-				final String studySettingValueParameter = "studySettingValue_" + key;
-				sqlQueryBuilder.setParameter(studySettingValueParameter, "%" + value + "%");
+				sqlQueryBuilder.append(" AND " + tableName + ".variable_id = :" + studySettingIdParameter + " AND " + tableName + ".value ");
 
 				if (categoricalValueReferenceIdsByVariablesIds.containsKey(key)) {
-					final String cvTermTableName = "cv_" + key;
-					sqlQueryBuilder.append(
-						" AND " + tableName + ".value IN (SELECT " + cvTermTableName + ".cvterm_id FROM cvterm " + cvTermTableName
-							+ "  WHERE ");
-
 					final String studySettingIdsParameter = "studySettingsCatIds_" + key;
 					sqlQueryBuilder.setParameter(studySettingIdsParameter, categoricalValueReferenceIdsByVariablesIds.get(key));
-					sqlQueryBuilder.append(
-						cvTermTableName + ".cvterm_id IN (:" + studySettingIdsParameter + ") AND " + cvTermTableName + ".definition LIKE :"
-							+ studySettingValueParameter
-							+ ")");
+					sqlQueryBuilder.append(" IN (:" + studySettingIdsParameter + ")");
 				} else {
-					sqlQueryBuilder.append(" AND " + tableName + ".value LIKE :" + studySettingValueParameter);
+					final String studySettingValueParameter = "studySettingValue_" + key;
+					sqlQueryBuilder.setParameter(studySettingValueParameter, "%" + value + "%");
+					sqlQueryBuilder.append(" LIKE :" + studySettingValueParameter);
 				}
 			});
 		}
