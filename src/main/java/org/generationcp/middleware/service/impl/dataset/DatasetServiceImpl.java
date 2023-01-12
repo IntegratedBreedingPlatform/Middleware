@@ -208,7 +208,8 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getObservationSetColumns(final Integer studyId, final Integer observationSetId,
 		final Boolean draftMode) {
-		final DatasetDTO datasetDTO = this.getDataset(observationSetId);
+		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(observationSetId);
+
 		// Analysis Summary Variables
 		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
 			final List<MeasurementVariable> columns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
