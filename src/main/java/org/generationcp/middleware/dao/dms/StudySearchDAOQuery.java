@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.util.DAOQueryUtils;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -98,7 +99,7 @@ public class StudySearchDAOQuery {
 	private static final String ENVIRONMENT_DETAILS_BASE_SUBQUERY = "SELECT env.parent_project_id FROM project env "
 		+ " %s " // usage of SELECT_JOINS
 		+ " WHERE env.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId()
-		+ " AND %s"; // usage of conditions;
+		+ " %s"; // usage of conditions;
 
 	private static final String EXPERIMENT_JOIN_QUERY = "INNER JOIN nd_experiment nde ON nde.project_id = env.project_id";
 	private static final String GEOLOCATION_JOIN_QUERY = "INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id";
@@ -109,23 +110,24 @@ public class StudySearchDAOQuery {
 		"INNER JOIN nd_geolocationprop glp_%1$s ON gl.nd_geolocation_id = glp_%1$s.nd_geolocation_id";
 
 	static SQLQueryBuilder getSelectQuery(final StudySearchRequest request,
-		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final Pageable pageable) {
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds,
+		final Pageable pageable) {
 		final String joins = getSelectQueryJoins(request);
 		final String baseQuery =
 			String.format(BASE_QUERY, SELECT_EXPRESSION, joins);
 		final SQLQueryBuilder sqlQueryBuilder = new SQLQueryBuilder(baseQuery);
-		addFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds);
+		addFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds, locationIds);
 		sqlQueryBuilder.append(
 			DAOQueryUtils.getOrderClause(input -> SortColumn.getByValue(input).value, pageable));
 		return sqlQueryBuilder;
 	}
 
 	static SQLQueryBuilder getCountQuery(final StudySearchRequest request,
-		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds) {
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds) {
 		final String countQueryJoins = getCountQueryJoins(request);
 		final String baseQuery = String.format(BASE_QUERY, COUNT_EXPRESSION, countQueryJoins);
 		final SQLQueryBuilder sqlQueryBuilder = new SQLQueryBuilder(baseQuery);
-		addFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds);
+		addFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds, locationIds);
 		return sqlQueryBuilder;
 	}
 
@@ -155,7 +157,7 @@ public class StudySearchDAOQuery {
 	}
 
 	private static void addFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request,
-		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds) {
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds) {
 		if (!CollectionUtils.isEmpty(request.getStudyIds())) {
 			sqlQueryBuilder.setParameter("studyIds", request.getStudyIds());
 			sqlQueryBuilder.append(" AND study.project_id IN (:studyIds) ");
@@ -206,7 +208,7 @@ public class StudySearchDAOQuery {
 		}
 
 		addStudySettingsFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds);
-		addEnvironmentDetailsFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds);
+		addEnvironmentDetailsFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds, locationIds);
 	}
 
 	private static void addStudySettingsFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request,
@@ -216,7 +218,8 @@ public class StudySearchDAOQuery {
 				final String studySettingIdParameter = "studySetting_" + key;
 				final String tableAlias = "studySetting_" + key;
 				sqlQueryBuilder.setParameter(studySettingIdParameter, key);
-				sqlQueryBuilder.append(" AND " + tableAlias + ".variable_id = :" + studySettingIdParameter + " AND " + tableAlias + ".value ");
+				sqlQueryBuilder
+					.append(" AND " + tableAlias + ".variable_id = :" + studySettingIdParameter + " AND " + tableAlias + ".value ");
 
 				if (categoricalValueReferenceIdsByVariablesIds.containsKey(key)) {
 					final String studySettingCatIdsParameter = "studySettingsCatIds_" + key;
@@ -230,9 +233,9 @@ public class StudySearchDAOQuery {
 			});
 		}
 	}
-	
+
 	private static void addEnvironmentDetailsFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request,
-		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds) {
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds) {
 		if (!CollectionUtils.isEmpty(request.getEnvironmentDetails())) {
 			final Set<String> envDetailsJoins = new LinkedHashSet<>();
 			envDetailsJoins.add(EXPERIMENT_JOIN_QUERY);
@@ -249,23 +252,27 @@ public class StudySearchDAOQuery {
 
 				final String tableAlias = "glp_" + key;
 				final StringBuilder envDetailCondition = new StringBuilder();
-				envDetailCondition
-					.append(tableAlias + ".type_id = :" + environmentDetailIdParameter + " AND " + tableAlias + ".value");
-				if (categoricalValueReferenceIdsByVariablesIds.containsKey(key)) {
+				envDetailCondition.append(tableAlias).append(".type_id = :").append(environmentDetailIdParameter).append(" AND ")
+					.append(tableAlias).append(".value");
+				if (TermId.LOCATION_ID.getId() == key) {
+					final String locationIdsParameter = "locationIds_" + key;
+					sqlQueryBuilder.setParameter(locationIdsParameter, locationIds);
+					envDetailCondition.append(" IN (:").append(locationIdsParameter).append(")");
+				} else if (categoricalValueReferenceIdsByVariablesIds.containsKey(key) || TermId.LOCATION_ID.getId() == key) {
 					final String environmentDetailCatIdsParameter = "environmentDetailCatIds_" + key;
 					sqlQueryBuilder.setParameter(environmentDetailCatIdsParameter, categoricalValueReferenceIdsByVariablesIds.get(key));
-					envDetailCondition.append(" IN (:" + environmentDetailCatIdsParameter + ")");
+					envDetailCondition.append(" IN (:").append(environmentDetailCatIdsParameter).append(")");
 				} else {
 					final String environmentDetailValueParameter = "environmentDetailValue_" + key;
 					sqlQueryBuilder.setParameter(environmentDetailValueParameter, "%" + value + "%");
-					envDetailCondition.append(" LIKE :" + environmentDetailValueParameter);
+					envDetailCondition.append(" LIKE :").append(environmentDetailValueParameter);
 				}
 				envDetailsConditions.add(envDetailCondition.toString());
 			});
 
 			final String envDetailsSubQuery = String.format(ENVIRONMENT_DETAILS_BASE_SUBQUERY,
 				String.join(" ", envDetailsJoins),
-				String.join("", envDetailsConditions));
+				String.join(" AND ", envDetailsConditions));
 			sqlQueryBuilder.append(" AND study.project_id IN (").append(envDetailsSubQuery).append(")");
 			sqlQueryBuilder.setParameter("envDetailsVariableIds", request.getEnvironmentDetails().keySet());
 		}

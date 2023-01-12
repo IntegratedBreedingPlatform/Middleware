@@ -2072,9 +2072,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<StudySearchResponse> searchStudies(final String programUUID, final StudySearchRequest request,
-		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final Pageable pageable) {
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds,
+		final Pageable pageable) {
 		final SQLQueryBuilder queryBuilder =
-			StudySearchDAOQuery.getSelectQuery(request, categoricalValueReferenceIdsByVariablesIds, pageable);
+			StudySearchDAOQuery.getSelectQuery(request, categoricalValueReferenceIdsByVariablesIds, locationIds, pageable);
 		queryBuilder.setParameter("programUUID", programUUID);
 
 		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
@@ -2099,8 +2100,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public long countSearchStudies(final String programUUID, final StudySearchRequest request,
-		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds) {
-		final SQLQueryBuilder queryBuilder = StudySearchDAOQuery.getCountQuery(request, categoricalValueReferenceIdsByVariablesIds);
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds) {
+		final SQLQueryBuilder queryBuilder =
+			StudySearchDAOQuery.getCountQuery(request, categoricalValueReferenceIdsByVariablesIds, locationIds);
 		queryBuilder.setParameter("programUUID", programUUID);
 
 		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());

@@ -8,6 +8,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
+import org.generationcp.middleware.api.location.LocationDTO;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudyDetailsDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
@@ -23,6 +25,7 @@ import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -52,6 +55,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -177,7 +182,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public boolean studyHasGivenDatasetType(final Integer studyId, final Integer datasetTypeId) {
 		final List<DmsProject> datasets = this.daoFactory.getDmsProjectDAO()
 			.getDatasetsByTypeForStudy(studyId, datasetTypeId);
-		return (!org.springframework.util.CollectionUtils.isEmpty(datasets));
+		return (!CollectionUtils.isEmpty(datasets));
 	}
 
 	@Override
@@ -231,31 +236,18 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<StudySearchResponse> searchStudies(final String programUUID, final StudySearchRequest studySearchRequest,
 		final Pageable pageable) {
-		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds =
-			this.getCategoricalValueReferenceIdsByVariablesIds(studySearchRequest);
-		final boolean areCategoricalVariablesNotMatching =
-			categoricalValueReferenceIdsByVariablesIds.values().stream().anyMatch(CollectionUtils::isEmpty);
-		if (areCategoricalVariablesNotMatching) {
-			return new ArrayList<>();
-		}
-		// TODO: prefilter by location name and cooperator user name
-		// TODO: consider geolocations variables (search in geolocation)
-
-		return this.daoFactory.getDmsProjectDAO()
-			.searchStudies(programUUID, studySearchRequest, categoricalValueReferenceIdsByVariablesIds, pageable);
+		final Function<SearchStudiesModel, List<StudySearchResponse>> function = model -> this.daoFactory.getDmsProjectDAO()
+			.searchStudies(programUUID, studySearchRequest, model.getCategoricalValueReferenceIdsByVariablesIds(), model.getLocationIds(),
+				pageable);
+		return this.searchStudies(programUUID, studySearchRequest, ArrayList::new, function);
 	}
 
 	@Override
 	public long countSearchStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
-		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds =
-			this.getCategoricalValueReferenceIdsByVariablesIds(studySearchRequest);
-		final boolean areCategoricalVariablesNotMatching =
-			categoricalValueReferenceIdsByVariablesIds.values().stream().anyMatch(CollectionUtils::isEmpty);
-		if (areCategoricalVariablesNotMatching) {
-			return 0;
-		}
-		return this.daoFactory.getDmsProjectDAO()
-			.countSearchStudies(programUUID, studySearchRequest, categoricalValueReferenceIdsByVariablesIds);
+		final Function<SearchStudiesModel, Long> function = model -> this.daoFactory.getDmsProjectDAO()
+			.countSearchStudies(programUUID, studySearchRequest, model.getCategoricalValueReferenceIdsByVariablesIds(),
+				model.getLocationIds());
+		return this.searchStudies(programUUID, studySearchRequest, () -> 0L, function);
 	}
 
 	@Override
@@ -474,6 +466,57 @@ public class StudyServiceImpl extends Service implements StudyService {
 			}
 		}
 		return studySettingsCategoricalValueReferenceIds;
+	}
+
+	private <T> T searchStudies(final String programUUID, final StudySearchRequest studySearchRequest, final Supplier<T> defaultValue,
+		final Function<SearchStudiesModel, T> searchStudiesFunction) {
+
+		// Prefilter locations names
+		final List<Integer> locationIds = new ArrayList<>();
+		if (!CollectionUtils.isEmpty(studySearchRequest.getEnvironmentDetails())) {
+			final String locationNameSearchText = studySearchRequest.getEnvironmentDetails().get(TermId.LOCATION_ID.getId());
+			if (locationNameSearchText != null) {
+				final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+				locationSearchRequest.setLocationNameFilter(new SqlTextFilter(locationNameSearchText, SqlTextFilter.Type.CONTAINS));
+				final List<LocationDTO> locationDTOS = this.daoFactory.getLocationDAO()
+					.searchLocations(locationSearchRequest, new PageRequest(0, Integer.MAX_VALUE), programUUID);
+				if (CollectionUtils.isEmpty(locationDTOS)) {
+					return defaultValue.get();
+				}
+				locationIds.addAll(locationDTOS.stream().map(LocationDTO::getId).collect(Collectors.toList()));
+			}
+		}
+
+		// Prefilter categorical variables values
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds =
+			this.getCategoricalValueReferenceIdsByVariablesIds(studySearchRequest);
+		final boolean areCategoricalVariablesNotMatching =
+			categoricalValueReferenceIdsByVariablesIds.values().stream().anyMatch(CollectionUtils::isEmpty);
+		if (areCategoricalVariablesNotMatching) {
+			return defaultValue.get();
+		}
+		return searchStudiesFunction.apply(new SearchStudiesModel(locationIds, categoricalValueReferenceIdsByVariablesIds));
+	}
+
+	private static class SearchStudiesModel {
+
+		private final List<Integer> locationIds;
+		private final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds;
+
+		public SearchStudiesModel(final List<Integer> locationIds,
+			final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds) {
+			this.locationIds = locationIds;
+			this.categoricalValueReferenceIdsByVariablesIds = categoricalValueReferenceIdsByVariablesIds;
+		}
+
+		public List<Integer> getLocationIds() {
+			return locationIds;
+		}
+
+		public Map<Integer, List<Integer>> getCategoricalValueReferenceIdsByVariablesIds() {
+			return categoricalValueReferenceIdsByVariablesIds;
+		}
+
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
