@@ -6,6 +6,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.util.DAOQueryUtils;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
@@ -15,10 +16,10 @@ import org.springframework.util.CollectionUtils;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class StudySearchDAOQuery {
 
@@ -32,7 +33,7 @@ public class StudySearchDAOQuery {
 		PARENT_FOLDER_NAME(PARENT_FOLDER_NAME_ALIAS),
 		OBJECTIVE(OBJECTIVE_ALIAS);
 
-		private String value;
+		private final String value;
 
 		SortColumn(final String value) {
 			this.value = value;
@@ -64,12 +65,14 @@ public class StudySearchDAOQuery {
 	static final String PARENT_FOLDER_NAME_ALIAS = "parentFolderName";
 	static final String OBJECTIVE_ALIAS = "objective";
 
-	private final static String BASE_QUERY = "SELECT %s " // usage of SELECT_EXPRESION / COUNT_EXPRESSION
+	private static final String BASE_QUERY = "SELECT %s " // usage of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ " FROM project study "
 		+ " %s " // usage of SELECT_JOINS
 		+ " WHERE study.study_type_id IS NOT NULL AND study.deleted = 0 AND study.program_uuid = :programUUID";
 
-	private final static String SELECT_EXPRESSION = " DISTINCT(study.project_id) AS " + STUDY_ID_ALIAS + ", "
+	private static final String COUNT_EXPRESSION = " COUNT(DISTINCT study.project_id) ";
+
+	private static final String SELECT_EXPRESSION = " DISTINCT(study.project_id) AS " + STUDY_ID_ALIAS + ", "
 		+ " study.name AS " + STUDY_NAME_ALIAS + ", "
 		+ " study.description AS " + STUDY_DESCRIPTION_ALIAS + ", "
 		+ " studyType.label AS " + STUDY_TYPE_NAME_ALIAS + ", "
@@ -82,15 +85,28 @@ public class StudySearchDAOQuery {
 		+ " inn.name AS " + PARENT_FOLDER_NAME_ALIAS + ", "
 		+ " study.objective AS " + OBJECTIVE_ALIAS;
 
-	private final static String SELF_JOIN_QUERY = "LEFT JOIN project inn ON study.parent_project_id = inn.project_id";
-	private final static String STUDY_TYPE_JOIN_QUERY =
+	// JOINS
+	private static final String SELF_JOIN_QUERY = "LEFT JOIN project inn ON study.parent_project_id = inn.project_id";
+	private static final String STUDY_TYPE_JOIN_QUERY =
 		"INNER JOIN study_type studyType ON study.study_type_id = studyType.study_type_id";
-	private final static String WORKBENCH_USER_JOIN_QUERY = "INNER JOIN workbench.users user ON user.userid = study.created_by";
-	private final static String STUDY_SETTINGS_JOIN_QUERY =
+	private static final String WORKBENCH_USER_JOIN_QUERY = "INNER JOIN workbench.users user ON user.userid = study.created_by";
+	private static final String STUDY_SETTINGS_JOIN_QUERY =
 		"INNER JOIN projectprop studySetting_%1$s ON study.project_id = studySetting_%1$s.project_id AND studySetting_%1$s.type_id = "
 			+ VariableType.STUDY_DETAIL.getId();
 
-	private static final String COUNT_EXPRESSION = " COUNT(DISTINCT study.project_id) ";
+	// ENVIRONMENT VARIABLES
+	private static final String ENVIRONMENT_DETAILS_BASE_SUBQUERY = "SELECT env.parent_project_id FROM project env "
+		+ " %s " // usage of SELECT_JOINS
+		+ " WHERE env.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId()
+		+ " AND %s"; // usage of conditions;
+
+	private static final String EXPERIMENT_JOIN_QUERY = "INNER JOIN nd_experiment nde ON nde.project_id = env.project_id";
+	private static final String GEOLOCATION_JOIN_QUERY = "INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id";
+	private static final String ENVIRONMENT_PROPS_JOIN_QUERY =
+		"INNER JOIN projectprop envDetails on env.project_id = envDetails.project_id AND envDetails.type_id = "
+			+ VariableType.ENVIRONMENT_DETAIL.getId() + " AND envDetails.variable_id in (:envDetailsVariableIds)";
+	private static final String GEOLOCATION_PROP_JOIN_QUERY =
+		"INNER JOIN nd_geolocationprop glp_%1$s ON gl.nd_geolocation_id = glp_%1$s.nd_geolocation_id";
 
 	static SQLQueryBuilder getSelectQuery(final StudySearchRequest request,
 		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final Pageable pageable) {
@@ -114,18 +130,18 @@ public class StudySearchDAOQuery {
 	}
 
 	private static String getSelectQueryJoins(final StudySearchRequest request) {
-		final Set<String> joins = new HashSet<>();
+		final Set<String> joins = new LinkedHashSet<>();
 		joins.add(SELF_JOIN_QUERY);
 		joins.add(STUDY_TYPE_JOIN_QUERY);
 		joins.add(WORKBENCH_USER_JOIN_QUERY);
 		if (!CollectionUtils.isEmpty(request.getStudySettings())) {
 			request.getStudySettings().keySet().forEach(key -> joins.add(String.format(STUDY_SETTINGS_JOIN_QUERY, key)));
 		}
-		return joins.stream().collect(Collectors.joining(" "));
+		return String.join(" ", joins);
 	}
 
 	private static String getCountQueryJoins(final StudySearchRequest request) {
-		final Set<String> joins = new HashSet<>();
+		final Set<String> joins = new LinkedHashSet<>();
 		if (!StringUtils.isEmpty(request.getParentFolderName())) {
 			joins.add(SELF_JOIN_QUERY);
 		}
@@ -135,7 +151,7 @@ public class StudySearchDAOQuery {
 		if (!CollectionUtils.isEmpty(request.getStudySettings())) {
 			request.getStudySettings().keySet().forEach(key -> joins.add(String.format(STUDY_SETTINGS_JOIN_QUERY, key)));
 		}
-		return joins.stream().collect(Collectors.joining(" "));
+		return String.join(" ", joins);
 	}
 
 	private static void addFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request,
@@ -189,24 +205,69 @@ public class StudySearchDAOQuery {
 			sqlQueryBuilder.append(" AND study.objective LIKE :objective ");
 		}
 
-		final Map<Integer, String> studySettings = request.getStudySettings();
-		if (!CollectionUtils.isEmpty(studySettings)) {
-			studySettings.forEach((key, value) -> {
-				final String tableName = "studySetting_" + key;
+		addStudySettingsFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds);
+		addEnvironmentDetailsFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds);
+	}
+
+	private static void addStudySettingsFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request,
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds) {
+		if (!CollectionUtils.isEmpty(request.getStudySettings())) {
+			request.getStudySettings().forEach((key, value) -> {
 				final String studySettingIdParameter = "studySetting_" + key;
+				final String tableAlias = "studySetting_" + key;
 				sqlQueryBuilder.setParameter(studySettingIdParameter, key);
-				sqlQueryBuilder.append(" AND " + tableName + ".variable_id = :" + studySettingIdParameter + " AND " + tableName + ".value ");
+				sqlQueryBuilder.append(" AND " + tableAlias + ".variable_id = :" + studySettingIdParameter + " AND " + tableAlias + ".value ");
 
 				if (categoricalValueReferenceIdsByVariablesIds.containsKey(key)) {
-					final String studySettingIdsParameter = "studySettingsCatIds_" + key;
-					sqlQueryBuilder.setParameter(studySettingIdsParameter, categoricalValueReferenceIdsByVariablesIds.get(key));
-					sqlQueryBuilder.append(" IN (:" + studySettingIdsParameter + ")");
+					final String studySettingCatIdsParameter = "studySettingsCatIds_" + key;
+					sqlQueryBuilder.setParameter(studySettingCatIdsParameter, categoricalValueReferenceIdsByVariablesIds.get(key));
+					sqlQueryBuilder.append(" IN (:" + studySettingCatIdsParameter + ")");
 				} else {
 					final String studySettingValueParameter = "studySettingValue_" + key;
 					sqlQueryBuilder.setParameter(studySettingValueParameter, "%" + value + "%");
 					sqlQueryBuilder.append(" LIKE :" + studySettingValueParameter);
 				}
 			});
+		}
+	}
+	
+	private static void addEnvironmentDetailsFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request,
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds) {
+		if (!CollectionUtils.isEmpty(request.getEnvironmentDetails())) {
+			final Set<String> envDetailsJoins = new LinkedHashSet<>();
+			envDetailsJoins.add(EXPERIMENT_JOIN_QUERY);
+			envDetailsJoins.add(GEOLOCATION_JOIN_QUERY);
+			envDetailsJoins.add(ENVIRONMENT_PROPS_JOIN_QUERY);
+
+			final Set<String> envDetailsConditions = new HashSet<>();
+			request.getEnvironmentDetails().forEach((key, value) -> {
+				final String geolocationJoin = String.format(GEOLOCATION_PROP_JOIN_QUERY, key);
+				envDetailsJoins.add(geolocationJoin);
+
+				final String environmentDetailIdParameter = "environmentDetail_" + key;
+				sqlQueryBuilder.setParameter(environmentDetailIdParameter, key);
+
+				final String tableAlias = "glp_" + key;
+				final StringBuilder envDetailCondition = new StringBuilder();
+				envDetailCondition
+					.append(tableAlias + ".type_id = :" + environmentDetailIdParameter + " AND " + tableAlias + ".value");
+				if (categoricalValueReferenceIdsByVariablesIds.containsKey(key)) {
+					final String environmentDetailCatIdsParameter = "environmentDetailCatIds_" + key;
+					sqlQueryBuilder.setParameter(environmentDetailCatIdsParameter, categoricalValueReferenceIdsByVariablesIds.get(key));
+					envDetailCondition.append(" IN (:" + environmentDetailCatIdsParameter + ")");
+				} else {
+					final String environmentDetailValueParameter = "environmentDetailValue_" + key;
+					sqlQueryBuilder.setParameter(environmentDetailValueParameter, "%" + value + "%");
+					envDetailCondition.append(" LIKE :" + environmentDetailValueParameter);
+				}
+				envDetailsConditions.add(envDetailCondition.toString());
+			});
+
+			final String envDetailsSubQuery = String.format(ENVIRONMENT_DETAILS_BASE_SUBQUERY,
+				String.join(" ", envDetailsJoins),
+				String.join("", envDetailsConditions));
+			sqlQueryBuilder.append(" AND study.project_id IN (").append(envDetailsSubQuery).append(")");
+			sqlQueryBuilder.setParameter("envDetailsVariableIds", request.getEnvironmentDetails().keySet());
 		}
 	}
 

@@ -28,6 +28,7 @@ public class StudySearchRequest {
 	private String objective;
 
 	private Map<Integer, String> studySettings = new HashMap<>();
+	private Map<Integer, String> environmentDetails = new HashMap<>();
 
 	public List<Integer> getStudyIds() {
 		return studyIds;
@@ -107,6 +108,14 @@ public class StudySearchRequest {
 
 	public void setStudySettings(final Map<Integer, String> studySettings) {
 		this.studySettings = studySettings;
+	}
+
+	public Map<Integer, String> getEnvironmentDetails() {
+		return environmentDetails;
+	}
+
+	public void setEnvironmentDetails(final Map<Integer, String> environmentDetails) {
+		this.environmentDetails = environmentDetails;
 	}
 
 	@Override
