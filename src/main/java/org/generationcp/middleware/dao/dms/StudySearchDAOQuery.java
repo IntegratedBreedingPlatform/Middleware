@@ -15,8 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -99,13 +99,13 @@ public class StudySearchDAOQuery {
 	private static final String ENVIRONMENT_DETAILS_BASE_SUBQUERY = "SELECT env.parent_project_id FROM project env "
 		+ " %s " // usage of SELECT_JOINS
 		+ " WHERE env.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId()
-		+ " %s"; // usage of conditions;
+		+ " AND %s"; // usage of conditions;
 
 	private static final String EXPERIMENT_JOIN_QUERY = "INNER JOIN nd_experiment nde ON nde.project_id = env.project_id";
 	private static final String GEOLOCATION_JOIN_QUERY = "INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id";
 	private static final String ENVIRONMENT_PROPS_JOIN_QUERY =
 		"INNER JOIN projectprop envDetails on env.project_id = envDetails.project_id AND envDetails.type_id = "
-			+ VariableType.ENVIRONMENT_DETAIL.getId() + " AND envDetails.variable_id in (:envDetailsVariableIds)";
+			+ VariableType.ENVIRONMENT_DETAIL.getId() + " AND envDetails.variable_id = %s";
 	private static final String GEOLOCATION_PROP_JOIN_QUERY =
 		"INNER JOIN nd_geolocationprop glp_%1$s ON gl.nd_geolocation_id = glp_%1$s.nd_geolocation_id";
 
@@ -237,13 +237,14 @@ public class StudySearchDAOQuery {
 	private static void addEnvironmentDetailsFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request,
 		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds) {
 		if (!CollectionUtils.isEmpty(request.getEnvironmentDetails())) {
-			final Set<String> envDetailsJoins = new LinkedHashSet<>();
-			envDetailsJoins.add(EXPERIMENT_JOIN_QUERY);
-			envDetailsJoins.add(GEOLOCATION_JOIN_QUERY);
-			envDetailsJoins.add(ENVIRONMENT_PROPS_JOIN_QUERY);
-
-			final Set<String> envDetailsConditions = new HashSet<>();
 			request.getEnvironmentDetails().forEach((key, value) -> {
+				final Set<String> envDetailsJoins = new LinkedHashSet<>();
+				envDetailsJoins.add(EXPERIMENT_JOIN_QUERY);
+				envDetailsJoins.add(GEOLOCATION_JOIN_QUERY);
+
+				final String envPropJoin = String.format(ENVIRONMENT_PROPS_JOIN_QUERY, key);
+				envDetailsJoins.add(envPropJoin);
+
 				final String geolocationJoin = String.format(GEOLOCATION_PROP_JOIN_QUERY, key);
 				envDetailsJoins.add(geolocationJoin);
 
@@ -267,14 +268,12 @@ public class StudySearchDAOQuery {
 					sqlQueryBuilder.setParameter(environmentDetailValueParameter, "%" + value + "%");
 					envDetailCondition.append(" LIKE :").append(environmentDetailValueParameter);
 				}
-				envDetailsConditions.add(envDetailCondition.toString());
-			});
 
-			final String envDetailsSubQuery = String.format(ENVIRONMENT_DETAILS_BASE_SUBQUERY,
-				String.join(" ", envDetailsJoins),
-				String.join(" AND ", envDetailsConditions));
-			sqlQueryBuilder.append(" AND study.project_id IN (").append(envDetailsSubQuery).append(")");
-			sqlQueryBuilder.setParameter("envDetailsVariableIds", request.getEnvironmentDetails().keySet());
+				final String envDetailsSubQuery = String.format(ENVIRONMENT_DETAILS_BASE_SUBQUERY,
+					String.join(" ", envDetailsJoins),
+					String.join(" AND ", envDetailCondition.toString()));
+				sqlQueryBuilder.append(" AND study.project_id IN (").append(envDetailsSubQuery).append(") ");
+			});
 		}
 	}
 
