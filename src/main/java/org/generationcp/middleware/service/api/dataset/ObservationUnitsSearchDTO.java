@@ -33,6 +33,8 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	/** This is used by Visualization tool, to specify the columns that will be included in the data returned from the server. **/
 	private List<String> filterColumns = new ArrayList<>();
 
+	private Map<String, Boolean> columnVisibilityMap  = new HashMap<>();
+
 	/**
 	 * This is used by DataTables to ensure that the Ajax returns from server-side processing requests are drawn in sequence
 	 */
@@ -295,6 +297,14 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 
 	public void setNameTypes(final List<MeasurementVariableDto> nameTypes) {
 		this.nameTypes = nameTypes;
+	}
+
+	public Map<String, Boolean> getColumnVisibilityMap() {
+		return this.columnVisibilityMap;
+	}
+
+	public void setColumnVisibilityMap(final Map<String, Boolean> columnVisibilityMap) {
+		this.columnVisibilityMap = columnVisibilityMap;
 	}
 
 	@Override

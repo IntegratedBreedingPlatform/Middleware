@@ -629,6 +629,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.CROSS.getId()));
 	}
 
+	private boolean isColumnVisible(final String columnName, final Map<String, Boolean> columnVisibilityMap) {
+		if (!CollectionUtils.isEmpty(columnVisibilityMap)) {
+			return columnVisibilityMap.getOrDefault(columnName, true);
+		}
+		return true;
+	}
+
 	private String getObservationUnitTableQuery(
 		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName, final String plotNoName, final Map<String, String> finalColumnsQueryMap, final Pageable pageable) {
 
@@ -655,14 +662,22 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		searchDto.getEntryDetails().forEach(measurementVariable -> {
 			final StringBuilder entryDetailsClauseFormat = new StringBuilder();
-			if (TermId.ENTRY_NO.name().equals(measurementVariable.getName())) {
-				entryDetailsClauseFormat.append(" s.uniquename AS '%1$s',");
+
+			if (this.isColumnVisible(measurementVariable.getName(), searchDto.getColumnVisibilityMap())) {
+				if (TermId.ENTRY_NO.name().equals(measurementVariable.getName())) {
+					entryDetailsClauseFormat.append(" s.uniquename AS '%1$s',");
+				} else {
+					entryDetailsClauseFormat.append(" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.value, NULL)) AS '%1$s',");
+				}
+				entryDetailsClauseFormat.append(
+					" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.stockprop_id, NULL)) AS '%1$s_StockPropId',");
+				entryDetailsClauseFormat.append(" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.cvalue_id, NULL)) AS '%1$s_CvalueId'");
 			} else {
-				entryDetailsClauseFormat.append(" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.value, NULL)) AS '%1$s',");
+				entryDetailsClauseFormat.append(" NULL AS '%1$s',");
+				entryDetailsClauseFormat.append(" NULL AS '%1$s_StockPropId',");
+				entryDetailsClauseFormat.append(" NULL AS '%1$s_CvalueId'");
 			}
 
-			entryDetailsClauseFormat.append(" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.stockprop_id, NULL)) AS '%1$s_StockPropId',");
-			entryDetailsClauseFormat.append(" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.cvalue_id, NULL)) AS '%1$s_CvalueId'");
 			columns.add(String.format(entryDetailsClauseFormat.toString(), measurementVariable.getName()));
 		});
 
@@ -780,19 +795,31 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (!CollectionUtils.isEmpty(searchDto.getPassportAndAttributes())) {
 			for (final MeasurementVariableDto measurementVariable : searchDto.getPassportAndAttributes()) {
 				final String alias = this.formatVariableAlias(measurementVariable.getId());
-				columns.add(
-					String.format("(SELECT aval FROM atributs WHERE gid = s.dbxref_id AND atype = %1$s) AS %2$s",
-						measurementVariable.getId(),
-						alias));
+
+				if (this.isColumnVisible(measurementVariable.getName(), searchDto.getColumnVisibilityMap())) {
+					columns.add(
+						String.format("(SELECT aval FROM atributs WHERE gid = s.dbxref_id AND atype = %1$s) AS %2$s",
+							measurementVariable.getId(),
+							alias));
+				} else {
+					columns.add(
+						String.format(" NULL AS %1$s", alias));
+				}
 			}
 		}
 
 		if (!CollectionUtils.isEmpty(searchDto.getNameTypes())) {
 			for (final MeasurementVariableDto measurementVariable : searchDto.getNameTypes()) {
 				final String alias = this.formatNameAlias(measurementVariable.getId());
-				columns.add(
-					String.format("(SELECT nval FROM names WHERE gid = s.dbxref_id AND ntype = %1$s) AS %2$s", measurementVariable.getId(),
-						alias));
+				if (this.isColumnVisible(measurementVariable.getName(), searchDto.getColumnVisibilityMap())) {
+					columns.add(
+						String.format("(SELECT nval FROM names WHERE gid = s.dbxref_id AND ntype = %1$s) AS %2$s",
+							measurementVariable.getId(),
+							alias));
+				} else {
+					columns.add(
+						String.format(" NULL AS %1$s", alias));
+				}
 			}
 		}
 
