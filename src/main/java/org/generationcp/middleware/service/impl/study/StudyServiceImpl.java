@@ -34,11 +34,13 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -78,6 +80,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Resource
 	private StudyEntryService studyEntryService;
+
+	@Resource
+	protected UserService userService;
 
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 
@@ -238,7 +243,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final Pageable pageable) {
 		final Function<SearchStudiesModel, List<StudySearchResponse>> function = model -> this.daoFactory.getDmsProjectDAO()
 			.searchStudies(programUUID, studySearchRequest, model.getCategoricalValueReferenceIdsByVariablesIds(), model.getLocationIds(),
-				pageable);
+				model.getUserIds(), pageable);
 		return this.searchStudies(programUUID, studySearchRequest, ArrayList::new, function);
 	}
 
@@ -246,7 +251,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public long countSearchStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
 		final Function<SearchStudiesModel, Long> function = model -> this.daoFactory.getDmsProjectDAO()
 			.countSearchStudies(programUUID, studySearchRequest, model.getCategoricalValueReferenceIdsByVariablesIds(),
-				model.getLocationIds());
+				model.getLocationIds(), model.getUserIds());
 		return this.searchStudies(programUUID, studySearchRequest, () -> 0L, function);
 	}
 
@@ -471,10 +476,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 	private <T> T searchStudies(final String programUUID, final StudySearchRequest studySearchRequest, final Supplier<T> defaultValue,
 		final Function<SearchStudiesModel, T> searchStudiesFunction) {
 
-		// Prefilter locations names
+		// Prefilter by locations names and/or cooperator
+		final Map<Integer, String> environmentDetails = studySearchRequest.getEnvironmentDetails();
 		final List<Integer> locationIds = new ArrayList<>();
-		if (!CollectionUtils.isEmpty(studySearchRequest.getEnvironmentDetails())) {
-			final String locationNameSearchText = studySearchRequest.getEnvironmentDetails().get(TermId.LOCATION_ID.getId());
+		final List<Integer> userIds = new ArrayList<>();
+		if (!CollectionUtils.isEmpty(environmentDetails)) {
+			final String locationNameSearchText = environmentDetails.get(TermId.LOCATION_ID.getId());
 			if (locationNameSearchText != null) {
 				final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 				locationSearchRequest.setLocationNameFilter(new SqlTextFilter(locationNameSearchText, SqlTextFilter.Type.CONTAINS));
@@ -484,6 +491,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 					return defaultValue.get();
 				}
 				locationIds.addAll(locationDTOS.stream().map(LocationDTO::getId).collect(Collectors.toList()));
+			}
+
+			final String cooperatorNameSearchText = environmentDetails.get(TermId.COOPERATOOR_ID.getId());
+			if (cooperatorNameSearchText != null) {
+				final List<WorkbenchUser> users =
+					this.userService.getUsersByPersonFirstNameOrLastNameContains(cooperatorNameSearchText);
+				if (CollectionUtils.isEmpty(users)) {
+					return defaultValue.get();
+				}
+				userIds.addAll(users.stream().map(user -> user.getPerson().getId()).collect(Collectors.toList()));
 			}
 		}
 
@@ -495,22 +512,28 @@ public class StudyServiceImpl extends Service implements StudyService {
 		if (areCategoricalVariablesNotMatching) {
 			return defaultValue.get();
 		}
-		return searchStudiesFunction.apply(new SearchStudiesModel(locationIds, categoricalValueReferenceIdsByVariablesIds));
+		return searchStudiesFunction.apply(new SearchStudiesModel(locationIds, userIds, categoricalValueReferenceIdsByVariablesIds));
 	}
 
 	private static class SearchStudiesModel {
 
 		private final List<Integer> locationIds;
+		private final List<Integer> userIds;
 		private final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds;
 
-		public SearchStudiesModel(final List<Integer> locationIds,
+		public SearchStudiesModel(final List<Integer> locationIds, final List<Integer> userIds,
 			final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds) {
 			this.locationIds = locationIds;
+			this.userIds = userIds;
 			this.categoricalValueReferenceIdsByVariablesIds = categoricalValueReferenceIdsByVariablesIds;
 		}
 
 		public List<Integer> getLocationIds() {
 			return locationIds;
+		}
+
+		public List<Integer> getUserIds() {
+			return userIds;
 		}
 
 		public Map<Integer, List<Integer>> getCategoricalValueReferenceIdsByVariablesIds() {

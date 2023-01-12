@@ -15,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -111,23 +110,24 @@ public class StudySearchDAOQuery {
 
 	static SQLQueryBuilder getSelectQuery(final StudySearchRequest request,
 		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds,
-		final Pageable pageable) {
+		final List<Integer> userIds, final Pageable pageable) {
 		final String joins = getSelectQueryJoins(request);
 		final String baseQuery =
 			String.format(BASE_QUERY, SELECT_EXPRESSION, joins);
 		final SQLQueryBuilder sqlQueryBuilder = new SQLQueryBuilder(baseQuery);
-		addFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds, locationIds);
+		addFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds, locationIds, userIds);
 		sqlQueryBuilder.append(
 			DAOQueryUtils.getOrderClause(input -> SortColumn.getByValue(input).value, pageable));
 		return sqlQueryBuilder;
 	}
 
 	static SQLQueryBuilder getCountQuery(final StudySearchRequest request,
-		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds) {
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds,
+		final List<Integer> userIds) {
 		final String countQueryJoins = getCountQueryJoins(request);
 		final String baseQuery = String.format(BASE_QUERY, COUNT_EXPRESSION, countQueryJoins);
 		final SQLQueryBuilder sqlQueryBuilder = new SQLQueryBuilder(baseQuery);
-		addFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds, locationIds);
+		addFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds, locationIds, userIds);
 		return sqlQueryBuilder;
 	}
 
@@ -157,7 +157,8 @@ public class StudySearchDAOQuery {
 	}
 
 	private static void addFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request,
-		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds) {
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds,
+		final List<Integer> userIds) {
 		if (!CollectionUtils.isEmpty(request.getStudyIds())) {
 			sqlQueryBuilder.setParameter("studyIds", request.getStudyIds());
 			sqlQueryBuilder.append(" AND study.project_id IN (:studyIds) ");
@@ -208,7 +209,7 @@ public class StudySearchDAOQuery {
 		}
 
 		addStudySettingsFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds);
-		addEnvironmentDetailsFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds, locationIds);
+		addEnvironmentDetailsFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds, locationIds, userIds);
 	}
 
 	private static void addStudySettingsFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request,
@@ -235,7 +236,8 @@ public class StudySearchDAOQuery {
 	}
 
 	private static void addEnvironmentDetailsFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request,
-		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds) {
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds,
+		final List<Integer> userIds) {
 		if (!CollectionUtils.isEmpty(request.getEnvironmentDetails())) {
 			request.getEnvironmentDetails().forEach((key, value) -> {
 				final Set<String> envDetailsJoins = new LinkedHashSet<>();
@@ -259,7 +261,11 @@ public class StudySearchDAOQuery {
 					final String locationIdsParameter = "locationIds_" + key;
 					sqlQueryBuilder.setParameter(locationIdsParameter, locationIds);
 					envDetailCondition.append(" IN (:").append(locationIdsParameter).append(")");
-				} else if (categoricalValueReferenceIdsByVariablesIds.containsKey(key) || TermId.LOCATION_ID.getId() == key) {
+				} else if (TermId.COOPERATOOR_ID.getId() == key) {
+					final String cooperatorIdsParameter = "cooperatorIds_" + key;
+					sqlQueryBuilder.setParameter(cooperatorIdsParameter, userIds);
+					envDetailCondition.append(" IN (:").append(cooperatorIdsParameter).append(")");
+				} else if (categoricalValueReferenceIdsByVariablesIds.containsKey(key)) {
 					final String environmentDetailCatIdsParameter = "environmentDetailCatIds_" + key;
 					sqlQueryBuilder.setParameter(environmentDetailCatIdsParameter, categoricalValueReferenceIdsByVariablesIds.get(key));
 					envDetailCondition.append(" IN (:").append(environmentDetailCatIdsParameter).append(")");
