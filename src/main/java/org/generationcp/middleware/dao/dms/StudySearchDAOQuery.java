@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,14 @@ public class StudySearchDAOQuery {
 
 	//TODO: move to utils
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
+
+	private static final Map<Integer, String> geoCoordinatesColumnsByTermId = new HashMap<>();
+
+	static {
+		geoCoordinatesColumnsByTermId.put(TermId.LATITUDE.getId(), "latitude");
+		geoCoordinatesColumnsByTermId.put(TermId.LONGITUDE.getId(), "longitude");
+		geoCoordinatesColumnsByTermId.put(TermId.ALTITUDE.getId(), "altitude");
+	}
 
 	static final String STUDY_ID_ALIAS = "studyId";
 	static final String STUDY_NAME_ALIAS = "studyName";
@@ -106,7 +115,7 @@ public class StudySearchDAOQuery {
 		"INNER JOIN projectprop envDetails on env.project_id = envDetails.project_id AND envDetails.type_id = "
 			+ VariableType.ENVIRONMENT_DETAIL.getId() + " AND envDetails.variable_id = %s";
 	private static final String GEOLOCATION_PROP_JOIN_QUERY =
-		"INNER JOIN nd_geolocationprop glp_%1$s ON gl.nd_geolocation_id = glp_%1$s.nd_geolocation_id";
+		"INNER JOIN nd_geolocationprop glp ON gl.nd_geolocation_id = glp.nd_geolocation_id";
 
 	static SQLQueryBuilder getSelectQuery(final StudySearchRequest request,
 		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds,
@@ -240,6 +249,10 @@ public class StudySearchDAOQuery {
 		final List<Integer> userIds) {
 		if (!CollectionUtils.isEmpty(request.getEnvironmentDetails())) {
 			request.getEnvironmentDetails().forEach((key, value) -> {
+				final boolean isGeoCoordinateVariable = TermId.LATITUDE.getId() == key ||
+					TermId.LONGITUDE.getId() == key ||
+					TermId.ALTITUDE.getId() == key;
+
 				final Set<String> envDetailsJoins = new LinkedHashSet<>();
 				envDetailsJoins.add(EXPERIMENT_JOIN_QUERY);
 				envDetailsJoins.add(GEOLOCATION_JOIN_QUERY);
@@ -247,32 +260,41 @@ public class StudySearchDAOQuery {
 				final String envPropJoin = String.format(ENVIRONMENT_PROPS_JOIN_QUERY, key);
 				envDetailsJoins.add(envPropJoin);
 
-				final String geolocationJoin = String.format(GEOLOCATION_PROP_JOIN_QUERY, key);
-				envDetailsJoins.add(geolocationJoin);
-
-				final String environmentDetailIdParameter = "environmentDetail_" + key;
-				sqlQueryBuilder.setParameter(environmentDetailIdParameter, key);
-
-				final String tableAlias = "glp_" + key;
 				final StringBuilder envDetailCondition = new StringBuilder();
-				envDetailCondition.append(tableAlias).append(".type_id = :").append(environmentDetailIdParameter).append(" AND ")
-					.append(tableAlias).append(".value");
-				if (TermId.LOCATION_ID.getId() == key) {
+				if (!isGeoCoordinateVariable) {
+					envDetailsJoins.add(GEOLOCATION_PROP_JOIN_QUERY);
+
+					final String environmentDetailIdParameter = "environmentDetail_" + key;
+					sqlQueryBuilder.setParameter(environmentDetailIdParameter, key);
+					envDetailCondition.append("glp.type_id = :").append(environmentDetailIdParameter).append(" AND glp.value");
+				}
+
+				if (isGeoCoordinateVariable) {
+					final String geoCoordinateValueParameter = "geoCoordinateValue_" + key;
+					sqlQueryBuilder.setParameter(geoCoordinateValueParameter, value);
+					envDetailCondition.append("gl.").append(geoCoordinatesColumnsByTermId.get(key)).append(" = :")
+						.append(geoCoordinateValueParameter);
+
+				} else if (TermId.LOCATION_ID.getId() == key) {
 					final String locationIdsParameter = "locationIds_" + key;
 					sqlQueryBuilder.setParameter(locationIdsParameter, locationIds);
 					envDetailCondition.append(" IN (:").append(locationIdsParameter).append(")");
+
 				} else if (TermId.COOPERATOOR_ID.getId() == key) {
 					final String cooperatorIdsParameter = "cooperatorIds_" + key;
 					sqlQueryBuilder.setParameter(cooperatorIdsParameter, userIds);
 					envDetailCondition.append(" IN (:").append(cooperatorIdsParameter).append(")");
+
 				} else if (categoricalValueReferenceIdsByVariablesIds.containsKey(key)) {
 					final String environmentDetailCatIdsParameter = "environmentDetailCatIds_" + key;
 					sqlQueryBuilder.setParameter(environmentDetailCatIdsParameter, categoricalValueReferenceIdsByVariablesIds.get(key));
 					envDetailCondition.append(" IN (:").append(environmentDetailCatIdsParameter).append(")");
+
 				} else {
 					final String environmentDetailValueParameter = "environmentDetailValue_" + key;
 					sqlQueryBuilder.setParameter(environmentDetailValueParameter, "%" + value + "%");
 					envDetailCondition.append(" LIKE :").append(environmentDetailValueParameter);
+
 				}
 
 				final String envDetailsSubQuery = String.format(ENVIRONMENT_DETAILS_BASE_SUBQUERY,
