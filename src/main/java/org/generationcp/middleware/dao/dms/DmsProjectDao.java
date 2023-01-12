@@ -1280,38 +1280,38 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "	case when hasInventory.nd_geolocation_id is null then 0 else 1 end as hasInventory, \n"
 
 				// If study has any plot experiments, hasExperimentalDesign flag = true
-				+ "  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
-				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasExperimentalDesign, "
+				+ "  case when EXISTS(select exp.nd_experiment_id FROM nd_experiment exp WHERE exp.type_id = 1155 "
+				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) then 1 else 0 end as hasExperimentalDesign, "
 
 				// If study samples
-				+ "  case when (select count(1) \n"
+				+ "  case when EXISTS(select s.sample_id \n"
 				+ "               from sample s \n"
 				+ "                        inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 \n"
-				+ "               where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 \n"
+				+ "               where exp.nd_geolocation_id = geoloc.nd_geolocation_id) \n"
 				// or has sub-observations or
-				+ "        or (select count(1) \n"
+				+ "        or EXISTS(select exp.nd_experiment_id \n"
 				+ "            from nd_experiment exp \n"
 				+ "                     INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 \n"
 				+ "                     INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 \n"
-				+ "            where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 \n"
+				+ "            where exp.nd_geolocation_id = geoloc.nd_geolocation_id) \n"
 				// or inventory
 				+ "        or hasInventory.nd_geolocation_id is not null \n"
 				// or has files
-				+ "        or (select count(1) \n"
+				+ "        or EXISTS(select f.file_id \n"
 				+ "            from file_metadata f \n"
 				+ "              inner join nd_experiment exp on f.nd_experiment_id = exp.nd_experiment_id \n"
 				+ "              inner join project pr on pr.project_id = exp.project_id \n"
 				+ "                         and exp.type_id = " + TermId.PLOT_EXPERIMENT.getId()
-				+ "            where exp.nd_geolocation_id = geoloc.nd_geolocation_id ) > 0 \n"
+				+ "            where exp.nd_geolocation_id = geoloc.nd_geolocation_id ) \n"
 				// then canBeDeleted = false
 				+ "             then 0 \n"
 				+ "         else 1 end as canBeDeleted, "
 
 				// if study has any pending or accepted plot observations, hasMeasurements = true
-				+ "  case when (select count(1) from phenotype ph "
+				+ "  case when EXISTS(select ph.phenotype_id from phenotype ph "
 				+ "  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
 				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id	 and "
-				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) > 0 then 1 else 0 end as hasMeasurements "
+				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) then 1 else 0 end as hasMeasurements "
 
 				+ " from nd_geolocation geoloc \n"
 				+ " inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
