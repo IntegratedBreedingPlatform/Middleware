@@ -29,6 +29,7 @@ public class StudySearchRequest {
 
 	private Map<Integer, String> studySettings = new HashMap<>();
 	private Map<Integer, String> environmentDetails = new HashMap<>();
+	private Map<Integer, String> environmentConditions = new HashMap<>();
 
 	public List<Integer> getStudyIds() {
 		return studyIds;
@@ -116,6 +117,14 @@ public class StudySearchRequest {
 
 	public void setEnvironmentDetails(final Map<Integer, String> environmentDetails) {
 		this.environmentDetails = environmentDetails;
+	}
+
+	public Map<Integer, String> getEnvironmentConditions() {
+		return environmentConditions;
+	}
+
+	public void setEnvironmentConditions(final Map<Integer, String> environmentConditions) {
+		this.environmentConditions = environmentConditions;
 	}
 
 	@Override

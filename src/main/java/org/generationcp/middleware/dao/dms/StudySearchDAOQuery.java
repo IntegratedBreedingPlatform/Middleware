@@ -104,7 +104,7 @@ public class StudySearchDAOQuery {
 			+ VariableType.STUDY_DETAIL.getId();
 
 	// ENVIRONMENT VARIABLES
-	private static final String ENVIRONMENT_DETAILS_BASE_SUBQUERY = "SELECT env.parent_project_id FROM project env "
+	private static final String ENVIRONMENT_BASE_SUBQUERY = "SELECT env.parent_project_id FROM project env "
 		+ " %s " // usage of SELECT_JOINS
 		+ " WHERE env.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId()
 		+ " AND %s"; // usage of conditions;
@@ -116,6 +116,7 @@ public class StudySearchDAOQuery {
 			+ VariableType.ENVIRONMENT_DETAIL.getId() + " AND envDetails.variable_id = %s";
 	private static final String GEOLOCATION_PROP_JOIN_QUERY =
 		"INNER JOIN nd_geolocationprop glp ON gl.nd_geolocation_id = glp.nd_geolocation_id";
+	private static final String PHENOTYPE_JOIN_QUERY = "INNER JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id";
 
 	static SQLQueryBuilder getSelectQuery(final StudySearchRequest request,
 		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds,
@@ -219,6 +220,7 @@ public class StudySearchDAOQuery {
 
 		addStudySettingsFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds);
 		addEnvironmentDetailsFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds, locationIds, userIds);
+		addEnvironmentConditionsFilters(sqlQueryBuilder, request, categoricalValueReferenceIdsByVariablesIds);
 	}
 
 	private static void addStudySettingsFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request,
@@ -249,6 +251,7 @@ public class StudySearchDAOQuery {
 		final List<Integer> userIds) {
 		if (!CollectionUtils.isEmpty(request.getEnvironmentDetails())) {
 			request.getEnvironmentDetails().forEach((key, value) -> {
+
 				final boolean isGeoCoordinateVariable = TermId.LATITUDE.getId() == key ||
 					TermId.LONGITUDE.getId() == key ||
 					TermId.ALTITUDE.getId() == key;
@@ -297,9 +300,43 @@ public class StudySearchDAOQuery {
 
 				}
 
-				final String envDetailsSubQuery = String.format(ENVIRONMENT_DETAILS_BASE_SUBQUERY,
+				final String envDetailsSubQuery = String.format(ENVIRONMENT_BASE_SUBQUERY,
 					String.join(" ", envDetailsJoins),
 					String.join(" AND ", envDetailCondition.toString()));
+				sqlQueryBuilder.append(" AND study.project_id IN (").append(envDetailsSubQuery).append(") ");
+			});
+		}
+	}
+
+	private static void addEnvironmentConditionsFilters(final SQLQueryBuilder sqlQueryBuilder, final StudySearchRequest request,
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds) {
+		if (!CollectionUtils.isEmpty(request.getEnvironmentConditions())) {
+			request.getEnvironmentConditions().forEach((key, value) -> {
+
+				final Set<String> envDetailsJoins = new LinkedHashSet<>();
+				envDetailsJoins.add(EXPERIMENT_JOIN_QUERY);
+				envDetailsJoins.add(PHENOTYPE_JOIN_QUERY);
+
+				final StringBuilder envConditionCondition = new StringBuilder();
+				final String environmentConditionIdParameter = "environmentCondition_" + key;
+				sqlQueryBuilder.setParameter(environmentConditionIdParameter, key);
+				envConditionCondition.append("ph.observable_id = :").append(environmentConditionIdParameter).append(" AND ph.value");
+
+				if (categoricalValueReferenceIdsByVariablesIds.containsKey(key)) {
+					final String environmentConditionCatIdsParameter = "environmentConditionCatIds_" + key;
+					sqlQueryBuilder.setParameter(environmentConditionCatIdsParameter, categoricalValueReferenceIdsByVariablesIds.get(key));
+					envConditionCondition.append(" IN (:").append(environmentConditionCatIdsParameter).append(")");
+
+				} else {
+					final String environmentConditionValueParameter = "environmentConditionValue_" + key;
+					sqlQueryBuilder.setParameter(environmentConditionValueParameter, "%" + value + "%");
+					envConditionCondition.append(" LIKE :").append(environmentConditionValueParameter);
+
+				}
+
+				final String envDetailsSubQuery = String.format(ENVIRONMENT_BASE_SUBQUERY,
+					String.join(" ", envDetailsJoins),
+					String.join(" AND ", envConditionCondition.toString()));
 				sqlQueryBuilder.append(" AND study.project_id IN (").append(envDetailsSubQuery).append(") ");
 			});
 		}
