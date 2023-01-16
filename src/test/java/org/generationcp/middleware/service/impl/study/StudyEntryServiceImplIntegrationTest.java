@@ -64,7 +64,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 	private static final String ACCNO = "ACCNO";
 
 	@Autowired
-	private StudyEntryService service;
+	private StudyEntryService studyEntryService;
 
 	private IntegrationTestDataInitializer testDataInitializer;
 
@@ -93,7 +93,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testCountStudyEntries() {
 		final DmsProject study = this.createStudy();
 		this.createTestGermplasm(study.getProjectId());
-		Assert.assertEquals(NUMBER_OF_GERMPLASM.intValue(), this.service.countStudyEntries(study.getProjectId()));
+		Assert.assertEquals(NUMBER_OF_GERMPLASM.intValue(), this.studyEntryService.countStudyEntries(study.getProjectId()));
 	}
 
 	@Test
@@ -101,8 +101,8 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		this.createTestGermplasm(study.getProjectId());
 
-		this.service.deleteStudyEntries(study.getProjectId());
-		Assert.assertEquals(0, this.service.countStudyEntries(study.getProjectId()));
+		this.studyEntryService.deleteStudyEntries(study.getProjectId());
+		Assert.assertEquals(0, this.studyEntryService.countStudyEntries(study.getProjectId()));
 	}
 
 	@Test
@@ -125,9 +125,9 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		this.addGermplasmListDataDetail(germplasmListData2, TermId.ENTRY_TYPE.getId(),
 			SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeValue(), SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeCategoricalId());
 
-		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+		this.studyEntryService.saveStudyEntries(study.getProjectId(), germplasmList.getId());
 
-		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		final List<StudyEntryDto> studyEntries = this.studyEntryService.getStudyEntries(study.getProjectId());
 		assertThat(studyEntries, hasSize(2));
 
 		// Assert entry 1
@@ -157,9 +157,9 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		this.addGermplasmListData(germplasmList, germplasm1.getGid(), 1);
 		this.addGermplasmListData(germplasmList, germplasm2.getGid(), 2);
 
-		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+		this.studyEntryService.saveStudyEntries(study.getProjectId(), germplasmList.getId());
 
-		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		final List<StudyEntryDto> studyEntries = this.studyEntryService.getStudyEntries(study.getProjectId());
 		assertThat(studyEntries, hasSize(2));
 
 		// Assert entry 1
@@ -192,9 +192,9 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 
 		this.addGermplasmListData(germplasmList, germplasm2.getGid(), 2);
 
-		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+		this.studyEntryService.saveStudyEntries(study.getProjectId(), germplasmList.getId());
 
-		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		final List<StudyEntryDto> studyEntries = this.studyEntryService.getStudyEntries(study.getProjectId());
 		assertThat(studyEntries, hasSize(2));
 
 		// Assert entry 1
@@ -223,11 +223,11 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 			germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "Unknown", "LNAME", 0, null);
 		this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 
-		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+		this.studyEntryService.saveStudyEntries(study.getProjectId(), germplasmList.getId());
 
-		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		final List<StudyEntryDto> studyEntries = this.studyEntryService.getStudyEntries(study.getProjectId());
 
-		final Integer nextEntryNumber = this.service.getNextEntryNumber(study.getProjectId());
+		final Integer nextEntryNumber = this.studyEntryService.getNextEntryNumber(study.getProjectId());
 		final int expectedValue = studyEntries.get(0).getEntryNumber() + 1;
 		Assert.assertEquals(Integer.toString(expectedValue), nextEntryNumber.toString());
 	}
@@ -237,12 +237,12 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
 
-		Assert.assertTrue(this.service.hasUnassignedEntries(study.getProjectId()));
+		Assert.assertTrue(this.studyEntryService.hasUnassignedEntries(study.getProjectId()));
 		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(study.getProjectId());
 		this.addExperimentsForStocks(stocks, study);
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
-		Assert.assertFalse(this.service.hasUnassignedEntries(study.getProjectId()));
+		Assert.assertFalse(this.studyEntryService.hasUnassignedEntries(study.getProjectId()));
 	}
 
 	@Test
@@ -250,10 +250,10 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
 
-		final StudyEntryDto oldEntry = this.service.getStudyEntries(study.getProjectId()).get(1);
+		final StudyEntryDto oldEntry = this.studyEntryService.getStudyEntries(study.getProjectId()).get(1);
 		Assert.assertNotNull(oldEntry);
 		final Integer newGid = gids.get(0);
-		this.service.replaceStudyEntry(study.getProjectId(), oldEntry.getEntryId(), newGid);
+		this.studyEntryService.replaceStudyEntry(study.getProjectId(), oldEntry.getEntryId(), newGid);
 
 		final StockModel newEntry = this.daoFactory.getStockDao().getStocksForStudy(study.getProjectId()).stream()
 			.filter(stockModel -> stockModel.getGermplasm().getGid().equals(newGid) &&
@@ -276,10 +276,10 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
 
-		final StudyEntryDto dto = this.service.getStudyEntries(study.getProjectId()).get(1);
+		final StudyEntryDto dto = this.studyEntryService.getStudyEntries(study.getProjectId()).get(1);
 		Assert.assertNotNull(dto);
 		final Integer newGid = gids.get(0);
-		this.service.replaceStudyEntry(study.getProjectId(), dto.getEntryId() + 10, newGid);
+		this.studyEntryService.replaceStudyEntry(study.getProjectId(), dto.getEntryId() + 10, newGid);
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
@@ -287,10 +287,10 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
 
-		final StudyEntryDto dto = this.service.getStudyEntries(study.getProjectId()).get(1);
+		final StudyEntryDto dto = this.studyEntryService.getStudyEntries(study.getProjectId()).get(1);
 		Assert.assertNotNull(dto);
 		final Integer newGid = gids.get(0);
-		this.service.replaceStudyEntry(study.getProjectId() + 1, dto.getEntryId(), newGid);
+		this.studyEntryService.replaceStudyEntry(study.getProjectId() + 1, dto.getEntryId(), newGid);
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
@@ -298,9 +298,9 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		this.createTestGermplasm(study.getProjectId());
 
-		final StudyEntryDto dto = this.service.getStudyEntries(study.getProjectId()).get(1);
+		final StudyEntryDto dto = this.studyEntryService.getStudyEntries(study.getProjectId()).get(1);
 		Assert.assertNotNull(dto);
-		this.service.replaceStudyEntry(study.getProjectId() + 1, dto.getEntryId(), dto.getGid());
+		this.studyEntryService.replaceStudyEntry(study.getProjectId() + 1, dto.getEntryId(), dto.getGid());
 	}
 
 	@Test
@@ -318,18 +318,18 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getStockDao().save(new StockModel(study2.getProjectId(), this.createTestStudyEntry(1, germplasm1.getGid())));
 		this.daoFactory.getStockDao().save(new StockModel(study2.getProjectId(), this.createTestStudyEntry(2, germplasm2.getGid())));
 
-		this.service.replaceStudyEntries(Arrays.asList(germplasm1.getGid(), germplasm2.getGid()), targetGermplasm.getGid(),
+		this.studyEntryService.replaceStudyEntries(Arrays.asList(germplasm1.getGid(), germplasm2.getGid()), targetGermplasm.getGid(),
 			RandomStringUtils.randomAlphabetic(10));
 
 		this.sessionProvder.getSession().flush();
 
 		// Check if the study entries are replaced with the target germplasm id for the first study
-		final List<StudyEntryDto> studyEntries1 = this.service.getStudyEntries(study1.getProjectId());
+		final List<StudyEntryDto> studyEntries1 = this.studyEntryService.getStudyEntries(study1.getProjectId());
 		Assert.assertEquals(targetGermplasm.getGid(), studyEntries1.get(0).getGid());
 		Assert.assertEquals(targetGermplasm.getGid(), studyEntries1.get(1).getGid());
 
 		// Check if the study entries are replaced with the target germplasm id for the second study
-		final List<StudyEntryDto> studyEntries2 = this.service.getStudyEntries(study2.getProjectId());
+		final List<StudyEntryDto> studyEntries2 = this.studyEntryService.getStudyEntries(study2.getProjectId());
 		Assert.assertEquals(targetGermplasm.getGid(), studyEntries2.get(0).getGid());
 		Assert.assertEquals(targetGermplasm.getGid(), studyEntries2.get(1).getGid());
 
@@ -340,7 +340,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
 
-		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		final List<StudyEntryDto> studyEntries = this.studyEntryService.getStudyEntries(study.getProjectId());
 		int index = 0;
 		for (final StudyEntryDto dto : studyEntries) {
 			this.verifyStudyEntryDetails(gids.get(index), index + 1, dto);
@@ -353,7 +353,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudyWithGermplasmListAsociated();
 
 		final List<StudyEntryColumnDTO> columns =
-			this.service.getStudyEntryColumns(study.getProjectId(), null);
+			this.studyEntryService.getStudyEntryColumns(study.getProjectId(), null);
 		final StudyEntryColumnDTO aCCNONameTypeColumn =
 			columns.stream().filter(column -> //
 					column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO) && column.getTypeId() == null)
@@ -367,7 +367,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		this.studyDatasetService.updatePlotDatasetProperties(study.getProjectId(), plotDatasetPropertiesDTO, null);
 
 		final List<StudyEntryColumnDTO> updatedColumns =
-			this.service.getStudyEntryColumns(study.getProjectId(), null);
+			this.studyEntryService.getStudyEntryColumns(study.getProjectId(), null);
 
 		final StudyEntryColumnDTO selectedACCNONameTypeColumn = updatedColumns.stream().filter(column -> //
 				column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO) && column.getTypeId() == null)
@@ -384,7 +384,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		plotDatasetPropertiesDTO.setVariableIds(Collections.emptyList());
 		this.studyDatasetService.updatePlotDatasetProperties(study.getProjectId(), plotDatasetPropertiesDTO, null);
 
-		final List<StudyEntryColumnDTO> columns = this.service.getStudyEntryColumns(study.getProjectId(), null);
+		final List<StudyEntryColumnDTO> columns = this.studyEntryService.getStudyEntryColumns(study.getProjectId(), null);
 		StudyEntryColumnDTO aCCNONameTypeColumn =
 			columns.stream().filter( column -> //
 					column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO) && column.getTypeId() == null)
@@ -394,7 +394,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 
 		plotDatasetPropertiesDTO.setNameTypeIds(Collections.emptyList());
 		this.studyDatasetService.updatePlotDatasetProperties(study.getProjectId(), plotDatasetPropertiesDTO, null);
-		final List<StudyEntryColumnDTO> Updatedcolumns = this.service.getStudyEntryColumns(study.getProjectId(), null);
+		final List<StudyEntryColumnDTO> Updatedcolumns = this.studyEntryService.getStudyEntryColumns(study.getProjectId(), null);
 
 		aCCNONameTypeColumn =
 			Updatedcolumns.stream().filter(column -> column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO ) && column.getTypeId() == null).findFirst().get();
@@ -487,7 +487,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final Integer[] gids = this.germplasmTestDataGenerator.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, "PREFF", parentGermplasm);
 
 		final Integer listId = this.createGermplasmList(null, gids);
-		this.service.saveStudyEntries(study.getProjectId(), listId);
+		this.studyEntryService.saveStudyEntries(study.getProjectId(), listId);
 		return study;
 	}
 
