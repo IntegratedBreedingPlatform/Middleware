@@ -61,8 +61,7 @@ public interface GermplasmGroupingService {
 	 * @param parentGid
 	 * @param parentNames
 	 */
-	void copyParentalSelectionHistoryAtFixation(Germplasm germplasm, final Integer parentGid,
-		final List<BasicNameDTO> parentNames);
+	void copyParentalSelectionHistoryAtFixation(Germplasm germplasm, Integer parentGid, List<BasicNameDTO> parentNames);
 
 	/**
 	 * Get all group members where the given germplasm is a founder. For the
