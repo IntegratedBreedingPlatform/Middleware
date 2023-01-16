@@ -350,7 +350,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void updatePlotDatasetProperties_shouldAddNameType() {
-		final DmsProject study = this.createStudyWithGermplasmListAsociated();
+		final DmsProject study = this.createStudyWithGermplasmListAssociated();
 
 		final List<StudyEntryColumnDTO> columns =
 			this.studyEntryService.getStudyEntryColumns(study.getProjectId(), null);
@@ -377,7 +377,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testUpdatePlotDatasetProperties_shouldRemoveNameType(){
-		final DmsProject study = this.createStudyWithGermplasmListAsociated();
+		final DmsProject study = this.createStudyWithGermplasmListAssociated();
 
 		final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO = new PlotDatasetPropertiesDTO();
 		plotDatasetPropertiesDTO.setNameTypeIds(Arrays.asList(1));
@@ -480,7 +480,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		return study;
 	}
 
-	private DmsProject createStudyWithGermplasmListAsociated() {
+	private DmsProject createStudyWithGermplasmListAssociated() {
 		final DmsProject study = this.createStudy();
 
 		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
