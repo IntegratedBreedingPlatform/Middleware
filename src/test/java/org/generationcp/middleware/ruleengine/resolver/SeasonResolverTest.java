@@ -1,6 +1,5 @@
 package org.generationcp.middleware.ruleengine.resolver;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
@@ -25,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class SeasonResolverTest {
