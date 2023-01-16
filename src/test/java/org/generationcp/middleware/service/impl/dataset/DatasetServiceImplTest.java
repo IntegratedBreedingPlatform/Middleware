@@ -430,7 +430,7 @@ public class DatasetServiceImplTest {
 		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
 		assertThat(datasetDTO, equalTo(result));
 		Mockito.verify(this.dmsProjectDao)
-			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetTypeEnum.SUMMARY_DATA.getVariableTypes());
+			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetServiceImpl.ENVIRONMENT_DATASET_VARIABLE_TYPES);
 	}
 
 	@Test
@@ -440,7 +440,7 @@ public class DatasetServiceImplTest {
 		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
 		assertThat(datasetDTO, equalTo(result));
 		Mockito.verify(this.dmsProjectDao)
-			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetTypeEnum.MEANS_DATA.getVariableTypes());
+			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetServiceImpl.MEANS_DATASET_VARIABLE_TYPES);
 	}
 
 	@Test
@@ -451,7 +451,7 @@ public class DatasetServiceImplTest {
 		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
 		assertThat(datasetDTO, equalTo(result));
 		Mockito.verify(this.dmsProjectDao)
-			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getVariableTypes());
+			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetServiceImpl.SUMMARY_STATISTICS_DATASET_VARIABLE_TYPES);
 	}
 
 	@Test

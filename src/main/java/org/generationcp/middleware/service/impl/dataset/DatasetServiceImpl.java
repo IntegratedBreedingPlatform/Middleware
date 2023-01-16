@@ -121,12 +121,25 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.GERMPLASM_ATTRIBUTE.getId(),
 		VariableType.GERMPLASM_PASSPORT.getId());
 
+	protected static final List<Integer> ENVIRONMENT_DATASET_VARIABLE_TYPES = Lists.newArrayList(
+		VariableType.ENVIRONMENT_DETAIL.getId(),
+		VariableType.ENVIRONMENT_CONDITION.getId());
+
 	public static final List<Integer> OBSERVATION_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.OBSERVATION_UNIT.getId(),
 		VariableType.TRAIT.getId(),
 		VariableType.SELECTION_METHOD.getId(),
 		VariableType.GERMPLASM_DESCRIPTOR.getId(),
 		VariableType.ENTRY_DETAIL.getId());
+
+	protected static final List<Integer> MEANS_DATASET_VARIABLE_TYPES = Lists.newArrayList(
+		VariableType.ENVIRONMENT_DETAIL.getId(),
+		VariableType.GERMPLASM_DESCRIPTOR.getId(),
+		VariableType.ANALYSIS_SUMMARY.getId());
+
+	protected static final List<Integer> SUMMARY_STATISTICS_DATASET_VARIABLE_TYPES = Lists.newArrayList(
+		VariableType.ENVIRONMENT_DETAIL.getId(),
+		VariableType.ANALYSIS_SUMMARY.getId());
 
 	protected static final List<Integer> MEASUREMENT_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.TRAIT.getId(),
@@ -692,11 +705,14 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private List<Integer> resolveVariableTypes(final Integer datasetTypeId) {
-		final List<Integer> variableTypes = DatasetTypeEnum.get(datasetTypeId).getVariableTypes();
-		if (CollectionUtils.isEmpty(variableTypes)) {
-			return DatasetServiceImpl.OBSERVATION_DATASET_VARIABLE_TYPES;
+		if (DatasetTypeEnum.SUMMARY_DATA.getId() == datasetTypeId.intValue()) {
+			return DatasetServiceImpl.ENVIRONMENT_DATASET_VARIABLE_TYPES;
+		} else if (DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId() == datasetTypeId.intValue()) {
+			return DatasetServiceImpl.SUMMARY_STATISTICS_DATASET_VARIABLE_TYPES;
+		} else if (DatasetTypeEnum.MEANS_DATA.getId() == datasetTypeId.intValue()) {
+			return DatasetServiceImpl.MEANS_DATASET_VARIABLE_TYPES;
 		}
-		return variableTypes;
+		return DatasetServiceImpl.OBSERVATION_DATASET_VARIABLE_TYPES;
 	}
 
 	@Override
