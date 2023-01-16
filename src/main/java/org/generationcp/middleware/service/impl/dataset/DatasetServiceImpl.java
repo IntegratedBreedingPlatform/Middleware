@@ -3,11 +3,13 @@ package org.generationcp.middleware.service.impl.dataset;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.constant.ColumnLabels;
@@ -146,6 +148,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
+
+	@Autowired
+	private OntologyVariableService ontologyVariableService;
 
 	@Autowired
 	private ProgramService programService;
@@ -322,11 +327,14 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getProjectPropertyDAO().getByProjectId(environmentDataset.getProjectId()).stream()
 				.filter(prop -> termId == prop.getVariableId()).findFirst();
 
+		final Multimap<Integer, VariableType> variableTypeMultimap = this.ontologyVariableService.getVariableTypesOfVariables(Arrays.asList(termId));
+
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		measurementVariable.setName(cvTerm.getName());
 		measurementVariable.setAlias(variableAlias.isPresent() ? variableAlias.get().getAlias() : cvTerm.getName());
 		measurementVariable.setTermId(termId);
 		measurementVariable.setFactor(true);
+		measurementVariable.setVariableType(variableTypeMultimap.get(termId).iterator().next());
 		sortedColumns.add(positionColumn, measurementVariable);
 	}
 
