@@ -5,10 +5,13 @@ import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@AutoProperty
 public class AdvancingSource {
 
 	private BasicGermplasmDTO originGermplasm;
@@ -201,6 +204,21 @@ public class AdvancingSource {
 
 	public void addAdvancedGermplasm(final Germplasm advancedGermplasm) {
 		this.advancedGermplasms.add(advancedGermplasm);
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 
 }
