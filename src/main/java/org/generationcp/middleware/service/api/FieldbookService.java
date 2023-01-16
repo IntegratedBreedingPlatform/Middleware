@@ -480,15 +480,6 @@ public interface FieldbookService {
 	Map<Integer, List<Name>> getNamesByGids(List<Integer> gids);
 
 	/**
-	 * Returns a map of Gid, and list of Names.
-	 *
-	 * @param gids
-	 *            the gids
-	 * @return the names by gids
-	 */
-	Map<Integer, List<BasicNameDTO>> getNamesByGids(Set<Integer> gids);
-
-	/**
 	 * Count germplasm list data by list id.
 	 *
 	 * @param listId
