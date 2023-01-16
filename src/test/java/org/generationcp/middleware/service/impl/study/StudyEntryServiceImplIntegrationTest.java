@@ -545,13 +545,17 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmList.setProgramUUID(programUUID);
 
 		// Germplasm list data
-		final List<GermplasmListData> germplasmListData = new ArrayList<>();
+		final List<GermplasmListData> germplasmListDataList = new ArrayList<>();
 		for (int i = 0; i < DataSetupTest.NUMBER_OF_GERMPLASM; i++) {
-			germplasmListData.add(new GermplasmListData(null, germplasmList, gids[i], i,
+			germplasmListDataList.add(new GermplasmListData(null, germplasmList, gids[i], i,
 				DataSetupTest.GERMPLSM_PREFIX + i + " Source",
 				DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));
 		}
-		this.germplasmListService.addGermplasmListData(germplasmListData);
+
+		germplasmListDataList.forEach((germplasmListData) -> {
+			germplasmListData.truncateGroupNameIfNeeded();
+			final GermplasmListData recordSaved = this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
+		});
 		return germplasmList.getId();
 	}
 
