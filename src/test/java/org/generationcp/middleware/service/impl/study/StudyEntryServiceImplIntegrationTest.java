@@ -354,12 +354,12 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final List<StudyEntryColumnDTO> columns =
 			this.studyEntryService.getStudyEntryColumns(study.getProjectId(), null);
-		final StudyEntryColumnDTO aCCNONameTypeColumn =
+		final StudyEntryColumnDTO accNoNameTypeColumn =
 			columns.stream().filter(column -> //
 					column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO) && column.getTypeId() == null)
 				.findFirst().get();
 
-		Assert.assertFalse(aCCNONameTypeColumn.isSelected());
+		Assert.assertFalse(accNoNameTypeColumn.isSelected());
 
 		final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO = new PlotDatasetPropertiesDTO();
 		plotDatasetPropertiesDTO.setNameTypeIds(Arrays.asList(1));
@@ -385,20 +385,20 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		this.studyDatasetService.updatePlotDatasetProperties(study.getProjectId(), plotDatasetPropertiesDTO, null);
 
 		final List<StudyEntryColumnDTO> columns = this.studyEntryService.getStudyEntryColumns(study.getProjectId(), null);
-		StudyEntryColumnDTO aCCNONameTypeColumn =
+		StudyEntryColumnDTO accNoNameTypeColumn =
 			columns.stream().filter( column -> //
 					column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO) && column.getTypeId() == null)
 				.findFirst().get();
 
-		Assert.assertTrue(aCCNONameTypeColumn.isSelected());
+		Assert.assertTrue(accNoNameTypeColumn.isSelected());
 
 		plotDatasetPropertiesDTO.setNameTypeIds(Collections.emptyList());
 		this.studyDatasetService.updatePlotDatasetProperties(study.getProjectId(), plotDatasetPropertiesDTO, null);
 		final List<StudyEntryColumnDTO> Updatedcolumns = this.studyEntryService.getStudyEntryColumns(study.getProjectId(), null);
 
-		aCCNONameTypeColumn =
+		accNoNameTypeColumn =
 			Updatedcolumns.stream().filter(column -> column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO ) && column.getTypeId() == null).findFirst().get();
-		Assert.assertFalse(aCCNONameTypeColumn.isSelected());
+		Assert.assertFalse(accNoNameTypeColumn.isSelected());
 	}
 
 	private void verifyStudyEntryDetails(final Integer gid, final int index, final StudyEntryDto dto) {
