@@ -15,7 +15,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSourceList;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSourceList;
 import org.generationcp.middleware.ruleengine.pojo.ImportedCross;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
 
@@ -35,7 +35,7 @@ public interface DeprecatedNamingConventionService {
 	/*
 	* Generated the names for the list of crosses based on on rules setup for the breeding methods
 	*/
-	List<ImportedCross> generateCrossesList(List<ImportedCross> importedCrosses, AdvancingSourceList rows, boolean checkForDuplicateName,
+	List<ImportedCross> generateCrossesList(List<ImportedCross> importedCrosses, DeprecatedAdvancingSourceList rows, boolean checkForDuplicateName,
 		Workbook workbook, List<Integer> gids) throws RuleException;
 
 }

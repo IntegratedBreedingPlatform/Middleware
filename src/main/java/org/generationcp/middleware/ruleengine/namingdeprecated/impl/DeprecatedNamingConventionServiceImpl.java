@@ -17,7 +17,7 @@ import org.generationcp.middleware.ruleengine.namingdeprecated.rules.DeprecatedN
 import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedNamingConventionService;
 import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
-import org.generationcp.middleware.ruleengine.pojo.AdvancingSourceList;
+import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSourceList;
 import org.generationcp.middleware.ruleengine.pojo.ImportedCross;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
 import org.generationcp.middleware.ruleengine.service.RulesService;
@@ -113,7 +113,7 @@ public class DeprecatedNamingConventionServiceImpl implements DeprecatedNamingCo
 	}
 
 	@Override
-	public List<ImportedCross> generateCrossesList(final List<ImportedCross> importedCrosses, final AdvancingSourceList rows,
+	public List<ImportedCross> generateCrossesList(final List<ImportedCross> importedCrosses, final DeprecatedAdvancingSourceList rows,
 		final boolean checkForDuplicateName, final Workbook workbook, final List<Integer> gids) throws RuleException {
 
 		final List<Method> methodList = this.fieldbookMiddlewareService.getAllBreedingMethods(false);
