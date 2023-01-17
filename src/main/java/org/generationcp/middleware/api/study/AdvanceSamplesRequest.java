@@ -11,32 +11,12 @@ public class AdvanceSamplesRequest extends AbstractAdvanceRequest {
 	 */
 	private Integer breedingMethodId;
 
-	// TODO: what it's the purpose of selecting a date 'cause currently (old advance) we are not doing anything with the date
-	private Integer harvestYear;
-	private Integer harvestMonth;
-
 	public Integer getBreedingMethodId() {
 		return breedingMethodId;
 	}
 
 	public void setBreedingMethodId(final Integer breedingMethodId) {
 		this.breedingMethodId = breedingMethodId;
-	}
-
-	public Integer getHarvestYear() {
-		return harvestYear;
-	}
-
-	public void setHarvestYear(final Integer harvestYear) {
-		this.harvestYear = harvestYear;
-	}
-
-	public Integer getHarvestMonth() {
-		return harvestMonth;
-	}
-
-	public void setHarvestMonth(final Integer harvestMonth) {
-		this.harvestMonth = harvestMonth;
 	}
 
 	@Override
