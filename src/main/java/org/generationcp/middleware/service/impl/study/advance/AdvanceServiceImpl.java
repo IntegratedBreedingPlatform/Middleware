@@ -306,7 +306,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 			final Integer plantNumberVariableId = this.getVariableId(PLANT_NUMBER_VARIABLE_NAME);
 			advancingSources.forEach(advancingSource -> {
 				final AtomicInteger selectionNumber = new AtomicInteger(1);
-				advancingSource.getAdvancedGermplasms().forEach(germplasm -> {
+				advancingSource.getAdvancedGermplasm().forEach(germplasm -> {
 
 					// inherit 'selection history at fixation' and code names of parent if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {

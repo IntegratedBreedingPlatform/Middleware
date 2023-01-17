@@ -59,7 +59,7 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 				if (generatedName.length() > NAME_MAX_LENGTH) {
 					throw new MiddlewareQueryException("error.save.resulting.name.exceeds.limit");
 				}
-				final Germplasm germplasm = advancingSource.getAdvancedGermplasms().get(i);
+				final Germplasm germplasm = advancingSource.getAdvancedGermplasm().get(i);
 				final Name derivativeName =
 					new Name(null, germplasm, GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), 1, generatedName,
 						germplasm.getLocationId(), germplasm.getGdate(), 0);

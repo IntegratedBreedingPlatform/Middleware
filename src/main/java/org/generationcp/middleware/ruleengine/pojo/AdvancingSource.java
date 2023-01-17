@@ -36,7 +36,7 @@ public class AdvancingSource {
 	private String rootName;
 	private Integer rootNameType;
 
-	private List<Germplasm> advancedGermplasms = new ArrayList<>();
+	private List<Germplasm> advancedGermplasm = new ArrayList<>();
 
 	// These are only used by crosses generation process. Remove them once cross process will be redo it
 	private int maleGid;
@@ -150,8 +150,8 @@ public class AdvancingSource {
 		this.rootNameType = rootNameType;
 	}
 
-	public List<Germplasm> getAdvancedGermplasms() {
-		return advancedGermplasms;
+	public List<Germplasm> getAdvancedGermplasm() {
+		return advancedGermplasm;
 	}
 
 	public int getMaleGid() {
@@ -203,7 +203,7 @@ public class AdvancingSource {
 	}
 
 	public void addAdvancedGermplasm(final Germplasm advancedGermplasm) {
-		this.advancedGermplasms.add(advancedGermplasm);
+		this.advancedGermplasm.add(advancedGermplasm);
 	}
 
 	@Override
