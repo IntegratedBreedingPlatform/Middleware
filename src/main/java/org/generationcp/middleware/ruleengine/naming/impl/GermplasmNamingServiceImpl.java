@@ -23,14 +23,13 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 	}
 
 	@Override
-	public int getNextNumberAndIncrementSequenceWithoutHibernate(final String keyPrefix) {
-		final int nextSequence = this.getNextSequenceWithoutHibernate(keyPrefix);
+	public int getNextNumberAndIncrementSequenceUsingNativeSQL(final String keyPrefix) {
+		final int nextSequence = this.getNextSequenceUsingNativeSQL(keyPrefix);
 		this.keySequenceRegisterService.saveLastSequenceUsedWithoutHibernate(keyPrefix, nextSequence);
 		return nextSequence;
 	}
 
-	// TODO: rename me!
-	private int getNextSequenceWithoutHibernate(final String keyPrefix) {
+	private int getNextSequenceUsingNativeSQL(final String keyPrefix) {
 		if (!StringUtils.isEmpty(keyPrefix)) {
 			final int nextSequenceNumber = this.keySequenceRegisterService.getNextSequenceWithoutHibernate(keyPrefix.trim());
 			if (nextSequenceNumber > 1) {

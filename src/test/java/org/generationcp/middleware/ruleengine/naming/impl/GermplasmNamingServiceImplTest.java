@@ -1,13 +1,11 @@
 package org.generationcp.middleware.ruleengine.naming.impl;
 
-import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -60,7 +58,7 @@ public class GermplasmNamingServiceImplTest {
 
 	@Test
 	public void testGetNextNumberAndIncrementSequence() {
-		final int nextNumber = this.germplasmNamingService.getNextNumberAndIncrementSequenceWithoutHibernate(PREFIX);
+		final int nextNumber = this.germplasmNamingService.getNextNumberAndIncrementSequenceUsingNativeSQL(PREFIX);
 		Assert.assertEquals(GermplasmNamingServiceImplTest.NEXT_NUMBER.intValue(), nextNumber);
 		Mockito.verify(this.keySequenceRegisterService).getNextSequenceWithoutHibernate(PREFIX);
 		Mockito.verify(this.keySequenceRegisterService).saveLastSequenceUsedWithoutHibernate(PREFIX, nextNumber);

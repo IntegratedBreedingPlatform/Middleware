@@ -38,7 +38,7 @@ public class PaddedSequenceExpressionTest extends TestExpression {
 		this.expression.setGermplasmNamingService(this.germplasmNamingService);
 
 		Mockito.doReturn(NEXT_NUMBER_FROM_DB, NEXT_NUMBER_FROM_DB + 1, NEXT_NUMBER_FROM_DB + 2, NEXT_NUMBER_FROM_DB + 3,
-			NEXT_NUMBER_FROM_DB + 4).when(this.germplasmNamingService).getNextNumberAndIncrementSequenceWithoutHibernate(
+			NEXT_NUMBER_FROM_DB + 4).when(this.germplasmNamingService).getNextNumberAndIncrementSequenceUsingNativeSQL(
 			ArgumentMatchers.anyString());
 		Mockito
 			.doReturn("0" + NEXT_NUMBER_FROM_DB, "0" + (NEXT_NUMBER_FROM_DB + 1), "0" + (NEXT_NUMBER_FROM_DB + 2),
@@ -115,7 +115,7 @@ public class PaddedSequenceExpressionTest extends TestExpression {
 		this.expression.apply(values, source, null);
 		assertEquals(PLANTS_SELECTED.intValue(), values.size());
 		Mockito.verify(this.germplasmNamingService, Mockito.times(PLANTS_SELECTED))
-			.getNextNumberAndIncrementSequenceWithoutHibernate(ROOT_NAME + SEPARATOR + PREFIX);
+			.getNextNumberAndIncrementSequenceUsingNativeSQL(ROOT_NAME + SEPARATOR + PREFIX);
 		Mockito.verify(this.germplasmNamingService, Mockito.times(PLANTS_SELECTED))
 			.getNumberWithLeadingZeroesAsString(ArgumentMatchers.anyInt(), ArgumentMatchers.eq(ExpressionUtils.DEFAULT_LENGTH));
 

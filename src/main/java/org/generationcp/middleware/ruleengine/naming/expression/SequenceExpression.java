@@ -48,7 +48,7 @@ public class SequenceExpression extends BaseExpression implements Expression {
 						if (matcher.find()) {
 							final String keyPrefix = upperCaseValue.substring(0, matcher.start());
 							final int nextNumberInSequence =
-								this.germplasmNamingService.getNextNumberAndIncrementSequenceWithoutHibernate(keyPrefix);
+								this.germplasmNamingService.getNextNumberAndIncrementSequenceUsingNativeSQL(keyPrefix);
 							final String numberString = this.germplasmNamingService
 								.getNumberWithLeadingZeroesAsString(nextNumberInSequence, this.getNumberOfDigits(value));
 
