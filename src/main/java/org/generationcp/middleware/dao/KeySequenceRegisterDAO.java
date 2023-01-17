@@ -33,8 +33,7 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 		return null;
 	}
 
-	// TODO: rename me!
-	public Integer getByPrefixWithoutHibernate(final String keyPrefix){
+	public Integer getByPrefixUsingNativeSQL(final String keyPrefix){
 		if (keyPrefix != null) {
 			/*
 			 *  There can be multiple results (eg. same prefix but both null and empty string suffix will be returned from DB)
@@ -59,9 +58,8 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 		return 1;
 	}
 
-	// TODO: rename me!
-	public int getNextSequenceWithoutHibernate(final String keyPrefix) {
-		final Integer lastUsedSequence = this.getByPrefixWithoutHibernate(keyPrefix);
+	public int getNextSequenceUsingNativeSQL(final String keyPrefix) {
+		final Integer lastUsedSequence = this.getByPrefixUsingNativeSQL(keyPrefix);
 
 		if (lastUsedSequence != null) {
 			return lastUsedSequence + 1;
@@ -84,17 +82,16 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 		}
 	}
 
-//	// TODO: rename me
-	public int incrementAndGetNextSequenceWithoutHibernate(final String keyPrefix) {
+	public int incrementAndGetNextSequenceUsingNativeSQL(final String keyPrefix) {
 
-		final Integer lastUsedSequence = this.getByPrefixWithoutHibernate(keyPrefix);
+		final Integer lastUsedSequence = this.getByPrefixUsingNativeSQL(keyPrefix);
 
 		if (lastUsedSequence != null) {
 			final int newLastUsedSequence = lastUsedSequence + 1;
-			this.updateLastSequenceWithoutHibernate(keyPrefix, newLastUsedSequence);
+			this.updateLastSequenceUsingNativeSQL(keyPrefix, newLastUsedSequence);
 			return newLastUsedSequence;
 		} else {
-			this.createKeySequenceRegisterWithoutHibernate(keyPrefix, 1);
+			this.createKeySequenceRegisterUsingNativeSQL(keyPrefix, 1);
 			return 1;
 		}
 	}
@@ -114,17 +111,16 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 		}
 	}
 
-	// TODO: rename me!
-	public void saveLastSequenceUsedWithoutHibernate(final String keyPrefix, final Integer lastSequence) {
+	public void saveLastSequenceUsedUsingNativeSQL(final String keyPrefix, final Integer lastSequence) {
 
-		final Integer lastUsedSequence = this.getByPrefixWithoutHibernate(keyPrefix);
+		final Integer lastUsedSequence = this.getByPrefixUsingNativeSQL(keyPrefix);
 
 		if (lastUsedSequence != null) {
 			if (lastSequence > lastUsedSequence) {
-				this.updateLastSequenceWithoutHibernate(keyPrefix, lastSequence);
+				this.updateLastSequenceUsingNativeSQL(keyPrefix, lastSequence);
 			}
 		} else {
-			this.createKeySequenceRegisterWithoutHibernate(keyPrefix, lastSequence);
+			this.createKeySequenceRegisterUsingNativeSQL(keyPrefix, lastSequence);
 		}
 	}
 
@@ -143,7 +139,7 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 		}
 	}
 
-	private void updateLastSequenceWithoutHibernate(final String keyPrefix, final Integer lastSequence) {
+	private void updateLastSequenceUsingNativeSQL(final String keyPrefix, final Integer lastSequence) {
 		final String sql = "UPDATE key_sequence_register SET last_used_sequence = :lastSequence WHERE key_prefix = :keyPrefix";
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
 		query.setParameter("keyPrefix", keyPrefix);
@@ -151,7 +147,7 @@ public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, Stri
 		query.executeUpdate();
 	}
 
-	private void createKeySequenceRegisterWithoutHibernate(final String keyPrefix, final Integer lastSequence) {
+	private void createKeySequenceRegisterUsingNativeSQL(final String keyPrefix, final Integer lastSequence) {
 		final String sql = "INSERT INTO key_sequence_register (key_prefix, last_used_sequence, optimistic_lock_number) VALUES ('"
 			+ keyPrefix + "', " + lastSequence + ", 0)";
 		this.getSession().createSQLQuery(sql).executeUpdate();

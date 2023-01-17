@@ -35,7 +35,7 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
 	public int incrementAndGetNextSequenceWithoutHibernate(final String keyPrefix) {
-		return this.keySequenceRegisterDAO.incrementAndGetNextSequenceWithoutHibernate(keyPrefix);
+		return this.keySequenceRegisterDAO.incrementAndGetNextSequenceUsingNativeSQL(keyPrefix);
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
 	public int getNextSequenceWithoutHibernate(final String keyPrefix) {
-		return this.keySequenceRegisterDAO.getNextSequenceWithoutHibernate(keyPrefix);
+		return this.keySequenceRegisterDAO.getNextSequenceUsingNativeSQL(keyPrefix);
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void saveLastSequenceUsedWithoutHibernate(final String keyPrefix, final Integer lastSequenceUsed) {
-		this.keySequenceRegisterDAO.saveLastSequenceUsedWithoutHibernate(keyPrefix, lastSequenceUsed);
+		this.keySequenceRegisterDAO.saveLastSequenceUsedUsingNativeSQL(keyPrefix, lastSequenceUsed);
 	}
 
 	@Override
