@@ -3,11 +3,13 @@ package org.generationcp.middleware.domain.workbench;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.generationcp.middleware.pojos.workbench.Permission;
+import org.generationcp.middleware.service.api.user.RoleTypeDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @AutoProperty
 public class PermissionDto {
@@ -19,6 +21,9 @@ public class PermissionDto {
 	private String description;
 
 	private Integer parentId;
+
+	@JsonIgnore
+	private Map<RoleTypeDto, Boolean> roleTypeSelectableMap;
 
 	@JsonIgnore
 	private Integer workbenchCategoryLinkId;
@@ -98,6 +103,15 @@ public class PermissionDto {
 
 	public void addChild(final PermissionDto permissionDto) {
 		this.children.add(permissionDto);
+	}
+
+	public Map<RoleTypeDto, Boolean> getRoleTypeSelectableMap() {
+		return roleTypeSelectableMap;
+	}
+
+	public void setRoleTypeSelectableMap(
+		final Map<RoleTypeDto, Boolean> roleTypeSelectableMap) {
+		this.roleTypeSelectableMap = roleTypeSelectableMap;
 	}
 
 	@Override

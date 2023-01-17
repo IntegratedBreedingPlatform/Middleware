@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
 			user.setAssignDate(currentDate);
 			user.setCloseDate(currentDate);
 			user.setInstalid(0);
-			user.setStatus(userDto.getStatus().equals("true") ? 0 : 1);
+			user.setStatus(userDto.getActive() ? 0 : 1);
 			user.setType(0);
 			user.setMultiFactorAuthenticationEnabled(userDto.isMultiFactorAuthenticationEnabled());
 
@@ -180,7 +180,7 @@ public class UserServiceImpl implements UserService {
 			user.setName(userDto.getUsername());
 			user.setAssignDate(currentDate);
 			user.setCloseDate(currentDate);
-			user.setStatus(userDto.getStatus().equals("true") ? 0 : 1);
+			user.setStatus(userDto.getActive() ? 0 : 1);
 			user.setMultiFactorAuthenticationEnabled(userDto.isMultiFactorAuthenticationEnabled());
 
 			final List<UserRole> userRoles = new ArrayList<>();
@@ -353,11 +353,6 @@ public class UserServiceImpl implements UserService {
 			this.workbenchDaoFactory.getPermissionDAO().getPermissions(user.getUserid(), cropName, programId);
 		user.setPermissions(permissions);
 		return user;
-	}
-
-	@Override
-	public List<WorkbenchUser> getUsersWithRole(final int roleId) {
-		return this.workbenchDaoFactory.getUserRoleDao().getUsersByRoleId(roleId);
 	}
 
 	@Override

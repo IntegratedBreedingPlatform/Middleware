@@ -10,6 +10,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleDto;
+import org.generationcp.middleware.service.api.user.RoleTypeDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.hibernate.Criteria;
@@ -340,7 +341,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 				users.add(new UserDto((Integer) item.get(ProgramEligibleUsersQuery.USER_ID),
 					(String) item.get(ProgramEligibleUsersQuery.USERNAME),
 					(String) item.get(ProgramEligibleUsersQuery.FIRST_NAME), (String) item.get(ProgramEligibleUsersQuery.LAST_NAME), null,
-					"true", (String) item.get(ProgramEligibleUsersQuery.EMAIL)));
+					Boolean.TRUE, (String) item.get(ProgramEligibleUsersQuery.EMAIL)));
 			}
 			return users;
 
@@ -367,6 +368,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			query.addScalar(ProgramMembersQuery.ROLE_ID);
 			query.addScalar(ProgramMembersQuery.ROLE_NAME);
 			query.addScalar(ProgramMembersQuery.ROLE_DESCRIPTION);
+			query.addScalar(ProgramMembersQuery.ROLE_TYPE_ID);
 			query.addScalar(ProgramMembersQuery.ROLE_TYPE_NAME);
 			query.addScalar(ProgramMembersQuery.ROLE_ACTIVE);
 
@@ -378,7 +380,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			for (final Map<String, Object> item : queryResults) {
 				final RoleDto roleDto = new RoleDto((Integer) item
 					.get(ProgramMembersQuery.ROLE_ID), (String) item.get(ProgramMembersQuery.ROLE_NAME),
-					(String) item.get(ProgramMembersQuery.ROLE_DESCRIPTION), (String) item.get(ProgramMembersQuery.ROLE_TYPE_NAME),
+					(String) item.get(ProgramMembersQuery.ROLE_DESCRIPTION), new RoleTypeDto((Integer) item.get(ProgramMembersQuery.ROLE_TYPE_ID), (String) item.get(ProgramMembersQuery.ROLE_TYPE_NAME)),
 					(Boolean) item.get(ProgramMembersQuery.ROLE_ACTIVE), null, null);
 				final ProgramMemberDto programMemberDto =
 					new ProgramMemberDto((Integer) item.get(ProgramMembersQuery.USER_ID), (String) item.get(ProgramMembersQuery.USERNAME),
