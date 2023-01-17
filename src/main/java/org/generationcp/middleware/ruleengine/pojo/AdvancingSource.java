@@ -18,7 +18,7 @@ public class AdvancingSource {
 	private List<BasicNameDTO> names;
 	private ObservationUnitRow plotObservation;
 
-	//This will be used if we have trail
+	//This will be used if we have trial
 	private ObservationUnitRow trialInstanceObservation;
 
 	private Method breedingMethod;
