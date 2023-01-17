@@ -33,7 +33,7 @@ public class DoubleHaploidSourceExpressionTest extends TestExpression {
 
 		final List<StringBuilder> values = this.createInitialValues("(CML454 X CML451)-B-3-1-1@0", source);
 
-		Mockito.when(this.keySequenceRegisterService.incrementAndGetNextSequenceWithoutHibernate("(CML454 X CML451)-B-3-1-1@")).thenReturn(25);
+		Mockito.when(this.keySequenceRegisterService.incrementAndGetNextSequenceUsingNativeSQL("(CML454 X CML451)-B-3-1-1@")).thenReturn(25);
 
 		doubleHaploidSourceExpression.apply(values, source, null);
 

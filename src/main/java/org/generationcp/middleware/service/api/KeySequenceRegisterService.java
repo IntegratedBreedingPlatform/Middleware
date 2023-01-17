@@ -48,7 +48,7 @@ public interface KeySequenceRegisterService {
 	 * <strong>HibernateOptimisticLockingFailureException</strong> to occur. This is a re-triable exception. Callers can catch it and
 	 * operation can be retried.
 	 */
-	int incrementAndGetNextSequenceWithoutHibernate(String keyPrefix);
+	int incrementAndGetNextSequenceUsingNativeSQL(String keyPrefix);
 
 	/**
 	 * Finds next available sequence number for a given the keyPrefix in key sequence registry
@@ -72,8 +72,7 @@ public interface KeySequenceRegisterService {
 	 * operation can be retried.
 	 *
 	 */
-	// TODO: rename me!
-	int getNextSequenceWithoutHibernate(String keyPrefix);
+	int getNextSequenceUsingNativeSQL(String keyPrefix);
 
 	/**
 	 * If keyPrefix exists in key sequence registry, update the last sequence number
@@ -109,7 +108,7 @@ public interface KeySequenceRegisterService {
 	 * @param keyPrefix
 	 * @param lastSequenceUsed
 	 */
-	void saveLastSequenceUsedWithoutHibernate(String keyPrefix, Integer lastSequenceUsed);
+	void saveLastSequenceUsedUsingNativeSQL(String keyPrefix, Integer lastSequenceUsed);
 
 	/**
 	 * Deletes the KeySequenceRegister entries given the Key Prefixes

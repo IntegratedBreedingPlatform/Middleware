@@ -32,7 +32,7 @@ public class GermplasmNamingServiceImplTest {
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		this.germplasmNameSetting = this.createGermplasmNameSetting();
-		Mockito.doReturn(NEXT_NUMBER).when(this.keySequenceRegisterService).getNextSequenceWithoutHibernate(PREFIX);
+		Mockito.doReturn(NEXT_NUMBER).when(this.keySequenceRegisterService).getNextSequenceUsingNativeSQL(PREFIX);
 	}
 
 	@Test
@@ -60,8 +60,8 @@ public class GermplasmNamingServiceImplTest {
 	public void testGetNextNumberAndIncrementSequence() {
 		final int nextNumber = this.germplasmNamingService.getNextNumberAndIncrementSequenceUsingNativeSQL(PREFIX);
 		Assert.assertEquals(GermplasmNamingServiceImplTest.NEXT_NUMBER.intValue(), nextNumber);
-		Mockito.verify(this.keySequenceRegisterService).getNextSequenceWithoutHibernate(PREFIX);
-		Mockito.verify(this.keySequenceRegisterService).saveLastSequenceUsedWithoutHibernate(PREFIX, nextNumber);
+		Mockito.verify(this.keySequenceRegisterService).getNextSequenceUsingNativeSQL(PREFIX);
+		Mockito.verify(this.keySequenceRegisterService).saveLastSequenceUsedUsingNativeSQL(PREFIX, nextNumber);
 		Mockito.verifyZeroInteractions(this.germplasmDataManager);
 	}
 
