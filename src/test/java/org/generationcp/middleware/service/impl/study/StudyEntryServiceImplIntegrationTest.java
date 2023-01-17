@@ -5,12 +5,15 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -23,6 +26,8 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
@@ -32,10 +37,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -54,9 +61,10 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 	private static final String ENTRYCODE = "ENTRYCODE-";
 	private static final String CROSS = "ABC/XYZ-";
 	private static final String SEEDSOURCE = "SEEDSOURCE-";
+	private static final String ACCNO = "ACCNO";
 
 	@Autowired
-	private StudyEntryService service;
+	private StudyEntryService studyEntryService;
 
 	private IntegrationTestDataInitializer testDataInitializer;
 
@@ -64,11 +72,20 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private DaoFactory daoFactory;
 
+	@Autowired
+	private GermplasmListManager germplasmListManager;
+
+	@Autowired
+	private GermplasmListService germplasmListService;
+
+	@Autowired
+	private DatasetService studyDatasetService;
+
 	@Before
 	public void setup() {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, this.daoFactory);
 
 	}
 
@@ -76,7 +93,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testCountStudyEntries() {
 		final DmsProject study = this.createStudy();
 		this.createTestGermplasm(study.getProjectId());
-		Assert.assertEquals(NUMBER_OF_GERMPLASM.intValue(), this.service.countStudyEntries(study.getProjectId()));
+		Assert.assertEquals(NUMBER_OF_GERMPLASM.intValue(), this.studyEntryService.countStudyEntries(study.getProjectId()));
 	}
 
 	@Test
@@ -84,8 +101,8 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		this.createTestGermplasm(study.getProjectId());
 
-		this.service.deleteStudyEntries(study.getProjectId());
-		Assert.assertEquals(0, this.service.countStudyEntries(study.getProjectId()));
+		this.studyEntryService.deleteStudyEntries(study.getProjectId());
+		Assert.assertEquals(0, this.studyEntryService.countStudyEntries(study.getProjectId()));
 	}
 
 	@Test
@@ -108,9 +125,9 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		this.addGermplasmListDataDetail(germplasmListData2, TermId.ENTRY_TYPE.getId(),
 			SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeValue(), SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeCategoricalId());
 
-		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+		this.studyEntryService.saveStudyEntries(study.getProjectId(), germplasmList.getId());
 
-		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		final List<StudyEntryDto> studyEntries = this.studyEntryService.getStudyEntries(study.getProjectId());
 		assertThat(studyEntries, hasSize(2));
 
 		// Assert entry 1
@@ -140,9 +157,9 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		this.addGermplasmListData(germplasmList, germplasm1.getGid(), 1);
 		this.addGermplasmListData(germplasmList, germplasm2.getGid(), 2);
 
-		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+		this.studyEntryService.saveStudyEntries(study.getProjectId(), germplasmList.getId());
 
-		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		final List<StudyEntryDto> studyEntries = this.studyEntryService.getStudyEntries(study.getProjectId());
 		assertThat(studyEntries, hasSize(2));
 
 		// Assert entry 1
@@ -175,9 +192,9 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 
 		this.addGermplasmListData(germplasmList, germplasm2.getGid(), 2);
 
-		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+		this.studyEntryService.saveStudyEntries(study.getProjectId(), germplasmList.getId());
 
-		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		final List<StudyEntryDto> studyEntries = this.studyEntryService.getStudyEntries(study.getProjectId());
 		assertThat(studyEntries, hasSize(2));
 
 		// Assert entry 1
@@ -206,11 +223,11 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 			germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "Unknown", "LNAME", 0, null);
 		this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 
-		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+		this.studyEntryService.saveStudyEntries(study.getProjectId(), germplasmList.getId());
 
-		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		final List<StudyEntryDto> studyEntries = this.studyEntryService.getStudyEntries(study.getProjectId());
 
-		final Integer nextEntryNumber = this.service.getNextEntryNumber(study.getProjectId());
+		final Integer nextEntryNumber = this.studyEntryService.getNextEntryNumber(study.getProjectId());
 		final int expectedValue = studyEntries.get(0).getEntryNumber() + 1;
 		Assert.assertEquals(Integer.toString(expectedValue), nextEntryNumber.toString());
 	}
@@ -220,12 +237,12 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
 
-		Assert.assertTrue(this.service.hasUnassignedEntries(study.getProjectId()));
+		Assert.assertTrue(this.studyEntryService.hasUnassignedEntries(study.getProjectId()));
 		final List<StockModel> stocks = this.daoFactory.getStockDao().getStocksForStudy(study.getProjectId());
 		this.addExperimentsForStocks(stocks, study);
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
-		Assert.assertFalse(this.service.hasUnassignedEntries(study.getProjectId()));
+		Assert.assertFalse(this.studyEntryService.hasUnassignedEntries(study.getProjectId()));
 	}
 
 	@Test
@@ -233,10 +250,10 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
 
-		final StudyEntryDto oldEntry = this.service.getStudyEntries(study.getProjectId()).get(1);
+		final StudyEntryDto oldEntry = this.studyEntryService.getStudyEntries(study.getProjectId()).get(1);
 		Assert.assertNotNull(oldEntry);
 		final Integer newGid = gids.get(0);
-		this.service.replaceStudyEntry(study.getProjectId(), oldEntry.getEntryId(), newGid);
+		this.studyEntryService.replaceStudyEntry(study.getProjectId(), oldEntry.getEntryId(), newGid);
 
 		final StockModel newEntry = this.daoFactory.getStockDao().getStocksForStudy(study.getProjectId()).stream()
 			.filter(stockModel -> stockModel.getGermplasm().getGid().equals(newGid) &&
@@ -259,10 +276,10 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
 
-		final StudyEntryDto dto = this.service.getStudyEntries(study.getProjectId()).get(1);
+		final StudyEntryDto dto = this.studyEntryService.getStudyEntries(study.getProjectId()).get(1);
 		Assert.assertNotNull(dto);
 		final Integer newGid = gids.get(0);
-		this.service.replaceStudyEntry(study.getProjectId(), dto.getEntryId() + 10, newGid);
+		this.studyEntryService.replaceStudyEntry(study.getProjectId(), dto.getEntryId() + 10, newGid);
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
@@ -270,10 +287,10 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
 
-		final StudyEntryDto dto = this.service.getStudyEntries(study.getProjectId()).get(1);
+		final StudyEntryDto dto = this.studyEntryService.getStudyEntries(study.getProjectId()).get(1);
 		Assert.assertNotNull(dto);
 		final Integer newGid = gids.get(0);
-		this.service.replaceStudyEntry(study.getProjectId() + 1, dto.getEntryId(), newGid);
+		this.studyEntryService.replaceStudyEntry(study.getProjectId() + 1, dto.getEntryId(), newGid);
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
@@ -281,9 +298,9 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		this.createTestGermplasm(study.getProjectId());
 
-		final StudyEntryDto dto = this.service.getStudyEntries(study.getProjectId()).get(1);
+		final StudyEntryDto dto = this.studyEntryService.getStudyEntries(study.getProjectId()).get(1);
 		Assert.assertNotNull(dto);
-		this.service.replaceStudyEntry(study.getProjectId() + 1, dto.getEntryId(), dto.getGid());
+		this.studyEntryService.replaceStudyEntry(study.getProjectId() + 1, dto.getEntryId(), dto.getGid());
 	}
 
 	@Test
@@ -301,18 +318,18 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getStockDao().save(new StockModel(study2.getProjectId(), this.createTestStudyEntry(1, germplasm1.getGid())));
 		this.daoFactory.getStockDao().save(new StockModel(study2.getProjectId(), this.createTestStudyEntry(2, germplasm2.getGid())));
 
-		this.service.replaceStudyEntries(Arrays.asList(germplasm1.getGid(), germplasm2.getGid()), targetGermplasm.getGid(),
+		this.studyEntryService.replaceStudyEntries(Arrays.asList(germplasm1.getGid(), germplasm2.getGid()), targetGermplasm.getGid(),
 			RandomStringUtils.randomAlphabetic(10));
 
 		this.sessionProvder.getSession().flush();
 
 		// Check if the study entries are replaced with the target germplasm id for the first study
-		final List<StudyEntryDto> studyEntries1 = this.service.getStudyEntries(study1.getProjectId());
+		final List<StudyEntryDto> studyEntries1 = this.studyEntryService.getStudyEntries(study1.getProjectId());
 		Assert.assertEquals(targetGermplasm.getGid(), studyEntries1.get(0).getGid());
 		Assert.assertEquals(targetGermplasm.getGid(), studyEntries1.get(1).getGid());
 
 		// Check if the study entries are replaced with the target germplasm id for the second study
-		final List<StudyEntryDto> studyEntries2 = this.service.getStudyEntries(study2.getProjectId());
+		final List<StudyEntryDto> studyEntries2 = this.studyEntryService.getStudyEntries(study2.getProjectId());
 		Assert.assertEquals(targetGermplasm.getGid(), studyEntries2.get(0).getGid());
 		Assert.assertEquals(targetGermplasm.getGid(), studyEntries2.get(1).getGid());
 
@@ -323,12 +340,65 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject study = this.createStudy();
 		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
 
-		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		final List<StudyEntryDto> studyEntries = this.studyEntryService.getStudyEntries(study.getProjectId());
 		int index = 0;
 		for (final StudyEntryDto dto : studyEntries) {
 			this.verifyStudyEntryDetails(gids.get(index), index + 1, dto);
 			index++;
 		}
+	}
+
+	@Test
+	public void updatePlotDatasetProperties_shouldAddNameType() {
+		final DmsProject study = this.createStudyWithGermplasmListAssociated();
+
+		final List<StudyEntryColumnDTO> columns =
+			this.studyEntryService.getStudyEntryColumns(study.getProjectId(), null);
+		final StudyEntryColumnDTO accNoNameTypeColumn =
+			columns.stream().filter(column -> //
+					column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO) && column.getTypeId() == null)
+				.findFirst().get();
+
+		Assert.assertFalse(accNoNameTypeColumn.isSelected());
+
+		final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO = new PlotDatasetPropertiesDTO();
+		plotDatasetPropertiesDTO.setNameTypeIds(Arrays.asList(1));
+		plotDatasetPropertiesDTO.setVariableIds(Collections.emptyList());
+		this.studyDatasetService.updatePlotDatasetProperties(study.getProjectId(), plotDatasetPropertiesDTO, null);
+
+		final List<StudyEntryColumnDTO> updatedColumns =
+			this.studyEntryService.getStudyEntryColumns(study.getProjectId(), null);
+
+		final StudyEntryColumnDTO selectedACCNONameTypeColumn = updatedColumns.stream().filter(column -> //
+				column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO) && column.getTypeId() == null)
+			.findFirst().get();
+		Assert.assertTrue(selectedACCNONameTypeColumn.isSelected());
+	}
+
+	@Test
+	public void testUpdatePlotDatasetProperties_shouldRemoveNameType(){
+		final DmsProject study = this.createStudyWithGermplasmListAssociated();
+
+		final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO = new PlotDatasetPropertiesDTO();
+		plotDatasetPropertiesDTO.setNameTypeIds(Arrays.asList(1));
+		plotDatasetPropertiesDTO.setVariableIds(Collections.emptyList());
+		this.studyDatasetService.updatePlotDatasetProperties(study.getProjectId(), plotDatasetPropertiesDTO, null);
+
+		final List<StudyEntryColumnDTO> columns = this.studyEntryService.getStudyEntryColumns(study.getProjectId(), null);
+		StudyEntryColumnDTO accNoNameTypeColumn =
+			columns.stream().filter( column -> //
+					column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO) && column.getTypeId() == null)
+				.findFirst().get();
+
+		Assert.assertTrue(accNoNameTypeColumn.isSelected());
+
+		plotDatasetPropertiesDTO.setNameTypeIds(Collections.emptyList());
+		this.studyDatasetService.updatePlotDatasetProperties(study.getProjectId(), plotDatasetPropertiesDTO, null);
+		final List<StudyEntryColumnDTO> Updatedcolumns = this.studyEntryService.getStudyEntryColumns(study.getProjectId(), null);
+
+		accNoNameTypeColumn =
+			Updatedcolumns.stream().filter(column -> column.getName().equalsIgnoreCase(StudyEntryServiceImplIntegrationTest.ACCNO ) && column.getTypeId() == null).findFirst().get();
+		Assert.assertFalse(accNoNameTypeColumn.isSelected());
 	}
 
 	private void verifyStudyEntryDetails(final Integer gid, final int index, final StudyEntryDto dto) {
@@ -406,7 +476,18 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getProjectPropertyDAO().save(entryNoProp);
 		this.daoFactory.getProjectPropertyDAO().save(crossProp);
 		this.daoFactory.getProjectPropertyDAO().save(entryTypeProp);
+		this.sessionProvder.getSession().refresh(plotDataset);
+		return study;
+	}
 
+	private DmsProject createStudyWithGermplasmListAssociated() {
+		final DmsProject study = this.createStudy();
+
+		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final Integer[] gids = this.germplasmTestDataGenerator.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, "PREFF", parentGermplasm);
+
+		final Integer listId = this.createGermplasmList(null, gids);
+		this.studyEntryService.saveStudyEntries(study.getProjectId(), listId);
 		return study;
 	}
 
@@ -451,6 +532,31 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(entryPropertyData.getVariableId(), is(termId.getId()));
 		assertThat(entryPropertyData.getValue(), is(value));
 		assertThat(entryPropertyData.getCategoricalValueId(), is(categoricalValueId));
+	}
+
+	public Integer createGermplasmList(final String programUUID, final Integer[] gids) {
+		final int randomInt = new Random().nextInt(100);
+
+		// Germplasm list
+		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt,
+			Long.valueOf(20141014), "LST", 1, "Test Germplasm List", null, 1);
+
+		this.germplasmListManager.addGermplasmList(germplasmList);
+		germplasmList.setProgramUUID(programUUID);
+
+		// Germplasm list data
+		final List<GermplasmListData> germplasmListDataList = new ArrayList<>();
+		for (int i = 0; i < DataSetupTest.NUMBER_OF_GERMPLASM; i++) {
+			germplasmListDataList.add(new GermplasmListData(null, germplasmList, gids[i], i,
+				DataSetupTest.GERMPLSM_PREFIX + i + " Source",
+				DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));
+		}
+
+		germplasmListDataList.forEach((germplasmListData) -> {
+			germplasmListData.truncateGroupNameIfNeeded();
+			final GermplasmListData recordSaved = this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
+		});
+		return germplasmList.getId();
 	}
 
 }

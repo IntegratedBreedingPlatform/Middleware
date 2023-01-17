@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleDto;
+import org.generationcp.middleware.service.api.user.RoleTypeDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -228,7 +229,7 @@ public class WorkbenchTestDataUtil {
 		userdto.setLastName(lastName);
 		final UserRoleDto userRoleDto = new UserRoleDto(1,
 			new RoleDto(1, "Admin", "",
-				"instance", true, true,
+				new RoleTypeDto(1, "instance"), true, true,
 				true), null,
 			null, null);
 		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
@@ -236,7 +237,7 @@ public class WorkbenchTestDataUtil {
 		userdto.setPassword("fwgtrgrehgewsdsdeferhkjlkjSli");
 		final String email = RandomStringUtils.randomAlphanumeric(24);
 		userdto.setEmail("test" + email + "@leafnode.io");
-		userdto.setStatus("true");
+		userdto.setActive(Boolean.TRUE);
 		return userdto;
 	}
 
