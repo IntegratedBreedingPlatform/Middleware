@@ -54,4 +54,19 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="cuenyad" id="v23.1.0-3">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="1">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'BROWSE_STUDIES';
+             </sqlCheck>
+ 		</preConditions>
+		<sql>
+			update permission p1
+			    inner join permission p2  on p1.permission_id = p2.permission_id  and P2.name = 'BROWSE_STUDIES'
+			        set P1.name = 'VIEW_STUDIES', P1.description = 'View Studies', P1.workbench_sidebar_category_link_id=(SELECT sidebar_category_link_id FROM
+						workbench_sidebar_category_link where tool_name='study_manager_fieldbook_web');
+		</sql>
+         <comment>Migrate Browse Studies as View Studies permission</comment>
+	</changeSet>
+
 </databaseChangeLog>
