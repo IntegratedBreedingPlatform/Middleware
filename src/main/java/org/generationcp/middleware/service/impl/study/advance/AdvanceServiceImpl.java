@@ -616,13 +616,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	private Attribute createGermplasmAttribute(final Integer germplasmId, final String value, final Integer typeId,
 		final Integer locationId, final Integer date) {
-		final Attribute attribute = new Attribute();
-		attribute.setGermplasmId(germplasmId);
-		attribute.setAval(value);
-		attribute.setTypeId(typeId);
-		attribute.setAdate(date);
-		attribute.setLocationId(locationId);
-		return attribute;
+		return new Attribute(null, germplasmId, typeId, value, null, locationId, null, date);
 	}
 
 }
