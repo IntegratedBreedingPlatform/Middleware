@@ -14,13 +14,13 @@ import org.generationcp.middleware.util.projection.CustomProjections;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -153,16 +153,19 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		projectionList.add(Projections.property("germplasm.gid"), "gid");
 		projectionList.add(Projections.property("sample.plateId"), "plateId");
 		projectionList.add(Projections.property("sample.well"), "well");
+		projectionList.add(Projections.property("parent_properties.value"), "plotNo");
 
 		criteria.createAlias(SampleListDao.SAMPLES, "sample")
 			.createAlias("samples.experiment", "experiment")
-			.createAlias("experiment.properties", "properties",
-				CriteriaSpecification.LEFT_JOIN, Restrictions.eq("properties.typeId", TermId.PLOT_NO.getId()))
+			.createAlias("experiment.properties", "properties", JoinType.LEFT_OUTER_JOIN,
+				Restrictions.eq("properties.typeId", TermId.PLOT_NO.getId()))
+			.createAlias("experiment.parent", "parent_experiment", JoinType.LEFT_OUTER_JOIN)
+			.createAlias("parent_experiment.properties", "parent_properties", JoinType.LEFT_OUTER_JOIN,
+				Restrictions.eq("parent_properties.typeId", TermId.PLOT_NO.getId()))
 			.createAlias("experiment.stock", "stock")
 			.createAlias("stock.germplasm", "germplasm")
 			.createAlias(
-				"germplasm.names", "name",
-				CriteriaSpecification.LEFT_JOIN, Restrictions.eq("name.nstat", 1))
+				"germplasm.names", "name", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("name.nstat", 1))
 			.add(Restrictions.eq("id", sampleListId))
 			.setProjection(projectionList)
 			.setResultTransformer(Transformers.aliasToBean(SampleDetailsDTO.class)).addOrder(Order.asc("sample.sampleId"));
@@ -246,7 +249,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error with getSampleListMetadata(folderIds=" + folderIds.toString() + ") query from sample_list: " + e.getMessage(),
+				"Error with getSampleListMetadata(folderIds=" + folderIds + ") query from sample_list: " + e.getMessage(),
 				e);
 		}
 		return Maps.uniqueIndex(list, new Function<ListMetadata, Integer>() {

@@ -174,8 +174,10 @@ public class SampleDetailsDTO implements Serializable {
 		return this.plotNo;
 	}
 
-	public void setPlotNo(final Integer plotNo) {
-		this.plotNo = plotNo;
+	public void setPlotNo(final Object plotNo) {
+		if (plotNo instanceof String) {
+			this.plotNo = Integer.valueOf((String) plotNo);
+		}
 	}
 
 	public Integer getGid() {
