@@ -2,11 +2,12 @@ package org.generationcp.middleware.api.role;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
-import org.generationcp.middleware.pojos.workbench.RoleType;
+import org.generationcp.middleware.service.api.user.RoleTypeDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -19,13 +20,15 @@ public class RoleTypeServiceImpl implements RoleTypeService {
 	}
 
 	@Override
-	public List<RoleType> getRoleTypes() {
-		return this.workbenchDaoFactory.getRoleTypeDAO().getRoleTypes();
+	public List<RoleTypeDto> getRoleTypes() {
+		return
+			this.workbenchDaoFactory.getRoleTypeDAO().getRoleTypes().stream().map(r -> new RoleTypeDto(r)).collect(
+				Collectors.toList());
 	}
 
 	@Override
-	public RoleType getRoleType(final Integer id) {
-		return this.workbenchDaoFactory.getRoleTypeDAO().getById(id);
+	public RoleTypeDto getRoleType(final Integer id) {
+		return new RoleTypeDto(this.workbenchDaoFactory.getRoleTypeDAO().getById(id));
 	}
 
 }

@@ -1,6 +1,6 @@
 package org.generationcp.middleware.api.role;
 
-import org.generationcp.middleware.pojos.workbench.RoleType;
+import org.generationcp.middleware.service.api.user.RoleTypeDto;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ public interface RoleTypeService {
 	 *
 	 * @return
 	 */
-	List<RoleType> getRoleTypes();
+	List<RoleTypeDto> getRoleTypes();
 
 	/**
 	 * Get role type
@@ -19,6 +19,6 @@ public interface RoleTypeService {
 	 * @param id
 	 * @return ROle Type
 	 */
-	RoleType getRoleType(Integer id);
+	RoleTypeDto getRoleType(Integer id);
 
 }

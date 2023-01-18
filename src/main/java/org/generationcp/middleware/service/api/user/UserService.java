@@ -172,8 +172,6 @@ public interface UserService {
 
 	WorkbenchUser getUserWithAuthorities(String userName, String cropName, String programUuid);
 
-	List<WorkbenchUser> getUsersWithRole(int id);
-
 	List<ProgramMemberDto> getProgramMembers(String programUUID, ProgramMembersSearchRequest userSearchRequest, Pageable pageable);
 
 	long countAllProgramMembers(String programUUID, ProgramMembersSearchRequest userSearchRequest);

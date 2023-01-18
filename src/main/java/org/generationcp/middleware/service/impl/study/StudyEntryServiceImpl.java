@@ -111,7 +111,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	private void addPreFilteredGids(final StudyEntrySearchDto.Filter filter) {
-		Set<String> textKeys = filter.getFilteredTextValues().keySet();
+		final Set<String> textKeys = filter.getFilteredTextValues().keySet();
 		if(textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_GID.getId())) ||
 			textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_NAME.getId())) ||
 			textKeys.contains(String.valueOf(TermId.MALE_PARENT_GID.getId())) ||
@@ -345,17 +345,10 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				projectVariableIds.contains(column.getId())))
 			.collect(Collectors.toList());
 
-		final List<Integer> nameTypeIds = plotDataset.getProperties().stream()
-			.filter(projectProperty -> projectProperty.getTypeId() == null  &&
-				projectProperty.getVariableId() == null  &&
-				projectProperty.getNameFldno() != null)
-			.map(ProjectProperty::getNameFldno)
-			.collect(Collectors.toList());
-
 		final List<StockModel> entries = this.daoFactory.getStockDao().getStocksForStudy(studyId);
 		final List<Integer> gids = entries.stream().map(stockModel -> stockModel.getGermplasm().getGid()).collect(toList());
 		final List<Attribute> attributes = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(gids);
-		final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids);
+		final List<UserDefinedField> nameTypesFromGIDList = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids);
 		if (!CollectionUtils.isEmpty(attributes)) {
 			final VariableFilter variableFilter = new VariableFilter();
 			variableFilter.setProgramUuid(programUUID);
@@ -380,18 +373,21 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			columns.addAll(germplasmAttributeColumns);
 		}
 
-		final List<GermplasmNameTypeDTO> existingNameTypes = this.datasetService.getDatasetNameTypes(plotDataset.getProjectId());
-		if(!CollectionUtils.isEmpty(existingNameTypes)){
-			columns.addAll(existingNameTypes.stream().map(nameType ->
+		final List<GermplasmNameTypeDTO> nameTypesFromDataset = this.datasetService.getDatasetNameTypes(plotDataset.getProjectId());
+		if(!CollectionUtils.isEmpty(nameTypesFromDataset)){
+			columns.addAll(nameTypesFromDataset.stream().map(nameType ->
 					new StudyEntryColumnDTO(nameType.getId(), nameType.getCode(), null, null, true))
 				.collect(toList()));
 		}
 
-		if (!CollectionUtils.isEmpty(nameTypes)) {
+		final List<Integer> existingNameTypeIds = nameTypesFromDataset.stream().map(GermplasmNameTypeDTO::getId)
+			.collect(Collectors.toList());
+
+		if (!CollectionUtils.isEmpty(nameTypesFromGIDList)) {
 			columns.addAll(
-				nameTypes.stream().filter((nameType) -> !nameTypeIds.contains(nameType.getFldno()))
+				nameTypesFromGIDList.stream().filter((nameType) -> !existingNameTypeIds.contains(nameType.getFldno()))
 					.map(nameType ->
-						new StudyEntryColumnDTO(nameType.getFldno(), nameType.getFcode(), null, null, nameTypeIds.contains(nameType.getFldno())))
+						new StudyEntryColumnDTO(nameType.getFldno(), nameType.getFcode(), null, null, existingNameTypeIds.contains(nameType.getFldno())))
 					.collect(toList()));
 		}
 

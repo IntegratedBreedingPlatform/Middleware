@@ -1458,16 +1458,12 @@ public class DatasetServiceImpl implements DatasetService {
 				});
 		}
 
-		final List<Integer> namTypeIds = plotDataset.getProperties()
-			.stream()
-			.filter(projectProperty -> projectProperty.getTypeId() == null  &&
-				projectProperty.getVariableId() == null  &&
-				projectProperty.getNameFldno() != null)
-			.map(ProjectProperty::getNameFldno)
+		final List<GermplasmNameTypeDTO> existingNameTypes = this.getDatasetNameTypes(plotDataset.getProjectId());
+		final List<Integer> nameTypeIds = existingNameTypes.stream().map(GermplasmNameTypeDTO::getId)
 			.collect(Collectors.toList());
 
 		final List<Integer> newNameTypeIds = plotDatasetPropertiesDTO.getNameTypeIds().stream()
-			.filter(nameTypeId -> !namTypeIds.contains(nameTypeId)).collect(Collectors.toList());
+			.filter(nameTypeId -> !nameTypeIds.contains(nameTypeId)).collect(Collectors.toList());
 
 		if (!CollectionUtils.isEmpty(newNameTypeIds)) {
 			final AtomicInteger nextRank =
@@ -1487,7 +1483,7 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(plotDataset.getProjectId(), removeVariableIds);
 		}
 
-		final List<Integer> nameTypeIdsToRemove = namTypeIds.stream()
+		final List<Integer> nameTypeIdsToRemove = nameTypeIds.stream()
 			.filter(nameTypeId -> !plotDatasetPropertiesDTO.getNameTypeIds().contains(nameTypeId)).collect(Collectors.toList());
 
 		if (!CollectionUtils.isEmpty(nameTypeIdsToRemove)) {
