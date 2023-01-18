@@ -190,7 +190,7 @@ public class AdvanceServiceImplTest extends IntegrationTestBase {
 		this.assertAdvancedGermplasm(advancedGermplasmsForAllReps.get(1), method, originGermplasms.get(0).getGid(), "2", "2", 1, 1);
 
 		// Getting only the first replication
-		advanceStudyRequest.setSelectedReplications(Arrays.asList("1"));
+		advanceStudyRequest.setSelectedReplications(Arrays.asList(1));
 		final List<Integer> advancedGermplasmGidsForRep1 = this.advanceService.advanceStudy(this.studyId, advanceStudyRequest);
 		assertThat(advancedGermplasmGidsForRep1, hasSize(1));
 
@@ -199,7 +199,7 @@ public class AdvanceServiceImplTest extends IntegrationTestBase {
 		this.assertAdvancedGermplasm(advancedGermplasmsForRep1.get(0), method, originGermplasms.get(0).getGid(), "1", "1", 1, 1);
 
 		// Getting only the second replication
-		advanceStudyRequest.setSelectedReplications(Arrays.asList("2"));
+		advanceStudyRequest.setSelectedReplications(Arrays.asList(2));
 		final List<Integer> advancedGermplasmGidsForRep2 = this.advanceService.advanceStudy(this.studyId, advanceStudyRequest);
 		assertThat(advancedGermplasmGidsForRep2, hasSize(1));
 
@@ -421,7 +421,7 @@ public class AdvanceServiceImplTest extends IntegrationTestBase {
 		return request;
 	}
 
-	private AdvanceStudyRequest createAdvanceStudyRequest(final List<String> selectedReplications,
+	private AdvanceStudyRequest createAdvanceStudyRequest(final List<Integer> selectedReplications,
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest,
 		final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest, final AdvanceStudyRequest.BulkingRequest bulkingRequest,
 		final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest) {

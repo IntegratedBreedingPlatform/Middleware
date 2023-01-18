@@ -348,14 +348,15 @@ public class AdvanceServiceImpl implements AdvanceService {
 	}
 
 	private List<ObservationUnitRow> getPlotObservations(final Integer studyId, final Integer plotDatasetId,
-		final List<Integer> instancesIds, final List<String> selectedReplications) {
+		final List<Integer> instancesIds, final List<Integer> selectedReplications) {
 
 		final ObservationUnitsSearchDTO plotDataObservationsSearchDTO = new ObservationUnitsSearchDTO();
 		plotDataObservationsSearchDTO.setInstanceIds(instancesIds);
 
 		if (!CollectionUtils.isEmpty(selectedReplications)) {
 			final Map<String, List<String>> filteredValues = new HashMap<>();
-			filteredValues.put(String.valueOf(TermId.REP_NO.getId()), selectedReplications);
+			filteredValues.put(String.valueOf(TermId.REP_NO.getId()), selectedReplications.stream().map(Objects::toString).collect(
+				Collectors.toList()));
 			final ObservationUnitsSearchDTO.Filter filter = plotDataObservationsSearchDTO.new Filter();
 			filter.setFilteredValues(filteredValues);
 

@@ -10,7 +10,7 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 
 	// Represents the selected instance ids
 	private List<Integer> instanceIds;
-	private List<String> selectedReplications;
+	private List<Integer> selectedReplications;
 
 	private SelectionTraitRequest selectionTraitRequest;
 
@@ -24,11 +24,11 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 	}
 
 	@Override
-	public List<String> getSelectedReplications() {
+	public List<Integer> getSelectedReplications() {
 		return selectedReplications;
 	}
 
-	public void setSelectedReplications(final List<String> selectedReplications) {
+	public void setSelectedReplications(final List<Integer> selectedReplications) {
 		this.selectedReplications = selectedReplications;
 	}
 

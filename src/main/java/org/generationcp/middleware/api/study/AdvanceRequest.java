@@ -6,7 +6,7 @@ public interface AdvanceRequest {
 
 	List<Integer> getInstanceIds();
 
-	List<String> getSelectedReplications();
+	List<Integer> getSelectedReplications();
 
 	AbstractAdvanceRequest.SelectionTraitRequest getSelectionTraitRequest();
 
