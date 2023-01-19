@@ -274,7 +274,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 			// Resolves data related to season, selection trait and location for environment and plot
 			this.resolveEnvironmentAndPlotLevelData(environmentDataset.getDatasetId(), plotDataset.getDatasetId(),
-				request.getSelectionTraitRequest(), advancingSource, row, locationsByLocationId, plotDataVariablesByTermId);
+				request.getSelectionTraitRequest(), advancingSource, row, locationsByLocationId, plotDataVariablesByTermId, environmentVariablesByTermId);
 
 			// Creates the lines that are advanced
 			this.createAdvancedGermplasm(cropType, advancingSource);
@@ -465,11 +465,13 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest,
 		final AdvancingSource source, final ObservationUnitRow row,
 		final Map<Integer, Location> locationsByLocationId,
-		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId) {
+		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId,
+		final Map<Integer, MeasurementVariable> environmentVariablesByTermId) {
+
 		this.locationDataResolver.resolveEnvironmentLevelData(source, locationsByLocationId);
 		this.seasonDataResolver.resolveEnvironmentLevelData(source, plotDataVariablesByTermId);
 		this.selectionTraitDataResolver
-			.resolveEnvironmentLevelData(environmentDatasetId, selectionTraitRequest, source, plotDataVariablesByTermId);
+			.resolveEnvironmentLevelData(environmentDatasetId, selectionTraitRequest, source, environmentVariablesByTermId);
 		this.selectionTraitDataResolver
 			.resolvePlotLevelData(plotDatasetId, selectionTraitRequest, source, row, plotDataVariablesByTermId);
 	}
