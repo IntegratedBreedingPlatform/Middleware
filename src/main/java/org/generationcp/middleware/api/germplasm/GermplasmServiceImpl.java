@@ -11,7 +11,9 @@ import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
+import org.generationcp.middleware.api.nametype.NameTypeMetadataFilterRequest;
 import org.generationcp.middleware.constant.SystemNameTypes;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.NameDAO;
@@ -68,18 +70,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -1066,21 +1057,69 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final UserDefinedField puiUserDefinedField = this.daoFactory.getUserDefinedFieldDAO()
 			.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), SystemNameTypes.PUI.getType());
 		final NameDAO nameDAO = this.daoFactory.getNameDao();
-		final List<Name> names = nameDAO.getNamesByGids(gidsNonSelectedGermplasm);
+		final List<Name> names = nameDAO.getNamesByGids(gidsNonSelectedGermplasm).stream()
+				.sorted(Comparator.comparing(Name::getTypeId)).collect(Collectors.toList());
 		final List<Integer> existingNameTypeIds = targetGermplasm.getNames().stream().map(Name::getTypeId).collect(Collectors.toList());
+		Integer currentTypeId = 0;
+		Integer nameTypeIndex = 1;
+		String baseNameTypeCode = null;
+		UserDefinedField nameType = null;
 		for (final Name name : names) {
 			// If name is a PUI do not migrate if it's already present
 			if (!(puiUserDefinedField.getFldno().equals(name.getTypeId()) && existingNameTypeIds.contains(name.getTypeId()))) {
+				Integer nameTypeId = null;
+				if (!existingNameTypeIds.contains(name.getTypeId())) {
+					nameTypeId = name.getTypeId();
+				} else {
+					if (!currentTypeId.equals(name.getTypeId())) {
+						currentTypeId = name.getTypeId();
+						nameTypeIndex = 1;
+						nameType = this.daoFactory.getUserDefinedFieldDAO().getById(currentTypeId);
+						baseNameTypeCode = this.getBaseNameTypeCode(nameType.getFcode());
+					}
+					nameTypeId = this.getNameTypeId(existingNameTypeIds, nameTypeIndex, nameType, baseNameTypeCode);
+					nameTypeIndex++;
+				}
 				final Name nameToSave =
-					new Name(null, targetGermplasm, name.getTypeId(), 0, name.getNval(), name.getLocationId(), name.getNdate(),
-						name.getReferenceId());
+						new Name(null, targetGermplasm, nameTypeId, 0, name.getNval(), name.getLocationId(), name.getNdate(),
+								name.getReferenceId());
 				nameDAO.save(nameToSave);
 				existingNameTypeIds.add(nameToSave.getTypeId());
+
 			}
 			// Delete non-preferred names of merged germplasm (we need to retain the preferred name to be able to show in audit history)
 			if (name.getNstat() != 1) {
 				nameDAO.makeTransient(name);
 			}
+		}
+	}
+
+	private String getBaseNameTypeCode(final String nameTypeCode) {
+		// Get the base Nametype to handle cases such as germplasm with both LNAME_1 nametype
+		if (nameTypeCode.matches("^.*_\\d$")) {
+			return nameTypeCode.substring(0, nameTypeCode.lastIndexOf('_'));
+		}
+		return nameTypeCode;
+	}
+
+	private Integer getNameTypeId(final List<Integer> existingNameTypeIds, Integer nameTypeIndex, final UserDefinedField nameType, final String baseNameTypeCode) {
+		// Check if there's an existing UserDefinedField for needed nameType that's not yet used by the germplasm
+		UserDefinedField existingNameType = this.daoFactory.getUserDefinedFieldDAO()
+				.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), baseNameTypeCode + "_" + nameTypeIndex);
+		while(existingNameType != null && existingNameTypeIds.contains(existingNameType.getFldno())) {
+			existingNameType = this.daoFactory.getUserDefinedFieldDAO()
+					.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), baseNameTypeCode + "_" + (++nameTypeIndex));
+		}
+
+		if (existingNameType != null) {
+			return existingNameType.getFldno();
+		} else {
+			// Create a new NameType if not existing in the database
+			final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = new GermplasmNameTypeRequestDTO();
+			germplasmNameTypeRequestDTO.setCode(baseNameTypeCode + "_" + nameTypeIndex);
+			germplasmNameTypeRequestDTO.setName(nameType.getFname());
+			germplasmNameTypeRequestDTO.setDescription(nameType.getFdesc());
+			return this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO);
 		}
 	}
 
