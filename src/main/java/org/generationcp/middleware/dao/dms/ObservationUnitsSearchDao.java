@@ -527,11 +527,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsSearchDTO searchDto,
-		final String observationVariableName, final Map<Integer, String> standardDatasetVariablesMap, final Map<String, String> finalColumnsQueryMap, final Pageable pageable, final boolean addOnlyFilterColumns) {
+		final String observationVariableName, final Map<Integer, String> standardDatasetVariablesMap, final Map<String, String> finalColumnsQueryMap, final Pageable pageable, final boolean forVisualization) {
 		try {
 
-			final String sql = this.getObservationUnitTableQuery(searchDto, observationVariableName, standardDatasetVariablesMap.get(TermId.PLOT_NO.getId()), finalColumnsQueryMap, pageable);
-			final SQLQuery query = this.createQueryAndAddScalar(searchDto, sql, standardDatasetVariablesMap, addOnlyFilterColumns);
+			final String sql = this.getObservationUnitTableQuery(searchDto, observationVariableName, standardDatasetVariablesMap.get(TermId.PLOT_NO.getId()), finalColumnsQueryMap, pageable, forVisualization);
+			final SQLQuery query = this.createQueryAndAddScalar(searchDto, sql, standardDatasetVariablesMap, forVisualization);
 			this.setParameters(searchDto, query, pageable);
 			return query.list();
 
@@ -566,10 +566,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	private SQLQuery createQueryAndAddScalar(
 		final ObservationUnitsSearchDTO searchDto, final String generateQuery, final Map<Integer, String> standardVariableNamesMap,
-		final boolean addOnlyFilterColumns) {
+		final boolean forVisualization) {
 		final SQLQuery query = this.getSession().createSQLQuery(generateQuery);
-		if (addOnlyFilterColumns) {
-			searchDto.getFilterColumns().forEach(query::addScalar);
+		if (forVisualization) {
+			searchDto.getVisibleColumns().forEach(query::addScalar);
 		} else {
 			this.addScalar(query, standardVariableNamesMap);
 
@@ -629,181 +629,232 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.CROSS.getId()));
 	}
 
-	private boolean isColumnVisible(final String columnName, final Map<String, Boolean> columnVisibilityMap) {
-		if (!CollectionUtils.isEmpty(columnVisibilityMap)) {
-			return columnVisibilityMap.getOrDefault(columnName, true);
+	private boolean isColumnVisible(final String columnName, final Set<String> visibleColumns) {
+		if (!CollectionUtils.isEmpty(visibleColumns)) {
+			return visibleColumns.stream().anyMatch(s -> s.equalsIgnoreCase(columnName));
 		}
+		// If visible columns list is not specified, retrieve the column by default.
 		return true;
 	}
 
 	private String getObservationUnitTableQuery(
-		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName, final String plotNoName, final Map<String, String> finalColumnsQueryMap, final Pageable pageable) {
+		final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName, final String plotNoName,
+		final Map<String, String> finalColumnsQueryMap, final Pageable pageable, final boolean forVisualization) {
 
 		// FIXME some props should be fetched from plot, not immediate parent. It won't work for sub-sub obs
 		//  same for columns -> DatasetServiceImpl.getSubObservationSetColumns
 
-		// If filterColumns has values, we should only include the specified columns to the query. This is to optimize the query to only
-		// get the information it needs (reduce subqueries and minimize the amount of data returned to the client)
-		// ObservationUnitsSearchDTO is only applicable in Observation table, if filterColumns has values it means that the request is called
-		// for Visualization table
-		final List<String> filterColumns = searchDto.getFilterColumns();
-		final boolean noFilterVariables = CollectionUtils.isEmpty(filterColumns);
+		/** NOTE: If ObservationUnitsSearchDTO#getVisibleColumns() has values, we should only include the specified columns to the query.
+		 * This will optimize the query by processing only the columns it needs, reducing sub-queries and to minimize the amount of data
+		 * that will be returned to the client.
+		 *
+		 * If visibleColumns is not specified, the query will process and return all columns by default. **/
+
 		final List<String> columns = new ArrayList<>();
 
-		if (noFilterVariables) {
-			columns.addAll(finalColumnsQueryMap.values());
-		} else {
-			for (final String columnName : filterColumns) {
-				if (finalColumnsQueryMap.containsKey(columnName)) {
-					columns.add(finalColumnsQueryMap.get(columnName));
-				}
+		finalColumnsQueryMap.forEach((columnName, columnQueryString) -> {
+			// If column is OBSERVATION_UNIT_ID, we should always include it in the query
+			if (this.isColumnVisible(columnName, searchDto.getVisibleColumns()) || OBSERVATION_UNIT_ID.equalsIgnoreCase(columnName)) {
+				columns.add(finalColumnsQueryMap.get(columnName));
+			} else {
+				columns.add(String.format("NULL as `%s`", columnName));
 			}
-		}
+		});
 
 		searchDto.getEntryDetails().forEach(measurementVariable -> {
 			final StringBuilder entryDetailsClauseFormat = new StringBuilder();
 
-			if (this.isColumnVisible(measurementVariable.getName(), searchDto.getColumnVisibilityMap())) {
+			if (this.isColumnVisible(measurementVariable.getName(), searchDto.getVisibleColumns())) {
 				if (TermId.ENTRY_NO.name().equals(measurementVariable.getName())) {
-					entryDetailsClauseFormat.append(" s.uniquename AS '%1$s',");
+					entryDetailsClauseFormat.append(" s.uniquename AS `%1$s`,");
 				} else {
-					entryDetailsClauseFormat.append(" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.value, NULL)) AS '%1$s',");
+					entryDetailsClauseFormat.append(" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.value, NULL)) AS `%1$s`,");
 				}
 				entryDetailsClauseFormat.append(
-					" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.stockprop_id, NULL)) AS '%1$s_StockPropId',");
-				entryDetailsClauseFormat.append(" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.cvalue_id, NULL)) AS '%1$s_CvalueId'");
+					" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.stockprop_id, NULL)) AS `%1$s_StockPropId`,");
+				entryDetailsClauseFormat.append(" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.cvalue_id, NULL)) AS `%1$s_CvalueId`");
 			} else {
-				entryDetailsClauseFormat.append(" NULL AS '%1$s',");
-				entryDetailsClauseFormat.append(" NULL AS '%1$s_StockPropId',");
-				entryDetailsClauseFormat.append(" NULL AS '%1$s_CvalueId'");
+				entryDetailsClauseFormat.append(" NULL AS `%1$s`,");
+				entryDetailsClauseFormat.append(" NULL AS `%1$s_StockPropId`,");
+				entryDetailsClauseFormat.append(" NULL AS `%1$s_CvalueId`");
 			}
 
 			columns.add(String.format(entryDetailsClauseFormat.toString(), measurementVariable.getName()));
 		});
 
-		if (noFilterVariables) {
-			final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%1$s', ph.value, NULL)) AS '%1$s',"
-				+ " MAX(IF(cvterm_variable.name = '%1$s', ph.phenotype_id, NULL)) AS '%1$s_PhenotypeId',"
-				+ " MAX(IF(cvterm_variable.name = '%1$s', ph.status, NULL)) AS '%1$s_Status',"
-				+ " MAX(IF(cvterm_variable.name = '%1$s', ph.cvalue_id, NULL)) AS '%1$s_CvalueId', "
-				+ " MAX(IF(cvterm_variable.name = '%1$s', ph.draft_value, NULL)) AS '%1$s_DraftValue',"
-				+ " MAX(IF(cvterm_variable.name = '%1$s', ph.draft_cvalue_id, NULL)) AS '%1$s_DraftCvalueId'";
-			searchDto.getDatasetVariables().forEach(measurementVariable -> columns.add(String.format(traitClauseFormat, measurementVariable.getName())));
-		} else {
+		if (forVisualization) {
 
-			final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'";
-			final String traitDraftClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS '%s'";
+			final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS `%s`";
+			final String traitDraftClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS `%s`";
+			final String traitClauseFormatNullValue = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS `%s`";
+			final String traitDraftClauseFormatNullValue = " MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS `%s`";
 
 			for (final MeasurementVariableDto measurementVariable : searchDto.getDatasetVariables()) {
-				if (filterColumns.contains(measurementVariable.getName())) {
+				if (this.isColumnVisible(measurementVariable.getName(), searchDto.getVisibleColumns())) {
 					columns.add(String.format(
 						Boolean.TRUE.equals(searchDto.getDraftMode()) ? traitDraftClauseFormat : traitClauseFormat,
 						measurementVariable.getName(),
 						measurementVariable.getName()));
+				} else {
+					columns.add(String.format(
+						Boolean.TRUE.equals(searchDto.getDraftMode()) ? traitDraftClauseFormatNullValue : traitClauseFormatNullValue,
+						measurementVariable.getName(),
+						measurementVariable.getName()));
 				}
 			}
+
+		} else {
+
+			final StringBuilder traitClauseFormat = new StringBuilder(" MAX(IF(cvterm_variable.name = '%1$s', ph.value, NULL)) AS `%1$s`,")
+				.append(" MAX(IF(cvterm_variable.name = '%1$s', ph.phenotype_id, NULL)) AS `%1$s_PhenotypeId`,")
+				.append(" MAX(IF(cvterm_variable.name = '%1$s', ph.status, NULL)) AS `%1$s_Status`,")
+				.append(" MAX(IF(cvterm_variable.name = '%1$s', ph.cvalue_id, NULL)) AS `%1$s_CvalueId`, ")
+				.append(" MAX(IF(cvterm_variable.name = '%1$s', ph.draft_value, NULL)) AS `%1$s_DraftValue`,")
+				.append(" MAX(IF(cvterm_variable.name = '%1$s', ph.draft_cvalue_id, NULL)) AS `%1$s_DraftCvalueId`");
+
+			final StringBuilder traitClauseFormatNullValues = new StringBuilder(" NULL AS `%1$s`,")
+				.append(" NULL AS `%1$s_PhenotypeId`,")
+				.append(" NULL AS `%1$s_Status`,")
+				.append(" NULL AS `%1$s_CvalueId`, ")
+				.append(" NULL AS `%1$s_DraftValue`,")
+				.append(" NULL AS `%1$s_DraftCvalueId`");
+
+			searchDto.getDatasetVariables().forEach((measurementVariable) -> {
+				if (this.isColumnVisible(measurementVariable.getName(), searchDto.getVisibleColumns())) {
+					columns.add(String.format(traitClauseFormat.toString(), measurementVariable.getName()));
+				} else {
+					columns.add(String.format(traitClauseFormatNullValues.toString(), measurementVariable.getName()));
+				}
+
+			});
 		}
 
 		if (!CollectionUtils.isEmpty(searchDto.getGenericGermplasmDescriptors())) {
 			final String germplasmDescriptorClauseFormat =
-				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND %s) AS '%s'";
+				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND %s) AS `%s`";
 			for (final String gpFactor : searchDto.getGenericGermplasmDescriptors()) {
-				if ((noFilterVariables || filterColumns.contains(gpFactor)) && !gpFactor.equals(TermId.GROUPGID.name()) &&
+				if (!gpFactor.equals(TermId.GROUPGID.name()) &&
 					!gpFactor.equals(TermId.GUID.name())) {
-					final String cvtermQuery;
-					if (TermId.IMMEDIATE_SOURCE_NAME.name().equals(gpFactor)) {
-						cvtermQuery = " CASE \n"
-							+ "                WHEN g.gnpgs = -1 \n"
-							+ "                AND g.gpid2 IS NOT NULL  \n"
-							+ "                AND g.gpid2 <> 0 THEN immediateSource.nval \n"
-							+ "                ELSE '-' \n"
-							+ "            END AS " + TermId.IMMEDIATE_SOURCE_NAME.name() + " ";
-					} else if (TermId.GROUP_SOURCE_NAME.name().equals(gpFactor)) {
-							cvtermQuery = " CASE \n"
-								+ " 			WHEN g.gnpgs = -1 \n"
-								+ "				AND g.gpid1 IS NOT NULL \n"
-								+ " 			AND g.gpid1 <> 0 THEN groupSourceName.nval \n"
-								+ "				ELSE '-' "
-								+ "			END AS " + TermId.GROUP_SOURCE_NAME.name() + " ";
-					} else if (TermId.BREEDING_METHOD_ABBR.name().equals(gpFactor)) {
-						cvtermQuery = " m.mcode AS " + TermId.BREEDING_METHOD_ABBR.name() + " ";
+					final StringBuilder cvtermQuery;
+					final boolean isVisible = this.isColumnVisible(gpFactor, searchDto.getVisibleColumns());
+					if (TermId.IMMEDIATE_SOURCE_NAME.name().equals(gpFactor) && isVisible) {
+						cvtermQuery = new StringBuilder(" CASE ")
+							.append(" WHEN g.gnpgs = -1 ")
+							.append(" AND g.gpid2 IS NOT NULL ")
+							.append(" AND g.gpid2 <> 0 THEN immediateSource.nval ")
+							.append(" ELSE '-' ")
+							.append(" END AS `" + TermId.IMMEDIATE_SOURCE_NAME.name() + "` ");
+					} else if (TermId.GROUP_SOURCE_NAME.name().equals(gpFactor) && isVisible) {
+						cvtermQuery = new StringBuilder(" CASE ")
+							.append(" WHEN g.gnpgs = -1 ")
+							.append(" AND g.gpid1 IS NOT NULL ")
+							.append(" AND g.gpid1 <> 0 THEN groupSourceName.nval ")
+							.append(" ELSE '-' ")
+							.append(" END AS `").append(TermId.GROUP_SOURCE_NAME.name()).append("` ");
+					} else if (TermId.BREEDING_METHOD_ABBR.name().equals(gpFactor) && isVisible) {
+						cvtermQuery = new StringBuilder(" m.mcode AS `").append(TermId.BREEDING_METHOD_ABBR.name()).append("` ");
+					} else if (isVisible) {
+						cvtermQuery = new StringBuilder(
+							String.format(germplasmDescriptorClauseFormat, "spropcvt.name = '" + gpFactor + "'", gpFactor));
 					} else {
-						cvtermQuery = String.format(germplasmDescriptorClauseFormat, "spropcvt.name = '" + gpFactor + "'", gpFactor);
+						cvtermQuery = new StringBuilder(String.format(" NULL AS `%s` ", gpFactor));
 					}
-					columns.add(cvtermQuery);
+					columns.add(cvtermQuery.toString());
 				}
 			}
 		}
 
 		if (!CollectionUtils.isEmpty(searchDto.getAdditionalDesignFactors())) {
 			final String designFactorClauseFormat =
-				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = plot.nd_experiment_id AND xpropcvt.name = '%s') AS '%s'";
+				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = plot.nd_experiment_id AND xpropcvt.name = '%s') AS `%s`";
 			for (final String designFactor : searchDto.getAdditionalDesignFactors()) {
-				if (noFilterVariables || filterColumns.contains(designFactor)) {
+				if (this.isColumnVisible(designFactor, searchDto.getVisibleColumns())) {
 					columns.add(String.format(designFactorClauseFormat, designFactor, designFactor));
+				} else {
+					columns.add(String.format(" NULL AS `%s`", designFactor));
 				}
 			}
 		}
 
-		// Only variables at observation level are supported in filtering columns. Variables at environment level are automatically excluded if filterColumns has values.
-		if (noFilterVariables && !CollectionUtils.isEmpty(searchDto.getEnvironmentDetails())) {
+		// Variables at environment level are automatically excluded if the query is for Visualization.
+		if (!forVisualization && !CollectionUtils.isEmpty(searchDto.getEnvironmentDetails())) {
 			final String envFactorFormat =
-				"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) '%s'";
+				"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) `%s`";
 			final String geolocEnvFactorFormat =
-				" %s AS '%s'";
+				" %s AS `%s`";
 			for (final MeasurementVariableDto envFactor : searchDto.getEnvironmentDetails()) {
-				if (geolocSpecialFactorsMap.containsKey(envFactor.getName())) {
+				if (this.isColumnVisible(envFactor.getName(), searchDto.getVisibleColumns()) && geolocSpecialFactorsMap.containsKey(
+					envFactor.getName())) {
 					final String column = geolocSpecialFactorsMap.get(envFactor.getName());
 					columns.add(String.format(geolocEnvFactorFormat, column, this.getEnvironmentColumnName(envFactor.getName())));
-				} else {
+				} else if (this.isColumnVisible(envFactor.getName(), searchDto.getVisibleColumns())) {
 					columns.add(String.format(envFactorFormat, envFactor.getName(), this.getEnvironmentColumnName(envFactor.getName())));
+				} else {
+					columns.add(String.format(" NULL AS `%s`", this.getEnvironmentColumnName(envFactor.getName())));
 				}
 			}
 		}
 
-		// Only variables at observation level are supported in filtering columns. Variables at environment level are automatically excluded if filterColumns has values.
-		if (noFilterVariables && !CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())) {
-			final String envConditionFormat =
-				"    (SELECT pheno.value from phenotype pheno "
-					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.name = '%s' "
-					+ "		INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id AND envnde.project_id = :datasetEnvironmentId "
-					+ "		WHERE envnde.nd_geolocation_id = gl.nd_geolocation_id) '%s'";
+		// Variables at environment level are automatically excluded if the query is for Visualization.
+		if (!forVisualization && !CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())) {
 			for (final MeasurementVariableDto envCondition : searchDto.getEnvironmentConditions()) {
-				columns.add(
-					String.format(envConditionFormat, envCondition.getName(), this.getEnvironmentColumnName(envCondition.getName())));
+				if (this.isColumnVisible(envCondition.getName(), searchDto.getVisibleColumns())) {
+					final StringBuilder envConditionFormat = new StringBuilder(" SELECT pheno.value from phenotype pheno ")
+						.append(" INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.name = '%s' ")
+						.append(
+							" INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id AND envnde.project_id = :datasetEnvironmentId ")
+						.append(" WHERE envnde.nd_geolocation_id = gl.nd_geolocation_id) `%s`");
+					columns.add(
+						String.format(envConditionFormat.toString(), envCondition.getName(),
+							this.getEnvironmentColumnName(envCondition.getName())));
+				} else {
+					columns.add(
+						String.format(" NULL AS `%s`", this.getEnvironmentColumnName(envCondition.getName())));
+				}
 			}
 		}
 
 		// TODO move PLOT_NO to nd_exp
-		// If the request is for Observation/Sub-observation table (noFilterVariables is true), always add the OBSERVATION_UNIT_NO column.
-		// If the request is for Visualization (noFilterVariables is false) and dataset is sub-observation (observationUnitNoName with "PLOT_NO" value means the dataset is observation),
-		// we add the OBSERVATION_UNIT_NO column with the observationUnitNoName as its column alias.
-		if (noFilterVariables || (filterColumns.contains(observationUnitNoName) && !plotNoName.equals(observationUnitNoName))) {
-			columns.add(" COALESCE(nde.observation_unit_no, ("
-				+ "		SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ndep.type_id = 8200 "
-				+ " )) AS " + (noFilterVariables ? OBSERVATION_UNIT_NO : observationUnitNoName));
+		if (!forVisualization) {
+			if (this.isColumnVisible(observationUnitNoName, searchDto.getVisibleColumns())) {
+				// If the request is for Observation/Sub-observation table (forVisualization is false), always add the OBSERVATION_UNIT_NO column.
+				columns.add(new StringBuilder(" COALESCE(nde.observation_unit_no, (")
+					.append(
+						" SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ndep.type_id = 8200 ")
+					.append(" )) AS `").append(OBSERVATION_UNIT_NO).append("` ").toString());
+			} else {
+				columns.add(new StringBuilder(" NULL AS ").append(OBSERVATION_UNIT_NO).toString());
+			}
+		} else if (this.isColumnVisible(observationUnitNoName, searchDto.getVisibleColumns()) && !plotNoName.equals(
+			observationUnitNoName)) {
+			// If the request is for Visualization and dataset is sub-observation (observationUnitNoName that is not "PLOT_NO" value means the dataset is sub-observation),
+			// we add the OBSERVATION_UNIT_NO column with the observationUnitNoName as its column alias.
+			columns.add(new StringBuilder(" COALESCE(nde.observation_unit_no, (")
+				.append(
+					" SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ndep.type_id = 8200 ")
+				.append(" )) AS `").append(observationUnitNoName).append("` ").toString());
 		}
 
 		if (this.hasDescriptor(searchDto.getGenericGermplasmDescriptors(), TermId.GROUPGID)) {
-			columns.add(" g.mgid AS " + TermId.GROUPGID.name());
+			columns.add(" g.mgid AS `" + TermId.GROUPGID.name() + "`");
 		}
 
 		if (this.hasDescriptor(searchDto.getGenericGermplasmDescriptors(), TermId.GUID)) {
-			columns.add(" g.germplsm_uuid AS " + TermId.GUID.name());
+			columns.add(" g.germplsm_uuid AS `" + TermId.GUID.name() + "`");
 		}
 
 		if (!CollectionUtils.isEmpty(searchDto.getPassportAndAttributes())) {
 			for (final MeasurementVariableDto measurementVariable : searchDto.getPassportAndAttributes()) {
 				final String alias = this.formatVariableAlias(measurementVariable.getId());
 
-				if (this.isColumnVisible(measurementVariable.getName(), searchDto.getColumnVisibilityMap())) {
+				if (this.isColumnVisible(measurementVariable.getName(), searchDto.getVisibleColumns())) {
 					columns.add(
-						String.format("(SELECT aval FROM atributs WHERE gid = s.dbxref_id AND atype = %1$s) AS %2$s",
+						String.format("(SELECT aval FROM atributs WHERE gid = s.dbxref_id AND atype = %1$s) AS `%2$s`",
 							measurementVariable.getId(),
 							alias));
 				} else {
 					columns.add(
-						String.format(" NULL AS %1$s", alias));
+						String.format(" NULL AS `%1$s`", alias));
 				}
 			}
 		}
@@ -811,14 +862,14 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (!CollectionUtils.isEmpty(searchDto.getNameTypes())) {
 			for (final MeasurementVariableDto measurementVariable : searchDto.getNameTypes()) {
 				final String alias = this.formatNameAlias(measurementVariable.getId());
-				if (this.isColumnVisible(measurementVariable.getName(), searchDto.getColumnVisibilityMap())) {
+				if (this.isColumnVisible(measurementVariable.getName(), searchDto.getVisibleColumns())) {
 					columns.add(
-						String.format("(SELECT nval FROM names WHERE gid = s.dbxref_id AND ntype = %1$s) AS %2$s",
+						String.format("(SELECT nval FROM names WHERE gid = s.dbxref_id AND ntype = %1$s) AS `%2$s`",
 							measurementVariable.getId(),
 							alias));
 				} else {
 					columns.add(
-						String.format(" NULL AS %1$s", alias));
+						String.format(" NULL AS `%1$s`", alias));
 				}
 			}
 		}
@@ -835,10 +886,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		this.addHavingClause(sql, searchDto.getFilter());
 
-		if (noFilterVariables) {
-			this.addOrder(sql, searchDto, observationUnitNoName, plotNoName, pageable);
-		} else {
+		if (forVisualization) {
 			sql.append(") T ");
+		} else {
+			this.addOrder(sql, searchDto, observationUnitNoName, plotNoName, pageable);
 		}
 
 		return sql.toString();

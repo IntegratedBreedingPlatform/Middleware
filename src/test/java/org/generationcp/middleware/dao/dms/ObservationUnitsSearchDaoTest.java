@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -540,25 +541,25 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 			new MeasurementVariableDto(TermId.ENTRY_NO.getId(),"ENTRY_NO"), //
 			new MeasurementVariableDto(TermId.ENTRY_TYPE.getId(),"ENTRY_TYPE"), //
 			new MeasurementVariableDto(TermId.ENTRY_CODE.getId(),"ENTRY_CODE")));
-		final List<String> filterColumns = observationUnitsSearchDTO.getFilterColumns();
+		final Set<String> visibleColumns = observationUnitsSearchDTO.getVisibleColumns();
 
 		// Add the columns we want the query to return.
-		filterColumns.add(TRIAL_INSTANCE);
-		filterColumns.add(GID);
-		filterColumns.add(DESIGNATION);
-		filterColumns.add(ENTRY_TYPE);
-		filterColumns.add(ENTRY_CODE);
-		filterColumns.add(ENTRY_NO);
-		filterColumns.add(REP_NO);
-		filterColumns.add(PLOT_NO);
-		filterColumns.add(BLOCK_NO);
-		filterColumns.add(ROW);
-		filterColumns.add(COL);
-		filterColumns.add(ObservationUnitsSearchDao.SUM_OF_SAMPLES);
-		filterColumns.add(observationUnitVariableName);
-		filterColumns.add(FIELDMAP_RANGE);
-		filterColumns.add(FIELDMAP_COLUMN);
-		filterColumns.add(traitName);
+		visibleColumns.add(TRIAL_INSTANCE);
+		visibleColumns.add(GID);
+		visibleColumns.add(DESIGNATION);
+		visibleColumns.add(ENTRY_TYPE);
+		visibleColumns.add(ENTRY_CODE);
+		visibleColumns.add(ENTRY_NO);
+		visibleColumns.add(REP_NO);
+		visibleColumns.add(PLOT_NO);
+		visibleColumns.add(BLOCK_NO);
+		visibleColumns.add(ROW);
+		visibleColumns.add(COL);
+		visibleColumns.add(ObservationUnitsSearchDao.SUM_OF_SAMPLES);
+		visibleColumns.add(observationUnitVariableName);
+		visibleColumns.add(FIELDMAP_RANGE);
+		visibleColumns.add(FIELDMAP_COLUMN);
+		visibleColumns.add(traitName);
 
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
