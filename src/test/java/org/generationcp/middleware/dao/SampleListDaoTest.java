@@ -318,7 +318,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		Assert.assertNotNull(sampleDetailsDTO.getGid());
 		Assert.assertEquals(1, sampleDetailsDTO.getSampleNumber().intValue());
 		Assert.assertNotNull(sampleDetailsDTO.getObsUnitId());
-		Assert.assertEquals(1, sampleDetailsDTO.getPlotNo().intValue()); //should retrieve parent's
+		Assert.assertEquals("1", sampleDetailsDTO.getPlotNo()); //should retrieve parent's
 		Assert.assertEquals(1, sampleDetailsDTO.getSampleNumber().intValue());
 		Assert.assertEquals("PLATEID", sampleDetailsDTO.getPlateId());
 		Assert.assertEquals("WELLID", sampleDetailsDTO.getWell());
