@@ -61,10 +61,8 @@
              </sqlCheck>
  		</preConditions>
 		<sql>
-			update permission p1
-			    inner join permission p2  on p1.permission_id = p2.permission_id  and P2.name = 'BROWSE_STUDIES'
-			        set P1.name = 'VIEW_STUDIES', P1.description = 'View Studies', P1.workbench_sidebar_category_link_id=(SELECT sidebar_category_link_id FROM
-						workbench_sidebar_category_link where tool_name='study_manager_fieldbook_web');
+		  UPDATE PERMISSION SET NAME = 'VIEW_STUDIES', DESCRIPTION = 'View Studies', WORKBENCH_SIDEBAR_CATEGORY_LINK_ID = (SELECT SIDEBAR_CATEGORY_LINK_ID FROM
+						WORKBENCH_SIDEBAR_CATEGORY_LINK WHERE TOOL_NAME='study_manager_fieldbook_web') WHERE NAME = 'BROWSE_STUDIES';
 		</sql>
          <comment>Migrate Browse Studies as View Studies permission</comment>
 	</changeSet>
