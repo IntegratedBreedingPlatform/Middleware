@@ -60,11 +60,11 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'BROWSE_STUDIES';
              </sqlCheck>
  		</preConditions>
+         <comment>Migrate Browse Studies as View Studies permission</comment>
 		<sql>
 		  UPDATE PERMISSION SET NAME = 'VIEW_STUDIES', DESCRIPTION = 'View Studies', WORKBENCH_SIDEBAR_CATEGORY_LINK_ID = (SELECT SIDEBAR_CATEGORY_LINK_ID FROM
 						WORKBENCH_SIDEBAR_CATEGORY_LINK WHERE TOOL_NAME='study_manager_fieldbook_web') WHERE NAME = 'BROWSE_STUDIES';
 		</sql>
-         <comment>Migrate Browse Studies as View Studies permission</comment>
 	</changeSet>
 
 </databaseChangeLog>
