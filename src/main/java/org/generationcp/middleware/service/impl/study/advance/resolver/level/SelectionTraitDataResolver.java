@@ -1,6 +1,6 @@
 package org.generationcp.middleware.service.impl.study.advance.resolver.level;
 
-import org.generationcp.middleware.api.study.AdvanceStudyRequest;
+import org.generationcp.middleware.api.study.AbstractAdvanceRequest;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -27,7 +27,7 @@ public class SelectionTraitDataResolver {
 	 * @return the selection trait value
 	 */
 	public String resolveStudyLevelData(
-		final Integer datasetId, final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest,
+		final Integer datasetId, final AbstractAdvanceRequest.SelectionTraitRequest selectionTraitRequest,
 		final List<MeasurementVariable> studyVariates) {
 
 		if (!this.shouldResolveLevel(datasetId, selectionTraitRequest)) {
@@ -65,7 +65,8 @@ public class SelectionTraitDataResolver {
 	 * @param source
 	 * @param plotDataVariablesByTermId
 	 */
-	public void resolveEnvironmentLevelData(final Integer datasetId, final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest,
+	public void resolveEnvironmentLevelData(final Integer datasetId,
+		final AbstractAdvanceRequest.SelectionTraitRequest selectionTraitRequest,
 		final AdvancingSource source,
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId) {
 
@@ -89,7 +90,7 @@ public class SelectionTraitDataResolver {
 	 * @param row
 	 * @param plotDataVariablesByTermId
 	 */
-	public void resolvePlotLevelData(final Integer datasetId, final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest,
+	public void resolvePlotLevelData(final Integer datasetId, final AbstractAdvanceRequest.SelectionTraitRequest selectionTraitRequest,
 		final AdvancingSource source, final ObservationUnitRow row,
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId) {
 
@@ -128,7 +129,7 @@ public class SelectionTraitDataResolver {
 			});
 	}
 
-	boolean shouldResolveLevel(final Integer datasetId, final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest) {
+	boolean shouldResolveLevel(final Integer datasetId, final AbstractAdvanceRequest.SelectionTraitRequest selectionTraitRequest) {
 		return selectionTraitRequest != null && datasetId.equals(selectionTraitRequest.getDatasetId())
 			&& selectionTraitRequest.getVariableId() != null;
 	}
