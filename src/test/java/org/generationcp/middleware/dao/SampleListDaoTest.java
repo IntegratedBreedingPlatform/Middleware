@@ -110,9 +110,9 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		this.roleService = new RoleServiceImpl(this.workbenchSessionProvider);
 		this.userService = new UserServiceImpl(this.workbenchSessionProvider);
 		// Create three sample lists test data for search
-		this.createSampleListForSearch("TEST-LIST-1");
-		this.createSampleListForSearch("TEST-LIST-2");
-		this.createSampleListForSearch("TEST-LIST-3");
+		this.createSampleListForSearch("TEST-LIST-1", true);
+		this.createSampleListForSearch("TEST-LIST-2", false);
+		this.createSampleListForSearch("TEST-LIST-3", false);
 	}
 
 	@Test
@@ -294,9 +294,37 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(1, sampleDetailsDTO.getSampleNumber().intValue());
 		Assert.assertEquals("PLATEID", sampleDetailsDTO.getPlateId());
 		Assert.assertEquals("WELLID", sampleDetailsDTO.getWell());
+		Assert.assertNull(sampleDetailsDTO.getPlotNo());
 	}
 
-	private void createSampleListForSearch(final String listName) {
+	@Test
+	public void testGetSampleDetailsDTO_subObservation() {
+
+		final List<SampleList> sampleLists = this.sampleListDao.searchSampleLists("SUB-TEST-LIST-1", true, PROGRAM_UUID, null);
+
+		final List<SampleDetailsDTO> result = this.sampleListDao.getSampleDetailsDTO(sampleLists.get(0).getId());
+
+		Assert.assertFalse(result.isEmpty());
+		final SampleDetailsDTO sampleDetailsDTO = result.get(0);
+
+		final WorkbenchUser workbenchUser = this.userService.getUserByUsername(SampleListDaoTest.ADMIN);
+		Assert.assertEquals("BUSINESS-KEY-SUB-TEST-LIST-1", sampleDetailsDTO.getSampleBusinessKey());
+		Assert.assertEquals(workbenchUser.getUserid(), sampleDetailsDTO.getTakenByUserId());
+		Assert.assertEquals("SAMPLE-SUB-TEST-LIST-1", sampleDetailsDTO.getSampleName());
+		Assert.assertEquals("Germplasm SP", sampleDetailsDTO.getDesignation());
+		Assert.assertEquals(sampleDetailsDTO.getDateFormat().format(new Date()), sampleDetailsDTO.getDisplayDate());
+		Assert.assertEquals(1, sampleDetailsDTO.getEntryNumber().intValue());
+		Assert.assertEquals(1, sampleDetailsDTO.getObservationUnitNumber().intValue());
+		Assert.assertNotNull(sampleDetailsDTO.getGid());
+		Assert.assertEquals(1, sampleDetailsDTO.getSampleNumber().intValue());
+		Assert.assertNotNull(sampleDetailsDTO.getObsUnitId());
+		Assert.assertEquals(1, sampleDetailsDTO.getPlotNo().intValue()); //should retrieve parent's
+		Assert.assertEquals(1, sampleDetailsDTO.getSampleNumber().intValue());
+		Assert.assertEquals("PLATEID", sampleDetailsDTO.getPlateId());
+		Assert.assertEquals("WELLID", sampleDetailsDTO.getWell());
+	}
+
+	private void createSampleListForSearch(final String listName, final boolean createSub) {
 
 		final DmsProject study = new DmsProject();
 		study.setName("TEST STUDY " + new Random().nextInt());
@@ -313,11 +341,16 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		final WorkbenchUser user = this.createTestUser();
 
-		final ExperimentModel experimentModel = this.createTestExperiment(plotDmsProject);
+		final ExperimentModel experimentModel = this.createTestExperiment(plotDmsProject, null);
 		this.createTestStock(study, experimentModel);
 
 		this.createTestSampleList(listName, user, experimentModel);
 
+		if (createSub) {
+			final ExperimentModel experimentModelSub = this.createTestExperiment(plotDmsProject, experimentModel);
+			this.createTestStock(study, experimentModelSub);
+			this.createTestSampleList("SUB-" + listName, user, experimentModelSub);
+		}
 	}
 
 	private void createTestSampleList(final String listName, final WorkbenchUser workbenchUser, final ExperimentModel experimentModel) {
@@ -359,7 +392,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		return workbenchUser;
 	}
 
-	private ExperimentModel createTestExperiment(final DmsProject project) {
+	private ExperimentModel createTestExperiment(final DmsProject project, final ExperimentModel parent) {
 
 		final ExperimentModel experimentModel = new ExperimentModel();
 		final Geolocation geolocation = new Geolocation();
@@ -368,15 +401,21 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		experimentModel.setGeoLocation(geolocation);
 		experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 		experimentModel.setProject(project);
-		experimentModel.setObservationUnitNo(1);
-		this.experimentDao.saveOrUpdate(experimentModel);
 
-		final ExperimentProperty experimentProperty = new ExperimentProperty();
-		experimentProperty.setExperiment(experimentModel);
-		experimentProperty.setTypeId(TermId.PLOT_NO.getId());
-		experimentProperty.setValue("1");
-		experimentProperty.setRank(1);
-		this.experimentPropertyDao.saveOrUpdate(experimentProperty);
+		if (parent != null) {
+			experimentModel.setObservationUnitNo(1);
+			experimentModel.setParent(parent);
+			this.experimentDao.saveOrUpdate(experimentModel);
+		} else {
+			this.experimentDao.saveOrUpdate(experimentModel);
+
+			final ExperimentProperty experimentProperty = new ExperimentProperty();
+			experimentProperty.setExperiment(experimentModel);
+			experimentProperty.setTypeId(TermId.PLOT_NO.getId());
+			experimentProperty.setValue("1");
+			experimentProperty.setRank(1);
+			this.experimentPropertyDao.saveOrUpdate(experimentProperty);
+		}
 
 		return experimentModel;
 
