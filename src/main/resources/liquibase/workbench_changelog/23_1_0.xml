@@ -67,4 +67,22 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="cuenyad" id="v23.1.0-4">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="1">
+                 SELECT COUNT(*) > 0 FROM PERMISSION WHERE WORKBENCH_SIDEBAR_CATEGORY_LINK_ID IS NOT NULL
+                       AND NAME IN ('MS_MANAGE_OBSERVATION_UNITS','MS_CREATE_LOTS',
+                                    'MS_WITHDRAW_INVENTORY','MS_CREATE_PENDING_WITHDRAWALS','MS_CREATE_CONFIRMED_WITHDRAWALS',
+									'MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES');
+             </sqlCheck>
+ 		</preConditions>
+         <comment>Remove link from some permissions. Explicit VIEW permission are needed now to access Manage Studies</comment>
+		<sql>
+		  UPDATE PERMISSION SET WORKBENCH_SIDEBAR_CATEGORY_LINK_ID = NULL
+		    	WHERE NAME IN ('MS_MANAGE_OBSERVATION_UNITS','MS_CREATE_LOTS',
+						 	'MS_WITHDRAW_INVENTORY','MS_CREATE_PENDING_WITHDRAWALS','MS_CREATE_CONFIRMED_WITHDRAWALS',
+							'MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES');
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
