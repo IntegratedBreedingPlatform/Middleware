@@ -4,6 +4,7 @@ package org.generationcp.middleware.ruleengine.stockid;
 import java.util.List;
 
 import org.generationcp.middleware.ruleengine.OrderedRuleExecutionContext;
+import org.generationcp.middleware.ruleengine.RuleExecutionNamespace;
 import org.generationcp.middleware.service.api.inventory.LotService;
 
 /**
@@ -32,6 +33,11 @@ public class StockIDGenerationRuleExecutionContext extends OrderedRuleExecutionC
 	@Override
 	public Object getRuleExecutionOutput() {
 		return this.stockIDGenerationBuilder.toString();
+	}
+
+	@Override
+	public RuleExecutionNamespace getRuleExecutionNamespace() {
+		return RuleExecutionNamespace.STOCK;
 	}
 
 	public StringBuilder getStockIDGenerationBuilder() {

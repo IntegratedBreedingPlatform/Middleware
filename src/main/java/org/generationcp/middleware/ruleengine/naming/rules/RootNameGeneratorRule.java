@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.ruleengine.naming.rules;
 
-import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.naming.expression.RootNameExpression;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
@@ -11,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class RootNameGeneratorRule extends OrderedRule<NamingRuleExecutionContext> {
+public class RootNameGeneratorRule extends NamingOrderedRule {
 
 	public static final String KEY = "RootNameGenerator";
 

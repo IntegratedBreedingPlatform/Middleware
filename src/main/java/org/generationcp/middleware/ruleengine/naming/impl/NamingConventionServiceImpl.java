@@ -7,6 +7,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.RuleExecutionContext;
+import org.generationcp.middleware.ruleengine.RuleExecutionNamespace;
 import org.generationcp.middleware.ruleengine.RuleFactory;
 import org.generationcp.middleware.ruleengine.naming.rules.EnforceUniqueNameRule;
 import org.generationcp.middleware.ruleengine.naming.rules.NamingRuleExecutionContext;
@@ -71,7 +72,7 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 
 	protected RuleExecutionContext setupNamingRuleExecutionContext(final AdvancingSource advancingSource,
 		final boolean checkForDuplicateName) {
-		List<String> sequenceList = Arrays.asList(this.ruleFactory.getRuleSequenceForNamespace("naming"));
+		List<String> sequenceList = Arrays.asList(this.ruleFactory.getRuleSequenceForNamespace(RuleExecutionNamespace.NAMING));
 
 		if (checkForDuplicateName) {
 			// new array list is required since list generated from asList method does not support adding of more elements

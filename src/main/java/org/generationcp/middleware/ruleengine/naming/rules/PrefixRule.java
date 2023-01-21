@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.ruleengine.naming.rules;
 
-import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
@@ -19,7 +18,7 @@ import java.util.List;
  *
  */
 @Component
-public class PrefixRule extends OrderedRule<NamingRuleExecutionContext> {
+public class PrefixRule extends NamingOrderedRule {
 
 	public static final String KEY = "Prefix";
 

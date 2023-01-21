@@ -10,6 +10,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.RuleExecutionContext;
+import org.generationcp.middleware.ruleengine.RuleExecutionNamespace;
 import org.generationcp.middleware.ruleengine.RuleFactory;
 import org.generationcp.middleware.ruleengine.RulesNotConfiguredException;
 import org.generationcp.middleware.ruleengine.namingdeprecated.rules.DeprecatedEnforceUniqueNameRule;
@@ -180,7 +181,7 @@ public class DeprecatedNamingConventionServiceImpl implements DeprecatedNamingCo
 	}
 
 	protected RuleExecutionContext setupNamingRuleExecutionContext(final DeprecatedAdvancingSource row, final boolean checkForDuplicateName) {
-		List<String> sequenceList = Arrays.asList(this.ruleFactory.getRuleSequenceForNamespace("naming"));
+		List<String> sequenceList = Arrays.asList(this.ruleFactory.getRuleSequenceForNamespace(RuleExecutionNamespace.NAMING));
 
 		if (checkForDuplicateName) {
 			// new array list is required since list generated from asList method does not support adding of more elements

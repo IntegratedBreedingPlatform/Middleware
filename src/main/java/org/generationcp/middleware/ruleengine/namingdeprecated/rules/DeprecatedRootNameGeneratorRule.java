@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.ruleengine.namingdeprecated.rules;
 
-import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.namingdeprecated.expression.DeprecatedRootNameExpression;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
@@ -12,7 +11,7 @@ import java.util.List;
 
 @Deprecated
 @Component
-public class DeprecatedRootNameGeneratorRule extends OrderedRule<DeprecatedNamingRuleExecutionContext> {
+public class DeprecatedRootNameGeneratorRule extends DeprecatedNamingOrderedRule {
 
 	public static final String KEY = "RootNameGenerator";
 

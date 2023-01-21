@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.ruleengine.naming.rules;
 
-import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class SuffixRule extends OrderedRule<NamingRuleExecutionContext> {
+public class SuffixRule extends NamingOrderedRule {
 
 	public static final String KEY = "Suffix";
 

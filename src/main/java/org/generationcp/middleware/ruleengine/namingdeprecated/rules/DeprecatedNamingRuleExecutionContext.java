@@ -3,6 +3,7 @@ package org.generationcp.middleware.ruleengine.namingdeprecated.rules;
 
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.ruleengine.OrderedRuleExecutionContext;
+import org.generationcp.middleware.ruleengine.RuleExecutionNamespace;
 import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.context.MessageSource;
@@ -36,6 +37,11 @@ public class DeprecatedNamingRuleExecutionContext extends OrderedRuleExecutionCo
 	@Override
 	public Object getRuleExecutionOutput() {
 		return this.currentData;
+	}
+
+	@Override
+	public RuleExecutionNamespace getRuleExecutionNamespace() {
+		return RuleExecutionNamespace.NAMING;
 	}
 
 	public DeprecatedProcessCodeService getProcessCodeService() {

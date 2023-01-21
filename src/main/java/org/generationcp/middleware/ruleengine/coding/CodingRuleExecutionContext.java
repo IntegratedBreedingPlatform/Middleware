@@ -2,6 +2,7 @@ package org.generationcp.middleware.ruleengine.coding;
 
 import org.generationcp.middleware.ruleengine.OrderedRuleExecutionContext;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
+import org.generationcp.middleware.ruleengine.RuleExecutionNamespace;
 
 import java.util.List;
 
@@ -20,6 +21,11 @@ public class CodingRuleExecutionContext extends OrderedRuleExecutionContext {
 	@Override
 	public Object getRuleExecutionOutput() {
 		return this.currentData;
+	}
+
+	@Override
+	public RuleExecutionNamespace getRuleExecutionNamespace() {
+		return RuleExecutionNamespace.CODING;
 	}
 
 	public NamingConfiguration getNamingConfiguration() {

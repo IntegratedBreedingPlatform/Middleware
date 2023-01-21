@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.ruleengine.namingdeprecated.rules;
 
-import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
@@ -11,7 +10,7 @@ import java.util.List;
 
 @Deprecated
 @Component
-public class DeprecatedSeparatorRule extends OrderedRule<DeprecatedNamingRuleExecutionContext> {
+public class DeprecatedSeparatorRule extends DeprecatedNamingOrderedRule {
 
 	public static final String KEY = "Separator";
 

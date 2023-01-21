@@ -1,10 +1,8 @@
 
 package org.generationcp.middleware.ruleengine.impl;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.ruleengine.Rule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.RuleExecutionContext;
@@ -13,8 +11,8 @@ import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import javax.annotation.Resource;
+import java.util.List;
 
 public class RulesServiceImpl implements RulesService {
 
@@ -37,11 +35,11 @@ public class RulesServiceImpl implements RulesService {
   		final List<String> sequenceOrder = context.getExecutionOrder();
   
   		assert !sequenceOrder.isEmpty();
-  		Rule rule = this.ruleFactory.getRule(sequenceOrder.get(0));
+  		Rule rule = this.ruleFactory.getRule(context.getRuleExecutionNamespace(), sequenceOrder.get(0));
   
   		while (rule != null) {
   			rule.runRule(context);
-  			rule = this.ruleFactory.getRule(rule.getNextRuleStepKey(context));
+  			rule = this.ruleFactory.getRule(context.getRuleExecutionNamespace(), rule.getNextRuleStepKey(context));
   		}
 		} finally {
 		  monitor.stop();

@@ -5,6 +5,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.ruleengine.BranchingRule;
 import org.generationcp.middleware.ruleengine.RuleException;
+import org.generationcp.middleware.ruleengine.RuleExecutionNamespace;
 import org.generationcp.middleware.ruleengine.pojo.AdvanceGermplasmChangeDetail;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -123,4 +124,10 @@ public class DeprecatedEnforceUniqueNameRule extends BranchingRule<DeprecatedNam
 	public String getKey() {
 		return DeprecatedEnforceUniqueNameRule.KEY;
 	}
+
+	@Override
+	public RuleExecutionNamespace getRuleExecutionNamespace() {
+		return RuleExecutionNamespace.NAMING;
+	}
+
 }

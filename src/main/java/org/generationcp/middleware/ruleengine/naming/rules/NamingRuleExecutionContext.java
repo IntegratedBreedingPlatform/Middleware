@@ -3,6 +3,7 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.ruleengine.OrderedRuleExecutionContext;
+import org.generationcp.middleware.ruleengine.RuleExecutionNamespace;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.context.MessageSource;
@@ -35,6 +36,11 @@ public class NamingRuleExecutionContext extends OrderedRuleExecutionContext {
 	@Override
 	public Object getRuleExecutionOutput() {
 		return this.currentData;
+	}
+
+	@Override
+	public RuleExecutionNamespace getRuleExecutionNamespace() {
+		return RuleExecutionNamespace.NAMING;
 	}
 
 	public ProcessCodeService getProcessCodeService() {
