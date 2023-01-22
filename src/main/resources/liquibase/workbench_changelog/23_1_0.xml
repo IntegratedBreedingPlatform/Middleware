@@ -48,9 +48,7 @@
 		</preConditions>
 		<comment>Change 'study-manager' tool paths</comment>
 		<sql dbms="mysql" splitStatements="true">
-		  UPDATE workbench_tool wt1
-			INNER JOIN workbench_tool wt2 ON wt1.tool_id = wt2.tool_id AND wt2.name = 'study_manager_fieldbook_web'
-		  SET wt1.path = '/ibpworkbench/controller/jhipster#study-manager', wt1.version = '23.1';
+		  UPDATE workbench_tool SET path = '/ibpworkbench/controller/jhipster#study-manager', version = '23.1' WHERE name = 'study_manager_fieldbook_web';
 		</sql>
 	</changeSet>
 
