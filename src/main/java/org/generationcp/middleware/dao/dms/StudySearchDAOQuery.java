@@ -8,13 +8,12 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.util.Constants;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.generationcp.middleware.util.StringUtil;
-import org.generationcp.middleware.util.Util;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -49,10 +48,6 @@ public class StudySearchDAOQuery {
 		}
 
 	}
-
-
-	//TODO: move to utils
-	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
 
 	private static final Map<Integer, String> geoCoordinatesColumnsByTermId = new HashMap<>();
 
@@ -200,12 +195,12 @@ public class StudySearchDAOQuery {
 
 		if (request.getStudyStartDateFrom() != null) {
 			sqlQueryBuilder.append(" AND study.start_date >= :studyStartDateFrom ");
-			sqlQueryBuilder.setParameter("studyStartDateFrom", DATE_FORMAT.format(request.getStudyStartDateFrom()));
+			sqlQueryBuilder.setParameter("studyStartDateFrom", Constants.DATE_FORMAT.format(request.getStudyStartDateFrom()));
 		}
 
 		if (request.getStudyStartDateTo() != null) {
 			sqlQueryBuilder.append(" AND study.start_date <= :studyStartDateTo ");
-			sqlQueryBuilder.setParameter("studyStartDateTo", DATE_FORMAT.format(request.getStudyStartDateTo()));
+			sqlQueryBuilder.setParameter("studyStartDateTo", Constants.DATE_FORMAT.format(request.getStudyStartDateTo()));
 		}
 
 		if (!StringUtils.isEmpty(request.getParentFolderName())) {
