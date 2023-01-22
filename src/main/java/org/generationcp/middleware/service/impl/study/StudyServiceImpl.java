@@ -278,10 +278,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 		studyDetailsDTO.setEndDate(studyData.getEndDate());
 		studyDetailsDTO.setLastUpdateDate(studyData.getUpdateDate());
 
-		// TODO: I added a method to retrieve a dataset with its variables in New Advance process implementation: https://github.com/IntegratedBreedingPlatform/Middleware/blob/0bbe6823d1c72f1cd4b3b14cd62f4e3c4e55fa8f/src/main/java/org/generationcp/middleware/service/api/dataset/DatasetService.java#L149
 		final DatasetDTO plotDataset =
 			this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId())).get(0);
-		// TODO: Also added a variableTypeResolver: https://github.com/IntegratedBreedingPlatform/Middleware/blob/0bbe6823d1c72f1cd4b3b14cd62f4e3c4e55fa8f/src/main/java/org/generationcp/middleware/service/impl/dataset/DatasetServiceImpl.java#L686
 		final List<Integer> observationDatasetVariableTypes = DatasetServiceImpl.OBSERVATION_DATASET_VARIABLE_TYPES;
 		observationDatasetVariableTypes.add(VariableType.EXPERIMENTAL_DESIGN.getId());
 		plotDataset.setVariables(this.daoFactory.getDmsProjectDAO()
