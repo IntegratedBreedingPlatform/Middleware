@@ -39,7 +39,7 @@ public class PlantSelectedResolverTest {
 	public void resolvePlantSelected_usingSameNotBulkingBreedingMethodAndSameNumberOfLines() {
 		final boolean isBulkMethod = false;
 		final Integer selectedBreedingMethodId = new Random().nextInt();
-		final Integer givenLinesSelected = new Random().nextInt();
+		final Integer givenLinesSelected = new Random().nextInt(Integer.MAX_VALUE);
 		final AdvanceStudyRequest advanceStudyRequest =
 			this.createMockAdvanceStudyRequest(selectedBreedingMethodId, null, givenLinesSelected, null, null, null
 			);
@@ -70,7 +70,7 @@ public class PlantSelectedResolverTest {
 	public void resolvePlantSelected_usingSameNotBulkingBreedingMethodAndVariateForNumberOfLines() {
 		final boolean isBulkMethod = false;
 		final Integer selectedBreedingMethodId = new Random().nextInt();
-		final Integer expectedLinesSelected = new Random().nextInt();
+		final Integer expectedLinesSelected = new Random().nextInt(Integer.MAX_VALUE);
 		final Integer lineVariateId = new Random().nextInt();
 		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(selectedBreedingMethodId, null, null,
 			lineVariateId, null, null
@@ -136,7 +136,7 @@ public class PlantSelectedResolverTest {
 	public void resolvePlantSelected_usingSameBulkingBreedingMethodAndVariateForPlots() {
 		final boolean isBulkMethod = true;
 		final Integer selectedBreedingMethodId = new Random().nextInt();
-		final Integer linesSelected = new Random().nextInt();
+		final Integer linesSelected = new Random().nextInt(Integer.MAX_VALUE);
 		final Integer plotVariateId = new Random().nextInt();
 		final boolean allPlotsSelected = false;
 
@@ -241,7 +241,7 @@ public class PlantSelectedResolverTest {
 	public void resolvePlantSelected_usingNotBulkingVariateBreedingMethodAndSameNumberOfLines() {
 		final boolean isBulkMethod = false;
 		final Integer methodVariateId = new Random().nextInt();
-		final Integer expectedLinesSelected = new Random().nextInt();
+		final Integer expectedLinesSelected = new Random().nextInt(Integer.MAX_VALUE);
 		final String plotBreedingMethodCode = RandomStringUtils.randomAlphabetic(10);
 
 		final AdvanceStudyRequest advanceStudyRequest =
@@ -281,7 +281,7 @@ public class PlantSelectedResolverTest {
 	public void resolvePlantSelected_usingNotBulkingVariateBreedingMethodAndVariateForNumberOfLines() {
 		final boolean isBulkMethod = false;
 		final Integer methodVariateId = new Random().nextInt();
-		final Integer expectedLinesSelected = new Random().nextInt();
+		final Integer expectedLinesSelected = new Random().nextInt(Integer.MAX_VALUE);
 		final String plotBreedingMethodCode = RandomStringUtils.randomAlphabetic(10);
 		final Integer lineVariateId = new Random().nextInt();
 		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(null, methodVariateId, null, lineVariateId, null,
@@ -367,7 +367,7 @@ public class PlantSelectedResolverTest {
 		final Integer plotVariateId = new Random().nextInt();
 		final String plotBreedingMethodCode = RandomStringUtils.randomAlphabetic(10);
 		final boolean allPlotsSelected = false;
-		final Integer linesSelected = new Random().nextInt();
+		final Integer linesSelected = new Random().nextInt(Integer.MAX_VALUE);
 
 		final AdvanceStudyRequest advanceStudyRequest = this.createMockAdvanceStudyRequest(null, methodVariateId, null, null,
 			allPlotsSelected, plotVariateId
@@ -406,6 +406,46 @@ public class PlantSelectedResolverTest {
 	 */
 	@Test
 	public void resolvePlantSelected_usingBulkingBreedingVariateMethodAndVariateForPlotsWithoutValue() {
+		this.assertResolvePlantSelected_usingBulkingBreedingVariateMethodAndInvalidVariatePlotValue(null);
+	}
+
+	/**
+	 * For this scenario the user has selected:
+	 * - a variate that defines a bulking breeding method for each advance
+	 * - a variate that defines which plots were selected but the variate has a string as value
+	 * <p>
+	 * Should return 0
+	 */
+	@Test
+	public void resolvePlantSelected_usingBulkingBreedingVariateMethodAndVariateForPlotsWithStringAsValue() {
+		this.assertResolvePlantSelected_usingBulkingBreedingVariateMethodAndInvalidVariatePlotValue("something");
+	}
+
+	/**
+	 * For this scenario the user has selected:
+	 * - a variate that defines a bulking breeding method for each advance
+	 * - a variate that defines which plots were selected but the variate has a negative number as value
+	 * <p>
+	 * Should return 0
+	 */
+	@Test
+	public void resolvePlantSelected_usingBulkingBreedingVariateMethodAndVariateForPlotsWithNegativeNumberAsValue() {
+		this.assertResolvePlantSelected_usingBulkingBreedingVariateMethodAndInvalidVariatePlotValue("-1");
+	}
+
+	/**
+	 * For this scenario the user has selected:
+	 * - a variate that defines a bulking breeding method for each advance
+	 * - a variate that defines which plots were selected but the variate has zero as value
+	 * <p>
+	 * Should return 0
+	 */
+	@Test
+	public void resolvePlantSelected_usingBulkingBreedingVariateMethodAndVariateForPlotsWithZeroAsValue() {
+		this.assertResolvePlantSelected_usingBulkingBreedingVariateMethodAndInvalidVariatePlotValue("0");
+	}
+
+	private void assertResolvePlantSelected_usingBulkingBreedingVariateMethodAndInvalidVariatePlotValue(final String value) {
 		final boolean isBulkMethod = true;
 		final Integer methodVariateId = new Random().nextInt();
 		final Integer plotVariateId = new Random().nextInt();
@@ -418,7 +458,7 @@ public class PlantSelectedResolverTest {
 
 		final ObservationUnitRow observationUnitRow = Mockito.mock(ObservationUnitRow.class);
 		Mockito.when(observationUnitRow.getVariableValueByVariableId(methodVariateId)).thenReturn(plotBreedingMethodCode);
-		Mockito.when(observationUnitRow.getVariableValueByVariableId(plotVariateId)).thenReturn(null);
+		Mockito.when(observationUnitRow.getVariableValueByVariableId(plotVariateId)).thenReturn(value);
 
 		final Method breedingMethod = Mockito.mock(Method.class);
 		Mockito.when(breedingMethod.isBulkingMethod()).thenReturn(isBulkMethod);

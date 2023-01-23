@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.impl.study.advance.resolver;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.pojos.Method;
@@ -55,10 +56,10 @@ public class PlantSelectedResolver {
 		if (isBulkMethod) {
 			if (bulkingRequest != null && (bulkingRequest.getAllPlotsSelected() == null || !bulkingRequest.getAllPlotsSelected())) {
 				// User has selected a variable that defines the number of lines selected from each plot. However, this is tricky because
-				// the variable works as a boolean. It return 1 if there is a value present, otherwise it returns zero.
+				// the variable works as a boolean. It return 1 if there is a valid value present, otherwise it returns zero.
 				final String plotVariateValue =
 					plotObservation.getVariableValueByVariableId(bulkingRequest.getPlotVariateId());
-				return StringUtils.isEmpty(plotVariateValue) ? 0 : 1;
+				return this.isValidPlotVariateValue(plotVariateValue) ? 1 : 0;
 			} else {
 				return 1;
 			}
@@ -74,6 +75,10 @@ public class PlantSelectedResolver {
 				return lineSelectionRequest.getLinesSelected();
 			}
 		}
+	}
+
+	private boolean isValidPlotVariateValue(final String plotVariateValue) {
+		return !StringUtils.isEmpty(plotVariateValue) && NumberUtils.isNumber(plotVariateValue) && Integer.parseInt(plotVariateValue) > 0;
 	}
 
 }
