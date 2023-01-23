@@ -188,6 +188,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					.entrySet()
 					.stream()
 					.filter(mapEntry -> {
+						if (String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()).equals(mapEntry.getKey()) ||
+							String.valueOf(TermId.GROUP_SOURCE_NAME.getId()).equals(mapEntry.getKey()) ||
+							String.valueOf(TermId.DESIG.getId()).equals(mapEntry.getKey())) {
+							return false;
+						}
 						final String variableType = filter.getVariableTypeMap().get(mapEntry.getKey());
 						return variableType == null;
 					}).forEach(mapEntry -> {
@@ -799,7 +804,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (!forVisualization && !CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())) {
 			for (final MeasurementVariableDto envCondition : searchDto.getEnvironmentConditions()) {
 				if (this.isColumnVisible(envCondition.getName(), searchDto.getVisibleColumns())) {
-					final StringBuilder envConditionFormat = new StringBuilder(" SELECT pheno.value from phenotype pheno ")
+					final StringBuilder envConditionFormat = new StringBuilder(" (SELECT pheno.value from phenotype pheno ")
 						.append(" INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.name = '%s' ")
 						.append(
 							" INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id AND envnde.project_id = :datasetEnvironmentId ")
@@ -1079,8 +1084,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					continue;
 				}
 
-				final String variableType = filter.getVariableTypeMap().get(variableId);
+				if (String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()).equals(variableId) ||
+					String.valueOf(TermId.GROUP_SOURCE_NAME.getId()).equals(variableId) ||
+					String.valueOf(TermId.DESIG.getId()).equals(variableId)) {
+					continue;
+				}
 
+				final String variableType = filter.getVariableTypeMap().get(variableId);
 				if (null == variableType) {
 					final String alias = this.formatNameAlias(variableId);
 					havingConditions.add(String.format(" %s LIKE :%s_text ", alias, variableId));

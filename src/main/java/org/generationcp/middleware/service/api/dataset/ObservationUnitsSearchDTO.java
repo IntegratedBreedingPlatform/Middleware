@@ -7,6 +7,7 @@ import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +35,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	 * List of columns that will be included and retrieved in the query.
 	 * If no columns are specified, the query will retrieve all columns by default.
 	 */
-	private Set<String> visibleColumns;
+	private Set<String> visibleColumns = new HashSet<>();
 
 	/**
 	 * This is used by DataTables to ensure that the Ajax returns from server-side processing requests are drawn in sequence

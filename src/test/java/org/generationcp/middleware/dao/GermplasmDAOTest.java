@@ -1333,9 +1333,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final UserDefinedField puiUserDefinedField = this.daoFactory.getUserDefinedFieldDAO()
 			.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), "PUI");
-		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, "PUI1", 0, 0, 0);
-		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, "PUI2", 0, 0, 0);
-		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, "PUI3", 0, 0, 0);
+		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
 
 		this.daoFactory.getNameDao().save(name1);
 		this.daoFactory.getNameDao().save(name2);
@@ -1365,9 +1365,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final UserDefinedField puiUserDefinedField = this.daoFactory.getUserDefinedFieldDAO()
 			.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), "PUI");
-		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, "PUI1", 0, 0, 0);
-		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, "PUI2", 0, 0, 0);
-		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, "PUI3", 0, 0, 0);
+		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
 
 		this.daoFactory.getNameDao().save(name1);
 		this.daoFactory.getNameDao().save(name2);
@@ -1430,9 +1430,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final UserDefinedField puiUserDefinedField = this.daoFactory.getUserDefinedFieldDAO()
 			.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), "PUI");
-		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, "PUI1", 0, 0, 0);
-		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, "PUI2", 0, 0, 0);
-		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, "PUI3", 0, 0, 0);
+		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
 
 		this.daoFactory.getNameDao().save(name1);
 		this.daoFactory.getNameDao().save(name2);
@@ -1479,9 +1479,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final UserDefinedField puiUserDefinedField = this.daoFactory.getUserDefinedFieldDAO()
 			.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), "PUI");
-		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, "PUI1", 0, 0, 0);
-		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, "PUI2", 0, 0, 0);
-		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, "PUI3", 0, 0, 0);
+		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
 
 		this.daoFactory.getNameDao().save(name1);
 		this.daoFactory.getNameDao().save(name2);
@@ -1594,9 +1594,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final UserDefinedField puiUserDefinedField = this.daoFactory.getUserDefinedFieldDAO()
 			.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), "PUI");
-		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, "PUI1", 0, 0, 0);
-		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, "PUI2", 0, 0, 0);
-		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, "PUI3", 0, 0, 0);
+		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
 
 		this.daoFactory.getNameDao().save(name1);
 		this.daoFactory.getNameDao().save(name2);
@@ -1633,9 +1633,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final UserDefinedField puiUserDefinedField = this.daoFactory.getUserDefinedFieldDAO()
 			.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), "PUI");
-		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, "PUI1", 0, 0, 0);
-		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, "PUI2", 0, 0, 0);
-		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, "PUI3", 0, 0, 0);
+		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
 
 		this.daoFactory.getNameDao().save(name1);
 		this.daoFactory.getNameDao().save(name2);
@@ -1672,9 +1672,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final UserDefinedField puiUserDefinedField = this.daoFactory.getUserDefinedFieldDAO()
 			.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), "PUI");
-		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, "PUI1", 0, 0, 0);
-		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, "PUI2", 0, 0, 0);
-		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, "PUI3", 0, 0, 0);
+		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
 
 		this.daoFactory.getNameDao().save(name1);
 		this.daoFactory.getNameDao().save(name2);
@@ -1732,9 +1732,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final UserDefinedField puiUserDefinedField = this.daoFactory.getUserDefinedFieldDAO()
 			.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), "PUI");
-		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, "PUI1", 0, 0, 0);
-		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, "PUI2", 0, 0, 0);
-		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, "PUI3", 0, 0, 0);
+		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
+		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, RandomStringUtils.randomAlphabetic(10), 0, 0, 0);
 
 		this.daoFactory.getNameDao().save(name1);
 		this.daoFactory.getNameDao().save(name2);
