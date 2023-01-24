@@ -171,5 +171,15 @@
             DROP PROCEDURE enforce_unique_germplasm_name_type;
         </sql>
     </changeSet>
-    
+
+    <changeSet author="mderamos" id="v23.1.0-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+                    WHERE TABLE_NAME = 'names' AND CONSTRAINT_NAME='names_uc1' and TABLE_SCHEMA = DATABASE();
+            </sqlCheck>
+        </preConditions>
+        <comment>Add unique constraint to names table for gid and ntype columns</comment>
+        <addUniqueConstraint columnNames="gid, ntype" constraintName="names_uc1" tableName="names" />
+    </changeSet>
 </databaseChangeLog>
