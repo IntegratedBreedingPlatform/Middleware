@@ -244,7 +244,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	private Integer mgid;
 
 	@OneToMany(mappedBy = "germplasm", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@BatchSize(size = 5000)
 	private List<Name> names = new ArrayList<>();
 
 	@Type(type = "org.hibernate.type.NumericBooleanType")

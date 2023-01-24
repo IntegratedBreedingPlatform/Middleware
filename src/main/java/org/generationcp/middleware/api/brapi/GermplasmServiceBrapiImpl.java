@@ -180,6 +180,9 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 			createdGermplasmUUIDs.add(germplasm.getGermplasmUUID());
 		}
 		if (!createdGermplasmUUIDs.isEmpty()) {
+			// Unless the session is flushed, the latest changes to germplasm,names and attributes are not reflected in object returned by method
+			this.sessionProvider.getSession().flush();
+
 			final GermplasmSearchRequest searchRequestDto = new GermplasmSearchRequest();
 			searchRequestDto.setGermplasmDbIds(createdGermplasmUUIDs);
 			return this.searchGermplasmDTO(searchRequestDto, null);
