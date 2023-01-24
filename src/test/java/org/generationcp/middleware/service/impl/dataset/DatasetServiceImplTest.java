@@ -669,7 +669,7 @@ public class DatasetServiceImplTest {
 		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao)
 			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.doReturn(dmsProject).when(this.dmsProjectDao).getById(datasetId);
-		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
+		this.datasetService.getAllObservationUnitRows(studyId, datasetId, null);
 		Mockito.verify(this.dmsProjectDao).getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 		Mockito.verify(this.obsUnitsSearchDao)

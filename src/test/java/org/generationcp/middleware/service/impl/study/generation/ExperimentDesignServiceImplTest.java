@@ -134,7 +134,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(
 				instanceNumbers));
 		this.sessionProvder.getSession().flush();
-		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertNotNull(rows);
 
 		// Verify saving of variables
@@ -171,7 +171,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 
 		this.sessionProvder.getSession().flush();
 
-		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertNotNull(rows);
 
 		// Verify saving of variables
@@ -203,7 +203,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows((Arrays.asList(1, 2))));
 		this.sessionProvder.getSession().flush();
 
-		final List<ObservationUnitRow> previousRows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		final List<ObservationUnitRow> previousRows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertEquals(2 * NO_ENTRIES * NO_REPS * NO_TREATMENTS, previousRows.size());
 		// Save fieldmap info for instance1
 		final Integer geolocationId1 = this.daoFactory.getGeolocationDao()
@@ -222,7 +222,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
-		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertNotNull(rows);
 
 		// Verify saving of variables
@@ -262,7 +262,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), instanceRowsMap);
 		this.sessionProvder.getSession().flush();
 
-		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertNotNull(rows);
 
 		// Verify saving of variables
@@ -314,7 +314,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		// Delete experiment design
 		this.experimentDesignService.deleteStudyExperimentDesign(this.studyId);
 
-		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertTrue(rows.isEmpty());
 
 		environmentVariableIds =
@@ -344,7 +344,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 
 		// Delete Design
 		this.experimentDesignService.deleteStudyExperimentDesign(this.studyId);
-		List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertTrue(rows.isEmpty());
 
 		final List<Integer> environmentVariableIds =
@@ -369,7 +369,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(),instanceRowsMap);
 		this.sessionProvder.getSession().flush();
 
-		rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertNotNull(rows);
 
 		// Verify saving of variables

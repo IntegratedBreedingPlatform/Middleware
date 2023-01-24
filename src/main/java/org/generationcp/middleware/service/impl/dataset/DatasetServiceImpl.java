@@ -798,7 +798,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<ObservationUnitRow> getAllObservationUnitRows(final int studyId, final int datasetId) {
+	public List<ObservationUnitRow> getAllObservationUnitRows(final int studyId, final int datasetId, final Set<String> visibleColumns) {
 		final DmsProject environmentDataset =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
 		final List<MeasurementVariable> studyVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(
@@ -810,6 +810,7 @@ public class DatasetServiceImpl implements DatasetService {
 		searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
+		searchDTO.setVisibleColumns(visibleColumns);
 		this.updateSearchDto(studyId, datasetId, searchDTO);
 
 		final List<ObservationUnitRow> observationUnits =
