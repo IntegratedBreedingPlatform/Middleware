@@ -60,6 +60,7 @@ import org.generationcp.middleware.service.impl.study.advance.visitor.GetExperim
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetPlantSelectedVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetSampleNumbersVisitor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -368,9 +369,13 @@ public class AdvanceServiceImpl implements AdvanceService {
 			plotDataObservationsSearchDTO.setFilter(filter);
 		}
 
+		final Sort sort = new Sort(
+			new Sort.Order(Sort.Direction.ASC, "TRIAL_INSTANCE"),
+			new Sort.Order(Sort.Direction.ASC, "PLOT_NO"),
+			new Sort.Order(Sort.Direction.ASC, "REP_NO"));
+		final PageRequest pageRequest = new PageRequest(0, Integer.MAX_VALUE, sort);
 		return this.datasetService
-			.getObservationUnitRows(studyId, plotDatasetId, plotDataObservationsSearchDTO,
-				new PageRequest(0, Integer.MAX_VALUE));
+			.getObservationUnitRows(studyId, plotDatasetId, plotDataObservationsSearchDTO, pageRequest);
 	}
 
 	private List<ObservationUnitRow> getTrialObservations(final Integer studyId, final Integer environmentDatasetId,
