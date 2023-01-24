@@ -3,5 +3,173 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="mderamos" id="v23.1.0-1">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <sqlCheck expectedResult="0">
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        information_schema.routines
+                    WHERE
+                        routine_schema = DATABASE()
+                      AND specific_name = 'enforce_unique_germplasm_name_type';
+                </sqlCheck>
+                <not>
+                    <sqlCheck expectedResult="0">
+                        SELECT COUNT(*) FROM
+                            (SELECT COUNT(*) FROM names GROUP BY gid, ntype HAVING COUNT(*) > 1) nametype_duplicates;
+                    </sqlCheck>
+                </not>
+            </and>
+        </preConditions>
+        <comment>
+            Create stored procedure enforce_unique_germplasm_name_type for enforcing unique germplasm's name nametypes
+            and creating new nametypes for the duplicates.
+        </comment>
+        <sql dbms="mysql" splitStatements="false">
+			<![CDATA[
+            CREATE PROCEDURE `enforce_unique_germplasm_name_type`()
+            BEGIN
+                DECLARE nameId INT;
+                DECLARE duplicateNameId INT;
+                DECLARE gid INT;
+                DECLARE nameTypeId INT;
+                DECLARE nameTypeIndex INT DEFAULT 1;
+                DECLARE baseNameType VARCHAR(255);
+                DECLARE currentNameType VARCHAR(255);
+
+                DECLARE hasExistingNameType INT DEFAULT FALSE;
+                DECLARE isNameTypeUsedByGermplasm INT DEFAULT TRUE;
+                DECLARE done INT DEFAULT FALSE;
+
+                -- retrieved entries will not be updated
+                DECLARE names_with_duplicates CURSOR FOR
+                    SELECT name.nid as `nameId`, name.gid as `gid`, name.ntype as `nameTypeId`
+                    FROM names name
+                    group by name.gid, name.ntype HAVING COUNT(*) > 1;
+
+                -- duplicate nametypes will be updated to remove duplicates
+                DECLARE duplicate_names CURSOR FOR
+                    SELECT name.nid as `duplicateNameId`
+                    FROM names name
+                    WHERE name.gid = gid AND name.ntype = nameTypeId and name.nid != nameId;
+
+                DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+                DECLARE EXIT HANDLER FOR SQLEXCEPTION
+                BEGIN
+                    ROLLBACK;
+                    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error in migrating summary statistics data.';
+                END;
+
+                OPEN names_with_duplicates;
+                names_loop: LOOP FETCH names_with_duplicates INTO  nameId, gid, nameTypeId;
+
+                        IF done THEN
+                            CLOSE names_with_duplicates;
+                            LEAVE names_loop;
+                        END IF;
+
+                        -- reset index to 0
+                        SET nameTypeIndex = 0;
+
+                        SELECT nameType.fcode INTO baseNameType
+                            FROM udflds nameType
+                            WHERE nameType.fldno = nameTypeId;
+
+                        IF baseNameType REGEXP '_[0-9]$' THEN
+                            -- Get the base name, ie: LNAME_1 will return LNAME
+                            SELECT LEFT(nameType.fcode, CHAR_LENGTH(nameType.fcode) - LOCATE('_', REVERSE(nameType.fcode))) INTO baseNameType
+                                from udflds nameType
+                                WHERE nameType.fldno = nameTypeId;
+                        END IF;
+
+                    OPEN duplicate_names;
+                    duplicate_names_loop: LOOP FETCH duplicate_names INTO duplicateNameId;
+                        IF done THEN
+                            -- set done to false for Outer loop's Continue handling
+                            SET done = false;
+                            CLOSE duplicate_names;
+                            LEAVE duplicate_names_loop;
+                        END IF;
+
+                        -- set initially to TRUE to enter loop
+                        SET isNameTypeUsedByGermplasm = TRUE;
+
+                        WHILE isNameTypeUsedByGermplasm DO
+                            SELECT (nameTypeIndex + 1) INTO nameTypeIndex;
+                            SELECT CONCAT(baseNameType, CONCAT('_', nameTypeIndex)) INTO currentNameType;
+
+                            -- Check if nametype is existing
+                            SELECT COUNT(1) INTO hasExistingNameType FROM udflds WHERE fcode = currentNameType
+                                AND ftable = 'NAMES' AND ftype = 'NAME';
+
+                            IF hasExistingNameType THEN
+                                -- Check if existing nametype is used by germplasm
+                                SELECT COUNT(1) INTO isNameTypeUsedByGermplasm FROM names name
+                                    INNER JOIN udflds nametype ON name.ntype = nametype.fldno
+                                    WHERE nametype.fcode = currentNameType AND name.gid = gid;
+                            ELSE
+                                -- Create a new nametype if not yet existing in Database
+                                INSERT INTO udflds(ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid)
+                                SELECT nametype.ftable, nametype.ftype, currentNameType, nametype.fname, nametype.ffmt,
+                                    nametype.fdesc, nametype.lfldno, nametype.fuid, nametype.fdate, nametype.scaleid
+                                    FROM udflds nametype WHERE nametype.fldno = nameTypeId;
+                                SET isNameTypeUsedByGermplasm = FALSE;
+                            END IF;
+                        END WHILE;
+
+                        -- update the name's nametype
+                        UPDATE names name
+                            SET name.ntype = (SELECT fldno FROM udflds WHERE fcode = currentNameType AND ftable = 'NAMES' AND ftype = 'NAME')
+                            WHERE name.nid = duplicateNameId;
+                    END LOOP duplicate_names_loop;
+                END LOOP names_loop;
+                COMMIT;
+            END;
+            ]]>
+		</sql>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v23.1.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT
+                COUNT(*)
+                FROM
+                information_schema.routines
+                WHERE
+                routine_schema = DATABASE()
+                AND specific_name = 'enforce_unique_germplasm_name_type';
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Call stored procedure enforce_unique_germplasm_name_type for enforcing unique germplasm's name nametypes
+            and creating new nametypes for the duplicates.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            CALL enforce_unique_germplasm_name_type();
+        </sql>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v23.1.0-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT
+                    COUNT(*)
+                FROM
+                    information_schema.routines
+                WHERE
+                    routine_schema = DATABASE()
+                  AND specific_name = 'enforce_unique_germplasm_name_type';
+            </sqlCheck>
+        </preConditions>
+        <comment>Drop procedure enforce_unique_germplasm_name_type</comment>
+        <sql dbms="mysql" splitStatements="false">
+            DROP PROCEDURE enforce_unique_germplasm_name_type;
+        </sql>
+    </changeSet>
     
 </databaseChangeLog>
