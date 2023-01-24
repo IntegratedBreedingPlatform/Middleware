@@ -40,6 +40,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integer> {
 
@@ -941,14 +943,22 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private void addOrder(final StringBuilder sql, final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName,
 		final String plotNoName, final Pageable pageable) {
 
+		if (pageable != null && pageable.getSort() != null) {
+			final String orderClause = StreamSupport.stream(pageable.getSort().spliterator(), false)
+				.filter(order -> StringUtils.isNotBlank(order.getProperty()))
+				.map(order -> {
+					final String property = order.getProperty();
+					final String sortDirection = order.getDirection().name();
+					return "(1 * `" + property + "`) " + sortDirection + ", `" + property + "` " + sortDirection;
+				})
+				.collect(Collectors.joining(","));
+			sql.append(" ) T ORDER BY ").append(orderClause);
+			return;
+		}
+
 		String orderColumn;
 		String sortBy = "";
 		String direction = "asc";
-		if (pageable != null && pageable.getSort() != null) {
-			sortBy = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getProperty() : "";
-			final String sortOrder = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getDirection().name() : "";
-			direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
-		}
 		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)
 			&& !plotNoName.equals(observationUnitNoName)) {
 			orderColumn = ObservationUnitsSearchDao.OBSERVATION_UNIT_NO;
