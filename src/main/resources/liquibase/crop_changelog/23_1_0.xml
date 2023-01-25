@@ -103,14 +103,14 @@
                             SELECT CONCAT(baseNameType, CONCAT('_', nameTypeIndex)) INTO currentNameType;
 
                             -- Check if nametype is existing
-                            SELECT COUNT(1) INTO hasExistingNameType FROM udflds WHERE fcode = currentNameType
-                                AND ftable = 'NAMES' AND ftype = 'NAME';
+                            SELECT EXISTS(SELECT fcode FROM udflds WHERE fcode = currentNameType
+                                AND ftable = 'NAMES' AND ftype = 'NAME') INTO hasExistingNameType;
 
                             IF hasExistingNameType THEN
                                 -- Check if existing nametype is used by germplasm
-                                SELECT COUNT(1) INTO isNameTypeUsedByGermplasm FROM names name
+                                SELECT EXISTS(SELECT name.ntype  FROM names name
                                     INNER JOIN udflds nametype ON name.ntype = nametype.fldno
-                                    WHERE nametype.fcode = currentNameType AND name.gid = gid;
+                                    WHERE nametype.fcode = currentNameType AND name.gid = gid) INTO isNameTypeUsedByGermplasm;
                             ELSE
                                 -- Create a new nametype if not yet existing in Database
                                 INSERT INTO udflds(ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid)
