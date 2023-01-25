@@ -1277,7 +1277,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "  max(case when json_props like '%geoCoordinates%' then 1 else 0 end) as hasGeoJSON, \n"
 
 				// if instance obs units are associated to transactions
-				+ "	case when hasInventory.nd_geolocation_id is null then 0 else 1 end as hasInventory, \n"
+				+ "	case when \n"
+				+ "    EXISTS(select ne.nd_geolocation_id  \n"
+				+ "    from ims_experiment_transaction iet  \n"
+				+ "             inner join nd_experiment ne on ne.nd_experiment_id = iet.nd_experiment_id  \n"
+				+ "             inner join ims_transaction it on it.trnid = iet.trnid  \n"
+				+ "    where it.trnstat <> 9 and ne.nd_geolocation_id = geoloc.nd_geolocation_id) then 1 else 0 end as hasInventory,  \n"
 
 				// If study has any plot experiments, hasExperimentalDesign flag = true
 				+ "  case when EXISTS(select exp.nd_experiment_id FROM nd_experiment exp WHERE exp.type_id = 1155 "
@@ -1295,7 +1300,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "                     INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 \n"
 				+ "            where exp.nd_geolocation_id = geoloc.nd_geolocation_id) \n"
 				// or inventory
-				+ "        or hasInventory.nd_geolocation_id is not null \n"
+				+ "        or EXISTS(select ne.nd_geolocation_id  \n"
+				+ "             from ims_experiment_transaction iet  \n"
+				+ "             inner join nd_experiment ne on ne.nd_experiment_id = iet.nd_experiment_id  \n"
+				+ "             inner join ims_transaction it on it.trnid = iet.trnid  \n"
+				+ "             where it.trnstat <> 9 and ne.nd_geolocation_id = geoloc.nd_geolocation_id) \n"
 				// or has files
 				+ "        or EXISTS(select f.file_id \n"
 				+ "            from file_metadata f \n"
@@ -1318,13 +1327,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ " inner join project proj on proj.project_id = nde.project_id \n"
 				+ " left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 				+ "	left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = " + TermId.LOCATION_ID.getId() + " \n"
-				+ " left join (  \n"
-				+ "    select ne.nd_geolocation_id  \n"
-				+ "    from ims_experiment_transaction iet  \n"
-				+ "             inner join nd_experiment ne on ne.nd_experiment_id = iet.nd_experiment_id  \n"
-				+ "             inner join ims_transaction it on it.trnid = iet.trnid  \n"
-				+ "    where it.trnstat <> 9  \n"
-				+ ") hasInventory on hasInventory.nd_geolocation_id = geoloc.nd_geolocation_id "
 				+ " left join nd_experimentprop ndep on nde.nd_experiment_id = ndep.nd_experiment_id "
 				+ " where proj.project_id = :datasetId \n";
 
