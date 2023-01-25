@@ -571,6 +571,8 @@ public class DatasetServiceImpl implements DatasetService {
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setCreatedDate(new Date());
 		phenotype.setUpdatedDate(new Date());
+		phenotype.setCreatedBy(observation.getCreatedBy());
+
 		phenotype.setcValue(observation.getCategoricalValueId());
 		final Integer variableId = observation.getVariableId();
 		phenotype.setObservableId(variableId);
@@ -613,6 +615,8 @@ public class DatasetServiceImpl implements DatasetService {
 			this.resolveObservationStatus(observableId, phenotype);
 		}
 
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setUpdatedBy(observationDto.getUpdatedBy());
 		phenotypeDao.update(phenotype);
 
 		if (!observationDto.isDraftMode()) {
@@ -1606,6 +1610,8 @@ public class DatasetServiceImpl implements DatasetService {
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setCreatedDate(new Date());
 		phenotype.setUpdatedDate(new Date());
+		phenotype.setCreatedBy(observation.getCreatedBy());
+		phenotype.setUpdatedBy(observation.getUpdatedBy());
 
 		final Integer variableId = observation.getVariableId();
 		phenotype.setObservableId(variableId);

@@ -9,6 +9,8 @@ public class ObservationDto {
 	private String status;
 	private String createdDate;
 	private String updatedDate;
+	private Integer createdBy;
+	private Integer updatedBy;
 	private Integer observationUnitId;
 	private Integer draftCategoricalValueId;
 	private String draftValue;
@@ -88,13 +90,27 @@ public class ObservationDto {
 		this.createdDate = createdDate;
 	}
 
+	public Integer getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public void setCreatedBy(final Integer createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Integer getUpdatedBy() {
+		return this.updatedBy;
+	}
+
+	public void setUpdatedBy(final Integer updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
 	public Integer getObservationUnitId() {
 		return this.observationUnitId;
 	}
 
-	public void setObservationUnitId(final Integer observationUnitId) {
-		this.observationUnitId = observationUnitId;
-	}
+	public void setObservationUnitId(final Integer observationUnitId) {	this.observationUnitId = observationUnitId; }
 
 	public Integer getDraftCategoricalValueId() {
 		return this.draftCategoricalValueId;
