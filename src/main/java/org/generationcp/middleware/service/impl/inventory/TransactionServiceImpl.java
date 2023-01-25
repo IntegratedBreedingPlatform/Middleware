@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.impl.inventory;
 
+import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
@@ -11,6 +12,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -38,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -222,10 +225,16 @@ public class TransactionServiceImpl implements TransactionService {
 					final ObservationUnitsSearchDTO observationUnitsSearchDTO = (ObservationUnitsSearchDTO) this.searchRequestService
 						.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(), ObservationUnitsSearchDTO.class);
 					final DatasetDTO datasetDTO = this.studyDatasetService.getDataset(observationUnitsSearchDTO.getDatasetId());
+
+					// Add required columns
+					final Set<String> visibleColumns = new HashSet<>();
+					visibleColumns.add(TermId.GID.name());
+					visibleColumns.add(TermId.OBS_UNIT_ID.name());
+					observationUnitsSearchDTO.setVisibleColumns(visibleColumns);
+
 					final List<ObservationUnitRow> observationUnitRows =
 						this.studyDatasetService.getObservationUnitRows(datasetDTO.getParentDatasetId(),
 							observationUnitsSearchDTO.getDatasetId(), observationUnitsSearchDTO, null);
-
 
 					Map<String, ExperimentModel> subObsExperimentalMap = this.daoFactory.getExperimentDao()
 						.getByObsUnitIds(observationUnitRows.stream().map(ObservationUnitRow::getObsUnitId).collect(
