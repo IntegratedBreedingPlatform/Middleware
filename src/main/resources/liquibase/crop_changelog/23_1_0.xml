@@ -61,7 +61,7 @@
                 DECLARE EXIT HANDLER FOR SQLEXCEPTION
                 BEGIN
                     ROLLBACK;
-                    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error in migrating summary statistics data.';
+                    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error in enforcing unique germplasm name type.';
                 END;
 
                 OPEN names_with_duplicates;
