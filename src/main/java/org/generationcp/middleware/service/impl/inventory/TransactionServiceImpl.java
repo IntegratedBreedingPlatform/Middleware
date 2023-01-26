@@ -1,6 +1,6 @@
 package org.generationcp.middleware.service.impl.inventory;
 
-import org.generationcp.middleware.constant.ColumnLabels;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -226,17 +227,18 @@ public class TransactionServiceImpl implements TransactionService {
 						.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(), ObservationUnitsSearchDTO.class);
 					final DatasetDTO datasetDTO = this.studyDatasetService.getDataset(observationUnitsSearchDTO.getDatasetId());
 
-					// Add required columns
-					final Set<String> visibleColumns = new HashSet<>();
-					visibleColumns.add(TermId.GID.name());
-					visibleColumns.add(TermId.OBS_UNIT_ID.name());
-					observationUnitsSearchDTO.setVisibleColumns(visibleColumns);
+					// Add only the required observation table columns necessary for this function
+					final Map<Integer, String> requiredColumns =
+						this.daoFactory.getCvTermDao().getByIds(Lists.newArrayList(TermId.GID.getId(),
+							TermId.OBS_UNIT_ID.getId())).stream().collect(Collectors.toMap(CVTerm::getCvTermId, CVTerm::getName));
+
+					observationUnitsSearchDTO.setVisibleColumns(new HashSet<>(requiredColumns.values()));
 
 					final List<ObservationUnitRow> observationUnitRows =
 						this.studyDatasetService.getObservationUnitRows(datasetDTO.getParentDatasetId(),
 							observationUnitsSearchDTO.getDatasetId(), observationUnitsSearchDTO, null);
 
-					Map<String, ExperimentModel> subObsExperimentalMap = this.daoFactory.getExperimentDao()
+					final Map<String, ExperimentModel> subObsExperimentalMap = this.daoFactory.getExperimentDao()
 						.getByObsUnitIds(observationUnitRows.stream().map(ObservationUnitRow::getObsUnitId).collect(
 							Collectors.toList())).stream().collect(Collectors.toMap(ExperimentModel::getObsUnitId, Function.identity()));
 
