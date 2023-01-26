@@ -56,7 +56,7 @@
 			</sqlCheck>
         </preConditions>
         <comment>
-            Create sequence entry for germplasm_study_source table generator
+            Create sequence entry for names table generator
         </comment>
         <sql dbms="mysql" splitStatements="true">
 			insert into sequence(sequence_name, sequence_value)
