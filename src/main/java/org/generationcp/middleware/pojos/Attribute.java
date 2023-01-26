@@ -20,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import java.io.Serializable;
 
 
@@ -39,7 +40,9 @@ public class Attribute extends AbstractEntity implements GenericAttribute, Seria
 	public static final String GET_BY_GID = "getAttributesByGID";
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@TableGenerator(name = "attributeIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
+		pkColumnValue = "atributs", allocationSize = 500)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "attributeIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "aid")
 	private Integer aid;

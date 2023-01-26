@@ -149,6 +149,8 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		GermplasmGuidGenerator.generateGermplasmGuids(this.crop, Collections.singletonList(this.germplasm));
 		this.daoFactory.getGermplasmDao().save(this.germplasm);
 
+		this.sessionProvder.getSession().flush();
+
 		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(this.germplasm.getGid());
 		germplasmName.setTypeId(2);
 		this.daoFactory.getNameDao().save(germplasmName);

@@ -4,6 +4,7 @@ package org.generationcp.middleware;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
@@ -18,9 +19,12 @@ public class GermplasmTestDataGenerator {
 	private static final Integer TEST_METHOD_ID = 101;
 	public static final String TEST_METHOD_NAME = "Single cross";
 
+	private HibernateSessionProvider sessionProvider;
 	private final DaoFactory daoFactory;
 
-	public GermplasmTestDataGenerator(final DaoFactory daoFactory) {
+	public GermplasmTestDataGenerator(final HibernateSessionProvider sessionProvider,
+		final DaoFactory daoFactory) {
+		this.sessionProvider = sessionProvider;
 		this.daoFactory = daoFactory;
 	}
 
@@ -34,6 +38,8 @@ public class GermplasmTestDataGenerator {
 		germplasm.getNames().add(preferredName);
 		this.daoFactory.getGermplasmDao().save(germplasm);
 
+		this.sessionProvider.getSession().flush();
+
 		return germplasm.getGid();
 	}
 
@@ -46,6 +52,7 @@ public class GermplasmTestDataGenerator {
 		preferredName.setGermplasm(germplasm);
 
 		this.daoFactory.getGermplasmDao().save(germplasm);
+		this.sessionProvider.getSession().flush();
 		this.daoFactory.getGermplasmDao().refresh(germplasm);
 		this.daoFactory.getNameDao().save(preferredName);
 		final Name otherName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid(), "Other Name ");
@@ -66,6 +73,7 @@ public class GermplasmTestDataGenerator {
 		germplasm.setMethod(new Method(GermplasmTestDataGenerator.TEST_METHOD_ID));
 
 		this.daoFactory.getGermplasmDao().save(germplasm);
+		this.sessionProvider.getSession().flush();
 		this.daoFactory.getGermplasmDao().refresh(germplasm);
 		this.daoFactory.getNameDao().save(preferredName);
 

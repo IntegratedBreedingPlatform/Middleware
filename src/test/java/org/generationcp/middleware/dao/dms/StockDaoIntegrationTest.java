@@ -213,6 +213,7 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 			germplasm.setGid(null);
 			this.germplasmDao.save(germplasm);
+			this.sessionProvder.getSession().flush();
 			this.germplasmDao.refresh(germplasm);
 			this.gids.add(germplasm.getGid());
 

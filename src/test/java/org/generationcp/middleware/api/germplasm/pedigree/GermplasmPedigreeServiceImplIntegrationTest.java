@@ -296,6 +296,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 		final Germplasm germplasm = new Germplasm(null, gnpgs, gpid1, gpid2, 0, 20201212, 0,
 			0, mgid, null, null, method);
 		this.daoFactory.getGermplasmDao().save(germplasm);
+		this.sessionProvder.getSession().flush();
 		this.daoFactory.getGermplasmDao().refresh(germplasm);
 
 		//Add preferred name

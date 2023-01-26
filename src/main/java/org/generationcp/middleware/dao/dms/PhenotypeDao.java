@@ -670,7 +670,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			this.getSession().flush();
 			// Delete phenotypes
 			this.getSession().createSQLQuery("DELETE FROM phenotype "
-				+ " WHERE phenotype.phenotype_id IN (:phenotypeIds)")
+					+ " WHERE phenotype.phenotype_id IN (:phenotypeIds)")
 				.setParameterList("phenotypeIds", phenotypeIds)
 				.executeUpdate();
 
@@ -710,14 +710,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			this.getSession().flush();
 			final StringBuilder query = new StringBuilder("UPDATE phenotype pheno SET ");
 			final String value = newValue == null ? null : "'" + newValue + "'";
-			if(draftMode) {
+			if (draftMode) {
 				query.append("	pheno.draft_value = " + value);
 				query.append("	, pheno.draft_cvalue_id = " + newCValueId);
 			} else {
 				query.append("	pheno.value = " + value);
 				query.append("	, pheno.cvalue_id = " + newCValueId);
 			}
-			if(isDerivedTrait) {
+			if (isDerivedTrait) {
 				query.append(" , pheno.status = '" + Phenotype.ValueStatus.MANUALLY_EDITED + "' ");
 			}
 
@@ -1141,13 +1141,28 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	private static void addObservationUnitSearchFilter(final ObservationUnitSearchRequestDTO requestDTO, final StringBuilder queryString) {
 		final List<String> cvTermIds = requestDTO.getObservationVariableDbIds();
+		final List<String> cvTermNames = requestDTO.getObservationVariableNames();
 
-		if (!CollectionUtils.isEmpty(cvTermIds)) {
+		if (!CollectionUtils.isEmpty(cvTermIds) || !CollectionUtils.isEmpty(cvTermNames)) {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATION_FILTER);
+
+			if (!CollectionUtils.isEmpty(cvTermIds)) {
+				queryString.append(PhenotypeQuery.TERM_ID_FILTER);
+			}
+
+			if (!CollectionUtils.isEmpty(cvTermNames)) {
+				queryString.append(PhenotypeQuery.TERM_NAME_FILTER);
+			}
+
+			queryString.append(")");
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getStudyDbIds())) {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getStudyNames())) {
+			queryString.append(" AND concat(p.name, '_', gl.description) IN (:studyNames)");
 		}
 
 		if (requestDTO.getObservationLevel() != null) {
@@ -1171,16 +1186,32 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append(" AND l.locid in (:locationDbIds) ");
 		}
 
+		if (!CollectionUtils.isEmpty(requestDTO.getLocationNames())) {
+			queryString.append(" AND l.lname in (:locationNames) ");
+		}
+
 		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
 			queryString.append(" AND g.germplsm_uuid in (:germplasmDbIds) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmNames())) {
+			queryString.append(" AND names.nval in (:germplasmNames) ");
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getProgramDbIds())) {
 			queryString.append(" AND p.program_uuid IN (:programDbIds) ");
 		}
 
+		if (!CollectionUtils.isEmpty(requestDTO.getProgramNames())) {
+			queryString.append(" AND wp.project_name IN (:programNames) ");
+		}
+
 		if (!CollectionUtils.isEmpty(requestDTO.getTrialDbIds())) {
 			queryString.append(" AND p.project_id IN (:trialDbIds) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getTrialNames())) {
+			queryString.append(" AND p.name IN (:trialNames) ");
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getObservationUnitDbIds())) {
@@ -1237,13 +1268,22 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	private static void addObservationUnitSearchQueryParams(final ObservationUnitSearchRequestDTO requestDTO, final SQLQuery sqlQuery) {
 
 		final List<String> cvTermIds = requestDTO.getObservationVariableDbIds();
+		final List<String> cvTermNames = requestDTO.getObservationVariableNames();
 
 		if (!CollectionUtils.isEmpty(cvTermIds)) {
 			sqlQuery.setParameterList(CV_TERM_IDS, cvTermIds);
 		}
 
+		if (!CollectionUtils.isEmpty(cvTermNames)) {
+			sqlQuery.setParameterList("cvTermNames", cvTermNames);
+		}
+
 		if (!CollectionUtils.isEmpty(requestDTO.getStudyDbIds())) {
 			sqlQuery.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getStudyNames())) {
+			sqlQuery.setParameterList("studyNames", requestDTO.getStudyNames());
 		}
 
 		if (requestDTO.getObservationLevel() != null) {
@@ -1263,16 +1303,32 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			sqlQuery.setParameterList("locationDbIds", requestDTO.getLocationDbIds());
 		}
 
+		if (!CollectionUtils.isEmpty(requestDTO.getLocationNames())) {
+			sqlQuery.setParameterList("locationNames", requestDTO.getLocationNames());
+		}
+
 		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
 			sqlQuery.setParameterList("germplasmDbIds", requestDTO.getGermplasmDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmNames())) {
+			sqlQuery.setParameterList("germplasmNames", requestDTO.getGermplasmNames());
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getProgramDbIds())) {
 			sqlQuery.setParameterList("programDbIds", requestDTO.getProgramDbIds());
 		}
 
+		if (!CollectionUtils.isEmpty(requestDTO.getProgramNames())) {
+			sqlQuery.setParameterList("programNames", requestDTO.getProgramNames());
+		}
+
 		if (!CollectionUtils.isEmpty(requestDTO.getTrialDbIds())) {
 			sqlQuery.setParameterList("trialDbIds", requestDTO.getTrialDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getTrialNames())) {
+			sqlQuery.setParameterList("trialNames", requestDTO.getTrialNames());
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getObservationUnitDbIds())) {

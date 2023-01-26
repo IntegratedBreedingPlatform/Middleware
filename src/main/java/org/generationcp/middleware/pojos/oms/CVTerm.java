@@ -98,8 +98,9 @@ public class CVTerm implements Serializable {
 	public CVTerm() {
 	}
 
-	public CVTerm(final Integer cvTermId, final Integer cv, final String name, final String definition, final Integer dbxRefId, final Integer isObsolete,
-			final Integer isRelationshipType, final Boolean isSystem) {
+	public CVTerm(final Integer cvTermId, final Integer cv, final String name, final String definition, final Integer dbxRefId,
+		final Integer isObsolete,
+		final Integer isRelationshipType, final Boolean isSystem) {
 		super();
 		this.cvTermId = cvTermId;
 		this.cvId = cv;
@@ -156,7 +157,6 @@ public class CVTerm implements Serializable {
 	}
 
 	public void setIsObsolete(final Boolean isObsolete) {
-
 		this.isObsolete = isObsolete ? 1 : 0;
 	}
 

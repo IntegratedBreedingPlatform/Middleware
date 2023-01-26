@@ -25,6 +25,9 @@ public class GermplasmExternalReferenceAuditIntegrationTest extends GenericExter
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName("LNAME");
 		this.daoFactory.getGermplasmDao().save(germplasm);
+
+		this.sessionProvder.getSession().flush();
+
 		this.recordId = germplasm.getGid();
 	}
 

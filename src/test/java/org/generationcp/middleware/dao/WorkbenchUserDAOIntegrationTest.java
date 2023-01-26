@@ -110,7 +110,7 @@ public class WorkbenchUserDAOIntegrationTest extends IntegrationTestBase {
 			assertThat(m.getRole().getId(), equalTo(role.getId()));
 			assertThat(m.getRole().getName(), equalTo(role.getName()));
 			assertThat(m.getRole().getDescription(), equalTo(role.getDescription()));
-			assertThat(m.getRole().getType(), equalToIgnoringCase(role.getRoleType().getName()));
+			assertThat(m.getRole().getRoleType().getName(), equalToIgnoringCase(role.getRoleType().getName()));
 		});
 	}
 

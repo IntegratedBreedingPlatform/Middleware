@@ -152,6 +152,9 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm = GermplasmTestDataInitializer
 				.createGermplasm(20180909, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		this.germplasmDao.save(germplasm);
+
+		this.sessionProvder.getSession().flush();
+
 		final List<String> targetFileUUIDs = new ArrayList();
 		targetFileUUIDs.add(this.fileMetadata1.getFileUUID());
 		targetFileUUIDs.add(this.fileMetadata2.getFileUUID());
