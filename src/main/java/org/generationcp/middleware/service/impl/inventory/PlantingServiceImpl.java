@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.inventory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -20,6 +21,7 @@ import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,8 +72,18 @@ public class PlantingServiceImpl implements PlantingService {
 		this.processSearchComposite(searchDTO);
 
 		// List Numeric Entry Details variables that are not system variable.
-		final List<MeasurementVariable> entryDetails = this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.ENTRY_DETAIL.getId())) //
-			.stream().filter( var -> DataType.NUMERIC_VARIABLE.getId().equals(var.getDataTypeId()) && !var.isSystemVariable()).collect(Collectors.toList());
+		final List<MeasurementVariable> entryDetails =
+			this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.ENTRY_DETAIL.getId())) //
+				.stream().filter(var -> DataType.NUMERIC_VARIABLE.getId().equals(var.getDataTypeId()) && !var.isSystemVariable())
+				.collect(Collectors.toList());
+
+		// Add only the required columns necessary for this function
+		final Map<Integer, String> requiredColumns =
+			this.daoFactory.getCvTermDao().getByIds(Lists.newArrayList(TermId.TRIAL_INSTANCE_FACTOR.getId(),
+				TermId.GID.getId(), TermId.DESIG.getId(), TermId.ENTRY_TYPE.getId(), TermId.ENTRY_NO.getId(),
+				TermId.OBS_UNIT_ID.getId())).stream().collect(Collectors.toMap(CVTerm::getCvTermId, CVTerm::getName));
+
+		searchDTO.getSearchRequest().setVisibleColumns(new HashSet<>(requiredColumns.values()));
 
 		// observation units
 		final List<ObservationUnitRow> observationUnitRows =
@@ -90,7 +103,7 @@ public class PlantingServiceImpl implements PlantingService {
 				entry.setEntryNo(observationUnitRow.getEntryNumber());
 				entry.setGid(gid);
 				entry.setDesignation(observationUnitRow.getDesignation());
-				entry.setEntryType(observationUnitRow.getVariables().get(TermId.ENTRY_TYPE.name()).getValue());
+				entry.setEntryType(observationUnitRow.getVariables().get(requiredColumns.get(TermId.ENTRY_TYPE.getId())).getValue());
 
 				entriesByEntryNo.put(observationUnitRow.getEntryNumber(), entry);
 
@@ -102,7 +115,7 @@ public class PlantingServiceImpl implements PlantingService {
 				for (final MeasurementVariable entryDetail : entryDetails) {
 					final String value = observationUnitRow.getVariables().get(entryDetail.getName()).getValue();
 					entriesByEntryNo.get(observationUnitRow.getEntryNumber()).getEntryDetailVariableId()
-						.put(entryDetail.getTermId(), StringUtils.isEmpty(value) ? null: Double.valueOf(value));
+						.put(entryDetail.getTermId(), StringUtils.isEmpty(value) ? null : Double.valueOf(value));
 				}
 			}
 
@@ -212,7 +225,7 @@ public class PlantingServiceImpl implements PlantingService {
 			final List<Integer> ndExperimentIds = new ArrayList<>();
 			plantingPreparationDTO.getEntries().stream().filter(entry -> entry.getEntryNo().equals(lotEntryNumber.getEntryNo()))
 				.forEach(entry -> ndExperimentIds.addAll(entry.getObservationUnits().stream().map(
-					PlantingPreparationDTO.PlantingPreparationEntryDTO.ObservationUnitDTO::getNdExperimentId)
+						PlantingPreparationDTO.PlantingPreparationEntryDTO.ObservationUnitDTO::getNdExperimentId)
 					.collect(Collectors.toList())));
 
 			//Get requested lot
@@ -227,7 +240,8 @@ public class PlantingServiceImpl implements PlantingService {
 			final Double amount = this.defineAmount(lotEntryNumber.getEntryNo(), lot, withdrawalInstruction, variableMapByEntryNo);
 			final BigDecimal totalToWithdraw =
 				(withdrawalInstruction.isWithdrawAllAvailableBalance()) ? new BigDecimal(amount) :
-					(new BigDecimal(amount).multiply(new BigDecimal(ndExperimentIds.size())).setScale(3, RoundingMode.HALF_DOWN).stripTrailingZeros());
+					(new BigDecimal(amount).multiply(new BigDecimal(ndExperimentIds.size())).setScale(3, RoundingMode.HALF_DOWN)
+						.stripTrailingZeros());
 
 			if (totalToWithdraw.doubleValue() > lot.getAvailableBalance()) {
 				throw new MiddlewareRequestException("", "planting.not.enough.inventory", lot.getStockId());
@@ -280,8 +294,10 @@ public class PlantingServiceImpl implements PlantingService {
 	}
 
 	@Override
-	public List<Transaction> getPlantingTransactionsByStudyAndEntryId(Integer studyId, Integer entryId, TransactionStatus transactionStatus) {
-		return daoFactory.getExperimentTransactionDao().getTransactionsByStudyAndEntryId(studyId, entryId, transactionStatus, ExperimentTransactionType.PLANTING);
+	public List<Transaction> getPlantingTransactionsByStudyAndEntryId(Integer studyId, Integer entryId,
+		TransactionStatus transactionStatus) {
+		return daoFactory.getExperimentTransactionDao()
+			.getTransactionsByStudyAndEntryId(studyId, entryId, transactionStatus, ExperimentTransactionType.PLANTING);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
