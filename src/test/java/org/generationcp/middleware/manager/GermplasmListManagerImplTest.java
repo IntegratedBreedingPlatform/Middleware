@@ -73,7 +73,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, this.daoFactory);
 		}
 
 		final GermplasmListTestDataInitializer germplasmListTDI = new GermplasmListTestDataInitializer();

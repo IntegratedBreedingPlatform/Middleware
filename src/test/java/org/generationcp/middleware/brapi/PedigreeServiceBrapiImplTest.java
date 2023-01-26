@@ -73,6 +73,8 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final Attribute attribute1 = this.addAttribute(germplasm_A, "Attribute1", RandomStringUtils.randomAlphabetic(10));
 		final Attribute attribute2 = this.addAttribute(germplasm_A, "Attribute2", RandomStringUtils.randomAlphabetic(10));
 
+		this.sessionProvder.getSession().flush();
+
 		final PedigreeNodeSearchRequest pedigreeNodeSearchRequest = new PedigreeNodeSearchRequest();
 		// Include full pedigree tree
 		pedigreeNodeSearchRequest.setIncludeFullTree(false);
@@ -888,8 +890,8 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
 		germplasm.setBibref(reference);
 		this.daoFactory.getGermplasmDao().save(germplasm);
-		this.daoFactory.getGermplasmDao().refresh(germplasm);
 		this.sessionProvder.getSession().flush();
+		this.daoFactory.getGermplasmDao().refresh(germplasm);
 
 		assertThat(germplasm.getCreatedBy(), is(this.userId));
 		assertNotNull(germplasm.getCreatedBy());

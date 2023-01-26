@@ -89,7 +89,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		this.projectDao = new DmsProjectDao();
 		this.projectDao.setSession(this.sessionProvder.getSession());
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, daoFactory);
 		}
 		this.dataSetupTest = new DataSetupTest();
 		this.dataSetupTest.setDataImportService(this.dataImportService);

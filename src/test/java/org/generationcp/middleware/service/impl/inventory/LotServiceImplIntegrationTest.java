@@ -87,7 +87,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.lotService.setTransactionService(this.transactionService);
 		this.lotService.setOntologyVariableDataManager(this.ontologyVariableDataManager);
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, this.daoFactory);
 		this.createGermplasm();
 		this.userId = this.findAdminUser();
 		this.createLot();
