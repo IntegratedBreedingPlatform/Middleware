@@ -182,4 +182,6 @@ public interface UserService {
 
 	long countAllActiveUsers();
 
+	Integer getCurrentlyLoggedInUserId();
+
 }

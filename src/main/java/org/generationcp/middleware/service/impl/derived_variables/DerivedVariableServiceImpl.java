@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -43,6 +44,9 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	@Autowired
 	private DatasetService datasetService;
+
+	@Autowired
+	private UserService userService;
 
 	private DaoFactory daoFactory;
 
@@ -222,9 +226,12 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	}
 
 	private void createPhenotype(final ObservationDto observation) {
+		final Integer loggedInUser = this.userService.getCurrentlyLoggedInUserId();
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setCreatedDate(new Date());
 		phenotype.setUpdatedDate(new Date());
+		phenotype.setCreatedBy(loggedInUser);
+		phenotype.setUpdatedBy(loggedInUser);
 		phenotype.setcValue(observation.getCategoricalValueId());
 		final Integer variableId = observation.getVariableId();
 		phenotype.setObservableId(variableId);

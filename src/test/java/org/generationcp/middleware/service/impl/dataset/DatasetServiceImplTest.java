@@ -41,12 +41,14 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorTest;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -107,6 +109,7 @@ public class DatasetServiceImplTest {
 	public static final String PLOT_NO = "PLOT_NO";
 	public static final String REP_NO = "REP_NO";
 	private static final String EXPECTED = "5";
+	private static final Integer USER_ID = 1;
 
 	@Mock
 	private DaoFactory daoFactory;
@@ -131,6 +134,9 @@ public class DatasetServiceImplTest {
 
 	@Mock
 	private StudyService studyService;
+
+	@Mock
+	private UserService userService;
 
 	@Mock
 	private ProjectPropertyDao projectPropertyDao;
@@ -326,6 +332,7 @@ public class DatasetServiceImplTest {
 		when(this.formulaDao.getByTargetVariableId(observableId)).thenReturn(new Formula());
 		when(this.phenotypeDao.getById(observationId)).thenReturn(existingPhenotype);
 
+		Mockito.when(this.userService.getCurrentlyLoggedInUserId()).thenReturn(USER_ID);
 		final ObservationDto savedObservation =
 			this.datasetService.updatePhenotype(observationId, observationDto);
 
