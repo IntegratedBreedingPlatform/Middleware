@@ -6,15 +6,140 @@
 
     <changeSet author="mderamos" id="v23.1.0-1">
         <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) from names where nstat=9;
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <comment> Remove germplasm names with deleted status(9)
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DELETE FROM names where nstat=9;
+        </sql>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v23.1.0-2">
+        <preConditions onFail="MARK_RAN">
             <and>
                 <sqlCheck expectedResult="0">
-                    SELECT
-                        COUNT(*)
-                    FROM
-                        information_schema.routines
-                    WHERE
-                        routine_schema = DATABASE()
-                      AND specific_name = 'enforce_unique_germplasm_name_type';
+                    SELECT COUNT(*) FROM information_schema.routines
+                    WHERE routine_schema = DATABASE() AND specific_name = 'fix_names_with_invalid_name_type';
+                </sqlCheck>
+                <not>
+                    <sqlCheck expectedResult="0">
+                        SELECT COUNT(*) FROM names name
+                            WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype);
+                    </sqlCheck>
+                </not>
+            </and>
+        </preConditions>
+        <comment>
+            Create stored procedure to "fix" names with invalid name types. Names with invalid nametype will be deleted
+            except for cases where all nametypes for a germplasm is invalid. The deleted name entries will be added
+            to a names backup table.
+        </comment>
+        <sql dbms="mysql" splitStatements="false">
+            <![CDATA[
+            CREATE PROCEDURE `fix_names_with_invalid_name_type`()
+            BEGIN
+                DECLARE lnameId INT;
+                DECLARE gid INT;
+                DECLARE isPreferredNameInvalid INT DEFAULT false;
+                DECLARE hasValidNames INT DEFAULT false;
+
+                SELECT fldno INTO lnameId FROM udflds where fcode='LNAME'  AND ftable = 'NAMES' AND ftype = 'NAME';
+
+                DECLARE gid_with_invalid_name_types CURSOR FOR
+                    SELECT DISTINCT(name.gid) as `gid` FROM names name
+                    WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype);
+
+                DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+                DECLARE EXIT HANDLER FOR SQLEXCEPTION
+                BEGIN
+                    ROLLBACK;
+                    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error in fixing names with invalid nameTypes.';
+                END;
+
+                OPEN gid_with_invalid_name_types;
+                gid_with_invalid_name_types_loop: LOOP FETCH gid_with_invalid_name_types INTO gid;
+                    IF done THEN
+                        CLOSE gid_with_invalid_name_types;
+                        LEAVE gid_with_invalid_name_types_loop;
+                    END IF;
+
+
+                    SELECT EXISTS (SELECT name.nid FROM names name
+                        WHERE name.gid = gid AND name.nstat = 1 AND
+                        NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype))
+                        INTO isPreferredNameInvalid;
+
+                    -- check if preferred name is invalid
+                    IF isPreferredNameInvalid THEN
+                        SELECT EXISTS (SELECT name.gid FROM names name
+                            WHERE name.gid = gid AND
+                            EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype)) INTO hasValidNames;
+
+                        -- check if there are valid names for the germplasm and set one of them as the preferred
+                        IF hasValidNames THEN
+                            UPDATE names SET nstat = 1
+                                WHERE nid = (SELECT name.nid FROM names name WHERE name.gid = gid AND
+                                EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype) LIMIT 1);
+                        ELSE
+                            -- if all names have invalid nametype, change the nametype of the preferred to LNAME
+                            UPDATE names name SET name.ntype = lnameId
+                                WHERE name.gid = gid AND name.nstat = 1;
+                        END IF;
+                    END IF;
+                END LOOP gid_with_invalid_name_types_loop;
+
+                CREATE TABLE names_invalid_ntype_bkp AS
+                SELECT * FROM names name
+                WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype);
+
+                DELETE * FROM names name
+                WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype);
+                COMMIT;
+            END;
+            ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v23.1.0-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.routines
+                WHERE routine_schema = DATABASE() AND specific_name = 'fix_names_with_invalid_name_type';
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Call stored procedure fix_names_with_invalid_name_type for "fixing" names with invalid nametypes.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            CALL fix_names_with_invalid_name_type();
+        </sql>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v23.1.0-5">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.routines
+                WHERE routine_schema = DATABASE() AND specific_name = 'fix_names_with_invalid_name_type';
+            </sqlCheck>
+        </preConditions>
+        <comment>Drop procedure fix_names_with_invalid_name_type</comment>
+        <sql dbms="mysql" splitStatements="false">
+            DROP PROCEDURE fix_names_with_invalid_name_type;
+        </sql>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v23.1.0-6">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM information_schema.routines
+                    WHERE routine_schema = DATABASE() AND specific_name = 'enforce_unique_germplasm_name_type';
                 </sqlCheck>
                 <not>
                     <sqlCheck expectedResult="0">
@@ -133,16 +258,11 @@
 		</sql>
     </changeSet>
 
-    <changeSet author="mderamos" id="v23.1.0-2">
+    <changeSet author="mderamos" id="v23.1.0-7">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
-                SELECT
-                COUNT(*)
-                FROM
-                information_schema.routines
-                WHERE
-                routine_schema = DATABASE()
-                AND specific_name = 'enforce_unique_germplasm_name_type';
+                SELECT COUNT(*) FROM information_schema.routines
+                WHERE routine_schema = DATABASE() AND specific_name = 'enforce_unique_germplasm_name_type';
             </sqlCheck>
         </preConditions>
         <comment>
@@ -154,16 +274,11 @@
         </sql>
     </changeSet>
 
-    <changeSet author="mderamos" id="v23.1.0-3">
+    <changeSet author="mderamos" id="v23.1.0-8">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
-                SELECT
-                    COUNT(*)
-                FROM
-                    information_schema.routines
-                WHERE
-                    routine_schema = DATABASE()
-                  AND specific_name = 'enforce_unique_germplasm_name_type';
+                SELECT COUNT(*) FROM information_schema.routines
+                WHERE routine_schema = DATABASE() AND specific_name = 'enforce_unique_germplasm_name_type';
             </sqlCheck>
         </preConditions>
         <comment>Drop procedure enforce_unique_germplasm_name_type</comment>
@@ -172,7 +287,7 @@
         </sql>
     </changeSet>
 
-    <changeSet author="mderamos" id="v23.1.0-4">
+    <changeSet author="mderamos" id="v23.1.0-9">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
