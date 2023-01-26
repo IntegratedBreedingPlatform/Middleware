@@ -43,16 +43,16 @@
             <![CDATA[
             CREATE PROCEDURE `fix_names_with_invalid_name_type`()
             BEGIN
-                DECLARE lnameId INT;
                 DECLARE gid INT;
                 DECLARE isPreferredNameInvalid INT DEFAULT false;
                 DECLARE hasValidNames INT DEFAULT false;
+                DECLARE done INT DEFAULT false;
+                DECLARE validNameId INT;
 
-                SELECT fldno INTO lnameId FROM udflds where fcode='LNAME'  AND ftable = 'NAMES' AND ftype = 'NAME';
-
+                -- retrieve germplasm with invalid preferred name types
                 DECLARE gid_with_invalid_name_types CURSOR FOR
-                    SELECT DISTINCT(name.gid) as `gid` FROM names name
-                    WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype);
+                    SELECT name.gid as `gid` FROM names name
+                    WHERE name.nstat = 1 AND NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype);
 
                 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
@@ -69,37 +69,35 @@
                         LEAVE gid_with_invalid_name_types_loop;
                     END IF;
 
+                    SELECT EXISTS (SELECT name.gid FROM names name
+                        WHERE name.gid = gid AND
+                        EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype)) INTO hasValidNames;
 
-                    SELECT EXISTS (SELECT name.nid FROM names name
-                        WHERE name.gid = gid AND name.nstat = 1 AND
-                        NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype))
-                        INTO isPreferredNameInvalid;
+                    -- check if there are valid names for the germplasm and set one of them as the preferred
+                    IF hasValidNames THEN
+                        SELECT name.nid INTO validNameId FROM names name WHERE name.gid = gid AND
+                            EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = ntype) LIMIT 1;
 
-                    -- check if preferred name is invalid
-                    IF isPreferredNameInvalid THEN
-                        SELECT EXISTS (SELECT name.gid FROM names name
-                            WHERE name.gid = gid AND
-                            EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype)) INTO hasValidNames;
-
-                        -- check if there are valid names for the germplasm and set one of them as the preferred
-                        IF hasValidNames THEN
-                            UPDATE names SET nstat = 1
-                                WHERE nid = (SELECT name.nid FROM names name WHERE name.gid = gid AND
-                                EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype) LIMIT 1);
-                        ELSE
-                            -- if all names have invalid nametype, change the nametype of the preferred to LNAME
-                            UPDATE names name SET name.ntype = lnameId
-                                WHERE name.gid = gid AND name.nstat = 1;
-                        END IF;
+                        UPDATE names SET nstat = 1 WHERE nid = validNameId;
+                    ELSE
+                        -- if all names have invalid nametype, change the nametype of the preferred to LNAME
+                        UPDATE names name SET name.ntype = (SELECT fldno FROM udflds where fcode='LNAME'
+                            AND ftable = 'NAMES' AND ftype = 'NAME')
+                            WHERE name.gid = gid AND name.nstat = 1;
                     END IF;
                 END LOOP gid_with_invalid_name_types_loop;
 
                 CREATE TABLE names_invalid_ntype_bkp AS
-                SELECT * FROM names name
-                WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype);
+                    SELECT * FROM names name
+                    WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype);
 
-                DELETE * FROM names name
-                WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype);
+                SET SQL_SAFE_UPDATES = 0;
+
+                DELETE FROM names
+                    WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = ntype);
+
+                SET SQL_SAFE_UPDATES = 1;
+
                 COMMIT;
             END;
             ]]>
