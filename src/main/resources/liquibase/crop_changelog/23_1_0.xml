@@ -91,13 +91,7 @@
                     SELECT * FROM names name
                     WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype);
 
-                SET SQL_SAFE_UPDATES = 0;
-
-                DELETE FROM names
-                    WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = ntype);
-
-                SET SQL_SAFE_UPDATES = 1;
-
+                DELETE FROM names WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = ntype);
                 COMMIT;
             END;
             ]]>
