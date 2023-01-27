@@ -109,7 +109,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, daoFactory);
 		}
 
 		if (this.studyId == null) {
@@ -319,7 +319,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		final Integer[] gids = this.germplasmTestDataGenerator
 			.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, "PREFF", parentGermplasm);
 
-		this.studyId = this.dataSetupTest.createNurseryForGermplasm(this.commonTestProject.getUniqueID(), gids, "ABCD");
+		this.studyId = this.dataSetupTest.createNurseryForGermplasm(this.commonTestProject.getUniqueID(), gids, "ABCD", DataSetupTest.NUMBER_OF_GERMPLASM, 2);
 		this.observationDatasetId = studyDataManager.getDataSetsByType(this.studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0).getId();
 	}
 

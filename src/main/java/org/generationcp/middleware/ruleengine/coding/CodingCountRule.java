@@ -1,15 +1,14 @@
 package org.generationcp.middleware.ruleengine.coding;
 
-import org.generationcp.middleware.ruleengine.OrderedRule;
+import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.coding.expression.CodingExpressionResolver;
-import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
 @Component
-public class CodingCountRule extends OrderedRule<CodingRuleExecutionContext> {
+public class CodingCountRule extends CodingOrderedRule {
 
 	public static final String KEY = "Count";
 

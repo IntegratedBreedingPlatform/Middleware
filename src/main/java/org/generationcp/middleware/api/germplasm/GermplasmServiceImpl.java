@@ -17,6 +17,7 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
+import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
@@ -1060,6 +1061,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public Map<Integer, Integer> countGermplasmDerivativeProgeny(final Set<Integer> gids) {
 		return this.daoFactory.getGermplasmDao().countGermplasmDerivativeProgeny(gids);
+	}
+
+	@Override
+	public List<BasicGermplasmDTO> getBasicGermplasmByGids(final Set<Integer> gids) {
+		return this.daoFactory.getGermplasmDao().getBasicGermplasmByGids(gids);
 	}
 
 	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Germplasm targetGermplasm) {

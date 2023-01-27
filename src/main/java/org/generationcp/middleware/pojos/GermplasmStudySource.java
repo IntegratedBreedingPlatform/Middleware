@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 
 @Entity
 @Table(name = "germplasm_study_source")
@@ -45,7 +46,9 @@ public class GermplasmStudySource {
 	}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@TableGenerator(name = "germplasmStudySourceIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
+		pkColumnValue = "germplasm_study_source", allocationSize = 500)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "germplasmStudySourceIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "germplasm_study_source_id")
 	private Integer germplasmStudySourceId;

@@ -130,8 +130,7 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.TRAIT.getId(),
 		VariableType.SELECTION_METHOD.getId(),
 		VariableType.GERMPLASM_DESCRIPTOR.getId(),
-		VariableType.ENTRY_DETAIL.getId())//
-	;
+		VariableType.ENTRY_DETAIL.getId());
 
 	protected static final List<Integer> MEANS_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.ENVIRONMENT_DETAIL.getId(),
@@ -510,11 +509,19 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<DatasetDTO> getDatasets(final Integer studyId, final Set<Integer> datasetTypeIds) {
 		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
-		this.filterDatasets(datasetDTOList, studyId, datasetTypeIds);
+		this.filterDatasets(datasetDTOList, studyId, datasetTypeIds, false);
 		return datasetDTOList;
 	}
 
-	private void filterDatasets(final List<DatasetDTO> filtered, final Integer parentId, final Set<Integer> datasetTypeIds) {
+	@Override
+	public List<DatasetDTO> getDatasetsWithVariables(final Integer studyId, final Set<Integer> datasetTypeIds) {
+		final List<DatasetDTO> datasetDTOList = new ArrayList<>();
+		this.filterDatasets(datasetDTOList, studyId, datasetTypeIds, true);
+		return datasetDTOList;
+	}
+
+	private void filterDatasets(final List<DatasetDTO> filtered, final Integer parentId, final Set<Integer> datasetTypeIds,
+		final boolean addVariables) {
 
 		final Map<Integer, Long> countOutOfSyncPerDatasetMap =
 			this.daoFactory.getPhenotypeDAO().countOutOfSyncDataOfDatasetsInStudy(parentId);
@@ -527,6 +534,12 @@ public class DatasetServiceImpl implements DatasetService {
 				datasetDTO.setHasOutOfSyncData(
 					countOutOfSyncPerDatasetMap.containsKey(datasetId) ? countOutOfSyncPerDatasetMap.get(datasetDTO.getDatasetId()) > 0 :
 						Boolean.FALSE);
+				if (addVariables) {
+					final List<Integer> variableTypes = this.resolveVariableTypes(datasetDTO.getDatasetTypeId());
+					final List<MeasurementVariable> variables = this.daoFactory.getDmsProjectDAO()
+						.getObservationSetVariables(datasetId, variableTypes);
+					datasetDTO.setVariables(variables);
+				}
 				filtered.add(datasetDTO);
 			}
 		}
@@ -849,18 +862,18 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Integer countAllObservationUnitsForDataset(
-		final Integer datasetId, final Integer instanceId, final Boolean draftMode) {
-		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, null);
+		final Integer datasetId, final List<Integer> instanceIds, final Boolean draftMode) {
+		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceIds, draftMode, null);
 	}
 
 	@Override
 	public long countFilteredObservationUnitsForDataset(
-		final Integer datasetId, final Integer instanceId, final Boolean draftMode,
+		final Integer datasetId, final List<Integer> instanceIds, final Boolean draftMode,
 		final ObservationUnitsSearchDTO.Filter filter) {
 		// FIXME: It was implemented pre-filters to FEMALE and MALE Parents by NAME or GID.
 		//  Is need a workaround solution to implement filters into the query if possible.
 		this.addPreFilteredGids(filter);
-		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, filter);
+		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceIds, draftMode, filter);
 	}
 
 	@Override
@@ -1367,7 +1380,6 @@ public class DatasetServiceImpl implements DatasetService {
 	public Map<Integer, List<ObservationUnitRow>> getInstanceIdToObservationUnitRowsMap(
 		final int studyId, final int datasetId,
 		final List<Integer> instanceIds) {
-		final Map<Integer, List<ObservationUnitRow>> instanceMap = new LinkedHashMap<>();
 
 		final DmsProject environmentDataset =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
@@ -1375,26 +1387,25 @@ public class DatasetServiceImpl implements DatasetService {
 			studyId,
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
-		for (final Integer instanceId : instanceIds) {
-			final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-			searchDTO.setDatasetId(datasetId);
-			searchDTO.setInstanceId(instanceId);
-			searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
-			searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
-			searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
-			this.updateSearchDto(studyId, datasetId, searchDTO);
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+		searchDTO.setDatasetId(datasetId);
+		searchDTO.setInstanceIds(instanceIds);
+		searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
+		searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
+		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
+		this.updateSearchDto(studyId, datasetId, searchDTO);
 
-			final List<ObservationUnitRow> observationUnits =
-				this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, null);
-			this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
-			instanceMap.put(instanceId, observationUnits);
+		final List<ObservationUnitRow> observationUnits =
+			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, null);
+		this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 
-			if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
-				final Set<Integer> gids = observationUnits.stream().map(s -> s.getGid()).collect(Collectors.toSet());
-				this.addParentsFromPedigreeTable(gids, observationUnits);
-			}
+		if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
+			final Set<Integer> gids = observationUnits.stream().map(s -> s.getGid()).collect(Collectors.toSet());
+			this.addParentsFromPedigreeTable(gids, observationUnits);
 		}
-		return instanceMap;
+
+		return observationUnits.stream()
+			.collect(Collectors.groupingBy(ObservationUnitRow::getInstanceId, LinkedHashMap::new, Collectors.toList()));
 	}
 
 	@Override

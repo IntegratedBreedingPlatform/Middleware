@@ -1,16 +1,15 @@
 
 package org.generationcp.middleware.ruleengine.stockid;
 
-import org.generationcp.middleware.ruleengine.OrderedRule;
-import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.ruleengine.RuleException;
 import org.springframework.stereotype.Component;
 
 /**
  * A rule implementation that defines the logic for processing stock notation within the context of generation of stock IDs
  */
 @Component
-public class StockNotationNumberRule extends OrderedRule<StockIDGenerationRuleExecutionContext> {
+public class StockNotationNumberRule extends StockIDOrderedRule {
 
 	static final String KEY = "NOTATION";
 

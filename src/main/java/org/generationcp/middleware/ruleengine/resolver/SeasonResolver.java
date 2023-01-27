@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.ruleengine.resolver;
 
-import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -14,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Revolves Season value for Nurseries and Trials.
@@ -67,7 +67,7 @@ public class SeasonResolver extends CategoricalKeyCodeResolverBase {
 			}
 		}
 
-		return Optional.absent();
+		return Optional.empty();
 
 	}
 

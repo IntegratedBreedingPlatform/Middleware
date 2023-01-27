@@ -2,7 +2,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import junit.framework.Assert;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +15,14 @@ public class SeasonExpressionTest extends TestExpression {
 
 	public static final Logger LOG = LoggerFactory.getLogger(SeasonExpressionTest.class);
 
+	private static final String DESIGNATION = "GERMPLASM_TEST";
+
 	@Test
 	public void testSeasonAsPrefix() throws Exception {
 		LOG.debug("Testing Season As Prefix");
-		SeasonExpression expression = new SeasonExpression();
-		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", null, "[SEASON]", null, null, true);
-		List<StringBuilder> values = this.createInitialValues(source);
+		final SeasonExpression expression = new SeasonExpression();
+		final AdvancingSource source = this.createAdvancingSourceTestData(DESIGNATION, null, "[SEASON]", null, null, true, 2);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 		expression.apply(values, source, null);
 		this.printResult(values, source);
 		Assert.assertEquals("GERMPLASM_TESTDry", this.buildResult(values));
@@ -29,9 +31,9 @@ public class SeasonExpressionTest extends TestExpression {
 	@Test
 	public void testSeasonAsSuffix() throws Exception {
 		LOG.debug("Testing Season As Suffix");
-		SeasonExpression expression = new SeasonExpression();
-		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", ":", null, null, "[SEASON]", true);
-		List<StringBuilder> values = this.createInitialValues(source);
+		final SeasonExpression expression = new SeasonExpression();
+		final AdvancingSource source = this.createAdvancingSourceTestData(DESIGNATION, ":", null, null, "[SEASON]", true, 2);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 		expression.apply(values, source, null);
 		this.printResult(values, source);
 		Assert.assertEquals("GERMPLASM_TEST:Dry", this.buildResult(values));
@@ -39,13 +41,13 @@ public class SeasonExpressionTest extends TestExpression {
 
 	@Test
 	public void testNoSeason() throws Exception {
-		SimpleDateFormat f = new SimpleDateFormat("YYYYMM");
-		String defSeason = f.format(new Date());
+		final SimpleDateFormat f = new SimpleDateFormat("YYYYMM");
+		final String defSeason = f.format(new Date());
 		LOG.debug("Testing No Season");
-		SeasonExpression expression = new SeasonExpression();
-		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", "-", null, null, "[SEASON]", true);
+		final SeasonExpression expression = new SeasonExpression();
+		final AdvancingSource source = this.createAdvancingSourceTestData(DESIGNATION, "-", null, null, "[SEASON]", true, 2);
 		source.setSeason(null);
-		List<StringBuilder> values = this.createInitialValues(source);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 		expression.apply(values, source, null);
 		this.printResult(values, source);
 		Assert.assertEquals("GERMPLASM_TEST-" + defSeason, this.buildResult(values));
@@ -53,9 +55,9 @@ public class SeasonExpressionTest extends TestExpression {
 
 	@Test
 	public void testCaseSensitive() throws Exception {
-		SeasonExpression expression = new SeasonExpression();
-		DeprecatedAdvancingSource source = this.createAdvancingSourceTestData("GERMPLASM_TEST", null, "[seasOn]", null, null, true);
-		List<StringBuilder> values = this.createInitialValues(source);
+		final SeasonExpression expression = new SeasonExpression();
+		final AdvancingSource source = this.createAdvancingSourceTestData(DESIGNATION, null, "[seasOn]", null, null, true, 2);
+		final List<StringBuilder> values = this.createInitialValues(DESIGNATION, source);
 		expression.apply(values, source, null);
 		LOG.debug("Testing process code is in lower case");
 		this.printResult(values, source);

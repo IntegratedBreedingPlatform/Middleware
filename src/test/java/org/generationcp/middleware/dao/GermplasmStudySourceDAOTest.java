@@ -50,6 +50,7 @@ public class GermplasmStudySourceDAOTest extends IntegrationTestBase {
 		this.germplasmStudySourceSecond =
 			this.integrationTestDataInitializer.addGermplasmStudySource(this.study, plot, geolocation, "333", "444");
 
+		this.sessionProvder.getSession().flush();
 	}
 
 	@Test

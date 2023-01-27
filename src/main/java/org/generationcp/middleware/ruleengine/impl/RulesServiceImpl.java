@@ -1,10 +1,8 @@
 
 package org.generationcp.middleware.ruleengine.impl;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.ruleengine.Rule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.RuleExecutionContext;
@@ -13,8 +11,8 @@ import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import javax.annotation.Resource;
+import java.util.List;
 
 public class RulesServiceImpl implements RulesService {
 
@@ -28,20 +26,20 @@ public class RulesServiceImpl implements RulesService {
 
 	// FIXME : catch RuleExceptions here?
 	@Override
-	public Object runRules(RuleExecutionContext context) throws RuleException {
+	public Object runRules(final RuleExecutionContext context) throws RuleException {
 
-		Monitor monitor = MonitorFactory.start(this.getClass().getName() + ".runRules");
+		final Monitor monitor = MonitorFactory.start(this.getClass().getName() + ".runRules");
 		
 		try{
-		
-  		List<String> sequenceOrder = context.getExecutionOrder();
+
+  		final List<String> sequenceOrder = context.getExecutionOrder();
   
   		assert !sequenceOrder.isEmpty();
-  		Rule rule = this.ruleFactory.getRule(sequenceOrder.get(0));
+  		Rule rule = this.ruleFactory.getRule(context.getRuleExecutionNamespace(), sequenceOrder.get(0));
   
   		while (rule != null) {
   			rule.runRule(context);
-  			rule = this.ruleFactory.getRule(rule.getNextRuleStepKey(context));
+  			rule = this.ruleFactory.getRule(context.getRuleExecutionNamespace(), rule.getNextRuleStepKey(context));
   		}
 		} finally {
 		  monitor.stop();
@@ -51,7 +49,7 @@ public class RulesServiceImpl implements RulesService {
 
 	}
 
-	public void setRuleFactory(RuleFactory ruleFactory) {
+	public void setRuleFactory(final RuleFactory ruleFactory) {
 		this.ruleFactory = ruleFactory;
 	}
 }

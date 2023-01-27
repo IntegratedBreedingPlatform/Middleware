@@ -78,11 +78,11 @@ public class GermplasmTestDataInitializer {
 		final Name name = new Name();
 		name.setGermplasm(new Germplasm(gid));
 		name.setNval(germplasmName);
-		name.setLocationId(Integer.valueOf(1));
-		name.setNdate(Integer.valueOf(20160101));
-		name.setReferenceId(Integer.valueOf(1));
-		name.setTypeId(Integer.valueOf(1));
-		name.setNstat(Integer.valueOf(1));
+		name.setLocationId(1);
+		name.setNdate(20160101);
+		name.setReferenceId(1);
+		name.setTypeId(1);
+		name.setNstat(1);
 
 		return name;
 	}

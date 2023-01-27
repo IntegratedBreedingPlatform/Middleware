@@ -14,15 +14,14 @@ package org.generationcp.middleware.ruleengine.pojo;
 import java.util.List;
 
 /**
- *
  * The POJO for the Germplasm List when Advancing a Nursery.
- *
  */
-public class AdvancingSourceList {
+@Deprecated
+public class DeprecatedAdvancingSourceList {
 
 	private List<DeprecatedAdvancingSource> rows;
 
-	public AdvancingSourceList() {
+	public DeprecatedAdvancingSourceList() {
 	}
 
 	/**

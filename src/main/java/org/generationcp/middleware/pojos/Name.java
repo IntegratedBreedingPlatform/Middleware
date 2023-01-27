@@ -24,6 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import java.io.Serializable;
 import java.util.Optional;
 
@@ -68,7 +69,9 @@ public class Name extends AbstractEntity implements Serializable {
 		+ "WHERE \n g.gid IN (:gids)";
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@TableGenerator(name = "nameIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
+		pkColumnValue = "names", allocationSize = 500)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "nameIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "nid")
 	private Integer nid;

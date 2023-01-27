@@ -20,25 +20,25 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.ruleengine.naming.context.AdvanceContext;
 import org.generationcp.middleware.ruleengine.pojo.ImportedCross;
 import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasmParent;
 import org.generationcp.middleware.ruleengine.service.GermplasmNamingProperties;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -76,8 +76,10 @@ public class SeedSourceGeneratorTest {
 		final TermSummary seasonCategory = new TermSummary(TermId.SEASON_DRY.getId(), Season.DRY.getDefinition(), Season.DRY.getDefinition());
 		seasonScale.addCategory(seasonCategory);
 		seasonVariable.setScale(seasonScale);
-		Mockito.when(this.ontologyVariableDataManager.getVariable(ArgumentMatchers.eq(PROGRAM_UUID),
-			ArgumentMatchers.eq(TermId.SEASON_VAR.getId()), ArgumentMatchers.eq(true))).thenReturn(seasonVariable);
+
+		final Map<Integer, Variable> variablesByTermId = new HashMap<>();
+		variablesByTermId.put(TermId.SEASON_VAR.getId(), seasonVariable);
+		AdvanceContext.setVariablesByTermId(variablesByTermId);
 	}
 
 	@Test

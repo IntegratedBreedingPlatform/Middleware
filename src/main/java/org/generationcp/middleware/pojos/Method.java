@@ -466,14 +466,23 @@ public class Method implements Serializable, Cloneable {
 	}
 
 	@Transient
+	public boolean isDerivative() {
+		return this.mtype != null && MethodType.isDerivative(this.mtype.trim());
+	}
+
+	@Transient
 	public boolean isGenerative() {
-		return this.mtype != null && MethodType.GENERATIVE.getCode().equals(this.mtype.trim());
+		return this.mtype != null && MethodType.isGenerative(this.mtype.trim());
+	}
+
+	@Transient
+	public boolean isMaintenance() {
+		return this.mtype != null && MethodType.isMaintenance(this.mtype.trim());
 	}
 
 	@Transient
 	public boolean isDerivativeOrMaintenance() {
-		return this.mtype != null && (MethodType.DERIVATIVE.getCode().equals(this.mtype.trim()) || MethodType.MAINTENANCE.getCode()
-			.equals(this.mtype.trim()));
+		return this.mtype != null && MethodType.isDerivativeOrMainenance(this.mtype.trim());
 	}
 
 	@Override

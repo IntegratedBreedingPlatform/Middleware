@@ -9,11 +9,11 @@ import java.util.List;
  */
 public abstract class BranchingRule<T extends OrderedRuleExecutionContext> extends OrderedRule<T> {
 
-	public void prepareContextForBranchingToKey(T context, String targetKey) {
-		List<String> executionOrder = context.getExecutionOrder();
-		int currentExecutionIndex = context.getCurrentExecutionIndex();
-		List<String> previousRuleKeys = executionOrder.subList(0, currentExecutionIndex);
-		int index = previousRuleKeys.lastIndexOf(targetKey);
+	public void prepareContextForBranchingToKey(final T context, final String targetKey) {
+		final List<String> executionOrder = context.getExecutionOrder();
+		final int currentExecutionIndex = context.getCurrentExecutionIndex();
+		final List<String> previousRuleKeys = executionOrder.subList(0, currentExecutionIndex);
+		final int index = previousRuleKeys.lastIndexOf(targetKey);
 
 		if (index != -1) {
 			context.setCurrentExecutionIndex(index);

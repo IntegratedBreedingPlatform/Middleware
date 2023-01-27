@@ -22,6 +22,7 @@ import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -36,6 +37,7 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This is the API for Fieldbook requirements.
@@ -236,6 +238,7 @@ public interface FieldbookService {
 	 *            the gids
 	 * @return the germplasms
 	 */
+	@Deprecated
 	List<Germplasm> getGermplasms(List<Integer> gids);
 
 	/**
@@ -477,6 +480,7 @@ public interface FieldbookService {
 	 *            the gids
 	 * @return the names by gids
 	 */
+	@Deprecated
 	Map<Integer, List<Name>> getNamesByGids(List<Integer> gids);
 
 	/**

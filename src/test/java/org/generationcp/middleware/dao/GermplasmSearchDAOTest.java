@@ -130,7 +130,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, daoFactory);
 		}
 
 		this.cropType = new CropType();
@@ -1289,6 +1289,8 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.germplasmDao.save(germplasm1);
 		this.germplasmDao.save(germplasm2);
+
+		this.sessionProvder.getSession().flush();
 
 		final Set<Integer> gids = new HashSet<>();
 		gids.add(germplasm1.getGid());
