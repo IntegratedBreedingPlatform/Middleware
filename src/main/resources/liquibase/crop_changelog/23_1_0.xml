@@ -4,7 +4,67 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="cheryleigh" id="v23.1.0-1">
+	<changeSet author="lkovacic" id="vTBD-1">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from sequence where sequence_name = 'atributs'
+			</sqlCheck>
+        </preConditions>
+        <comment>
+            Create sequence entry for atributs table generator
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			insert into sequence(sequence_name, sequence_value)
+			select 'atributs', coalesce(ceil(max(aid) / 500), 1) from atributs;
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="vTBD-2">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from sequence where sequence_name = 'germplsm'
+			</sqlCheck>
+        </preConditions>
+        <comment>
+            Create sequence entry for germplsm table generator
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			insert into sequence(sequence_name, sequence_value)
+			select 'germplsm', coalesce(ceil(max(gid) / 500), 1) from germplsm;
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="vTBD-3">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from sequence where sequence_name = 'germplasm_study_source'
+			</sqlCheck>
+        </preConditions>
+        <comment>
+            Create sequence entry for germplasm_study_source table generator
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			insert into sequence(sequence_name, sequence_value)
+			select 'germplasm_study_source', coalesce(ceil(max(germplasm_study_source_id) / 500), 1) from germplasm_study_source;
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="vTBD-4">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from sequence where sequence_name = 'names'
+			</sqlCheck>
+        </preConditions>
+        <comment>
+            Create sequence entry for names table generator
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			insert into sequence(sequence_name, sequence_value)
+			select 'names', coalesce(ceil(max(nid) / 500), 1) from names;
+        </sql>
+    </changeSet>
+
+	<changeSet author="cheryleigh" id="v23.1.0-5">
  		<preConditions onFail="MARK_RAN">
 			<and>
 				<tableExists tableName="phenotype"/>
@@ -20,7 +80,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="cheryleigh" id="v23.1.0-2">
+	<changeSet author="cheryleigh" id="v23.1.0-6">
  		<preConditions onFail="MARK_RAN">
 			<and>
 				<tableExists tableName="phenotype"/>
@@ -36,7 +96,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="cheryleigh" id="v23.1.0-3">
+	<changeSet author="cheryleigh" id="v23.1.0-7">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="phenotype_aud"></tableExists>
@@ -69,7 +129,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="cheryleigh" id="v23.1.0-4">
+	<changeSet author="cheryleigh" id="v23.1.0-8">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(1) FROM audit_cfg where table_name = 'PHENOTYPE';</sqlCheck>
 		</preConditions>

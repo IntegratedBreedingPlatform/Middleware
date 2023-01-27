@@ -81,6 +81,8 @@ public class UserDefinedFieldDAOTest extends IntegrationTestBase {
 		final Name deletedName = NameTestDataInitializer.createName(nameType4.getFldno(), germplasm2.getGid(), RandomStringUtils.randomAlphabetic(100));
 		deletedName.setNstat(9);
 		this.nameDao.save(deletedName);
+
+		this.sessionProvder.getSession().flush();
 	}
 
 	@Test

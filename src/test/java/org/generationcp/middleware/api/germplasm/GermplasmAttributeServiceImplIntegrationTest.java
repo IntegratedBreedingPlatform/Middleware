@@ -120,7 +120,10 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 		final AttributeRequestDto dto = new AttributeRequestDto(variables.get(0).getId(), ATTRIBUTE_VALUE,
 			ATTRIBUTE_DATE, LOCATION_ID);
-		return this.germplasmAttributeService.createGermplasmAttribute(germplasmId, dto);
+
+		final Integer germplasmAttributeId = this.germplasmAttributeService.createGermplasmAttribute(germplasmId, dto);
+		this.sessionProvder.getSession().flush();
+		return germplasmAttributeId;
 	}
 
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,

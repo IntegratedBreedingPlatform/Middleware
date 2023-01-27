@@ -108,7 +108,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		this.experimentTransactionDAO = this.daoFactory.getExperimentTransactionDao();
 		this.germplasmListData = Lists.newArrayList();
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, daoFactory);
 		}
 		this.inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
 
