@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context-4.1.xsd
+			http://www.springframework.org/schema/aop
+			http://www.springframework.org/schema/aop/spring-aop-4.1.xsd">
+
+    <bean id="ruleFactory" class="org.generationcp.middleware.ruleengine.ProcessCodeRuleFactory"
+          init-method="init"/>
+
+    <bean id="ruleConfigProvider"
+          class="org.generationcp.middleware.ruleengine.provider.PropertyFileRuleConfigurationProvider">
+        <property name="ruleSequenceConfiguration">
+            <map>
+                <entry key="naming" value="${naming.rules}"/>
+            </map>
+        </property>
+    </bean>
+	<bean id="ruleService" class="org.generationcp.middleware.ruleengine.impl.RulesServiceImpl" />
+
+	<bean id="processCodeFactory"
+		  class="org.generationcp.middleware.ruleengine.namingdeprecated.impl.DeprecatedProcessCodeFactory"
+		  init-method="init"/>
+
+	<!-- Singleton bean as there is nothing request specific in here. -->
+	<bean id="germplasmNamingProperties" class="org.generationcp.middleware.ruleengine.service.GermplasmNamingProperties">
+		<property name="germplasmOriginStudiesDefault" value="${germplasm.origin.studies.default}"/>
+		<property name="germplasmOriginStudiesWheat" value="${germplasm.origin.studies.wheat}"/>
+		<property name="germplasmOriginStudiesMaize" value="${germplasm.origin.studies.maize}"/>
+        <property name="breedersCrossIDStudy" value="${breeders.cross.id.study}" />
+	</bean>
+
+	<bean id="messageSource"
+			  class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="Messages" />
+    </bean>
+
+	<bean id="processCodeService" class="org.generationcp.middleware.ruleengine.namingdeprecated.impl.DeprecatedProcessCodeServiceImpl"></bean>
+
+	<bean id="namingConventionService" class="org.generationcp.middleware.ruleengine.namingdeprecated.impl.DeprecatedNamingConventionServiceImpl"></bean>
+
+</beans>

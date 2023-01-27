@@ -48,4 +48,25 @@ public enum MethodType {
 	public static List<String> getAdvancingMethodTypes(){
 		return Arrays.asList(MethodType.DERIVATIVE.getCode(), MethodType.MAINTENANCE.getCode());
 	}
+
+	public static boolean isDerivative(final String code) {
+		return checkMethodTypeEqualsCode(DERIVATIVE, code);
+	}
+
+	public static boolean isGenerative(final String code) {
+		return checkMethodTypeEqualsCode(GENERATIVE, code);
+	}
+
+	public static boolean isMaintenance(final String code) {
+		return checkMethodTypeEqualsCode(MAINTENANCE, code);
+	}
+
+	public static boolean isDerivativeOrMainenance(final String code) {
+		return isDerivative(code) || isMaintenance(code);
+	}
+
+	private static boolean checkMethodTypeEqualsCode(final MethodType methodType, final String code) {
+		return methodType.getCode().equals(code);
+	}
+
 }

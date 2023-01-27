@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -223,15 +224,22 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return true;
 	}
 
-	Name getSelectionHistory(final Germplasm germplasm, final String nameType) {
-		final UserDefinedField selectionHistoryNameType = this.getSelectionHistoryNameType(nameType);
-		return this.findNameByType(germplasm, selectionHistoryNameType);
-	}
-
+	@Deprecated
 	Name findNameByType(final Germplasm germplasm, final UserDefinedField nameType) {
 		if (nameType != null) {
 			final java.util.Optional<Name> nameOptional =
 				germplasm.getNames().stream().filter(name -> nameType.getFldno().equals(name.getTypeId())).findFirst();
+			if (nameOptional.isPresent()) {
+				return nameOptional.get();
+			}
+		}
+		return null;
+	}
+
+	BasicNameDTO findNameByType(final List<BasicNameDTO> names, final UserDefinedField nameType) {
+		if (nameType != null) {
+			final java.util.Optional<BasicNameDTO> nameOptional =
+				names.stream().filter(name -> nameType.getFldno().equals(name.getTypeId())).findFirst();
 			if (nameOptional.isPresent()) {
 				return nameOptional.get();
 			}
@@ -253,12 +261,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	 * usually does and will be accessible through the germplasm details screen
 	 * but will not be the name displayed in lists.
 	 */
-	private void addOrUpdateSelectionHistoryAtFixationName(final Germplasm germplasm, final Name nameToCopyFrom,
-		final UserDefinedField nameType) {
+	private void addOrUpdateSelectionHistoryAtFixationName(final Germplasm germplasm,
+		final String nameValue, final Integer nameLocationId, final UserDefinedField nameType) {
 
 		// 1. Check if there is an existing "selection history at fixation" name
-		final Name existingSelHisFixName =
-			this.findNameByType(germplasm, nameType);
+		final Name existingSelHisFixName = this.findNameByType(germplasm, nameType);
 
 		// 2. Add a new name as "selection history at fixation" with supplied
 		// name value.
@@ -267,16 +274,16 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			final Name newSelectionHistoryAtFixation = new Name();
 			newSelectionHistoryAtFixation.setGermplasm(germplasm);
 			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
-			newSelectionHistoryAtFixation.setNval(nameToCopyFrom.getNval());
+			newSelectionHistoryAtFixation.setNval(nameValue);
 			newSelectionHistoryAtFixation.setNstat(0);
-			newSelectionHistoryAtFixation.setLocationId(nameToCopyFrom.getLocationId());
+			newSelectionHistoryAtFixation.setLocationId(nameLocationId);
 			newSelectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
 			newSelectionHistoryAtFixation.setReferenceId(0);
 			germplasm.getNames().add(newSelectionHistoryAtFixation);
 		} else {
 			// 3. Update the extisting "selection history at fixation" with
 			// supplied name
-			existingSelHisFixName.setNval(nameToCopyFrom.getNval());
+			existingSelHisFixName.setNval(nameValue);
 			existingSelHisFixName.setNstat(0);
 			existingSelHisFixName.setNdate(Util.getCurrentDateAsIntegerValue());
 		}
@@ -294,9 +301,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	@Override
-	public void copyCodedNames(final Germplasm germplasm, final Germplasm sourceGermplasm) {
+	public void copyCodedNames(final Germplasm germplasm, final List<BasicNameDTO> sourceNames) {
 		for (final UserDefinedField codingNameType : this.getCodingNameTypes()) {
-			this.copyCodedName(germplasm, this.findNameByType(sourceGermplasm, codingNameType));
+			this.copyCodedName(germplasm, this.findNameByType(sourceNames, codingNameType));
 		}
 	}
 
@@ -310,7 +317,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return this.codingNameTypes;
 	}
 
-	private void copyCodedName(final Germplasm germplasm, final Name codedName) {
+	private void copyCodedName(final Germplasm germplasm, final BasicNameDTO codedName) {
 		if (codedName != null) {
 			this.addCodedName(germplasm, codedName);
 			GermplasmGroupingServiceImpl.LOG
@@ -320,7 +327,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 	}
 
-	private void addCodedName(final Germplasm germplasm, final Name nameToCopyFrom) {
+	private void addCodedName(final Germplasm germplasm, final BasicNameDTO nameToCopyFrom) {
 
 		// 1. Make current preferred name a non-preferred name by setting nstat
 		// = 0
@@ -358,7 +365,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 		final Name mySelectionHistory = this.findNameByType(germplasm, this.selHistNameType);
 		if (mySelectionHistory != null) {
-			this.addOrUpdateSelectionHistoryAtFixationName(germplasm, mySelectionHistory, this.selHistAtFixationNameType);
+			this.addOrUpdateSelectionHistoryAtFixationName(germplasm, mySelectionHistory.getNval(), mySelectionHistory.getLocationId(), this.selHistAtFixationNameType);
 			nameVal = mySelectionHistory.getNval();
 		}
 
@@ -377,24 +384,26 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	@Override
-	public void copyParentalSelectionHistoryAtFixation(final Germplasm germplasm, final Germplasm parent) {
+	public void copyParentalSelectionHistoryAtFixation(final Germplasm germplasm, final Integer parentGid,
+		final List<BasicNameDTO> parentNames) {
 		if (this.selHistAtFixationNameType == null) {
 			this.selHistAtFixationNameType =
 				this.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 		}
 
-		final Name parentSelectionHistoryAtFixation =
-			this.findNameByType(parent, this.selHistAtFixationNameType);
+		final BasicNameDTO parentSelectionHistoryAtFixation =
+			this.findNameByType(parentNames, this.selHistAtFixationNameType);
 
 		if (parentSelectionHistoryAtFixation != null) {
-			this.addOrUpdateSelectionHistoryAtFixationName(germplasm, parentSelectionHistoryAtFixation, this.selHistAtFixationNameType);
+			this.addOrUpdateSelectionHistoryAtFixationName(germplasm, parentSelectionHistoryAtFixation.getNval(),
+				parentSelectionHistoryAtFixation.getLocationId(), this.selHistAtFixationNameType);
 			GermplasmGroupingServiceImpl.LOG
 				.info("Selection history at fixation {} was copied from parent with gid {} to the child germplasm with gid {}.",
-					parentSelectionHistoryAtFixation.getNval(), germplasm.getGid(), parent.getGid());
+					parentSelectionHistoryAtFixation.getNval(), germplasm.getGid(), parentGid);
 		} else {
 			GermplasmGroupingServiceImpl.LOG
 				.info("No 'selection history at fixation' type name was found for parent germplasm with gid {}. Nothing to copy.",
-					parent.getGid());
+					parentGid);
 		}
 	}
 
@@ -403,7 +412,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		final Name previousCrossSelectionHistory = this.findNameByType(previousCross, this.selHistNameTypeForCode);
 
 		if (previousCrossSelectionHistory != null) {
-			this.addOrUpdateSelectionHistoryAtFixationName(cross, previousCrossSelectionHistory, this.selHistAtFixationNameType);
+			this.addOrUpdateSelectionHistoryAtFixationName(cross, previousCrossSelectionHistory.getNval(),
+				previousCrossSelectionHistory.getLocationId(), this.selHistAtFixationNameType);
 			GermplasmGroupingServiceImpl.LOG.info("Selection history {} for cross with gid {} was copied from previous cross with gid {}.",
 				previousCrossSelectionHistory.getNval(), cross.getGid(), previousCross.getGid());
 		} else {
@@ -502,7 +512,19 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 								oldestPreviousCrossWithMGID.getMgid(), oldestPreviousCrossWithMGID.getGid());
 							cross.setMgid(oldestPreviousCrossWithMGID.getMgid());
 							this.copySelectionHistoryForCross(cross, oldestPreviousCrossWithMGID);
-							this.copyCodedNames(cross, oldestPreviousCrossWithMGID);
+							final List<BasicNameDTO> names = oldestPreviousCrossWithMGID.getNames().stream()
+								.map(name -> {
+									final BasicNameDTO basicNameDTO = new BasicNameDTO();
+									basicNameDTO.setNid(name.getNid());
+									basicNameDTO.setGid(name.getGermplasm().getGid());
+									basicNameDTO.setTypeId(name.getTypeId());
+									basicNameDTO.setNstat(name.getNstat());
+									basicNameDTO.setNval(name.getNval());
+									basicNameDTO.setLocationId(name.getLocationId());
+									return basicNameDTO;
+								}).collect(Collectors.toList());
+
+							this.copyCodedNames(cross, names);
 						} else {
 							GermplasmGroupingServiceImpl.LOG
 								.info(

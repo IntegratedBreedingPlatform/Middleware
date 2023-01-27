@@ -351,7 +351,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 			.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, DataSetupTest.GERMPLSM_PREFIX,
 				parentGermplasm);
 
-		return this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix);
+		return this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix, DataSetupTest.NUMBER_OF_GERMPLASM, 2);
 	}
 
 

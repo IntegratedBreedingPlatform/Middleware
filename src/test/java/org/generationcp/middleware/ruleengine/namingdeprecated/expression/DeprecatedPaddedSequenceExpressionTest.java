@@ -1,7 +1,7 @@
-package org.generationcp.middleware.ruleengine.naming.expression;
+package org.generationcp.middleware.ruleengine.namingdeprecated.expression;
 
 import org.generationcp.middleware.ruleengine.ExpressionUtils;
-import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedGermplasmNamingService;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
+public class DeprecatedPaddedSequenceExpressionTest extends DeprecatedTestExpression {
 
 	private static final String ROOT_NAME = "TESTING";
 	private static final String SEPARATOR = "-";
@@ -26,15 +26,15 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 	private static final Integer PLANTS_SELECTED = 5;
 	private static final Integer NEXT_NUMBER_FROM_DB = 22;
 
-	private PaddedSequenceExpression expression;
+	private DeprecatedPaddedSequenceExpression expression;
 
 	@Mock
-	private GermplasmNamingService germplasmNamingService;
+	private DeprecatedGermplasmNamingService germplasmNamingService;
 
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		this.expression = new PaddedSequenceExpression();
+		this.expression = new DeprecatedPaddedSequenceExpression();
 		this.expression.setGermplasmNamingService(this.germplasmNamingService);
 
 		Mockito.doReturn(NEXT_NUMBER_FROM_DB, NEXT_NUMBER_FROM_DB + 1, NEXT_NUMBER_FROM_DB + 2, NEXT_NUMBER_FROM_DB + 3,
@@ -49,7 +49,7 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 
 	@Test
 	public void testExpressionRegex() {
-		Assert.assertTrue(CodingPaddedCodingSequenceExpressionTest.PADSEQ.matches(this.expression.getExpressionKey()));
+		Assert.assertTrue(DeprecatedPaddedSequenceExpressionTest.PADSEQ.matches(this.expression.getExpressionKey()));
 		Assert.assertTrue("[PADSEQ.2]".matches(this.expression.getExpressionKey()));
 		Assert.assertTrue("[PADSEQ.23]".matches(this.expression.getExpressionKey()));
 		Assert.assertFalse("[PADSEQ.AB2]".matches(this.expression.getExpressionKey()));
@@ -133,7 +133,7 @@ public class CodingPaddedCodingSequenceExpressionTest extends TestExpression {
 	@Test
 	public void testApplyWithNumberOfDigitsSpecified() {
 		final Integer numberofDigits = 5;
-		final String processCode = String.format(CodingPaddedCodingSequenceExpressionTest.PADSEQ_WITH_NUMBER, numberofDigits);
+		final String processCode = String.format(DeprecatedPaddedSequenceExpressionTest.PADSEQ_WITH_NUMBER, numberofDigits);
 		final DeprecatedAdvancingSource source = this.createAdvancingSourceTestData(ROOT_NAME, SEPARATOR, PREFIX, processCode, SUFFIX, false);
 		source.setPlantsSelected(PLANTS_SELECTED);
 

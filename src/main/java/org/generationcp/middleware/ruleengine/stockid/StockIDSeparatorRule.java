@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * A rule implementation that defines the logic for processing separators within the context of generation of stock IDs
  */
 @Component
-public class StockIDSeparatorRule extends OrderedRule<StockIDGenerationRuleExecutionContext> {
+public class StockIDSeparatorRule extends StockIDOrderedRule {
 
 	static final String KEY = "SEPARATOR";
 	public static final String DEFAULT_SEPARATOR = "-";

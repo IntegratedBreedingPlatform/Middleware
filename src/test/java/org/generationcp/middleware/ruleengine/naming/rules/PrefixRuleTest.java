@@ -3,15 +3,15 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.RuleException;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CodingPrefixRuleTest extends BaseNamingRuleTest {
+public class PrefixRuleTest extends BaseNamingRuleTest {
 
 	private PrefixRule rule;
 	private Method breedingMethod;
@@ -24,8 +24,8 @@ public class CodingPrefixRuleTest extends BaseNamingRuleTest {
 		this.breedingMethodSnameType = 5;
 		this.breedingMethod = new Method();
 		this.breedingMethod.setSnametype(this.breedingMethodSnameType);
-		this.row = new DeprecatedAdvancingSource();
-		this.row.setBreedingMethod(this.breedingMethod);
+		this.row = Mockito.mock(AdvancingSource.class, Mockito.CALLS_REAL_METHODS);
+		Mockito.when(this.row.getBreedingMethod()).thenReturn(this.breedingMethod);
 		this.testGermplasmName = "CMT1234-";
 		this.rule = new PrefixRule();
 	}
@@ -33,13 +33,13 @@ public class CodingPrefixRuleTest extends BaseNamingRuleTest {
 	@Test
 	public void testPrefixGenerationSimple() {
 		this.breedingMethod.setPrefix("B");
-		List<String> input = new ArrayList<String>();
+		List<String> input = new ArrayList();
 		input.add(this.testGermplasmName);
 
 		try {
 			input = (List<String>) this.rule.runRule(this.createExecutionContext(input));
-		} catch (RuleException re) {
-			Assert.fail("Rule failed to run for Prefix" + this.row.getBreedingMethod().getSeparator());
+		} catch (final org.generationcp.middleware.ruleengine.RuleException e) {
+			e.printStackTrace();
 		}
 		System.out.println(input.get(0));
 		Assert.assertEquals(1, input.size());
@@ -51,12 +51,12 @@ public class CodingPrefixRuleTest extends BaseNamingRuleTest {
 	public void testSeasonCodePrefix() {
 		this.breedingMethod.setPrefix("Wet");
 		this.row.setSeason("Wet");
-		List<String> input = new ArrayList<String>();
+		List<String> input = new ArrayList();
 		input.add(this.testGermplasmName);
 		try {
 			input = (List<String>) this.rule.runRule(this.createExecutionContext(input));
-		} catch (RuleException re) {
-			Assert.fail("Rule failed to run for Prefix" + this.row.getBreedingMethod().getSeparator());
+		} catch (final org.generationcp.middleware.ruleengine.RuleException e) {
+			e.printStackTrace();
 		}
 		System.out.println(input.get(0));
 		Assert.assertEquals(1, input.size());

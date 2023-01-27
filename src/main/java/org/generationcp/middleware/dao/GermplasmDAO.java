@@ -24,6 +24,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeMapper;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeSearchRequest;
+import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.ParentType;
@@ -2024,6 +2025,18 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				new ImmutablePair<>((String) row.get("groupSourceName"), (String) row.get("immediateSourceName")));
 		});
 		return results;
+	}
+
+	public List<BasicGermplasmDTO> getBasicGermplasmByGids(final Set<Integer> gids) {
+
+		final String queryString = "SELECT g.gid, g.gpid1, g.gpid2, g.gnpgs, g.mgid, g.methn as methodId, g.glocn as locationId "
+			+ " FROM germplsm g WHERE g.gid IN( :gids ) "
+			+ " AND g.deleted = 0"
+			+ " AND g.grplce = 0";
+		final SQLQuery query = this.getSession().createSQLQuery(queryString);
+		query.setParameterList("gids", gids);
+		query.setResultTransformer(Transformers.aliasToBean(BasicGermplasmDTO.class));
+		return query.list();
 	}
 
 }

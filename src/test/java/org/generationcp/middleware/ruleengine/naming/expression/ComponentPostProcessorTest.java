@@ -2,7 +2,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.ruleengine.RuleFactory;
 import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -32,7 +32,7 @@ public class ComponentPostProcessorTest {
     public void testProcessCodeAdd() {
         Expression testExpression = new Expression() {
             @Override
-            public void apply(List<StringBuilder> values, DeprecatedAdvancingSource source, final String capturedText) {
+            public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
                 // do nothing
             }
 

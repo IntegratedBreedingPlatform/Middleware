@@ -1,12 +1,15 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -19,18 +22,21 @@ public class AttributeMaleParentExpression extends AttributeExpression {
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
 
-	@Override
-	public void apply(final List<StringBuilder> values, final DeprecatedAdvancingSource source, final String capturedText) {
+	@Autowired
+	private GermplasmService germplasmService;
 
-		final Method breedingMethod = source.getBreedingMethod();
+	@Override
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
+
+		final Method breedingMethod = advancingSource.getBreedingMethod();
 		Integer gpid2 = null;
-		if (METHOD_TYPE_GEN.equals(breedingMethod.getMtype())) {
+		if (breedingMethod.isGenerative()) {
 			// If the method is Generative, GPID2 refers to male parent of the cross
-			gpid2 = Integer.valueOf(source.getMaleGid());
-		} else if (METHOD_TYPE_DER.equals(breedingMethod.getMtype()) || METHOD_TYPE_MAN.equals(breedingMethod.getMtype())) {
+			gpid2 = advancingSource.getMaleGid();
+		} else if (breedingMethod.isDerivativeOrMaintenance()) {
 
 			// If the method is Derivative or Maintenance, GPID2 refers to the male parent of the group source
-			final Integer groupSourceGid = this.getGroupSourceGID(source);
+			final Integer groupSourceGid = this.getGroupSourceGID(advancingSource);
 			gpid2 = this.getSourceParentGID(groupSourceGid);
 
 		}
@@ -41,6 +47,7 @@ public class AttributeMaleParentExpression extends AttributeExpression {
 		for (final StringBuilder value : values) {
 			this.replaceAttributeExpressionWithValue(value, ATTRIBUTE_KEY, variableId, attributeValue);
 		}
+
 	}
 
 	@Override
@@ -49,9 +56,9 @@ public class AttributeMaleParentExpression extends AttributeExpression {
 	}
 
 	protected Integer getSourceParentGID(final Integer gid) {
-		final Germplasm groupSource = this.germplasmDataManager.getGermplasmByGID(gid);
-		if (groupSource != null) {
-			return groupSource.getGpid2();
+		final List<BasicGermplasmDTO> groupSource = this.germplasmService.getBasicGermplasmByGids(Collections.singleton(gid));
+		if (!CollectionUtils.isEmpty(groupSource)) {
+			return groupSource.get(0).getGpid2();
 		} else {
 			return null;
 		}
