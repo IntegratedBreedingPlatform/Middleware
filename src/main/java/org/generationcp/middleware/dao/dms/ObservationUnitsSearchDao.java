@@ -3,6 +3,7 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -63,6 +64,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 	private static final String FILE_COUNT = "FILE_COUNT";
 	private static final String FILE_TERM_IDS = "FILE_TERM_IDS";
+	public static final String LOCATION_ID = "LOCATION_ID";
+	public static final String EXPT_DESIGN = "EXPT_DESIGN";
+
+	public static final Set<String> OBSERVATIONS_TABLE_SYSTEM_COLUMNS =
+		Sets.newHashSet(OBSERVATION_UNIT_ID, SUM_OF_SAMPLES, PARENT_OBS_UNIT_ID, FILE_TERM_IDS,
+			LOCATION_ID, EXPT_DESIGN, FILE_COUNT);
 
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 	private static final String ENVIRONMENT_COLUMN_NAME_SUFFIX = "_ENVIRONMENT";
@@ -635,10 +642,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private boolean isColumnVisible(final String columnName, final Set<String> visibleColumns) {
-		if (!CollectionUtils.isEmpty(visibleColumns)) {
+
+		// If the visible columns list is not empty, we should only include the columns specified.
+		// Exempted are the columns required by the system (e.g. OBSERVATION_UNIT_ID, FILE_TERM_IDS, FILE_COUNT, etc.)
+		if (!CollectionUtils.isEmpty(visibleColumns) && OBSERVATIONS_TABLE_SYSTEM_COLUMNS.stream().noneMatch(s -> s.equalsIgnoreCase(columnName))) {
 			return visibleColumns.stream().anyMatch(s -> s.equalsIgnoreCase(columnName));
 		}
-		// If visible columns list is not specified, retrieve the column by default.
+		// If the visible columns list is not specified, process and retrieve the column by default.
 		return true;
 	}
 
@@ -658,8 +668,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final List<String> columns = new ArrayList<>();
 
 		finalColumnsQueryMap.forEach((columnName, columnQueryString) -> {
-			// If column is OBSERVATION_UNIT_ID, we should always include it in the query
-			if (this.isColumnVisible(columnName, searchDto.getVisibleColumns()) || OBSERVATION_UNIT_ID.equalsIgnoreCase(columnName)) {
+			if (this.isColumnVisible(columnName, searchDto.getVisibleColumns())) {
 				columns.add(finalColumnsQueryMap.get(columnName));
 			} else {
 				columns.add(String.format("NULL as `%s`", columnName));
