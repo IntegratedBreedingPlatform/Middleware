@@ -390,7 +390,7 @@ public class UserServiceImpl implements UserService {
 	public Integer getCurrentlyLoggedInUserId() {
 		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null) {
-			return null;
+			return 0;
 		}
 		return this.getUserByUsername(authentication.getName()).getUserid();
 	}

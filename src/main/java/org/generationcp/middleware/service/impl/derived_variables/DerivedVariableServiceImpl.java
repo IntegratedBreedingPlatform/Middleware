@@ -218,6 +218,8 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	private void updatePhenotype(final Integer observationId, final Integer categoricalValueId, final String value) {
 		final PhenotypeDao phenotypeDao = this.daoFactory.getPhenotypeDAO();
 		final Phenotype phenotype = phenotypeDao.getById(observationId);
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setUpdatedBy(this.userService.getCurrentlyLoggedInUserId());
 		phenotype.setValue(value);
 		phenotype.setcValue(categoricalValueId == null || categoricalValueId == 0 ? null : categoricalValueId);
 		phenotype.setChanged(true);

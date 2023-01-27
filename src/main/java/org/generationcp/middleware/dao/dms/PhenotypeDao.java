@@ -705,7 +705,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public void updatePhenotypes(final List<Integer> phenotypeIds, final Integer newCValueId,
-		final String newValue, final Boolean draftMode, final boolean isDerivedTrait) {
+		final String newValue, final Boolean draftMode, final boolean isDerivedTrait, final Integer loggedInUser) {
 		try {
 			this.getSession().flush();
 			final StringBuilder query = new StringBuilder("UPDATE phenotype pheno SET ");
@@ -720,11 +720,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			if (isDerivedTrait) {
 				query.append(" , pheno.status = '" + Phenotype.ValueStatus.MANUALLY_EDITED + "' ");
 			}
-
+			query.append(" , pheno.updated_date = CURRENT_TIMESTAMP, pheno.updated_by = :userId");
 			query.append("	WHERE pheno.phenotype_id IN (:phenotypeIds) ");
 
 			this.getSession().createSQLQuery(query.toString())
 				.setParameterList("phenotypeIds", phenotypeIds)
+				.setParameter("userId", loggedInUser)
 				.executeUpdate();
 
 		} catch (final HibernateException e) {
@@ -1445,17 +1446,21 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return result.intValue() > 0;
 	}
 
-	public void updateOutOfSyncPhenotypes(final Set<Integer> experimentIds, final Set<Integer> targetVariableIds) {
+	public void updateOutOfSyncPhenotypes(final Set<Integer> experimentIds, final Set<Integer> targetVariableIds,
+		final Integer loggedInUser) {
 		final String sql = "UPDATE nd_experiment experiment\n"
 			+ "LEFT JOIN nd_experiment experimentParent ON experimentParent.nd_experiment_id = experiment.parent_id\n"
 			+ "INNER JOIN phenotype pheno ON  pheno.nd_experiment_id = experimentParent.nd_experiment_id OR pheno.nd_experiment_id = experiment.nd_experiment_id\n"
-			+ "SET pheno.status = :status \n"
+			+ "SET pheno.status = :status, \n"
+			+ "    pheno.updated_date = CURRENT_TIMESTAMP, \n"
+			+ "    pheno.updated_by = :userId \n"
 			+ "WHERE experiment.nd_experiment_id in (:experimentIds)  AND pheno.observable_id in (:variableIds) ;";
 
 		final SQLQuery statement = this.getSession().createSQLQuery(sql);
 		statement.setParameter("status", Phenotype.ValueStatus.OUT_OF_SYNC.getName());
 		statement.setParameterList("experimentIds", experimentIds);
 		statement.setParameterList("variableIds", targetVariableIds);
+		statement.setParameter("userId", loggedInUser);
 		statement.executeUpdate();
 	}
 

@@ -253,6 +253,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		phenotype.setValue(instanceObservationData.getValue());
 		phenotype.setcValue(instanceObservationData.getCategoricalValueId());
 		phenotype.setUpdatedDate(new Date());
+		phenotype.setUpdatedBy(this.userService.getCurrentlyLoggedInUserId());
 		phenotypeDAO.update(phenotype);
 
 		// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.

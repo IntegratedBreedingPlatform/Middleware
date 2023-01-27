@@ -671,7 +671,8 @@ public class DatasetServiceImpl implements DatasetService {
 			.isEmpty(observationUnitIds)) {
 			final List<Integer> targetVariableIds = Lists.transform(formulaList, formula -> formula.getTargetCVTerm().getCvTermId());
 			this.daoFactory.getPhenotypeDAO()
-				.updateOutOfSyncPhenotypes(observationUnitIds, Sets.newHashSet(targetVariableIds));
+				.updateOutOfSyncPhenotypes(observationUnitIds, Sets.newHashSet(targetVariableIds),
+					this.userService.getCurrentlyLoggedInUserId());
 		}
 
 	}
@@ -679,7 +680,8 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void updateOutOfSyncPhenotypes(final Set<Integer> targetVariableIds, final Set<Integer> observationUnitIds) {
 		if (!targetVariableIds.isEmpty()) {
-			this.daoFactory.getPhenotypeDAO().updateOutOfSyncPhenotypes(observationUnitIds, targetVariableIds);
+			this.daoFactory.getPhenotypeDAO().updateOutOfSyncPhenotypes(observationUnitIds, targetVariableIds,
+				this.userService.getCurrentlyLoggedInUserId());
 		}
 
 	}
@@ -1517,7 +1519,8 @@ public class DatasetServiceImpl implements DatasetService {
 		final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variableId);
 		final boolean isDerivedTrait = formula != null;
 		final Integer cvalueId = Integer.valueOf(0).equals(newCValueId) ? null : newCValueId;
-		this.daoFactory.getPhenotypeDAO().updatePhenotypes(phenotypeIds, cvalueId, newValue, draftMode, isDerivedTrait);
+		final Integer loggedInUser = this.userService.getCurrentlyLoggedInUserId();
+		this.daoFactory.getPhenotypeDAO().updatePhenotypes(phenotypeIds, cvalueId, newValue, draftMode, isDerivedTrait, loggedInUser);
 	}
 
 	void addStudyVariablesToUnitRows(final List<ObservationUnitRow> observationUnits, final List<MeasurementVariable> studyVariables) {
@@ -1620,6 +1623,8 @@ public class DatasetServiceImpl implements DatasetService {
 			phenotype.setChanged(true); // to set out-of-sync
 		}
 
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setUpdatedBy(this.userService.getCurrentlyLoggedInUserId());
 		phenotypeDao.update(phenotype);
 		return phenotype;
 	}
