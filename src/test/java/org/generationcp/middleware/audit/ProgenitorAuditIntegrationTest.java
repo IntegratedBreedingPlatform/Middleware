@@ -45,6 +45,8 @@ public class ProgenitorAuditIntegrationTest extends AuditIntegrationTestBase {
 		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName("LNAME");
 		this.daoFactory.getGermplasmDao().save(germplasm);
 
+		this.sessionProvder.getSession().flush();
+
 		this.enableEntityAudit();
 
 		//Create a progenitor 1

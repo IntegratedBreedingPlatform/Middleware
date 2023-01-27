@@ -110,7 +110,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, this.daoFactory);
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		if (!this.testDataSetup) {
 			this.updateInventory();
@@ -337,6 +337,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		advance2.setMethod(maintenanceMethod);
 		advance2.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		this.daoFactory.getGermplasmDao().save(advance2);
+
+		this.sessionProvder.getSession().flush();
 
 		final PedigreeDTO generativePedigree = this.daoFactory.getGermplasmDao().getPedigree(cross.getGid(), null, false);
 		final PedigreeDTO derivativePedigree = this.daoFactory.getGermplasmDao().getPedigree(advance.getGid(), null, true);
@@ -608,6 +610,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmDao().save(germplasm1);
 		this.daoFactory.getGermplasmDao().save(germplasm2);
 
+		this.sessionProvder.getSession().flush();
+
 		// Reset the germplasm group
 		this.daoFactory.getGermplasmDao().resetGermplasmGroup(Arrays.asList(germplasm1.getGid(), germplasm2.getGid()));
 
@@ -855,6 +859,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		cross.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		this.daoFactory.getGermplasmDao().save(cross);
 
+		this.sessionProvder.getSession().flush();
+
 		// Set female parent
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();
 		request.setParentDbIds(Lists.newArrayList(femaleParent.getGermplasmUUID()));
@@ -882,6 +888,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		cross.setGnpgs(2);
 		cross.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		this.daoFactory.getGermplasmDao().save(cross);
+
+		this.sessionProvder.getSession().flush();
 
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();
 		request.setProgenyDbIds(Lists.newArrayList(cross.getGermplasmUUID()));
@@ -1085,6 +1093,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm existingCross = GermplasmTestDataInitializer
 			.createGermplasm(20150101, femaleParent.getGid(), maleParent.getGid(), 2, 0, 1, 1, 0, 1, "LocationName");
 		this.daoFactory.getGermplasmDao().save(existingCross);
+
+		this.sessionProvder.getSession().flush();
+
 		Assert.assertTrue(
 			this.daoFactory.getGermplasmDao()
 				.hasExistingCrosses(femaleParent.getGid(), Collections.singletonList(maleParent.getGid()), Optional.empty()));
@@ -1128,6 +1139,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm existingCross = GermplasmTestDataInitializer
 			.createGermplasm(20150101, femaleParent.getGid(), maleParent.getGid(), 2, 0, 1, 1, 0, 1, "LocationName");
 		this.daoFactory.getGermplasmDao().save(existingCross);
+
+		this.sessionProvder.getSession().flush();
+
 		List<Germplasm> existingCrosses =
 			this.daoFactory.getGermplasmDao()
 				.getExistingCrosses(femaleParent.getGid(), Collections.singletonList(maleParent.getGid()), Optional.empty());
@@ -1255,6 +1269,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmDao().save(germplasm2);
 		this.daoFactory.getGermplasmDao().save(germplasm3);
 
+		this.sessionProvder.getSession().flush();
+
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGids(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
 		Assert.assertEquals(3l, this.daoFactory.getGermplasmDao().countGermplasmMatches(germplasmMatchRequestDto));
@@ -1279,6 +1295,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmDao().save(germplasm2);
 		this.daoFactory.getGermplasmDao().save(germplasm3);
 
+		this.sessionProvder.getSession().flush();
+
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGids(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
 		germplasmMatchRequestDto.setLocationName(new SqlTextFilter(location.getLname(), SqlTextFilter.Type.EXACTMATCH));
@@ -1297,6 +1315,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmDao().save(germplasm2);
 		this.daoFactory.getGermplasmDao().save(germplasm3);
 
+		this.sessionProvder.getSession().flush();
+
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGids(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
 		germplasmMatchRequestDto.setLocationAbbreviation(new SqlTextFilter(location.getLabbr(), SqlTextFilter.Type.CONTAINS));
@@ -1314,6 +1334,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmDao().save(germplasm1);
 		this.daoFactory.getGermplasmDao().save(germplasm2);
 		this.daoFactory.getGermplasmDao().save(germplasm3);
+
+		this.sessionProvder.getSession().flush();
 
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGids(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
@@ -1340,6 +1362,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(name1);
 		this.daoFactory.getNameDao().save(name2);
 		this.daoFactory.getNameDao().save(name3);
+
+		this.sessionProvder.getSession().flush();
 
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGermplasmPUIs(Arrays.asList(name1.getNval(), name2.getNval(), name3.getNval()));
@@ -1373,6 +1397,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(name2);
 		this.daoFactory.getNameDao().save(name3);
 
+		this.sessionProvder.getSession().flush();
+
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setNames(Arrays.asList(name1.getNval(), name2.getNval(), name3.getNval()));
 		Assert.assertEquals(3l, this.daoFactory.getGermplasmDao().countGermplasmMatches(germplasmMatchRequestDto));
@@ -1399,6 +1425,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(name1);
 		this.daoFactory.getNameDao().save(name2);
 		this.daoFactory.getNameDao().save(name3);
+
+		this.sessionProvder.getSession().flush();
 
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setNames(Arrays.asList(name1.getNval(), name2.getNval(), name3.getNval()));
@@ -1438,6 +1466,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(name2);
 		this.daoFactory.getNameDao().save(name3);
 
+		this.sessionProvder.getSession().flush();
+
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGermplasmPUIs(Collections.singletonList(name1.getNval()));
 		germplasmMatchRequestDto.setNames(Arrays.asList(name2.getNval(), name3.getNval()));
@@ -1453,6 +1483,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmDao().save(germplasm1);
 		this.daoFactory.getGermplasmDao().save(germplasm2);
 		this.daoFactory.getGermplasmDao().save(germplasm3);
+
+		this.sessionProvder.getSession().flush();
 
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGermplasmUUIDs(
@@ -1487,6 +1519,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(name2);
 		this.daoFactory.getNameDao().save(name3);
 
+		this.sessionProvder.getSession().flush();
+
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGermplasmPUIs(Collections.singletonList(name1.getNval()));
 		germplasmMatchRequestDto.setGermplasmUUIDs(Collections.singletonList(germplasm2.getGermplasmUUID()));
@@ -1503,6 +1537,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmDao().save(germplasm1);
 		this.daoFactory.getGermplasmDao().save(germplasm2);
 		this.daoFactory.getGermplasmDao().save(germplasm3);
+
+		this.sessionProvder.getSession().flush();
 
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		final List<Integer> gids = Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid());
@@ -1534,6 +1570,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmDao().save(germplasm2);
 		this.daoFactory.getGermplasmDao().save(germplasm3);
 
+		this.sessionProvder.getSession().flush();
+
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGids(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
 		germplasmMatchRequestDto.setLocationName(new SqlTextFilter(location.getLname(), SqlTextFilter.Type.EXACTMATCH));
@@ -1554,6 +1592,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmDao().save(germplasm2);
 		this.daoFactory.getGermplasmDao().save(germplasm3);
 
+		this.sessionProvder.getSession().flush();
+
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGids(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
 		germplasmMatchRequestDto.setLocationAbbreviation(new SqlTextFilter(location.getLabbr(), SqlTextFilter.Type.CONTAINS));
@@ -1573,6 +1613,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmDao().save(germplasm1);
 		this.daoFactory.getGermplasmDao().save(germplasm2);
 		this.daoFactory.getGermplasmDao().save(germplasm3);
+
+		this.sessionProvder.getSession().flush();
 
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGids(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
@@ -1601,6 +1643,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(name1);
 		this.daoFactory.getNameDao().save(name2);
 		this.daoFactory.getNameDao().save(name3);
+
+		this.sessionProvder.getSession().flush();
 
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		final List<String> germplasmPUIs = Arrays.asList(name1.getNval(), name2.getNval(), name3.getNval());
@@ -1641,6 +1685,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(name2);
 		this.daoFactory.getNameDao().save(name3);
 
+		this.sessionProvder.getSession().flush();
+
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		final List<String> germplasmPUIs = Arrays.asList(name1.getNval(), name2.getNval(), name3.getNval());
 		germplasmMatchRequestDto.setNames(germplasmPUIs);
@@ -1680,6 +1726,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(name2);
 		this.daoFactory.getNameDao().save(name3);
 
+		this.sessionProvder.getSession().flush();
+
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGermplasmPUIs(Collections.singletonList(name1.getNval()));
 		germplasmMatchRequestDto.setNames(Arrays.asList(name2.getNval(), name3.getNval()));
@@ -1698,6 +1746,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmDao().save(germplasm1);
 		this.daoFactory.getGermplasmDao().save(germplasm2);
 		this.daoFactory.getGermplasmDao().save(germplasm3);
+
+		this.sessionProvder.getSession().flush();
 
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		final List<String> germplasmUUIDs =
@@ -1740,6 +1790,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(name2);
 		this.daoFactory.getNameDao().save(name3);
 
+		this.sessionProvder.getSession().flush();
+
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGermplasmPUIs(Collections.singletonList(name1.getNval()));
 		germplasmMatchRequestDto.setGermplasmUUIDs(Collections.singletonList(germplasm2.getGermplasmUUID()));
@@ -1764,6 +1816,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		name.setTypeId(attributeField.getFldno());
 		name.setNstat(0); // TODO Review
 		this.daoFactory.getNameDao().save(name);
+
+		this.sessionProvder.getSession().flush();
+
 		return name;
 	}
 
@@ -1778,6 +1833,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.germplasmTestDataGenerator.addGermplasm(germplasm2, germplasm2.getPreferredName(), this.cropType);
 
 		final Name name2 = this.saveGermplasmName(germplasm2.getGid(), nameType);
+
+		this.sessionProvder.getSession().flush();
+
 		return Arrays.asList(name1.getNval(), name2.getNval());
 	}
 
@@ -1792,6 +1850,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.germplasmTestDataGenerator.addGermplasm(germplasm2, germplasm2.getPreferredName(), this.cropType);
 
 		final Attribute attribute2 = this.saveAttribute(germplasm2, attributeType);
+
+		this.sessionProvder.getSession().flush();
+
 		return Arrays.asList(attribute1.getAval(), attribute2.getAval());
 	}
 
@@ -1811,6 +1872,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		attribute.setAdate(germplasm.getGdate());
 
 		this.daoFactory.getAttributeDAO().saveOrUpdate(attribute);
+
+		this.sessionProvder.getSession().flush();
+
 		return attribute;
 	}
 
