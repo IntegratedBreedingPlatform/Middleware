@@ -79,7 +79,7 @@
         </sql>
     </changeSet>
 
-    <changeSet author="mderamos" id="v23.1.0-1">
+    <changeSet author="mderamos" id="v23.1.0-2">
         <preConditions onFail="MARK_RAN">
             <and>
                 <not>
@@ -103,7 +103,7 @@
         </sql>
     </changeSet>
 
-    <changeSet author="mderamos" id="v23.1.0-2">
+    <changeSet author="mderamos" id="v23.1.0-3">
         <preConditions onFail="MARK_RAN">
             <and>
                 <sqlCheck expectedResult="0">
@@ -202,7 +202,7 @@
         </sql>
     </changeSet>
 
-    <changeSet author="mderamos" id="v23.1.0-3">
+    <changeSet author="mderamos" id="v23.1.0-4">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) FROM information_schema.routines
@@ -341,7 +341,7 @@
                             SET isNameTypeUsedByGermplasm = FALSE;
                         END IF;
                     END WHILE;
-                    
+
                     -- update the name's nametype
                     UPDATE names name
                         SET name.ntype = (SELECT fldno FROM udflds WHERE fcode = currentNameType AND ftable = 'NAMES' AND ftype = 'NAME')
