@@ -148,11 +148,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public boolean checkIfProjectNameIsExistingInProgram(final String name, final String programUUID) {
-		return this.daoFactory.getDmsProjectDAO().checkIfProjectNameIsExistingInProgram(name, programUUID);
-	}
-
-	@Override
 	public List<Reference> getRootFolders(final String programUUID) {
 		final List<Reference> references = this.daoFactory.getDmsProjectDAO().getRootFolders(programUUID, null);
 		this.populateStudyOwnerName(references);
@@ -688,26 +683,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<StudyDetails> getStudyDetails(
-		final StudyTypeDto studyType, final String programUUID, final int start,
-		final int numOfRows) {
-		final List<StudyDetails> details = this.daoFactory.getDmsProjectDAO().getAllStudyDetails(studyType, programUUID, start, numOfRows);
-		this.populateSiteAndPersonIfNecessary(details);
-		return details;
-	}
-
-	@Override
 	public StudyDetails getStudyDetails(final int studyId) {
 		final StudyDetails studyDetails = this.daoFactory.getDmsProjectDAO().getStudyDetails(studyId);
 		this.populateSiteAnPersonIfNecessary(studyDetails);
 		return studyDetails;
-	}
-
-	@Override
-	public List<StudyDetails> getNurseryAndTrialStudyDetails(final String programUUID, final int start, final int numOfRows) {
-		final List<StudyDetails> list = this.daoFactory.getDmsProjectDAO().getAllStudyDetails(programUUID, start, numOfRows);
-		this.populateSiteAndPersonIfNecessary(list);
-		return list;
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -720,20 +699,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		this.populateSiteAndPersonIfNecessary(list);
 		return list;
-	}
-
-	@Override
-	public long countAllStudyDetails(final StudyTypeDto studyType, final String programUUID) {
-		long count = 0;
-		count += this.daoFactory.getDmsProjectDAO().countAllStudyDetails(studyType, programUUID);
-		return count;
-	}
-
-	@Override
-	public long countAllNurseryAndTrialStudyDetails(final String programUUID) {
-		long count = 0;
-		count += this.daoFactory.getDmsProjectDAO().countAllStudyDetails(programUUID);
-		return count;
 	}
 
 	@Override
@@ -1022,11 +987,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			return this.getStudyTypeBuilder().createStudyTypeDto(studyTypeByName);
 		}
 		return null;
-	}
-
-	@Override
-	public StudyTypeDto getStudyTypeByLabel(final String label) {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.daoFactory.getStudyTypeDao().getStudyTypeByLabel(label));
 	}
 
 	@Override
