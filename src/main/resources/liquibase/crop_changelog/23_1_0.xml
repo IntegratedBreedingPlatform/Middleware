@@ -89,7 +89,7 @@
 				</not>
 			</and>
 		</preConditions>
-		<comment> Add created_by to phenotype table </comment>
+		<comment> Add updated_by to phenotype table </comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE phenotype
 				ADD COLUMN updated_by INT(11) NULL;
