@@ -24,10 +24,13 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
+import org.generationcp.middleware.service.api.user.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +40,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SiteAnalysisServiceImpl implements SiteAnalysisService {
+
+	@Autowired
+	private UserService userService;
 
 	public static final Map<Integer, VariableType> MEANS_DATASET_DMSPROJECT_PROPERTIES = ImmutableMap.<Integer, VariableType>builder()
 		.put(TermId.DATASET_NAME.getId(), VariableType.STUDY_DETAIL)
@@ -206,17 +212,24 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		final Map<String, Double> values) {
 		final Map<Integer, Phenotype> phenotypesMap = CollectionUtils.isEmpty(experimentModel.getPhenotypes()) ? new HashMap<>() :
 			experimentModel.getPhenotypes().stream().collect(Collectors.toMap(Phenotype::getObservableId, Function.identity()));
+		final Integer loggedInUser = this.userService.getCurrentlyLoggedInUserId();
 		for (final Map.Entry<String, Double> mapEntry : values.entrySet()) {
 			final int observableId = variablesMap.get(mapEntry.getKey()).getCvTermId();
 			if (mapEntry.getValue() != null) {
 				if (phenotypesMap.containsKey(observableId)) {
 					final Phenotype existingPhenotype = phenotypesMap.get(observableId);
 					existingPhenotype.setValue(mapEntry.getValue().toString());
+					existingPhenotype.setUpdatedDate(new Date());
+					existingPhenotype.setUpdatedBy(loggedInUser);
 				} else {
 					final Phenotype phenotype = new Phenotype();
 					phenotype.setExperiment(experimentModel);
 					phenotype.setValue(mapEntry.getValue().toString());
 					phenotype.setObservableId(observableId);
+					phenotype.setCreatedDate(new Date());
+					phenotype.setCreatedBy(loggedInUser);
+					phenotype.setUpdatedDate(new Date());
+					phenotype.setUpdatedBy(loggedInUser);
 					phenotypesMap.put(observableId, phenotype);
 				}
 			}
