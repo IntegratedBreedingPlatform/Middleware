@@ -27,7 +27,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	private List<MeasurementVariableDto> datasetVariables;
 	private List<MeasurementVariableDto> entryDetails;
 	private int datasetId;
-	private Integer instanceId;
+	private List<Integer> instanceIds;
 	private Integer environmentDatasetId;
 	private Boolean draftMode;
 
@@ -171,7 +171,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		this.draftMode = false;
 	}
 
-	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors,
+	public ObservationUnitsSearchDTO(final int datasetId, final List<Integer> instanceIds, final List<String> genericGermplasmDescriptors,
 		final List<String> additionalDesignFactors,
 		final List<MeasurementVariableDto> datasetVariables) {
 		this();
@@ -179,7 +179,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		this.additionalDesignFactors = additionalDesignFactors;
 		this.datasetVariables = datasetVariables;
 		this.datasetId = datasetId;
-		this.instanceId = instanceId;
+		this.instanceIds = instanceIds;
 	}
 
 	public List<MeasurementVariableDto> getEnvironmentDetails() {
@@ -238,12 +238,12 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		this.datasetId = datasetId;
 	}
 
-	public Integer getInstanceId() {
-		return this.instanceId;
+	public List<Integer> getInstanceIds() {
+		return this.instanceIds;
 	}
 
-	public void setInstanceId(final Integer instanceId) {
-		this.instanceId = instanceId;
+	public void setInstanceIds(final List<Integer> instanceIds) {
+		this.instanceIds = instanceIds;
 	}
 
 	public Integer getEnvironmentDatasetId() {

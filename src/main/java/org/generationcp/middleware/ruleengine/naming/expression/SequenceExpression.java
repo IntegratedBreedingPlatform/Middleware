@@ -1,10 +1,9 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.generationcp.middleware.ruleengine.ExpressionUtils;
 import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +19,6 @@ public class SequenceExpression extends BaseExpression implements Expression {
 	private static final String KEY = "\\[SEQUENCE\\]";
 	private static final Pattern PATTERN = Pattern.compile(SequenceExpression.KEY);
 
-
 	@Autowired
 	protected GermplasmNamingService germplasmNamingService;
 
@@ -33,14 +31,14 @@ public class SequenceExpression extends BaseExpression implements Expression {
 	}
 
 	@Override
-	public void apply(final List<StringBuilder> values, final DeprecatedAdvancingSource source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
 
 		final List<StringBuilder> newNames = new ArrayList<>();
 
 		for (final StringBuilder value : values) {
-			if (source.getPlantsSelected() != null && source.getPlantsSelected() > 0) {
+			if (advancingSource.getPlantsSelected() != null && advancingSource.getPlantsSelected() > 0) {
 				synchronized (SequenceExpression.class) {
-					final int iterationCount = source.isBulk() ? 1 : source.getPlantsSelected();
+					final int iterationCount = advancingSource.isBulkingMethod() ? 1 : advancingSource.getPlantsSelected();
 					for (int i = 0; i < iterationCount; i++) {
 						final StringBuilder newName = new StringBuilder(value);
 						final String upperCaseValue = value.toString().toUpperCase();
@@ -49,22 +47,8 @@ public class SequenceExpression extends BaseExpression implements Expression {
 						final Matcher matcher = pattern.matcher(upperCaseValue);
 						if (matcher.find()) {
 							final String keyPrefix = upperCaseValue.substring(0, matcher.start());
-
-							int nextNumberInSequence;
-							// In preview mode, do not increment the prefix in sequence registry
-							if (BooleanUtils.isTrue(source.getDesignationIsPreviewOnly())) {
-								if (source.getKeySequenceMap().containsKey(keyPrefix)) {
-									nextNumberInSequence = source.getKeySequenceMap().get(keyPrefix) + 1;
-								} else {
-									nextNumberInSequence = this.germplasmNamingService.getNextSequence(keyPrefix);
-								}
-								source.getKeySequenceMap().put(keyPrefix, nextNumberInSequence);
-
-							// Look up last sequence number from database for KeyPrefix with synchronization at class level
-							} else {
-								nextNumberInSequence = this.germplasmNamingService.getNextNumberAndIncrementSequence(keyPrefix);
-							}
-
+							final int nextNumberInSequence =
+								this.germplasmNamingService.getNextNumberAndIncrementSequenceUsingNativeSQL(keyPrefix);
 							final String numberString = this.germplasmNamingService
 								.getNumberWithLeadingZeroesAsString(nextNumberInSequence, this.getNumberOfDigits(value));
 

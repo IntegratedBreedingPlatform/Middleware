@@ -54,12 +54,19 @@
         <property name="breedersCrossIDStudy" value="${breeders.cross.id.study}" />
 	</bean>
 
-    <bean id="breedersCrossIDGenerator" class="org.generationcp.middleware.ruleengine.generator.BreedersCrossIDGenerator">
+    <bean id="deprecatedBreedersCrossIDGenerator" class="org.generationcp.middleware.ruleengine.generator.DeprecatedBreedersCrossIDGenerator">
+	</bean>
+
+	<bean id="breedersCrossIDGenerator" class="org.generationcp.middleware.ruleengine.generator.BreedersCrossIDGenerator">
 	</bean>
 
 	<bean id="messageSource"
 			  class="org.springframework.context.support.ResourceBundleMessageSource">
         <property name="basename" value="Messages" />
     </bean>
+
+	<bean id="advanceService" class="org.generationcp.middleware.service.impl.study.advance.AdvanceServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
 
 </beans>

@@ -139,7 +139,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
 		observationUnitsSearchDTO.setDatasetId(plantSubObsDataset.getProjectId());
-		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
+		observationUnitsSearchDTO.setInstanceIds(Arrays.asList(geolocation.getLocationId()));
 		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
 		observationUnitsSearchDTO.setEnvironmentDetails(Collections.singletonList(environmentDetailDto));
 		observationUnitsSearchDTO.setEnvironmentConditions(Collections.singletonList(environmentConditionDto));
@@ -222,7 +222,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
 		observationUnitsSearchDTO.setDatasetId(plantSubObsDataset.getProjectId());
-		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
+		observationUnitsSearchDTO.setInstanceIds(Arrays.asList(geolocation.getLocationId()));
 		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
 
 		// Filter by Overwritten
@@ -305,9 +305,9 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		assertEquals((noOfSubObservationExperiment * 2),
 			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
 		assertEquals(noOfSubObservationExperiment,
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, geolocation.getLocationId(), false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, Arrays.asList(geolocation.getLocationId()), false, filter).intValue());
 		assertEquals(noOfSubObservationExperiment,
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, geolocation2.getLocationId(), false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, Arrays.asList(geolocation2.getLocationId()), false, filter).intValue());
 
 		// Filter by draft phenotype
 		filter.setVariableId(trait1.getCvTermId());
@@ -372,9 +372,9 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		assertEquals(instance1Units.size() + instance2Units.size(),
 			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
 		assertEquals(instance1Units.size(),
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, geolocation.getLocationId(), false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, Arrays.asList(geolocation.getLocationId()), false, filter).intValue());
 		assertEquals(instance2Units.size(),
-			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, geolocation2.getLocationId(), false, filter).intValue());
+			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, Arrays.asList(geolocation2.getLocationId()), false, filter).intValue());
 
 		// Filter by draft phenotype
 		filter.setVariableId(trait1.getCvTermId());
@@ -422,7 +422,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final Integer datasetId = this.plot.getProjectId();
 		observationUnitsSearchDTO.setDatasetId(datasetId);
 		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
-		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
+		observationUnitsSearchDTO.setInstanceIds(Arrays.asList(geolocation.getLocationId()));
 
 		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
 		filter.setByOutOfBound(true);
@@ -455,7 +455,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final Integer datasetId = this.plot.getProjectId();
 		observationUnitsSearchDTO.setDatasetId(datasetId);
 		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
-		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
+		observationUnitsSearchDTO.setInstanceIds(Arrays.asList(geolocation.getLocationId()));
 
 		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
 		filter.setByOutOfBound(true);
@@ -489,7 +489,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final Integer datasetId = this.plot.getProjectId();
 		observationUnitsSearchDTO.setDatasetId(datasetId);
 		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
-		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
+		observationUnitsSearchDTO.setInstanceIds(Arrays.asList(geolocation.getLocationId()));
 
 		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
 		filter.setByOutOfBound(true);
@@ -534,7 +534,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
 		observationUnitsSearchDTO.setDatasetId(plantSubObsDataset.getProjectId());
-		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
+		observationUnitsSearchDTO.setInstanceIds(Arrays.asList(geolocation.getLocationId()));
 		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
 		observationUnitsSearchDTO.setFilter(observationUnitsSearchDTO.new Filter());
 		observationUnitsSearchDTO.setEntryDetails(Arrays.asList(

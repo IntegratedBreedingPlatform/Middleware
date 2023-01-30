@@ -1,33 +1,32 @@
 
 package org.generationcp.middleware.ruleengine.naming.rules;
 
-import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class CountRule extends OrderedRule<NamingRuleExecutionContext> {
+public class CountRule extends NamingOrderedRule {
 
 	public static final String KEY = "Count";
 	public static final String DEFAULT_COUNT = "[NUMBER]";
 
 	@Override
-	public Object runRule(NamingRuleExecutionContext context) throws RuleException {
+	public Object runRule(final NamingRuleExecutionContext context) throws RuleException {
 		// create counts first - we need a list in case we have a sequence
 
-		ProcessCodeService service = context.getProcessCodeService();
-		DeprecatedAdvancingSource source = context.getAdvancingSource();
+		final ProcessCodeService service = context.getProcessCodeService();
+		final AdvancingSource source = context.getAdvancingSource();
 
-		List<String> input = context.getCurrentData();
+		final List<String> input = context.getCurrentData();
 
-		List<String> counts = new ArrayList<>();
+		final List<String> counts = new ArrayList<>();
 
-		for (String currentInput : input) {
+		for (final String currentInput : input) {
 			counts.addAll(service.applyProcessCode(currentInput, source.getBreedingMethod().getCount(), source));
 		}
 

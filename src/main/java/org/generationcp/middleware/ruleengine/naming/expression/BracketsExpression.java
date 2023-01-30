@@ -2,7 +2,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,18 +16,17 @@ public class BracketsExpression extends BaseExpression {
 	}
 
 	@Override
-	public void apply(List<StringBuilder> values, DeprecatedAdvancingSource source, final String capturedText) {
-		for (StringBuilder container : values) {
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
+		for (final StringBuilder container : values) {
 
-			String newRootName = source.getRootName();
+			final String newRootName = advancingSource.getRootName();
 
-			if (source.getRootNameType() != null && this.isCrossNameType(source.getRootNameType())) {
+			if (advancingSource.getRootNameType() != null && this.isCrossNameType(advancingSource.getRootNameType())) {
 
 				// if root name already has parentheses
 				if (newRootName.charAt(0) != '(' || newRootName.charAt(newRootName.length() - 1) != ')') {
 					this.replaceExpressionWithValue(container, ")");
 					container.insert(0, "(");
-					continue;
 				}
 			} else {
 				this.replaceExpressionWithValue(container, "");
@@ -35,7 +34,7 @@ public class BracketsExpression extends BaseExpression {
 		}
 	}
 
-	protected boolean isCrossNameType(Integer nameTypeId) {
+	protected boolean isCrossNameType(final Integer nameTypeId) {
 		return GermplasmNameType.CROSS_NAME.getUserDefinedFieldID() == nameTypeId
 				|| GermplasmNameType.ALTERNATE_CROSS_NAME.getUserDefinedFieldID() == nameTypeId;
 	}

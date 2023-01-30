@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.germplasm;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
@@ -99,7 +100,10 @@ public interface GermplasmService {
 	 * @param gids
 	 * @return a {@link Map} of {@link Pair} where the left value corresponds to the group source name and the right value to the immediate source name
 	 */
-	Map<Integer, Pair<String, String>> getDerivativeParentsMapByGids(final Set<Integer> gids);
+	Map<Integer, Pair<String, String>> getDerivativeParentsMapByGids(Set<Integer> gids);
 
 	Map<Integer, Integer> countGermplasmDerivativeProgeny(Set<Integer> gids);
+
+	List<BasicGermplasmDTO> getBasicGermplasmByGids(Set<Integer> gids);
+
 }

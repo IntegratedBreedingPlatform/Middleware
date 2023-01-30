@@ -7,9 +7,9 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,11 +18,11 @@ import java.util.List;
 public class RootNameExpression implements Expression {
 
 	@Override
-	public void apply(final List<StringBuilder> values, final DeprecatedAdvancingSource source, final String capturedText) {
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
 		for (final StringBuilder value : values) {
-			final Integer snametype = source.getBreedingMethod().getSnametype();
-			Name name = null;
-			final List<Name> names = source.getNames();
+			final Integer snametype = advancingSource.getBreedingMethod().getSnametype();
+			BasicNameDTO name = null;
+			final List<BasicNameDTO> names = advancingSource.getNames();
 
 			// this checks the matching sname type of the method to the names
 			if (snametype != null) {
@@ -50,8 +50,8 @@ public class RootNameExpression implements Expression {
 				typeId = name.getTypeId();
 			}
 
-			source.setRootNameType(typeId);
-			source.setRootName(nameString);
+			advancingSource.setRootNameType(typeId);
+			advancingSource.setRootName(nameString);
 
 			if (!this.checkNameIfEnclosed(nameString)) {
 				value.append("(").append(nameString).append(")");
@@ -61,12 +61,12 @@ public class RootNameExpression implements Expression {
 		}
 	}
 
-	public Name findNameUsingNameType(final Integer nameType, final List<Name> names) {
+	public BasicNameDTO findNameUsingNameType(final Integer nameType, final List<BasicNameDTO> names) {
 		if (names == null) {
 			return null;
 		}
 
-		for (final Name name : names) {
+		for (final BasicNameDTO name : names) {
 			if (name.getTypeId() != null && name.getTypeId().equals(nameType)) {
 				return name;
 			}
@@ -75,12 +75,12 @@ public class RootNameExpression implements Expression {
 		return null;
 	}
 
-	public Name findPreferredName(final List<Name> names) {
+	public BasicNameDTO findPreferredName(final List<BasicNameDTO> names) {
 		if (names == null) {
 			return null;
 		}
 
-		for (final Name name : names) {
+		for (final BasicNameDTO name : names) {
 			if (name.getNstat() != null && name.getNstat().equals(1)) {
 				return name;
 			}
@@ -112,7 +112,7 @@ public class RootNameExpression implements Expression {
 	}
 
 	private boolean checkNeighbor(final String name, final int index, final char literal, final int delta, final int stopPoint,
-			final char oppositeLiteral) {
+		final char oppositeLiteral) {
 		int oppositeCount = 0;
 		for (int i = index + delta; i != stopPoint + delta; i = i + delta) {
 			if (name.charAt(i) == literal) {

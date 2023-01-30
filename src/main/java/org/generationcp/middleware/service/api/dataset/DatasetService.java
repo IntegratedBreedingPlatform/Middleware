@@ -140,6 +140,15 @@ public interface DatasetService {
 	List<DatasetDTO> getDatasets(Integer studyId, Set<Integer> datasetTypeIds);
 
 	/**
+	 * Given a list of dataset types and a study, it will retrieve the study datasets with variables and with the specified types
+	 *
+	 * @param studyId        Id of the study
+	 * @param datasetTypeIds List of dataset types
+	 * @return List of datasets
+	 */
+	List<DatasetDTO> getDatasetsWithVariables(Integer studyId, Set<Integer> datasetTypeIds);
+
+	/**
 	 * If the variable is input variable for a formula, update the phenotypes status as "OUT OF SYNC" for given observation unit.
 	 * This will also update the phenotype status of calculated variables in plot observation if the observation unit is a sub-observation.
 	 *
@@ -184,11 +193,11 @@ public interface DatasetService {
 	 * units with at least one draft observation)
 	 *
 	 * @param datasetId  Id of the dataset
-	 * @param instanceId Id of the instance
+	 * @param instanceIds Id of the instance
 	 * @param draftMode  Indicates to count all observation units  or draft observations
 	 * @return Number of observations units that matches the dataset id and draftMode
 	 */
-	Integer countAllObservationUnitsForDataset(Integer datasetId, Integer instanceId, Boolean draftMode);
+	Integer countAllObservationUnitsForDataset(Integer datasetId, List<Integer> instanceIds, Boolean draftMode);
 
 	/**
 	 * Count how many observation units are affected by a filter
@@ -196,12 +205,12 @@ public interface DatasetService {
 	 * units with at least one draft observation)
 	 *
 	 * @param datasetId  Id of the dataset
-	 * @param instanceId Id of the instance
+	 * @param instanceIds Id of the instance
 	 * @param draftMode  draftMode
 	 * @param filter     Filyer
 	 * @return Number of observation units that matches the datasetId, draftMode and filter
 	 */
-	long countFilteredObservationUnitsForDataset(Integer datasetId, Integer instanceId, Boolean draftMode,
+	long countFilteredObservationUnitsForDataset(Integer datasetId, List<Integer> instanceIds, Boolean draftMode,
 		ObservationUnitsSearchDTO.Filter filter);
 
 	/**
@@ -324,8 +333,7 @@ public interface DatasetService {
 	 * @param instanceIds
 	 * @return
 	 */
-	Map<Integer, List<ObservationUnitRow>> getInstanceIdToObservationUnitRowsMap(
-		int studyId, int datasetId, List<Integer> instanceIds);
+	Map<Integer, List<ObservationUnitRow>> getInstanceIdToObservationUnitRowsMap(int studyId, int datasetId, List<Integer> instanceIds);
 
 	/**
 	 * Count obseravtion grouped by instance

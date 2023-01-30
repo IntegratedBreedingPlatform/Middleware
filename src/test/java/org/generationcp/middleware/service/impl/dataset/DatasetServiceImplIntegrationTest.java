@@ -211,7 +211,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     @Test
     public void testGetObservationUnitRows() {
         final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO();
-        searchDto.setInstanceId(this.instanceIds.get(0));
+        searchDto.setInstanceIds(this.instanceIds);
         final List<ObservationUnitRow> observationUnitRows = this.datasetService.getObservationUnitRows(this.studyId, this.subObsDatasetId,
                 searchDto, new PageRequest(0, Integer.MAX_VALUE));
         Assert.assertNotNull(observationUnitRows);
@@ -225,7 +225,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     @Test
     public void testGetObservationUnitRowsAsMapList() {
         final ObservationUnitsSearchDTO searchDto = new ObservationUnitsSearchDTO();
-        searchDto.setInstanceId(this.instanceIds.get(0));
+        searchDto.setInstanceIds(this.instanceIds);
         searchDto.getVisibleColumns().add("TRIAL_INSTANCE");
         searchDto.getVisibleColumns().add(TRAIT_NAME);
         final List<Map<String, Object>> rowsAsListMap = this.datasetService.getObservationUnitRowsAsMapList(this.studyId, this.subObsDatasetId,
@@ -363,7 +363,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         final Integer[] gids = this.germplasmTestDataGenerator
                 .createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, "PREFF", parentGermplasm);
 
-        this.studyId = this.dataSetupTest.createNurseryForGermplasm(this.commonTestProject.getUniqueID(), gids, "ABCD");
+        this.studyId = this.dataSetupTest.createNurseryForGermplasm(this.commonTestProject.getUniqueID(), gids, "ABCD", DataSetupTest.NUMBER_OF_GERMPLASM, 2);
         this.instanceIds = new ArrayList<>(this.studyDataManager.getInstanceGeolocationIdsMap(this.studyId).values());
 
         this.plotDatasetId = this.studyId + 2;

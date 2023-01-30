@@ -3,6 +3,7 @@ package org.generationcp.middleware.spring.util;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
+@Deprecated
 public class ComponentPostProcessorFactory{
 
     public <T> BeanPostProcessor generatePostProcessorFactory(final Class<T> componentClass, final ComponentFactory<T> factoryInstance)  {

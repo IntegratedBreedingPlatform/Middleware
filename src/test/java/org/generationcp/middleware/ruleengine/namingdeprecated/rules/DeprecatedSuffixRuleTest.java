@@ -1,10 +1,10 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.namingdeprecated.rules;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.ruleengine.RuleException;
-import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeServiceImpl;
+import org.generationcp.middleware.ruleengine.namingdeprecated.impl.DeprecatedProcessCodeServiceImpl;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,16 +12,16 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CodingSuffixRuleTest extends BaseNamingRuleTest {
+public class DeprecatedSuffixRuleTest extends DeprecatedBaseNamingRuleTest {
 
-	private SuffixRule rule;
+	private DeprecatedSuffixRule rule;
 	private Method breedingMethod;
 	private String testGermplasmName;
 	private Integer breedingMethodSnameType;
 
 	@Before
 	public void setUp() {
-		this.processCodeService = new ProcessCodeServiceImpl();
+		this.processCodeService = new DeprecatedProcessCodeServiceImpl();
 		this.breedingMethodSnameType = 5;
 		this.breedingMethod = new Method();
 		this.breedingMethod.setSnametype(this.breedingMethodSnameType);
@@ -29,7 +29,7 @@ public class CodingSuffixRuleTest extends BaseNamingRuleTest {
 		this.row = new DeprecatedAdvancingSource();
 		this.row.setBreedingMethod(this.breedingMethod);
 		this.testGermplasmName = "CMT1234-B-3-";
-		this.rule = new SuffixRule();
+		this.rule = new DeprecatedSuffixRule();
 	}
 
 	@Test

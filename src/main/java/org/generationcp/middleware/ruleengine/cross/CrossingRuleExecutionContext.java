@@ -4,6 +4,7 @@ package org.generationcp.middleware.ruleengine.cross;
 import java.util.List;
 
 import org.generationcp.middleware.ruleengine.OrderedRuleExecutionContext;
+import org.generationcp.middleware.ruleengine.RuleExecutionNamespace;
 import org.generationcp.middleware.ruleengine.settings.CrossSetting;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
@@ -39,6 +40,11 @@ public class CrossingRuleExecutionContext extends OrderedRuleExecutionContext {
 	@Override
 	public Object getRuleExecutionOutput() {
 		return null;
+	}
+
+	@Override
+	public RuleExecutionNamespace getRuleExecutionNamespace() {
+		return RuleExecutionNamespace.NAMING;
 	}
 
 	public Integer getFemaleGid() {

@@ -2,7 +2,7 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.ruleengine.util.ExpressionHelper;
 import org.generationcp.middleware.ruleengine.util.ExpressionHelperCallback;
 import org.springframework.stereotype.Component;
@@ -18,17 +18,17 @@ public class BulkCountExpression extends BaseExpression {
 	}
 
 	@Override
-	public void apply(List<StringBuilder> values, DeprecatedAdvancingSource source, final String capturedText) {
-		for (StringBuilder container : values) {
-            String computedValue;
-			if (source.getRootName() != null) {
-				BulkExpressionHelperCallback callback = new BulkExpressionHelperCallback();
-				ExpressionHelper.evaluateExpression(source.getRootName(), "-([0-9]*)B", callback);
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
+		for (final StringBuilder container : values) {
+            final String computedValue;
+			if (advancingSource.getRootName() != null) {
+				final BulkExpressionHelperCallback callback = new BulkExpressionHelperCallback();
+				ExpressionHelper.evaluateExpression(advancingSource.getRootName(), "-([0-9]*)B", callback);
 
-				StringBuilder lastBulkCount = callback.getLastBulkCount();
+				final StringBuilder lastBulkCount = callback.getLastBulkCount();
 
 				if (lastBulkCount.length() > 0) {
-					computedValue = (Integer.valueOf(lastBulkCount.toString()) + 1) + "B";
+					computedValue = (Integer.parseInt(lastBulkCount.toString()) + 1) + "B";
 				} else {
 					computedValue = "-B";
 				}
@@ -40,17 +40,17 @@ public class BulkCountExpression extends BaseExpression {
 		}
 	}
 
-	private class BulkExpressionHelperCallback implements ExpressionHelperCallback {
+	private static class BulkExpressionHelperCallback implements ExpressionHelperCallback {
 
 		final StringBuilder lastBulkCount = new StringBuilder();
 
 		@Override
-		public void evaluateCapturedExpression(String capturedText, String originalInput, int start, int end) {
+		public void evaluateCapturedExpression(final String capturedText, final String originalInput, final int start, final int end) {
 			if ("-B".equals(capturedText)) {
 				this.lastBulkCount.replace(0, this.lastBulkCount.length(), "1");
 			} else {
-				String newCapturedText = capturedText.replaceAll("[-B]*", "");
-				if (newCapturedText != null && NumberUtils.isNumber(newCapturedText)) {
+				final String newCapturedText = capturedText.replaceAll("[-B]*", "");
+				if (NumberUtils.isNumber(newCapturedText)) {
 					this.lastBulkCount.replace(0, this.lastBulkCount.length(), newCapturedText);
 				}
 			}
