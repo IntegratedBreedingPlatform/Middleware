@@ -67,6 +67,7 @@ import org.springframework.util.CollectionUtils;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -1412,6 +1413,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public Phenotype saveOrUpdate(final Phenotype entity) {
 		try {
 			if (entity.getPhenotypeId() == null) {
+				entity.setCreatedDate(new Date());
+				entity.setCreatedBy(entity.getUpdatedBy());
 				this.savePhenotype(entity);
 			}
 			this.getSession().saveOrUpdate(entity);
@@ -1425,6 +1428,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public Phenotype merge(final Phenotype entity) {
 		try {
 			if (entity.getPhenotypeId() == null) {
+				entity.setCreatedDate(new Date());
+				entity.setCreatedBy(entity.getUpdatedBy());
 				this.savePhenotype(entity);
 			}
 			this.getSession().merge(entity);

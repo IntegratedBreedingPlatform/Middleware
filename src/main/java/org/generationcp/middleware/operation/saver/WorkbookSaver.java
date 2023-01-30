@@ -465,7 +465,7 @@ public class WorkbookSaver extends Saver {
 	public void saveTrialObservations(final Workbook workbook, final String programUUID) {
 		if (!workbook.getTrialObservations().isEmpty()) {
 			for (final MeasurementRow trialObservation : workbook.getTrialObservations()) {
-				this.getGeolocationSaver().updateGeolocationInformation(trialObservation, programUUID);
+				this.getGeolocationSaver().updateGeolocationInformation(trialObservation, programUUID, workbook.getUserId());
 			}
 		}
 	}

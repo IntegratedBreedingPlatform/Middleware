@@ -26,6 +26,9 @@ import java.util.List;
 public class ExperimentModelSaverTest extends IntegrationTestBase {
 
 	private static final String CROP_PREFIX = RandomStringUtils.randomAlphanumeric(5);
+
+	private static final Integer USER_ID = 1;
+
 	private ExperimentModelSaver experimentModelSaver;
 	private ExperimentDao experimentDao;
 	private PhenotypeDao phenotypeDao;
@@ -139,7 +142,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		final CropType crop = new CropType();
 		crop.setUseUUID(false);
 		crop.setPlotCodePrefix(CROP_PREFIX);
-		this.experimentModelSaver.addOrUpdateExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		this.experimentModelSaver.addOrUpdateExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values, USER_ID);
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Assert.assertNotNull(experiment.getObsUnitId());
 		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorTest.UUID_REGEX));
