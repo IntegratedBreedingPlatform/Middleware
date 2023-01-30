@@ -2,7 +2,7 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,12 +28,12 @@ public class DoubleHaploidSourceExpressionTest extends TestExpression {
 	 */
     @Test
     public void testDesignationValueWithLastUsedSequenceNumberForDoubleHaploid() throws MiddlewareException {
-		DeprecatedAdvancingSource
-			source = this.createAdvancingSourceTestData("(CML454 X CML451)-B-3-1-1@0", null, null, null, "[DHSOURCE]", false);
+		final AdvancingSource
+			source = this.createAdvancingSourceTestData("(CML454 X CML451)-B-3-1-1@0", null, null, null, "[DHSOURCE]", false, 2);
 
-		List<StringBuilder> values = this.createInitialValues(source);
+		final List<StringBuilder> values = this.createInitialValues("(CML454 X CML451)-B-3-1-1@0", source);
 
-		Mockito.when(this.keySequenceRegisterService.incrementAndGetNextSequence("(CML454 X CML451)-B-3-1-1@")).thenReturn(25);
+		Mockito.when(this.keySequenceRegisterService.incrementAndGetNextSequenceUsingNativeSQL("(CML454 X CML451)-B-3-1-1@")).thenReturn(25);
 
 		doubleHaploidSourceExpression.apply(values, source, null);
 
@@ -46,10 +46,10 @@ public class DoubleHaploidSourceExpressionTest extends TestExpression {
 	 */
 	@Test
 	public void testDesignationValueWithoutLastUsedSequenceNumberForDoubleHaploid() throws MiddlewareException {
-		DeprecatedAdvancingSource
-			source = this.createAdvancingSourceTestData("(CML454 X CML451)-B-3-1-1", "-", "DH", null, "[DHSOURCE]", false);
+		final AdvancingSource
+			source = this.createAdvancingSourceTestData("(CML454 X CML451)-B-3-1-1", "-", "DH", null, "[DHSOURCE]", false, 2);
 
-		List<StringBuilder> values = this.createInitialValues(source);
+		final List<StringBuilder> values = this.createInitialValues("(CML454 X CML451)-B-3-1-1", source);
 
 		doubleHaploidSourceExpression.apply(values, source, null);
 

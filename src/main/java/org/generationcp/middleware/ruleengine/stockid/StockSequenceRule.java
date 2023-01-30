@@ -1,13 +1,12 @@
 
 package org.generationcp.middleware.ruleengine.stockid;
 
-import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 
 /**
  * A rule implementation that defines the logic for processing sequence numbers within the context of generation of stock IDs
  */
-public class StockSequenceRule extends OrderedRule<StockIDGenerationRuleExecutionContext> {
+public class StockSequenceRule extends StockIDOrderedRule {
 
 	static final String KEY = "SEQUENCE";
 

@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.ruleengine.naming.rules;
+package org.generationcp.middleware.ruleengine.namingdeprecated.rules;
 
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Method;
@@ -14,7 +14,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CodingCountRuleTest extends BaseNamingRuleTest {
+public class DeprecatedCountRuleTest extends DeprecatedBaseNamingRuleTest {
 
 	private Rule rule;
 	private Method breedingMethod;
@@ -30,7 +30,7 @@ public class CodingCountRuleTest extends BaseNamingRuleTest {
 		this.breedingMethod.setCount("");
 		this.row = new DeprecatedAdvancingSource();
 		this.row.setBreedingMethod(this.breedingMethod);
-		this.rule = new CountRule();
+		this.rule = new DeprecatedCountRule();
 
 		this.name = "TestGP";
 	}

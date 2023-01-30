@@ -1,25 +1,24 @@
 
 package org.generationcp.middleware.ruleengine.naming.rules;
 
-import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class SeparatorRule extends OrderedRule<NamingRuleExecutionContext> {
+public class SeparatorRule extends NamingOrderedRule {
 
 	public static final String KEY = "Separator";
 
 	@Override
-	public Object runRule(NamingRuleExecutionContext context) throws RuleException {
-		List<String> input = context.getCurrentData();
-		DeprecatedAdvancingSource source = context.getAdvancingSource();
+	public Object runRule(final NamingRuleExecutionContext context) throws RuleException {
+		final List<String> input = context.getCurrentData();
+		final AdvancingSource source = context.getAdvancingSource();
 
-		ProcessCodeService processCodeService = context.getProcessCodeService();
+		final ProcessCodeService processCodeService = context.getProcessCodeService();
 		String separatorExpression = source.getBreedingMethod().getSeparator();
 
 		if (separatorExpression == null) {

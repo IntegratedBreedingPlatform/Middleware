@@ -8,4 +8,7 @@ public interface Rule<T extends RuleExecutionContext> {
 	String getNextRuleStepKey(T context);
 
 	String getKey();
+
+	RuleExecutionNamespace getRuleExecutionNamespace();
+
 }

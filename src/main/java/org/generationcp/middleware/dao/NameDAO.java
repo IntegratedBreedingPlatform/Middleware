@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.dao;
 
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -36,6 +37,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -466,5 +468,15 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public List<BasicNameDTO> getBasicNamesByGids(final Set<Integer> gids) {
+		final String sql = "SELECT n.nid, n.gid, n.ntype AS typeId, n.nstat, n.nval, n.nlocn as locationId "
+			+ " FROM names n "
+			+ " WHERE n.gid IN (:gids) AND n.nstat <> " + DELETED;
+		final SQLQuery query = this.getSession().createSQLQuery(sql);
+		query.setParameterList("gids", gids);
+		query.setResultTransformer(Transformers.aliasToBean(BasicNameDTO.class));
+		return query.list();
 	}
 }

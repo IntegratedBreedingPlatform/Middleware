@@ -434,4 +434,11 @@
 		<constructor-arg ref="workbenchSessionProvider"/>
 	</bean>
 
+	<bean id="seedSourceGenerator" class="org.generationcp.middleware.ruleengine.generator.SeedSourceGenerator">
+	</bean>
+
+	<bean id="germplasmStudySourceService" class="org.generationcp.middleware.service.impl.study.germplasm.source.GermplasmStudySourceServiceImpl">
+		<constructor-arg name="hibernateSessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 </beans>

@@ -34,8 +34,20 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
+	public int incrementAndGetNextSequenceUsingNativeSQL(final String keyPrefix) {
+		return this.keySequenceRegisterDAO.incrementAndGetNextSequenceUsingNativeSQL(keyPrefix);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
 	public int getNextSequence(final String keyPrefix) {
 		return this.keySequenceRegisterDAO.getNextSequence(keyPrefix);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
+	public int getNextSequenceUsingNativeSQL(final String keyPrefix) {
+		return this.keySequenceRegisterDAO.getNextSequenceUsingNativeSQL(keyPrefix);
 	}
 
 	@Override
@@ -45,7 +57,13 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 	}
 
 	@Override
-	public void deleteKeySequences(final List<String> keyPrefixes){
+	@Transactional(propagation = Propagation.MANDATORY)
+	public void saveLastSequenceUsedUsingNativeSQL(final String keyPrefix, final Integer lastSequenceUsed) {
+		this.keySequenceRegisterDAO.saveLastSequenceUsedUsingNativeSQL(keyPrefix, lastSequenceUsed);
+	}
+
+	@Override
+	public void deleteKeySequences(final List<String> keyPrefixes) {
 		this.daoFactory.getKeySequenceRegisterDAO().deleteByKeyPrefixes(keyPrefixes);
 	}
 }

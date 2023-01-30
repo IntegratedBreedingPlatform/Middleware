@@ -5,6 +5,7 @@ import org.generationcp.middleware.ruleengine.ProcessCodeOrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
+import org.generationcp.middleware.ruleengine.RuleExecutionNamespace;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,4 +49,10 @@ public class BackCrossSuffixRule extends ProcessCodeOrderedRule<CrossingRuleExec
 	public String getProcessCode() {
 		return PROCESS_CODE;
 	}
+
+	@Override
+	public RuleExecutionNamespace getRuleExecutionNamespace() {
+		return RuleExecutionNamespace.NAMING;
+	}
+
 }

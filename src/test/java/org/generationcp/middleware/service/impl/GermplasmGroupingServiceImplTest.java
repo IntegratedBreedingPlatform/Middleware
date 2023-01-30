@@ -9,6 +9,7 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -26,6 +27,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -756,42 +758,6 @@ public class GermplasmGroupingServiceImplTest {
 		Mockito.verify(this.germplasmDAO, Mockito.never()).save(ArgumentMatchers.any(Germplasm.class));
 	}
 
-	@Test
-	public void testGetSelectionHistory() {
-		final Germplasm germplasm = new Germplasm();
-		// Germplasm has no name yet, expect to return null
-		Assert.assertNull(
-				this.germplasmGroupingService.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE));
-
-		// Add a matching name
-		final Name selHisNameExpected = new Name();
-		selHisNameExpected.setNid(1);
-		selHisNameExpected.setTypeId(this.selectionHistoryNameCode.getFldno());
-		germplasm.getNames().add(selHisNameExpected);
-
-		final Name selectionHistoryName =
-				this.germplasmGroupingService.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
-		Assert.assertEquals(selHisNameExpected, selectionHistoryName);
-	}
-
-	@Test
-	public void testGetSelectionHistoryAtFixation() {
-		final Germplasm germplasm = new Germplasm();
-		// Germplasm has no name yet, expect to return null
-		Assert.assertNull(this.germplasmGroupingService
-				.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE));
-
-		// Add a matching name
-		final Name selHisFixNameExpected = new Name();
-		selHisFixNameExpected.setNid(1);
-		selHisFixNameExpected.setTypeId(this.selHisFixNameCode.getFldno());
-		germplasm.getNames().add(selHisFixNameExpected);
-
-		final Name selHisFixNameActual = this.germplasmGroupingService
-				.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
-		Assert.assertEquals(selHisFixNameExpected, selHisFixNameActual);
-	}
-
 	@Test(expected = IllegalStateException.class)
 	public void testGetSelectionHistoryNameType() {
 
@@ -819,13 +785,9 @@ public class GermplasmGroupingServiceImplTest {
 	@Test
 	public void testCopyParentalSelectionHistoryAtFixation() {
 
-		// Setup source germplasm which has SELHISFIX name
-		final Germplasm advancedGermplasmSource = new Germplasm();
-		advancedGermplasmSource.setGid(2);
-
-		final Name selHisFixNameOfParent = NameTestDataInitializer
-				.createName(11, GermplasmGroupingServiceImplTest.PREFERRED_CODE, "CML", this.selHisFixNameCode.getFldno());
-		advancedGermplasmSource.getNames().add(selHisFixNameOfParent);
+		// Setup source name SELHISFIX name
+		final BasicNameDTO selHisFixNameOfParent =
+			this.createBasicNameDTO(11, GermplasmGroupingServiceImplTest.PREFERRED_CODE, "CML", this.selHisFixNameCode.getFldno());
 
 		// Setup advanced germplasm with a name given on advancing
 		final Germplasm advancedGermplasm = new Germplasm();
@@ -838,7 +800,7 @@ public class GermplasmGroupingServiceImplTest {
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
 
 		// Invoke the service
-		this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(advancedGermplasm, advancedGermplasmSource);
+		this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(advancedGermplasm, new Random().nextInt(), Arrays.asList(selHisFixNameOfParent));
 
 		// Expect that the advanced germplasm now has two names (SELHISFIX name
 		// for parent gets added)
@@ -851,13 +813,9 @@ public class GermplasmGroupingServiceImplTest {
 	@Test
 	public void testCopyCodedNames() {
 
-		// Setup source germplasm which has coded name
-		final Germplasm advancedGermplasmSource = new Germplasm();
-		advancedGermplasmSource.setGid(2);
-
-		final Name code1 = NameTestDataInitializer
-				.createName(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, "CODE1", this.codedName1.getFldno());
-		advancedGermplasmSource.getNames().add(code1);
+		// Setup source name
+		final BasicNameDTO code1 =
+			this.createBasicNameDTO(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, "CODE1", this.codedName1.getFldno());
 
 		// Setup advanced germplasm with a name given on advancing
 		final Germplasm advancedGermplasm = new Germplasm();
@@ -870,7 +828,7 @@ public class GermplasmGroupingServiceImplTest {
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
 
 		// Invoke the service
-		this.germplasmGroupingService.copyCodedNames(advancedGermplasm, advancedGermplasmSource);
+		this.germplasmGroupingService.copyCodedNames(advancedGermplasm, Arrays.asList(code1));
 
 		// Expect that the advanced germplasm now has two names (SELHISFIX name
 		// for parent gets added)
@@ -883,21 +841,13 @@ public class GermplasmGroupingServiceImplTest {
 	@Test
 	public void testCopyCodedNamesPriorityForSettingPreferredName() {
 
-		// Setup source germplasm which has coded name
-		final Germplasm advancedGermplasmSource = new Germplasm();
-		advancedGermplasmSource.setGid(2);
-
-		final Name code1 = NameTestDataInitializer
-				.createName(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, "CODE1", this.codedName1.getFldno());
-		advancedGermplasmSource.getNames().add(code1);
-
-		final Name code2 = NameTestDataInitializer
-				.createName(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, "CODE2", this.codedName2.getFldno());
-		advancedGermplasmSource.getNames().add(code2);
-
-		final Name code3 = NameTestDataInitializer
-				.createName(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, "CODE3", this.codedName3.getFldno());
-		advancedGermplasmSource.getNames().add(code3);
+		// Setup source names
+		final BasicNameDTO code1 =
+			this.createBasicNameDTO(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, "CODE1", this.codedName1.getFldno());
+		final BasicNameDTO code2 =
+			this.createBasicNameDTO(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, "CODE2", this.codedName2.getFldno());
+		final BasicNameDTO code3 =
+			this.createBasicNameDTO(12, GermplasmGroupingServiceImplTest.NON_PREFERRED_CODE, "CODE3", this.codedName3.getFldno());
 
 		// Setup advanced germplasm with a name given on advancing
 		final Germplasm advancedGermplasm = new Germplasm();
@@ -910,7 +860,7 @@ public class GermplasmGroupingServiceImplTest {
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
 
 		// Invoke the service
-		this.germplasmGroupingService.copyCodedNames(advancedGermplasm, advancedGermplasmSource);
+		this.germplasmGroupingService.copyCodedNames(advancedGermplasm, Arrays.asList(code1, code2, code3));
 
 		// Expect that the advanced germplasm now has two names (SELHISFIX name
 		// for parent gets added)
@@ -948,6 +898,15 @@ public class GermplasmGroupingServiceImplTest {
 
 	private Map<Integer, Integer> getGermplasmIdMethodIdMap(final List<Germplasm> germplasm) {
 		return germplasm.stream().collect(Collectors.toMap(Germplasm::getGid, g -> g.getMethod().getMid()));
+	}
+
+	private BasicNameDTO createBasicNameDTO(final Integer nid, final Integer nstat, final String nval, final Integer typeId) {
+		final BasicNameDTO name = new BasicNameDTO();
+		name.setNid(nid);
+		name.setNstat(nstat);
+		name.setNval(nval);
+		name.setTypeId(typeId);
+		return name;
 	}
 
 }

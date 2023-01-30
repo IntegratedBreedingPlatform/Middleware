@@ -1,21 +1,21 @@
 
 package org.generationcp.middleware.ruleengine;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
 import org.generationcp.middleware.ruleengine.provider.RuleConfigurationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
+
+import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RuleFactory {
 
 	private static Logger LOG = LoggerFactory.getLogger(RuleFactory.class);
 
-	private Map<String, Rule> availableRules;
+	private Map<RuleExecutionNamespace, Map<String, Rule>> availableRules;
 
 	private Map<String, String[]> ruleOrder;
 
@@ -31,35 +31,39 @@ public class RuleFactory {
 		this.ruleOrder = this.configProvider.getRuleSequenceConfiguration();
 	}
 
-	public void setAvailableRules(Map<String, Rule> availableRulesMap) {
+	public void setAvailableRules(final Map<RuleExecutionNamespace, Map<String, Rule>> availableRulesMap) {
 		this.availableRules = availableRulesMap;
 	}
 
-	public void addRule(Rule rule) {
-		this.availableRules.put(rule.getKey(), rule);
+	public void addRule(final Rule rule) {
+		this.availableRules.putIfAbsent(rule.getRuleExecutionNamespace(), new HashMap<>());
+		final Map<String, Rule> rules = this.availableRules.get(rule.getRuleExecutionNamespace());
+		rules.put(rule.getKey(), rule);
 	}
 
-	public Rule getRule(String key) {
-		if (key == null) {
+	public Rule getRule(final RuleExecutionNamespace ruleExecutionNamespace, final String key) {
+		if (ruleExecutionNamespace == null || key == null) {
 			return null;
 		}
 
-		return this.availableRules.get(key);
+		final Map<String, Rule> rules = this.availableRules.get(ruleExecutionNamespace);
+		if (CollectionUtils.isEmpty(rules)) {
+			return null;
+		}
+
+		return rules.get(key);
 	}
 
 	public int getAvailableRuleCount() {
 		return this.availableRules.size();
 	}
 
-	public String[] getRuleSequenceForNamespace(String namespace) {
-		if (!this.ruleOrder.containsKey(namespace)) {
-			return null;
-		}
-
-		return this.ruleOrder.get(namespace);
+	public String[] getRuleSequenceForNamespace(final RuleExecutionNamespace namespace) {
+		return this.ruleOrder.get(namespace.getName());
 	}
 
 	public Collection<String> getAvailableConfiguredNamespaces() {
 		return this.ruleOrder.keySet();
 	}
+
 }

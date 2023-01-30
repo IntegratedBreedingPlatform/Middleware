@@ -29,7 +29,7 @@ import java.util.UUID;
  * @author Naymesh Mistry
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath*:/testContext.xml"})
+@ContextConfiguration(locations = {"classpath:BaseNamingRuleTest-context.xml", "classpath*:/testContext.xml"})
 // Spring configuration to automatically rollback after test completion.
 @TransactionConfiguration(defaultRollback = true)
 @Transactional

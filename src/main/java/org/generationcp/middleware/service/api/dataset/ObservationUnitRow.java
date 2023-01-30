@@ -2,8 +2,13 @@ package org.generationcp.middleware.service.api.dataset;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @AutoProperty
 public class ObservationUnitRow {
@@ -34,6 +39,8 @@ public class ObservationUnitRow {
 	private String[] fileVariableIds;
 
 	private String stockId;
+
+	private Integer instanceId;
 
 	public ObservationUnitRow() {
 
@@ -144,6 +151,14 @@ public class ObservationUnitRow {
 		this.stockId = stockId;
 	}
 
+	public Integer getInstanceId() {
+		return instanceId;
+	}
+
+	public void setInstanceId(final Integer instanceId) {
+		this.instanceId = instanceId;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
@@ -157,6 +172,35 @@ public class ObservationUnitRow {
 	@Override
 	public String toString() {
 		return Pojomatic.toString(this);
+	}
+
+	public String getVariableValueByVariableId(final Integer variableId) {
+		return this.getVariableById(this.variables, variableId);
+	}
+
+	public String getEnvironmentVariableValueByVariableId(final Integer variableId) {
+		return this.getVariableById(this.environmentVariables, variableId);
+	}
+
+	public Optional<ObservationUnitData> getVariableById(final Collection<ObservationUnitData> variables,
+		final Integer variableId) {
+		if (CollectionUtils.isEmpty(variables)) {
+			return Optional.empty();
+		}
+
+		return variables.stream()
+			.filter(variable -> variableId.equals(variable.getVariableId()))
+			.findFirst();
+	}
+
+	private String getVariableById(final Map<String, ObservationUnitData> variables,
+		final Integer variableId) {
+		if (CollectionUtils.isEmpty(variables)) {
+			return null;
+		}
+		return this.getVariableById(variables.values(), variableId)
+			.map(ObservationUnitData::getValue)
+			.orElse(null);
 	}
 
 }

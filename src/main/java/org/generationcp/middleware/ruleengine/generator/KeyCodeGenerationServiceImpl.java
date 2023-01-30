@@ -15,20 +15,21 @@ public class KeyCodeGenerationServiceImpl implements KeyCodeGenerationService {
 
 
 	@Override
-	public String generateKey(KeyTemplateProvider keyTemplateProvider, Map<KeyComponent, KeyComponentValueResolver> keyComponentValueResolvers) {
+	public String generateKey(final KeyTemplateProvider keyTemplateProvider,
+		final Map<KeyComponent, KeyComponentValueResolver> keyComponentValueResolvers) {
 
 		String key = keyTemplateProvider.getKeyTemplate();
-		Set<KeyComponent> keySet = keyComponentValueResolvers.keySet();
-		Iterator<KeyComponent> iterator = keySet.iterator();
+		final Set<KeyComponent> keySet = keyComponentValueResolvers.keySet();
+		final Iterator<KeyComponent> iterator = keySet.iterator();
 
 		while (iterator.hasNext()) {
-			KeyComponent keyComponent = iterator.next();
+			final KeyComponent keyComponent = iterator.next();
 
-			Pattern pattern = Pattern.compile("(\\[" + keyComponent.name() + "\\])");
-			Matcher matcher = pattern.matcher(key);
+			final Pattern pattern = Pattern.compile("(\\[" + keyComponent.name() + "\\])");
+			final Matcher matcher = pattern.matcher(key);
 
-			KeyComponentValueResolver keyComponentValueResolver = keyComponentValueResolvers.get(keyComponent);
-			String resolvedValue = keyComponentValueResolver.resolve();
+			final KeyComponentValueResolver keyComponentValueResolver = keyComponentValueResolvers.get(keyComponent);
+			final String resolvedValue = keyComponentValueResolver.resolve();
 
 			if (!keyComponentValueResolver.isOptional()) {
 				key = matcher.replaceAll(Strings.nullToEmpty(resolvedValue));
