@@ -84,7 +84,7 @@
             <and>
                 <not>
                     <sqlCheck expectedResult="0">
-                        SELECT * FROM names name
+                        SELECT COUNT(*) FROM names name
                         WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype);
                     </sqlCheck>
                 </not>
