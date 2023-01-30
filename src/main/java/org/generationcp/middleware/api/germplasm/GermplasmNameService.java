@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasm;
 
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.pojos.Name;
@@ -7,6 +8,7 @@ import org.generationcp.middleware.pojos.Name;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface GermplasmNameService {
 
@@ -34,5 +36,15 @@ public interface GermplasmNameService {
 	boolean isLocationUsedInGermplasmName(Integer locationId);
 
 	Map<Integer, String> getPreferredNamesByGIDs(List<Integer> gids);
+
+
+	/**
+	 * Returns a map of Gid, and list of Names.
+	 *
+	 * @param gids
+	 *            the gids
+	 * @return the names by gids
+	 */
+	Map<Integer, List<BasicNameDTO>> getNamesByGids(Set<Integer> gids);
 
 }

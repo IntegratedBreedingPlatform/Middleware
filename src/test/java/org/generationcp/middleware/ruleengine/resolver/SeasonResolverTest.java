@@ -1,42 +1,31 @@
 package org.generationcp.middleware.ruleengine.resolver;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.data.initializer.ValueReferenceTestDataInitializer;
 import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.ruleengine.naming.context.AdvanceContext;
+import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import javax.annotation.Nullable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
-
-import static org.generationcp.middleware.service.api.dataset.ObservationUnitUtils.fromMeasurementData;
-import static org.generationcp.middleware.service.api.dataset.ObservationUnitUtils.fromMeasurementRow;
 
 public class SeasonResolverTest {
 
@@ -59,56 +48,45 @@ public class SeasonResolverTest {
 		ContextHolder.setCurrentCrop("maize");
 		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 
-		final Variable seasonVariable = new Variable();
-		final Scale seasonScale = new Scale();
 		final TermSummary seasonCategory = new TermSummary(SEASON_CATEGORY_ID, SEASON_CATEGORY_NAME_VALUE, SEASON_CATEGORY_DESCRIPTION_VALUE);
+		final Scale seasonScale = new Scale();
 		seasonScale.addCategory(seasonCategory);
+
+		final Variable seasonVariable = new Variable();
 		seasonVariable.setScale(seasonScale);
-		Mockito.when(this.ontologyVariableDataManager.getVariable(ArgumentMatchers.eq(PROGRAM_UUID),
-			ArgumentMatchers.eq(TermId.SEASON_VAR.getId()), ArgumentMatchers.eq(true))).thenReturn(seasonVariable);
+
+		final Map<Integer, Variable> variablesByTermId = new HashMap<>();
+		variablesByTermId.put(TermId.SEASON_VAR.getId(), seasonVariable);
+		AdvanceContext.setVariablesByTermId(variablesByTermId);
+
 		this.valueReferenceTestDataInitializer = new ValueReferenceTestDataInitializer();
 	}
 
 	@Test
 	public void testResolveForNurseryWithSeasonVariableAndValue() {
 
-		final Workbook workbook = new Workbook();
-		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(new StudyTypeDto("N"));
-		workbook.setStudyDetails(studyDetails);
-
 		final MeasurementVariable seasonMV = new MeasurementVariable();
 		seasonMV.setTermId(TermId.SEASON_VAR.getId());
 		seasonMV.setValue(SEASON_CATEGORY_ID.toString());
 
-		workbook.setConditions(Lists.newArrayList(seasonMV));
-
 		final SeasonResolver seasonResolver =
-			new SeasonResolver(this.ontologyVariableDataManager, workbook.getConditions(),
+			new SeasonResolver(this.ontologyVariableDataManager, Lists.newArrayList(seasonMV),
 				new ArrayList<>(), new HashMap<>());
 
 		final String season = seasonResolver.resolve();
 		Assert.assertEquals("Season should be resolved to the value of Crop_season_Code variable value in Nursery settings.",
 				SEASON_CATEGORY_NAME_VALUE, season);
-
 	}
 
 	@Test
 	public void testResolveForNurseryWithSeasonVariableButNoValue() {
 
-		final Workbook workbook = new Workbook();
-		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyTypeDto.getNurseryDto());
-		workbook.setStudyDetails(studyDetails);
-
 		final MeasurementVariable seasonMV = new MeasurementVariable();
 		seasonMV.setTermId(TermId.SEASON_VAR.getId());
 		// Variable presnet but no value
 
-		workbook.setConditions(Lists.newArrayList(seasonMV));
-
 		final SeasonResolver seasonResolver =
-			new SeasonResolver(this.ontologyVariableDataManager, workbook.getConditions(),
+			new SeasonResolver(this.ontologyVariableDataManager, Lists.newArrayList(seasonMV),
 				new ArrayList<>(), new HashMap<>());
 
 		final String season = seasonResolver.resolve();
@@ -124,13 +102,8 @@ public class SeasonResolverTest {
 	@Test
 	public void testResolveForNurseryWithoutSeasonVariable() {
 
-		final Workbook workbook = new Workbook();
-		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyTypeDto.getNurseryDto());
-		workbook.setStudyDetails(studyDetails);
-
 		final SeasonResolver seasonResolver =
-			new SeasonResolver(this.ontologyVariableDataManager, workbook.getConditions(),
+			new SeasonResolver(this.ontologyVariableDataManager, new ArrayList<>(),
 				new ArrayList<>(), new HashMap<>());
 
 		final String season = seasonResolver.resolve();
@@ -145,32 +118,27 @@ public class SeasonResolverTest {
 
 	@Test
 	public void testResolveForTrialWithSeasonVariableAndValue() {
-		final Workbook workbook = new Workbook();
-		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
-		workbook.setStudyDetails(studyDetails);
 
 		final MeasurementVariable firstInstanceSeasonMeasurementVariable = new MeasurementVariable();
 		firstInstanceSeasonMeasurementVariable.setTermId(TermId.SEASON_VAR.getId());
 		firstInstanceSeasonMeasurementVariable.setPossibleValues(this.createTestPossibleValuesForSeasonVariable());
-		final MeasurementData instance1SeasonMD = new MeasurementData();
+		final ObservationUnitData instance1SeasonMD = new ObservationUnitData();
 		instance1SeasonMD.setValue(SEASON_CATEGORY_DESCRIPTION_VALUE);
-		instance1SeasonMD.setMeasurementVariable(firstInstanceSeasonMeasurementVariable);
+		instance1SeasonMD.setVariableId(TermId.SEASON_VAR.getId());
 
 		final MeasurementVariable firstInstanceMeasurementVariable = new MeasurementVariable();
 		firstInstanceMeasurementVariable.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
-		final MeasurementData firstInstanceMeasurementData = new MeasurementData();
+		final ObservationUnitData firstInstanceMeasurementData = new ObservationUnitData();
 		firstInstanceMeasurementData.setValue("1");
-		firstInstanceMeasurementData.setMeasurementVariable(firstInstanceMeasurementVariable);
+		firstInstanceMeasurementData.setVariableId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 
-		final MeasurementRow trialInstanceObservation = new MeasurementRow();
-		trialInstanceObservation.setDataList(Lists.newArrayList(firstInstanceMeasurementData, instance1SeasonMD));
-
-		workbook.setTrialObservations(Lists.newArrayList(trialInstanceObservation));
+		final Map<Integer, MeasurementVariable> environmentVariablesByTermId = new HashMap<>();
+		environmentVariablesByTermId.put(TermId.SEASON_VAR.getId(), firstInstanceSeasonMeasurementVariable);
+		environmentVariablesByTermId.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), firstInstanceMeasurementVariable);
 
 		final SeasonResolver seasonResolver =
-			new SeasonResolver(this.ontologyVariableDataManager, workbook.getConditions(),
-				fromMeasurementRow(trialInstanceObservation).getVariables().values(), getMeasurementVariableByTermId(trialInstanceObservation));
+			new SeasonResolver(this.ontologyVariableDataManager, new ArrayList<>(),
+				Arrays.asList(instance1SeasonMD, firstInstanceMeasurementData), environmentVariablesByTermId);
 
 		final String season = seasonResolver.resolve();
 		Assert.assertEquals("Season should be resolved to the value of Crop_season_Code variable value in environment level settings.",
@@ -179,31 +147,25 @@ public class SeasonResolverTest {
 
 	@Test
 	public void testResolveForStudyWithSeasonVariableButNoValue() {
-		final Workbook workbook = new Workbook();
-		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
-		workbook.setStudyDetails(studyDetails);
-
 		final MeasurementVariable firstInstanceSeasonMeasurementVariable = new MeasurementVariable();
 		firstInstanceSeasonMeasurementVariable.setTermId(TermId.SEASON_VAR.getId());
-		final MeasurementData instance1SeasonMD = new MeasurementData();
+		final ObservationUnitData instance1SeasonMD = new ObservationUnitData();
 		// Variable present but has no value
-		instance1SeasonMD.setMeasurementVariable(firstInstanceSeasonMeasurementVariable);
+		instance1SeasonMD.setVariableId(TermId.SEASON_VAR.getId());
 
 		final MeasurementVariable firstInstanceMeasurementVariable = new MeasurementVariable();
 		firstInstanceMeasurementVariable.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
-		final MeasurementData firstInstanceMeasurementData = new MeasurementData();
+		final ObservationUnitData firstInstanceMeasurementData = new ObservationUnitData();
 		firstInstanceMeasurementData.setValue("1");
-		firstInstanceMeasurementData.setMeasurementVariable(firstInstanceMeasurementVariable);
+		firstInstanceMeasurementData.setVariableId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 
-		final MeasurementRow trialInstanceObservation = new MeasurementRow();
-		trialInstanceObservation.setDataList(Lists.newArrayList(firstInstanceMeasurementData, instance1SeasonMD));
-
-		workbook.setTrialObservations(Lists.newArrayList(trialInstanceObservation));
+		final Map<Integer, MeasurementVariable> environmentVariablesByTermId = new HashMap<>();
+		environmentVariablesByTermId.put(TermId.SEASON_VAR.getId(), firstInstanceSeasonMeasurementVariable);
+		environmentVariablesByTermId.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), firstInstanceMeasurementVariable);
 
 		final SeasonResolver seasonResolver =
-			new SeasonResolver(this.ontologyVariableDataManager, workbook.getConditions(),
-				fromMeasurementRow(trialInstanceObservation).getVariables().values(), getMeasurementVariableByTermId(trialInstanceObservation));
+			new SeasonResolver(this.ontologyVariableDataManager, new ArrayList<>(),
+				Arrays.asList(instance1SeasonMD, firstInstanceMeasurementData), environmentVariablesByTermId);
 
 		final String season = seasonResolver.resolve();
 
@@ -217,16 +179,11 @@ public class SeasonResolverTest {
 
 	@Test
 	public void testResolveForStudyWithoutSeasonVariable() {
-		final Workbook workbook = new Workbook();
-		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
-		workbook.setStudyDetails(studyDetails);
-
 		final SimpleDateFormat formatter = new SimpleDateFormat("YYYYMM");
 		final String currentYearAndMonth = formatter.format(new java.util.Date());
 
 		final SeasonResolver seasonResolver =
-			new SeasonResolver(this.ontologyVariableDataManager, workbook.getConditions(),
+			new SeasonResolver(this.ontologyVariableDataManager, new ArrayList<>(),
 				new ArrayList<>(), new HashMap<>());
 
 		final String season = seasonResolver.resolve();
@@ -238,71 +195,53 @@ public class SeasonResolverTest {
 	@Test
 	public void testGetValueFromStudyInstanceMeasurementDataSeasonDesscriptionIsPresentInPossibleValues() {
 
-		final Workbook workbook = new Workbook();
-		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
-		workbook.setStudyDetails(studyDetails);
-
 		final MeasurementVariable firstInstanceSeasonMeasurementVariable = new MeasurementVariable();
 		firstInstanceSeasonMeasurementVariable.setTermId(TermId.SEASON_VAR.getId());
 		firstInstanceSeasonMeasurementVariable.setPossibleValues(this.createTestPossibleValuesForSeasonVariable());
-		final MeasurementData firstInstanceSeasonMeasurementData = new MeasurementData();
+		final ObservationUnitData firstInstanceSeasonMeasurementData = new ObservationUnitData();
 		firstInstanceSeasonMeasurementData.setValue(SEASON_CATEGORY_DESCRIPTION_VALUE);
-		firstInstanceSeasonMeasurementData.setMeasurementVariable(firstInstanceSeasonMeasurementVariable);
+		firstInstanceSeasonMeasurementData.setVariableId(TermId.SEASON_VAR.getId());
 
-		final MeasurementRow trialInstanceObservation = new MeasurementRow();
-		trialInstanceObservation.setDataList(Lists.newArrayList(firstInstanceSeasonMeasurementData));
-
-		workbook.setTrialObservations(Lists.newArrayList(trialInstanceObservation));
+		final Map<Integer, MeasurementVariable> environmentVariablesByTermId = new HashMap<>();
+		environmentVariablesByTermId.put(TermId.SEASON_VAR.getId(), firstInstanceSeasonMeasurementVariable);
 
 		final SeasonResolver seasonResolver =
-			new SeasonResolver(this.ontologyVariableDataManager, workbook.getConditions(),
-				fromMeasurementRow(trialInstanceObservation).getVariables().values(), getMeasurementVariableByTermId(trialInstanceObservation));
+			new SeasonResolver(this.ontologyVariableDataManager, new ArrayList<>(),
+				Arrays.asList(firstInstanceSeasonMeasurementData), environmentVariablesByTermId);
 
 		Assert.assertEquals("The method should return the Season Name, not the Season Description.", SEASON_CATEGORY_NAME_VALUE,
-			seasonResolver.getValueFromObservationUnitData(fromMeasurementData(firstInstanceSeasonMeasurementData)));
+			seasonResolver.getValueFromObservationUnitData(firstInstanceSeasonMeasurementData));
 
 	}
 
 	@Test
 	public void testGetValueFromStudyInstanceMeasurementDataSeasonDesscriptionDoesNotExistInPossibleValues() {
 
-		final Workbook workbook = new Workbook();
-		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
-		workbook.setStudyDetails(studyDetails);
-
 		final MeasurementVariable firstInstanceSeasonMeasurementVariable = new MeasurementVariable();
 		firstInstanceSeasonMeasurementVariable.setTermId(TermId.SEASON_VAR.getId());
 		firstInstanceSeasonMeasurementVariable.setPossibleValues(this.createTestPossibleValuesForSeasonVariable());
-		final MeasurementData firstInstanceSeasonMeasurementData = new MeasurementData();
+		final ObservationUnitData firstInstanceSeasonMeasurementData = new ObservationUnitData();
 		firstInstanceSeasonMeasurementData.setValue(DESCRIPTION_STRING_NOT_FOUND_IN_POSSIBLE_VALUES);
-		firstInstanceSeasonMeasurementData.setMeasurementVariable(firstInstanceSeasonMeasurementVariable);
+		firstInstanceSeasonMeasurementData.setVariableId(TermId.SEASON_VAR.getId());
 
-		final MeasurementRow trialInstanceObservation = new MeasurementRow();
-		trialInstanceObservation.setDataList(Lists.newArrayList(firstInstanceSeasonMeasurementData));
-		workbook.setTrialObservations(Lists.newArrayList(trialInstanceObservation));
+		final Map<Integer, MeasurementVariable> environmentVariablesByTermId = new HashMap<>();
+		environmentVariablesByTermId.put(TermId.SEASON_VAR.getId(), firstInstanceSeasonMeasurementVariable);
 
 		final SeasonResolver seasonResolver =
-			new SeasonResolver(this.ontologyVariableDataManager, workbook.getConditions(),
-				fromMeasurementRow(trialInstanceObservation).getVariables().values(), getMeasurementVariableByTermId(trialInstanceObservation));
+			new SeasonResolver(this.ontologyVariableDataManager, new ArrayList<>(),
+				Arrays.asList(firstInstanceSeasonMeasurementData), environmentVariablesByTermId);
 
 		Assert.assertEquals("The method should return the Season Measurement Data value as it is since the value is not found in possible values.",
 			DESCRIPTION_STRING_NOT_FOUND_IN_POSSIBLE_VALUES,
-			seasonResolver.getValueFromObservationUnitData(fromMeasurementData(firstInstanceSeasonMeasurementData)));
+			seasonResolver.getValueFromObservationUnitData(firstInstanceSeasonMeasurementData));
 
 	}
 
 	@Test
 	public void testFindValueReferenceByDescriptionPossibleValues() {
 
-		final Workbook workbook = new Workbook();
-		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
-		workbook.setStudyDetails(studyDetails);
-
 		final SeasonResolver seasonResolver =
-			new SeasonResolver(this.ontologyVariableDataManager, workbook.getConditions(),
+			new SeasonResolver(this.ontologyVariableDataManager, new ArrayList<>(),
 				new ArrayList<>(), new HashMap<>());
 
 		final Optional<ValueReference> result1 = seasonResolver.findValueReferenceByDescription(SEASON_CATEGORY_DESCRIPTION_VALUE, null);
@@ -313,17 +252,10 @@ public class SeasonResolverTest {
 
 		final Optional<ValueReference> result3 = seasonResolver.findValueReferenceByDescription(DESCRIPTION_STRING_NOT_FOUND_IN_POSSIBLE_VALUES, this.createTestPossibleValuesForSeasonVariable());
 		Assert.assertFalse(result3.isPresent());
-
-
 	}
 
 	@Test
 	public void testResolveForStudyWithSeasonVariableConditions() {
-		final Workbook workbook = new Workbook();
-		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyTypeDto.getTrialDto());
-		workbook.setStudyDetails(studyDetails);
-
 		final MeasurementVariable firstInstanceSeasonMeasurementVariable = new MeasurementVariable();
 		firstInstanceSeasonMeasurementVariable.setTermId(TermId.SEASON_VAR.getId());
 		firstInstanceSeasonMeasurementVariable.setPossibleValues(this.createTestPossibleValuesForSeasonVariable());
@@ -333,13 +265,12 @@ public class SeasonResolverTest {
 		firstInstanceMeasurementVariable.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		firstInstanceMeasurementVariable.setValue("1");
 		
-		final List<MeasurementVariable> conditions = new ArrayList<>();
-		conditions.add(firstInstanceSeasonMeasurementVariable);
-		conditions.add(firstInstanceMeasurementVariable);
-		workbook.setConditions(conditions);
+		final List<MeasurementVariable> studyEnvironmentVariables = new ArrayList<>();
+		studyEnvironmentVariables.add(firstInstanceSeasonMeasurementVariable);
+		studyEnvironmentVariables.add(firstInstanceMeasurementVariable);
 
 		final SeasonResolver seasonResolver =
-			new SeasonResolver(this.ontologyVariableDataManager, workbook.getConditions(),
+			new SeasonResolver(this.ontologyVariableDataManager, studyEnvironmentVariables,
 				new ArrayList<>(), new HashMap<>());
 
 		final String season = seasonResolver.resolve();
@@ -353,17 +284,4 @@ public class SeasonResolverTest {
 		return possibleValues;
 	}
 
-	protected static Map<Integer, MeasurementVariable> getMeasurementVariableByTermId(final MeasurementRow trialInstanceObservation) {
-		if (trialInstanceObservation == null) {
-            return new HashMap<>();
-		}
-		return Maps.uniqueIndex(trialInstanceObservation.getMeasurementVariables(), new Function<MeasurementVariable, Integer>() {
-
-			@Nullable
-			@Override
-			public Integer apply(@Nullable final MeasurementVariable measurementVariable) {
-				return measurementVariable.getTermId();
-			}
-		});
-	}
 }

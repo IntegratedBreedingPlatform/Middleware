@@ -121,6 +121,9 @@ public class NameDAOTest extends IntegrationTestBase {
 		final Name name2 = this.createNameTestData(20190910, germplasm.getGid(), 0, "REF 001",
 			GermplasmNameType.DERIVATIVE_NAME);
 		NameDAOTest.nameDAO.save(name2);
+
+		this.sessionProvder.getSession().flush();
+
 		final List<String> names = NameDAOTest.nameDAO.getNamesByGidsAndPrefixes(Collections.singletonList(germplasm.getGid()), Collections.singletonList("PREF"));
 		Assert.assertEquals(1, names.size());
 		Assert.assertEquals(name1.getNval(), names.get(0));
@@ -131,9 +134,13 @@ public class NameDAOTest extends IntegrationTestBase {
 	public void testCheckIfMatches() {
 		final Germplasm germplasm1 = this.createGermplasmTestData(20190910);
 		NameDAOTest.germplasmDAO.save(germplasm1);
+
 		final Name name1 = this.createNameTestData(20190910, germplasm1.getGid(), 0, "SKSKSKSKSPREF 001",
 			GermplasmNameType.DERIVATIVE_NAME);
 		NameDAOTest.nameDAO.save(name1);
+
+		this.sessionProvder.getSession().flush();
+
 		Assert.assertTrue(NameDAOTest.nameDAO.checkIfMatches(name1.getNval()));
 
 		final Germplasm germplasm2 = this.createGermplasmTestData(20190910);

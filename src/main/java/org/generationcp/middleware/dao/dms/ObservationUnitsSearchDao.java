@@ -40,6 +40,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integer> {
 
@@ -62,6 +64,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 	private static final String FILE_COUNT = "FILE_COUNT";
 	private static final String FILE_TERM_IDS = "FILE_TERM_IDS";
+	private static final String INSTANCE_ID = "instanceId";
 
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 	private static final String ENVIRONMENT_COLUMN_NAME_SUFFIX = "_ENVIRONMENT";
@@ -158,7 +161,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		mainVariablesMap.put(String.valueOf(TermId.CROSS.getId()), "    s.cross_value AS '%s'");
 	}
 
-	public Integer countObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode,
+	public Integer countObservationUnitsForDataset(final Integer datasetId, final List<Integer> instanceIds, final Boolean draftMode,
 		final ObservationUnitsSearchDTO.Filter filter) {
 
 		try {
@@ -174,8 +177,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 			sql.append(" where p.project_id = :datasetId ");
 
-			if (instanceId != null) {
-				sql.append(" and gl.nd_geolocation_id = :instanceId ");
+			if (!CollectionUtils.isEmpty(instanceIds)) {
+				sql.append(" and gl.nd_geolocation_id IN (:instanceIds) ");
 			}
 
 			if (Boolean.TRUE.equals(draftMode)) {
@@ -196,15 +199,15 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("datasetId", datasetId);
 
-			if (instanceId != null) {
-				query.setParameter("instanceId", instanceId);
+			if (!CollectionUtils.isEmpty(instanceIds)) {
+				query.setParameterList("instanceIds", instanceIds);
 			}
 
 			return (Integer) query.uniqueResult();
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
 				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
-					datasetId, instanceId) + he.getMessage(),
+					datasetId, instanceIds) + he.getMessage(),
 				he);
 		}
 	}
@@ -225,8 +228,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					+ " where "
 					+ "	p.project_id = :datasetId ");
 
-			if (observationUnitsSearchDTO.getInstanceId() != null) {
-				sql.append(" and gl.nd_geolocation_id = :instanceId ");
+			if (!CollectionUtils.isEmpty(observationUnitsSearchDTO.getInstanceIds())) {
+				sql.append(" and gl.nd_geolocation_id IN (:instanceIds) ");
 			}
 
 			final String filterByVariableSQL =
@@ -258,8 +261,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 			query.setParameter("datasetId", datasetId);
 
-			if (observationUnitsSearchDTO.getInstanceId() != null) {
-				query.setParameter("instanceId", observationUnitsSearchDTO.getInstanceId());
+			if (!CollectionUtils.isEmpty(observationUnitsSearchDTO.getInstanceIds())) {
+				query.setParameterList("instanceIds", observationUnitsSearchDTO.getInstanceIds());
 			}
 
 			final Object[] result = (Object[]) query.uniqueResult();
@@ -269,7 +272,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
 				String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
-					datasetId, observationUnitsSearchDTO.getInstanceId()) + he.getMessage(),
+					datasetId, observationUnitsSearchDTO.getInstanceIds()) + he.getMessage(),
 				he);
 		}
 	}
@@ -286,8 +289,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 			query.setParameter("datasetId", params.getDatasetId());
 
-			if (params.getInstanceId() != null) {
-				query.setParameter("instanceId", String.valueOf(params.getInstanceId()));
+			if (!CollectionUtils.isEmpty(params.getInstanceIds())) {
+				query.setParameterList("instanceIds", params.getInstanceIds());
 			}
 
 			if (!CollectionUtils.isEmpty(params.getEnvironmentConditions())) {
@@ -412,8 +415,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
 			+ " WHERE p.project_id = :datasetId ");
 
-		if (searchDto.getInstanceId() != null) {
-			sql.append(" AND gl.nd_geolocation_id = :instanceId");
+		if (!CollectionUtils.isEmpty(searchDto.getInstanceIds())) {
+			sql.append(" AND gl.nd_geolocation_id IN (:instanceIds)");
 		}
 
 		final ObservationUnitsSearchDTO.Filter filter = searchDto.getFilter();
@@ -529,8 +532,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private void setParameters(final ObservationUnitsSearchDTO searchDto, final SQLQuery query, final Pageable pageable) {
 		query.setParameter("datasetId", searchDto.getDatasetId());
 
-		if (searchDto.getInstanceId() != null) {
-			query.setParameter("instanceId", String.valueOf(searchDto.getInstanceId()));
+		if (!CollectionUtils.isEmpty(searchDto.getInstanceIds())) {
+			query.setParameterList("instanceIds", searchDto.getInstanceIds());
 		}
 
 		if (!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())) {
@@ -611,6 +614,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.LOCATION_ID.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.CROSS.getId()));
+		createSQLQuery.addScalar(INSTANCE_ID);
 	}
 
 	private String getObservationUnitTableQuery(
@@ -628,6 +632,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final List<String> columns = new ArrayList<>();
 
 		if (noFilterVariables) {
+			columns.add("gl.nd_geolocation_id as " + INSTANCE_ID);
 			columns.addAll(finalColumnsQueryMap.values());
 		} else {
 			for (final String columnName : filterColumns) {
@@ -823,8 +828,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		sql.append(" WHERE p.project_id = :datasetId ");
 
-		if (searchDto.getInstanceId() != null) {
-			sql.append(" AND gl.nd_geolocation_id = :instanceId");
+		if (!CollectionUtils.isEmpty(searchDto.getInstanceIds())) {
+			sql.append(" AND gl.nd_geolocation_id IN (:instanceIds)");
 		}
 
 		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
@@ -938,14 +943,22 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private void addOrder(final StringBuilder sql, final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName,
 		final String plotNoName, final Pageable pageable) {
 
+		if (pageable != null && pageable.getSort() != null) {
+			final String orderClause = StreamSupport.stream(pageable.getSort().spliterator(), false)
+				.filter(order -> StringUtils.isNotBlank(order.getProperty()))
+				.map(order -> {
+					final String property = order.getProperty();
+					final String sortDirection = order.getDirection().name();
+					return "(1 * `" + property + "`) " + sortDirection + ", `" + property + "` " + sortDirection;
+				})
+				.collect(Collectors.joining(","));
+			sql.append(" ) T ORDER BY ").append(orderClause);
+			return;
+		}
+
 		String orderColumn;
 		String sortBy = "";
 		String direction = "asc";
-		if (pageable != null && pageable.getSort() != null) {
-			sortBy = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getProperty() : "";
-			final String sortOrder = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getDirection().name() : "";
-			direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
-		}
 		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)
 			&& !plotNoName.equals(observationUnitNoName)) {
 			orderColumn = ObservationUnitsSearchDao.OBSERVATION_UNIT_NO;
@@ -1320,7 +1333,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
-
+		observationUnitRow.setInstanceId((Integer) row.get(INSTANCE_ID));
 		observationUnitRow.setObservationUnitId((Integer) row.get(OBSERVATION_UNIT_ID));
 		observationUnitRow.setAction(((Integer) row.get(OBSERVATION_UNIT_ID)).toString());
 		observationUnitRow.setObsUnitId((String) row.get(standardVariableNameMap.get(TermId.OBS_UNIT_ID.getId())));
@@ -1333,7 +1346,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final Integer gid = (Integer) row.get(gidColumnName);
 		if (gid != null) {
 			observationUnitRow.setGid(gid);
-			observationVariables.put(gidColumnName, new ObservationUnitData(gid.toString()));
+			observationVariables.put(gidColumnName, new ObservationUnitData(TermId.GID.getId(), gid.toString()));
 		}
 
 
@@ -1341,13 +1354,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final String designation = (String) row.get(designationColumnName);
 		if (designation != null) {
 			observationUnitRow.setDesignation(designation);
-			observationVariables.put(designationColumnName, new ObservationUnitData(designation));
+			observationVariables.put(designationColumnName, new ObservationUnitData(TermId.DESIG.getId(), designation));
 		}
 
 		if (row.containsKey(STOCK_ID)) {
 			final String stockId = (String) row.get(STOCK_ID);
 			observationUnitRow.setStockId(stockId);
-			observationVariables.put(STOCK_ID, new ObservationUnitData(stockId));
+			observationVariables.put(STOCK_ID, new ObservationUnitData(TermId.STOCK_ID.getId(), stockId));
 		}
 
 		final String trialInstanceColumnName = standardVariableNameMap.get(TermId.TRIAL_INSTANCE_FACTOR.getId());
@@ -1355,21 +1368,23 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (NumberUtils.isDigits(trialInstance)) {
 			observationUnitRow.setTrialInstance(Integer.valueOf(trialInstance));
 		}
-		observationVariables.put(trialInstanceColumnName, new ObservationUnitData(trialInstance));
+		observationVariables.put(trialInstanceColumnName, new ObservationUnitData(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstance));
 
 		final String entryNoColumnName = standardVariableNameMap.get(TermId.ENTRY_NO.getId());
 		final String entryNumber = (String) row.get(entryNoColumnName);
 		if (NumberUtils.isDigits(entryNumber)) {
 			observationUnitRow.setEntryNumber(Integer.valueOf(entryNumber));
 		}
-		observationVariables.put(entryNoColumnName, new ObservationUnitData(entryNumber));
+		observationVariables.put(entryNoColumnName, new ObservationUnitData(TermId.ENTRY_NO.getId(), entryNumber));
 
-		standardVariableNameMap.values().forEach((column) -> {
+		standardVariableNameMap.entrySet().forEach(entry -> {
+			final String column = entry.getValue();
 			final Object value = row.get(column);
-			observationVariables.put(column, new ObservationUnitData(value != null ? String.valueOf(value) : null));
+			observationVariables.put(column, new ObservationUnitData(entry.getKey(), value != null ? String.valueOf(value) : null));
 		});
 		observationVariables.put(PARENT_OBS_UNIT_ID, new ObservationUnitData((String) row.get(PARENT_OBS_UNIT_ID)));
-		observationVariables.put(observationVariableName, new ObservationUnitData((String) row.get(OBSERVATION_UNIT_NO)));
+		// Avoid overriding PLOT_NO variable if it was already set using standardVariableNameMap iteration
+		observationVariables.putIfAbsent(observationVariableName, new ObservationUnitData((String) row.get(OBSERVATION_UNIT_NO)));
 
 		for (final String gpDesc : searchDto.getGenericGermplasmDescriptors()) {
 			observationVariables.put(gpDesc, new ObservationUnitData((String) row.get(gpDesc)));
@@ -1380,7 +1395,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (!CollectionUtils.isEmpty(searchDto.getPassportAndAttributes())) {
 			searchDto.getPassportAndAttributes().forEach(variable ->
-				observationVariables.put(variable.getName(), new ObservationUnitData((String) row.get(this.formatVariableAlias(variable.getId())))));
+				observationVariables.put(variable.getName(), new ObservationUnitData(variable.getId(), (String) row.get(this.formatVariableAlias(variable.getId())))));
 		}
 
 		if (!CollectionUtils.isEmpty(searchDto.getNameTypes())) {

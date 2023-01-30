@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.ruleengine.stockid;
 
-import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +8,7 @@ import org.springframework.stereotype.Component;
  * A rule implementation that defines the logic for processing breeder identifiers within the context of generation of stock IDs
  */
 @Component
-public class BreederIdentifierRule extends OrderedRule<StockIDGenerationRuleExecutionContext> {
+public class BreederIdentifierRule extends StockIDOrderedRule {
 
 	static final String KEY = "IDENTIFIER";
 

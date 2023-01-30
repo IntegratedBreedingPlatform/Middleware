@@ -1175,6 +1175,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		germplasm.setGid(null);
 		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
 		this.daoFactory.getGermplasmDao().save(germplasm);
+		this.sessionProvder.getSession().flush();
 		this.daoFactory.getGermplasmDao().refresh(germplasm);
 		this.addName(germplasm, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), RandomStringUtils.randomAlphabetic(8).toUpperCase(), 0,
 			0, 1);

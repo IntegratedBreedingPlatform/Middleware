@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.ruleengine.naming.expression;
 
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,23 +20,23 @@ public class FirstExpression extends BaseExpression {
 	}
 
 	@Override
-	public void apply(List<StringBuilder> values, DeprecatedAdvancingSource source, final String capturedText) {
-		String separatorExpression = source.getBreedingMethod().getSeparator();
+	public void apply(final List<StringBuilder> values, final AdvancingSource advancingSource, final String capturedText) {
+		final String separatorExpression = advancingSource.getBreedingMethod().getSeparator();
 
-		for (StringBuilder value : values) {
-			if (separatorExpression != null && separatorExpression.toString().toUpperCase().contains(FirstExpression.KEY)) {
-				int start = separatorExpression.toString().toUpperCase().indexOf(FirstExpression.KEY) + FirstExpression.KEY.length();
+		for (final StringBuilder value : values) {
+			if (separatorExpression != null && separatorExpression.toUpperCase().contains(FirstExpression.KEY)) {
+				int start = separatorExpression.toUpperCase().indexOf(FirstExpression.KEY) + FirstExpression.KEY.length();
 				int end = separatorExpression.indexOf("[", start);
 				if (end == -1) {
 					end = separatorExpression.length();
 				}
-				String literalSeparator = separatorExpression.substring(start, end);
+				final String literalSeparator = separatorExpression.substring(start, end);
 
-				int index = source.getRootName().indexOf(literalSeparator);
+				final int index = advancingSource.getRootName().indexOf(literalSeparator);
 				if (index > -1) {
-					String newRootName = source.getRootName().substring(0, index);
-					start = value.indexOf(source.getRootName());
-					end = start + source.getRootName().length();
+					final String newRootName = advancingSource.getRootName().substring(0, index);
+					start = value.indexOf(advancingSource.getRootName());
+					end = start + advancingSource.getRootName().length();
 					value.replace(start, end, newRootName);
 				}
 			}

@@ -1,11 +1,12 @@
 package org.generationcp.middleware.ruleengine.naming.expression;
 
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +27,6 @@ public class DoubleHaploidSourceExpressionIntegrationTest extends IntegrationTes
     @Test
     public void testDoubleHaploidApplyRuleWithMultipleThreads() throws ExecutionException, InterruptedException {
 
-        final DeprecatedAdvancingSource source = new DeprecatedAdvancingSource();
-
         final int threads = 10;
         final List<Future<String>> resultingDesignations = new ArrayList<>();
 
@@ -45,7 +44,7 @@ public class DoubleHaploidSourceExpressionIntegrationTest extends IntegrationTes
                     final DoubleHaploidSourceExpression doubleHaploidSourceExpression = new DoubleHaploidSourceExpression();
                     doubleHaploidSourceExpression.setKeySequenceRegisterService(keySequenceRegisterService);
 
-                    doubleHaploidSourceExpression.apply(values, source, null);
+                    doubleHaploidSourceExpression.apply(values, Mockito.mock(AdvancingSource.class), null);
                     return values.get(0).toString();
                 }
             });

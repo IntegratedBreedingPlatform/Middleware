@@ -35,6 +35,8 @@ public class AttributeExternalReferenceAuditIntegrationTest extends GenericExter
 				null);
 		this.daoFactory.getAttributeDAO().save(attribute);
 
+		this.sessionProvder.getSession().flush();
+
 		this.recordId = attribute.getAid();
 	}
 

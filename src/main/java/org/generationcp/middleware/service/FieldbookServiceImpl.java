@@ -14,6 +14,7 @@ import com.google.common.base.Optional;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
+import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.dao.AttributeDAO;
@@ -30,6 +31,7 @@ import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -115,6 +117,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Resource
 	private GermplasmListDataService germplasmListDataService;
+
+	@Resource
+	private GermplasmNameService germplasmNameService;
 
 	private DaoFactory daoFactory;
 
@@ -268,8 +273,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 			final Map<Integer, Germplasm> existingGermplasmsByGids =
 				CollectionUtils.isEmpty(existingGids) ? new HashMap<>() : this.getGermplasmByGids(existingGids);
-			final Map<Integer, Germplasm> parentGermplasmsByGids =
-				CollectionUtils.isEmpty(parentGids) ? new HashMap<>() : this.getGermplasmByGids(parentGids);
+			final Map<Integer, List<BasicNameDTO>> parentGermplasmNamesByGids =
+				CollectionUtils.isEmpty(parentGids) ? new HashMap<>() : this.germplasmNameService.getNamesByGids(parentGids);
 
 			// Save germplasms, names, list data
 			for (final Pair<Germplasm, List<Name>> pair : germplasms) {
@@ -315,9 +320,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					// parent
 					// if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
-						final Germplasm parent = parentGermplasmsByGids.get(germplasm.getGpid2());
-						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm, parent);
-						this.germplasmGroupingService.copyCodedNames(germplasm, parent);
+						final List<BasicNameDTO> parentNames = parentGermplasmNamesByGids.get(germplasm.getGpid2());
+						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm, germplasm.getGpid2(), parentNames);
+						this.germplasmGroupingService.copyCodedNames(germplasm, parentNames);
 					}
 
 					// Save Germplasm attributes

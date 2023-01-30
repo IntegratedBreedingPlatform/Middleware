@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.ruleengine.naming.context.AdvanceContext;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.springframework.util.CollectionUtils;
 
@@ -58,10 +59,7 @@ public abstract class CategoricalKeyCodeResolverBase implements KeyComponentValu
 		}
 
 		if (measurementVariable != null && StringUtils.isNotBlank(measurementVariable.getValue())) {
-			final String programUUID = ContextHolder.getCurrentProgramOptional().orElse(null);
-
-			final Variable variable = this.ontologyVariableDataManager
-					.getVariable(programUUID, measurementVariable.getTermId(), true);
+			final Variable variable = this.getVariableByTermId(measurementVariable.getTermId());
 
 			for (final TermSummary prefix : variable.getScale().getCategories()) {
 				if (measurementVariable.getValue().equals(prefix.getId().toString()) || measurementVariable.getValue()
@@ -93,6 +91,13 @@ public abstract class CategoricalKeyCodeResolverBase implements KeyComponentValu
 		}
 
 		return resolvedValue;
+	}
+
+	private Variable getVariableByTermId(final Integer termId) {
+		if (AdvanceContext.getVariablesByTermId() != null && AdvanceContext.getVariablesByTermId().containsKey(termId)) {
+			return AdvanceContext.getVariablesByTermId().get(termId);
+		}
+		return this.ontologyVariableDataManager.getVariable(ContextHolder.getCurrentProgramOptional().orElse(null),termId, true);
 	}
 
 	@Override

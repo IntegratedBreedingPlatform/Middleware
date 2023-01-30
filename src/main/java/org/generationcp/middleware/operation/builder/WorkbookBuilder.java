@@ -729,6 +729,7 @@ public class WorkbookBuilder extends Builder {
 			&& !variables.getFactors().getVariableTypes().isEmpty()) {
 
 			for (final DMSVariableType variable : variables.getFactors().getVariableTypes()) {
+				// TODO: we are not adding ENTRY_DETAILS as factors.
 				if (PhenotypicType.TRIAL_DESIGN == variable.getRole() || PhenotypicType.GERMPLASM == variable.getRole()
 					|| PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
 

@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.germplasm;
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
+import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -21,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -166,6 +168,13 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	@Override
 	public Map<Integer, String> getPreferredNamesByGIDs(final List<Integer> gids) {
 		return this.daoFactory.getNameDao().getPreferredNamesByGIDs(gids);
+	}
+
+	@Override
+	public Map<Integer, List<BasicNameDTO>> getNamesByGids(final Set<Integer> gids) {
+		return this.daoFactory.getNameDao().getBasicNamesByGids(new HashSet<>(gids))
+			.stream()
+			.collect(Collectors.groupingBy(BasicNameDTO::getGid, Collectors.toList()));
 	}
 
 }

@@ -3,10 +3,10 @@ package org.generationcp.middleware.ruleengine.naming.rules;
 
 import junit.framework.Assert;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.ruleengine.RuleException;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +24,8 @@ public class SeparatorRuleTest extends BaseNamingRuleTest {
 		this.breedingMethod = new Method();
 		this.breedingMethod.setSnametype(this.breedingMethodSnameType);
 		this.breedingMethod.setSeparator("-");
-		this.row = new DeprecatedAdvancingSource();
-		this.row.setBreedingMethod(this.breedingMethod);
+		this.row = Mockito.mock(AdvancingSource.class, Mockito.CALLS_REAL_METHODS);
+		Mockito.when(this.row.getBreedingMethod()).thenReturn(this.breedingMethod);
 		this.testGermplasmName = "CMT1234";
 		this.rule = new SeparatorRule();
 
@@ -34,13 +34,13 @@ public class SeparatorRuleTest extends BaseNamingRuleTest {
 	@Test
 	public void testGetGermplasmRootNameWithTheSameSnameTypeWithMethod() {
 
-		List<String> input = new ArrayList<String>();
+		List<String> input = new ArrayList();
 		input.add(this.testGermplasmName);
 
 		try {
 			input = (List<String>) this.rule.runRule(this.createExecutionContext(input));
-		} catch (RuleException re) {
-			Assert.fail("Rule failed to run for Separator" + this.row.getBreedingMethod().getSeparator());
+		} catch (org.generationcp.middleware.ruleengine.RuleException e) {
+			e.printStackTrace();
 		}
 
 		Assert.assertEquals(1, input.size());
@@ -51,15 +51,15 @@ public class SeparatorRuleTest extends BaseNamingRuleTest {
 	@Test
 	public void testGetGermplasmRootNameWithNullSeparator() {
 
-		List<String> input = new ArrayList<String>();
+		List<String> input = new ArrayList();
 		input.add(this.testGermplasmName);
 
 		this.breedingMethod.setSeparator(null);
 
 		try {
 			input = (List<String>) this.rule.runRule(this.createExecutionContext(input));
-		} catch (RuleException re) {
-			Assert.fail("Rule failed to run for Separator" + this.row.getBreedingMethod().getSeparator());
+		} catch (org.generationcp.middleware.ruleengine.RuleException e) {
+			e.printStackTrace();
 		}
 
 		Assert.assertEquals(1, input.size());

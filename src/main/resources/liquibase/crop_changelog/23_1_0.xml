@@ -4,6 +4,66 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
+	<changeSet author="lkovacic" id="vTBD-1">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from sequence where sequence_name = 'atributs'
+			</sqlCheck>
+        </preConditions>
+        <comment>
+            Create sequence entry for atributs table generator
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			insert into sequence(sequence_name, sequence_value)
+			select 'atributs', coalesce(ceil(max(aid) / 500), 1) from atributs;
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="vTBD-2">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from sequence where sequence_name = 'germplsm'
+			</sqlCheck>
+        </preConditions>
+        <comment>
+            Create sequence entry for germplsm table generator
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			insert into sequence(sequence_name, sequence_value)
+			select 'germplsm', coalesce(ceil(max(gid) / 500), 1) from germplsm;
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="vTBD-3">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from sequence where sequence_name = 'germplasm_study_source'
+			</sqlCheck>
+        </preConditions>
+        <comment>
+            Create sequence entry for germplasm_study_source table generator
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			insert into sequence(sequence_name, sequence_value)
+			select 'germplasm_study_source', coalesce(ceil(max(germplasm_study_source_id) / 500), 1) from germplasm_study_source;
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="vTBD-4">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from sequence where sequence_name = 'names'
+			</sqlCheck>
+        </preConditions>
+        <comment>
+            Create sequence entry for names table generator
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			insert into sequence(sequence_name, sequence_value)
+			select 'names', coalesce(ceil(max(nid) / 500), 1) from names;
+        </sql>
+    </changeSet>
+
     <changeSet author="mderamos" id="v23.1.0-1">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -92,8 +152,8 @@
                     END IF;
 
                     SELECT EXISTS (SELECT name.gid FROM names name
-                           WHERE name.gid = gid AND name.nstat = 1 AND
-                           EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype)) INTO hasValidPreferredName;
+                        WHERE name.gid = gid AND name.nstat = 1 AND
+                        EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype)) INTO hasValidPreferredName;
 
                     IF !hasValidPreferredName THEN
                         SELECT EXISTS (SELECT name.gid FROM names name
@@ -108,8 +168,8 @@
                             UPDATE names SET nstat = 1 WHERE nid = validNameId;
                         ELSE
                             SELECT EXISTS (SELECT name.gid FROM names name
-                               WHERE name.gid = gid AND name.nstat = 1 AND
-                               NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype)) INTO hasInvalidPreferredName;
+                                WHERE name.gid = gid AND name.nstat = 1 AND
+                                NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype)) INTO hasInvalidPreferredName;
 
                             IF hasInvalidPreferredName THEN
                                 -- if all names have invalid nametype, change the nametype of the preferred to LNAME
@@ -180,7 +240,7 @@
                 <not>
                     <sqlCheck expectedResult="0">
                         SELECT COUNT(*) FROM
-                            (SELECT COUNT(*) FROM names GROUP BY gid, ntype HAVING COUNT(*) > 1) nametype_duplicates;
+                        (SELECT COUNT(*) FROM names GROUP BY gid, ntype HAVING COUNT(*) > 1) nametype_duplicates;
                     </sqlCheck>
                 </not>
             </and>
@@ -228,64 +288,64 @@
                 OPEN names_with_duplicates;
                 names_loop: LOOP FETCH names_with_duplicates INTO  nameId, gid, nameTypeId;
 
-                        IF done THEN
-                            CLOSE names_with_duplicates;
-                            LEAVE names_loop;
-                        END IF;
+                IF done THEN
+                    CLOSE names_with_duplicates;
+                    LEAVE names_loop;
+                END IF;
 
-                        -- reset index to 0
-                        SET nameTypeIndex = 0;
+                -- reset index to 0
+                SET nameTypeIndex = 0;
 
-                        SELECT nameType.fcode INTO baseNameType
-                            FROM udflds nameType
-                            WHERE nameType.fldno = nameTypeId;
+                SELECT nameType.fcode INTO baseNameType
+                    FROM udflds nameType
+                    WHERE nameType.fldno = nameTypeId;
 
-                        IF baseNameType REGEXP '_[0-9]$' THEN
-                            -- Get the base name, ie: LNAME_1 will return LNAME
-                            SELECT LEFT(nameType.fcode, CHAR_LENGTH(nameType.fcode) - LOCATE('_', REVERSE(nameType.fcode))) INTO baseNameType
-                                from udflds nameType
-                                WHERE nameType.fldno = nameTypeId;
-                        END IF;
+                IF baseNameType REGEXP '_[0-9]$' THEN
+                    -- Get the base name, ie: LNAME_1 will return LNAME
+                    SELECT LEFT(nameType.fcode, CHAR_LENGTH(nameType.fcode) - LOCATE('_', REVERSE(nameType.fcode))) INTO baseNameType
+                        from udflds nameType
+                        WHERE nameType.fldno = nameTypeId;
+                END IF;
 
-                    OPEN duplicate_names;
-                    duplicate_names_loop: LOOP FETCH duplicate_names INTO duplicateNameId;
-                        IF done THEN
-                            -- set done to false for Outer loop's Continue handling
-                            SET done = false;
-                            CLOSE duplicate_names;
-                            LEAVE duplicate_names_loop;
-                        END IF;
+                OPEN duplicate_names;
+                duplicate_names_loop: LOOP FETCH duplicate_names INTO duplicateNameId;
+                    IF done THEN
+                        -- set done to false for Outer loop's Continue handling
+                        SET done = false;
+                        CLOSE duplicate_names;
+                        LEAVE duplicate_names_loop;
+                    END IF;
 
-                        -- set initially to TRUE to enter loop
-                        SET isNameTypeUsedByGermplasm = TRUE;
+                    -- set initially to TRUE to enter loop
+                    SET isNameTypeUsedByGermplasm = TRUE;
 
-                        WHILE isNameTypeUsedByGermplasm DO
-                            SELECT (nameTypeIndex + 1) INTO nameTypeIndex;
-                            SELECT CONCAT(baseNameType, CONCAT('_', nameTypeIndex)) INTO currentNameType;
+                    WHILE isNameTypeUsedByGermplasm DO
+                        SELECT (nameTypeIndex + 1) INTO nameTypeIndex;
+                        SELECT CONCAT(baseNameType, CONCAT('_', nameTypeIndex)) INTO currentNameType;
 
-                            -- Check if nametype is existing
-                            SELECT EXISTS(SELECT fcode FROM udflds WHERE fcode = currentNameType
-                                AND ftable = 'NAMES' AND ftype = 'NAME') INTO hasExistingNameType;
+                        -- Check if nametype is existing
+                        SELECT EXISTS(SELECT fcode FROM udflds WHERE fcode = currentNameType
+                            AND ftable = 'NAMES' AND ftype = 'NAME') INTO hasExistingNameType;
 
-                            IF hasExistingNameType THEN
-                                -- Check if existing nametype is used by germplasm
-                                SELECT EXISTS(SELECT name.ntype  FROM names name
-                                    INNER JOIN udflds nametype ON name.ntype = nametype.fldno
-                                    WHERE nametype.fcode = currentNameType AND name.gid = gid) INTO isNameTypeUsedByGermplasm;
-                            ELSE
-                                -- Create a new nametype if not yet existing in Database
-                                INSERT INTO udflds(ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid)
+                        IF hasExistingNameType THEN
+                            -- Check if existing nametype is used by germplasm
+                            SELECT EXISTS(SELECT name.ntype  FROM names name
+                                INNER JOIN udflds nametype ON name.ntype = nametype.fldno
+                                WHERE nametype.fcode = currentNameType AND name.gid = gid) INTO isNameTypeUsedByGermplasm;
+                        ELSE
+                            -- Create a new nametype if not yet existing in Database
+                            INSERT INTO udflds(ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid)
                                 SELECT nametype.ftable, nametype.ftype, currentNameType, nametype.fname, nametype.ffmt,
-                                    nametype.fdesc, nametype.lfldno, nametype.fuid, nametype.fdate, nametype.scaleid
-                                    FROM udflds nametype WHERE nametype.fldno = nameTypeId;
-                                SET isNameTypeUsedByGermplasm = FALSE;
-                            END IF;
-                        END WHILE;
-
-                        -- update the name's nametype
-                        UPDATE names name
-                            SET name.ntype = (SELECT fldno FROM udflds WHERE fcode = currentNameType AND ftable = 'NAMES' AND ftype = 'NAME')
-                            WHERE name.nid = duplicateNameId;
+                                nametype.fdesc, nametype.lfldno, nametype.fuid, nametype.fdate, nametype.scaleid
+                                FROM udflds nametype WHERE nametype.fldno = nameTypeId;
+                            SET isNameTypeUsedByGermplasm = FALSE;
+                        END IF;
+                    END WHILE;
+                    
+                    -- update the name's nametype
+                    UPDATE names name
+                        SET name.ntype = (SELECT fldno FROM udflds WHERE fcode = currentNameType AND ftable = 'NAMES' AND ftype = 'NAME')
+                        WHERE name.nid = duplicateNameId;
                     END LOOP duplicate_names_loop;
                 END LOOP names_loop;
                 COMMIT;
@@ -327,7 +387,7 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-                    WHERE TABLE_NAME = 'names' AND CONSTRAINT_NAME='names_uc1' and TABLE_SCHEMA = DATABASE();
+                WHERE TABLE_NAME = 'names' AND CONSTRAINT_NAME='names_uc1' and TABLE_SCHEMA = DATABASE();
             </sqlCheck>
         </preConditions>
         <comment>Add unique constraint to names table for gid and ntype columns</comment>

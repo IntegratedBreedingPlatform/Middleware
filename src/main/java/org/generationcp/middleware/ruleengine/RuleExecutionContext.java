@@ -12,4 +12,6 @@ public interface RuleExecutionContext {
 
 	Object getRuleExecutionOutput();
 
+	RuleExecutionNamespace getRuleExecutionNamespace();
+
 }

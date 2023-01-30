@@ -33,7 +33,6 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 
 	private GermplasmList germplasmList;
 
-	private InventoryDetailsTestDataInitializer inventoryDetailsTestDataInitializer;
 
 	private DaoFactory daoFactory;
 
@@ -44,8 +43,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		if (this.daoFactory == null) {
 			this.daoFactory = new DaoFactory(this.sessionProvder);
 		}
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
-		this.inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, daoFactory);
 		listInventoryBuilder = new ListInventoryBuilder(this.sessionProvder);
 		germplasmListManager = new GermplasmListManagerImpl(this.sessionProvder);
 		this.cropType = new CropType();

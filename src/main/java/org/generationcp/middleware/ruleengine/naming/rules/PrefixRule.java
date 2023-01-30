@@ -1,10 +1,9 @@
 
 package org.generationcp.middleware.ruleengine.naming.rules;
 
-import org.generationcp.middleware.ruleengine.OrderedRule;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
-import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
+import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,18 +18,18 @@ import java.util.List;
  *
  */
 @Component
-public class PrefixRule extends OrderedRule<NamingRuleExecutionContext> {
+public class PrefixRule extends NamingOrderedRule {
 
 	public static final String KEY = "Prefix";
 
 	@Override
-	public Object runRule(NamingRuleExecutionContext context) throws RuleException {
+	public Object runRule(final NamingRuleExecutionContext context) throws RuleException {
 
 		// append a separator string onto each element of the list - in place
-		List<String> input = context.getCurrentData();
+		final List<String> input = context.getCurrentData();
 
-		ProcessCodeService processCodeService = context.getProcessCodeService();
-		DeprecatedAdvancingSource advancingSource = context.getAdvancingSource();
+		final ProcessCodeService processCodeService = context.getProcessCodeService();
+		final AdvancingSource advancingSource = context.getAdvancingSource();
 		String prefix = advancingSource.getBreedingMethod().getPrefix();
 
 		if (prefix == null) {

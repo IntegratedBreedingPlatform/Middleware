@@ -3,7 +3,6 @@ package org.generationcp.middleware.ruleengine.naming.expression;
 import org.generationcp.middleware.ruleengine.RulesPostProcessor;
 import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
 import org.springframework.beans.BeansException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -14,7 +13,7 @@ public class ComponentPostProcessor extends RulesPostProcessor{
     private ProcessCodeFactory processCodeFactory;
 
     @Override
-    public Object postProcessAfterInitialization(Object o, String s) throws BeansException {
+    public Object postProcessAfterInitialization(final Object o, final String s) throws BeansException {
         super.postProcessAfterInitialization(o, s);
         if (o instanceof Expression) {
             processCodeFactory.addExpression((Expression) o);
@@ -24,12 +23,12 @@ public class ComponentPostProcessor extends RulesPostProcessor{
     }
 
     @Override
-    public Object postProcessBeforeInitialization(Object o, String s) throws BeansException {
+    public Object postProcessBeforeInitialization(final Object o, final String s) throws BeansException {
         return super.postProcessBeforeInitialization(o, s);
     }
 
     @Autowired
-    public void setProcessCodeFactory(ProcessCodeFactory processCodeFactory) {
+    public void setProcessCodeFactory(final ProcessCodeFactory processCodeFactory) {
         this.processCodeFactory = processCodeFactory;
     }
 }
