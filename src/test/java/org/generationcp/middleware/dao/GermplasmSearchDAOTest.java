@@ -28,6 +28,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
@@ -1595,14 +1596,13 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 			// Add Preferred Id, nstat = 8 means the name is preferred Id
 			final Name tempPreferredId =
-				GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Preferred Id of " + tempGermplasmGid, 1);
+				GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Preferred Id of " + tempGermplasmGid, GermplasmNameType.LINE_NAME.getUserDefinedFieldID());
 			tempPreferredId.setNstat(8);
 			this.nameDAO.save(tempPreferredId);
 
 			// Add name of CODE1 type
-			final UserDefinedField nameType = this.userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", DERIVATIVE_NAME_CODE);
 			final Name code1Name =
-				GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Code1 Name of " + tempGermplasmGid, nameType.getFldno());
+				GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Code1 Name of " + tempGermplasmGid, GermplasmNameType.CULTIVAR_NAME.getUserDefinedFieldID());
 			code1Name.setNstat(0);
 			this.nameDAO.save(code1Name);
 
