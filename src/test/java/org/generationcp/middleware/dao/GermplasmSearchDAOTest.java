@@ -131,7 +131,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, this.daoFactory);
 		}
 
 		this.cropType = new CropType();

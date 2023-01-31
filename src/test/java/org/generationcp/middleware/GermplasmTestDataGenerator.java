@@ -21,7 +21,7 @@ public class GermplasmTestDataGenerator {
 	private static final Integer TEST_METHOD_ID = 101;
 	public static final String TEST_METHOD_NAME = "Single cross";
 
-	private HibernateSessionProvider sessionProvider;
+	private final HibernateSessionProvider sessionProvider;
 	private final DaoFactory daoFactory;
 
 	public GermplasmTestDataGenerator(final HibernateSessionProvider sessionProvider,
@@ -58,7 +58,7 @@ public class GermplasmTestDataGenerator {
 		this.daoFactory.getGermplasmDao().refresh(germplasm);
 		this.daoFactory.getNameDao().save(preferredName);
 
-		UserDefinedField attributeField =
+		final UserDefinedField attributeField =
 			new UserDefinedField(null, "NAMES", "NAME", RandomStringUtils.randomAlphanumeric(10), "", "", "", 0, 0, 0, 0);
 		this.daoFactory.getUserDefinedFieldDAO().saveOrUpdate(attributeField);
 
