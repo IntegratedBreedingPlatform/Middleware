@@ -330,38 +330,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testImportGermplasmUpdates_ThrowException_DuplicateNames() {
-		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-
-		final int creationDate = 20200101;
-		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
-		final UserDefinedField newNameCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
-				UDTableType.NAMES_NAME.getType(), DRVNM);
-
-		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0, null);
-
-		final GermplasmUpdateDTO germplasmUpdateDTO =
-			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
-				Optional.of(newLocation), creationDate);
-		this.germplasmService.importGermplasmUpdates(this.programUUID, Collections.singletonList(germplasmUpdateDTO));
-
-		// Create duplicate names and attributes
-		this.daoFactory.getNameDao().save(new Name(null, germplasm, newNameCode.getFldno(), 0,
-			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
-		this.daoFactory.getNameDao().save(new Name(null, germplasm, newNameCode.getFldno(), 0,
-			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
-
-		try {
-			this.germplasmService.importGermplasmUpdates(this.programUUID, Collections.singletonList(germplasmUpdateDTO));
-		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.duplicate.names"));
-		}
-
-	}
-
-	@Test
 	public void testImportGermplasmUpdates_ThrowException_PUIAlreadyExists() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);

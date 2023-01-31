@@ -52,7 +52,7 @@ public class NameDAOTest extends IntegrationTestBase {
 		NameDAOTest.nameDAO.save(notPreferredName);
 		final Name uncategorizedName =
 				this.createNameTestData(dateIntValue, germplasm.getGid(), 0, NameDAOTest.UNCATEGORIZED_NAME,
-						GermplasmNameType.DERIVATIVE_NAME);
+						GermplasmNameType.LINE_NAME);
 		NameDAOTest.nameDAO.save(uncategorizedName);
 		final Name preferredName =
 				this.createNameTestData(dateIntValue, germplasm.getGid(), 1, NameDAOTest.PREFERRED_NAME, GermplasmNameType.LINE_NAME);
@@ -119,7 +119,7 @@ public class NameDAOTest extends IntegrationTestBase {
 			GermplasmNameType.DERIVATIVE_NAME);
 		NameDAOTest.nameDAO.save(name1);
 		final Name name2 = this.createNameTestData(20190910, germplasm.getGid(), 0, "REF 001",
-			GermplasmNameType.DERIVATIVE_NAME);
+			GermplasmNameType.LINE_NAME);
 		NameDAOTest.nameDAO.save(name2);
 
 		this.sessionProvder.getSession().flush();
