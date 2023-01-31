@@ -103,7 +103,7 @@ public class ProgramServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final RoleSearchDto roleSearchDto = new RoleSearchDto();
 		roleSearchDto.setRoleTypeId(3);
-		final List<Role> roles = this.daoFactory.getRoleDao().getRoles(roleSearchDto);
+		final List<Role> roles = this.daoFactory.getRoleDao().searchRoles(roleSearchDto, null);
 		if (!roles.isEmpty()) {
 			final UserRole userRole = new UserRole(adminUser, roles.get(0), new CropType(CROP), project);
 			this.daoFactory.getUserRoleDao().save(userRole);
