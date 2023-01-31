@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.api.program.ProgramService;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
@@ -29,7 +30,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -575,8 +575,9 @@ public class DatasetServiceImplTest {
 		final List<ObservationUnitRow> testMeasurements = Collections.singletonList(observationUnitRow);
 		Mockito.when(this.obsUnitsSearchDao.getObservationVariableName(DATASET_ID)).thenReturn("PLANT_NO");
 		final ObservationUnitsSearchDTO
-			searchDTO = new ObservationUnitsSearchDTO(DATASET_ID, Arrays.asList(INSTANCE_ID), Lists.newArrayList(this.germplasmDescriptorsMap.values()),
-			Lists.newArrayList(this.designFactorsMap.values()), projectTraits);
+			searchDTO =
+			new ObservationUnitsSearchDTO(DATASET_ID, Arrays.asList(INSTANCE_ID), Lists.newArrayList(this.germplasmDescriptorsMap.values()),
+				Lists.newArrayList(this.designFactorsMap.values()), projectTraits);
 
 		Mockito.when(this.obsUnitsSearchDao.getObservationUnitTable(searchDTO, new PageRequest(0, 100))).thenReturn(testMeasurements);
 

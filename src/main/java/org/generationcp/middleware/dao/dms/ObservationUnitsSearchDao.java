@@ -47,11 +47,13 @@ import java.util.stream.StreamSupport;
 public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ObservationUnitsSearchDao.class);
-	private static final List<Integer> STANDARD_DATASET_VARIABLE_IDS = Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId(),
-		TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.GID.getId(), TermId.ENTRY_TYPE.getId(), TermId.ENTRY_NO.getId(), TermId.REP_NO.getId(),
-		TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId(), TermId.ROW.getId(), TermId.COL.getId(), TermId.FIELDMAP_RANGE.getId(), TermId.DESIG.getId(),
-		TermId.FIELDMAP_COLUMN.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId());
-
+	private static final List<Integer> STANDARD_DATASET_VARIABLE_IDS =
+		Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId(),
+			TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.GID.getId(), TermId.ENTRY_TYPE.getId(), TermId.ENTRY_NO.getId(),
+			TermId.REP_NO.getId(),
+			TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId(), TermId.ROW.getId(), TermId.COL.getId(), TermId.FIELDMAP_RANGE.getId(),
+			TermId.DESIG.getId(),
+			TermId.FIELDMAP_COLUMN.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId());
 
 	private static final List<Integer> REMOVE_FILTERS = Lists.newArrayList(TermId.FEMALE_PARENT_GID.getId(),
 		TermId.FEMALE_PARENT_NAME.getId(), TermId.MALE_PARENT_GID.getId(), TermId.MALE_PARENT_NAME.getId());
@@ -79,11 +81,14 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.name(), VariableType.TREATMENT_FACTOR.name());
 	private static final String GERMPLASM_JOIN = " INNER JOIN germplsm g on g.gid = s.dbxref_id ";
 	private static final String NAME_JOIN = " INNER JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1 ";
-	private static final String IMMEDIATE_SOURCE_NAME_JOIN = " LEFT JOIN names immediateSource  ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
+	private static final String IMMEDIATE_SOURCE_NAME_JOIN =
+		" LEFT JOIN names immediateSource  ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
 	private static final String GROUP_SOURCE_NAME_JOIN =
 		" LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0 AND groupSourceName.nstat = 1 ";
-	private static final String LOCATION_JOIN = " LEFT JOIN nd_geolocationprop gprop on gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = " + TermId.LOCATION_ID.getId()
-		+ " LEFT JOIN location loc on loc.locid = gprop.value ";
+	private static final String LOCATION_JOIN =
+		" LEFT JOIN nd_geolocationprop gprop on gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = "
+			+ TermId.LOCATION_ID.getId()
+			+ " LEFT JOIN location loc on loc.locid = gprop.value ";
 	private static final String BREEDING_METHODS_ABBR_JOIN =
 		"LEFT JOIN methods m ON m.mid = g.methn ";
 
@@ -97,11 +102,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		factorsFilterMap.put(String.valueOf(TermId.OBS_UNIT_ID.getId()), "nde.obs_unit_id");
 		factorsFilterMap.put(String.valueOf(TermId.STOCK_ID.getId()),
 			"EXISTS ( SELECT 1 FROM ims_experiment_transaction ndt \n"
-			+ "   inner join ims_transaction tr on tr.trnid = ndt.trnid and ndt.type = " + ExperimentTransactionType.PLANTING.getId()
-			+ "   and tr.trntype = " + TransactionType.WITHDRAWAL.getId() +  "  and tr.trnstat != " + TransactionStatus.CANCELLED.getIntValue()
-			+ "   inner join ims_lot lot on lot.lotid = tr.lotid \n"
-			+ "    WHERE ndt.nd_experiment_id = nde.nd_experiment_id \n"
-			+ "     and lot.stock_id");
+				+ "   inner join ims_transaction tr on tr.trnid = ndt.trnid and ndt.type = " + ExperimentTransactionType.PLANTING.getId()
+				+ "   and tr.trntype = " + TransactionType.WITHDRAWAL.getId() + "  and tr.trnstat != "
+				+ TransactionStatus.CANCELLED.getIntValue()
+				+ "   inner join ims_lot lot on lot.lotid = tr.lotid \n"
+				+ "    WHERE ndt.nd_experiment_id = nde.nd_experiment_id \n"
+				+ "     and lot.stock_id");
 		factorsFilterMap.put(String.valueOf(TermId.GROUPGID.getId()), "g.mgid");
 		factorsFilterMap.put(String.valueOf(TermId.GUID.getId()), "g.germplsm_uuid");
 		factorsFilterMap.put(String.valueOf(TermId.GROUP_SOURCE_NAME.getId()), "groupSourceName.nval");
@@ -151,11 +157,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "        FROM sample sp "
 			+ "        WHERE sp.nd_experiment_id = nde.nd_experiment_id) "
 			+ "         + coalesce(child_sample_count.count, 0), 0), '-') AS 'SUM_OF_SAMPLES'");
-		mainVariablesMap.put(STOCK_ID,"    coalesce(nullif((SELECT distinct(lot.stock_id) "
+		mainVariablesMap.put(STOCK_ID, "    coalesce(nullif((SELECT distinct(lot.stock_id) "
 			+ "        FROM ims_experiment_transaction  ndt "
-			+ "			inner join ims_transaction tr on tr.trnid = ndt.trnid and ndt.type = " + ExperimentTransactionType.PLANTING.getId()
-			+ "			and tr.trntype = " + TransactionType.WITHDRAWAL.getId() +  "  and tr.trnstat != " + TransactionStatus.CANCELLED.getIntValue()
-			+ "			inner join ims_lot lot on lot.lotid = tr.lotid \n"
+			+ "        inner join ims_transaction tr on tr.trnid = ndt.trnid and ndt.type = "
+			+ ExperimentTransactionType.PLANTING.getId()
+			+ "        and tr.trntype = " + TransactionType.WITHDRAWAL.getId() + "  and tr.trnstat != "
+			+ TransactionStatus.CANCELLED.getIntValue()
+			+ "        inner join ims_lot lot on lot.lotid = tr.lotid \n"
 			+ "        WHERE ndt.nd_experiment_id = nde.nd_experiment_id), '-') ) AS 'STOCK_ID'");
 		mainVariablesMap.put(FILE_COUNT,
 			"(select count(1) from file_metadata fm where fm.nd_experiment_id = nde.nd_experiment_id) as '" + FILE_COUNT + "'");
@@ -214,12 +222,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 			sql.append(columns.stream().collect(Collectors.joining(", ")));
 
-			sql.append(" FROM nd_experiment nde "
-				+ "    INNER JOIN project p on p.project_id = nde.project_id "
-				+ "    INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id "
-				+ "    LEFT JOIN stock s ON s.stock_id = nde.stock_id "
+			sql.append(" FROM nd_experiment nde ")
+				.append("    INNER JOIN project p on p.project_id = nde.project_id ")
+				.append("    INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id ")
+				.append("    LEFT JOIN stock s ON s.stock_id = nde.stock_id ")
 				// FIXME won't work for sub-sub-obs
-				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
+				.append(
+					" INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
 
 			this.addCountQueryJoins(sql, filter);
 
@@ -230,11 +239,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			}
 
 			if (Boolean.TRUE.equals(draftMode)) {
-				sql.append(" and exists(select 1"
-					+ "   from phenotype ph"
-					+ "   where ph.nd_experiment_id = nde.nd_experiment_id "
-					+ "         and (ph.draft_value is not null "
-					+ "                or ph.draft_cvalue_id is not null)) ");
+				sql.append(" and exists(select 1 ")
+					.append(" from phenotype ph")
+					.append(" where ph.nd_experiment_id = nde.nd_experiment_id ")
+					.append(" and (ph.draft_value is not null ")
+					.append(" or ph.draft_cvalue_id is not null)) ");
 			}
 
 			if (filter != null) {
@@ -272,13 +281,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		Preconditions.checkNotNull(filter.getVariableId());
 
 		try {
-			final StringBuilder sql = new StringBuilder(
-				"select count(*) as totalObservationUnits, count(distinct(gl.nd_geolocation_id)) as totalInstances from "
-					+ "nd_experiment nde "
-					+ "    inner join project p on p.project_id = nde.project_id "
-					+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id "
-					+ " where "
-					+ "	p.project_id = :datasetId ");
+			final StringBuilder sql =
+				new StringBuilder("select count(*) as totalObservationUnits, count(distinct(gl.nd_geolocation_id)) as totalInstances from ")
+					.append("nd_experiment nde ")
+					.append("    inner join project p on p.project_id = nde.project_id ")
+					.append("    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id ")
+					.append(" where ")
+					.append(" p.project_id = :datasetId ");
 
 			if (!CollectionUtils.isEmpty(observationUnitsSearchDTO.getInstanceIds())) {
 				sql.append(" and gl.nd_geolocation_id IN (:instanceIds) ");
@@ -288,19 +297,19 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				(filter.getVariableId() == null) ? StringUtils.EMPTY : "and ph.observable_id = " + filter.getVariableId() + " ";
 
 			if (Boolean.TRUE.equals(observationUnitsSearchDTO.getDraftMode())) {
-				sql.append(" and exists(select 1"
-					+ "   from phenotype ph"
-					+ "   where ph.nd_experiment_id = nde.nd_experiment_id "
-					+ filterByVariableSQL
-					+ "         and (ph.draft_value is not null "
-					+ "                or ph.draft_cvalue_id is not null)) ");
+				sql.append(" and exists(select 1 ");
+				sql.append(" from phenotype ph");
+				sql.append(" where ph.nd_experiment_id = nde.nd_experiment_id ");
+				sql.append(filterByVariableSQL);
+				sql.append("         and (ph.draft_value is not null ");
+				sql.append("                or ph.draft_cvalue_id is not null)) ");
 			} else if (Boolean.TRUE.equals(filter.getVariableHasValue())) {
-				sql.append(" and exists(select 1"
-					+ "   from phenotype ph"
-					+ "   where ph.nd_experiment_id = nde.nd_experiment_id "
-					+ filterByVariableSQL
-					+ "         and (ph.value is not null "
-					+ "                or ph.cvalue_id is not null)) ");
+				sql.append(" and exists(select 1");
+				sql.append("   from phenotype ph");
+				sql.append("   where ph.nd_experiment_id = nde.nd_experiment_id ");
+				sql.append(filterByVariableSQL);
+				sql.append("         and (ph.value is not null ");
+				sql.append("                or ph.cvalue_id is not null)) ");
 			}
 
 			this.addFilters(sql, filter, observationUnitsSearchDTO.getDraftMode());
@@ -370,7 +379,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		final Set<String> joins = new LinkedHashSet<>();
 
-		if ((!CollectionUtils.isEmpty(filter.getFilteredValues()) && filter.getFilteredValues().keySet().contains(String.valueOf(TermId.GROUPGID.getId()))) ||
+		if ((!CollectionUtils.isEmpty(filter.getFilteredValues()) && filter.getFilteredValues().keySet()
+			.contains(String.valueOf(TermId.GROUPGID.getId()))) ||
 			this.checkFilterContainsFactor(filter, TermId.GUID.getId()) ||
 			this.checkFilterContainsFactor(filter, TermId.IMMEDIATE_SOURCE_NAME.getId()) ||
 			this.checkFilterContainsFactor(filter, TermId.BREEDING_METHOD_ABBR.getId()) ||
@@ -404,18 +414,17 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final StringBuilder sql = new StringBuilder("SELECT  "
 			+ "    nde.nd_experiment_id as observationUnitId, ");
 
-		final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s',"
-			+ " MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s',"
-			+ " MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s',"
-			+ " MAX(IF(cvterm_variable.name = '%s', ph.cvalue_id, NULL)) AS '%s', "
-			+ " MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS '%s',"
-			+ " MAX(IF(cvterm_variable.name = '%s', ph.draft_cvalue_id, NULL)) AS '%s', "
-			;
+		final StringBuilder traitClauseFormat = new StringBuilder(" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s',")
+			.append(" MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s',")
+			.append(" MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s',")
+			.append(" MAX(IF(cvterm_variable.name = '%s', ph.cvalue_id, NULL)) AS '%s', ")
+			.append(" MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS '%s',")
+			.append(" MAX(IF(cvterm_variable.name = '%s', ph.draft_cvalue_id, NULL)) AS '%s', ");
 
 		for (final MeasurementVariableDto measurementVariable : searchDto.getDatasetVariables()) {
 			if (measurementVariable.getId().equals(searchDto.getFilter().getVariableId())) {
 				sql.append(String.format(
-					traitClauseFormat,
+					traitClauseFormat.toString(),
 					measurementVariable.getName(),
 					measurementVariable.getName(), // Value
 					measurementVariable.getName(),
@@ -433,14 +442,14 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			}
 		}
 
-		sql.append(" 1 FROM "
-			+ "	project p "
-			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
-			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id "
-			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id "
-			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
-			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
-			+ " WHERE p.project_id = :datasetId ");
+		sql.append(" 1 FROM ")
+			.append(" project p ")
+			.append(" INNER JOIN nd_experiment nde ON nde.project_id = p.project_id ")
+			.append(" INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id ")
+			.append(" INNER JOIN stock s ON s.stock_id = nde.stock_id ")
+			.append(" LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id ")
+			.append(" LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id ")
+			.append(" WHERE p.project_id = :datasetId ");
 
 		if (!CollectionUtils.isEmpty(searchDto.getInstanceIds())) {
 			sql.append(" AND gl.nd_geolocation_id IN (:instanceIds)");
@@ -453,12 +462,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			(filter.getVariableId() == null) ? StringUtils.EMPTY : "and ph.observable_id = " + filter.getVariableId() + " ";
 
 		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
-			sql.append(" and exists(select 1"
-				+ "   from phenotype ph"
-				+ "   where ph.nd_experiment_id = nde.nd_experiment_id "
-				+ filterByVariableSQL
-				+ "         and (ph.draft_value is not null "
-				+ "                or ph.draft_cvalue_id is not null)) ");
+			sql.append(" and exists(select 1")
+				.append("   from phenotype ph")
+				.append("   where ph.nd_experiment_id = nde.nd_experiment_id ")
+				.append(filterByVariableSQL)
+				.append("         and (ph.draft_value is not null ")
+				.append("                or ph.draft_cvalue_id is not null)) ");
 		}
 
 		sql.append(" GROUP BY observationUnitId ");
@@ -541,10 +550,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private List<Map<String, Object>> getObservationUnitsQueryResult(final ObservationUnitsSearchDTO searchDto,
-		final String observationVariableName, final Map<Integer, String> standardDatasetVariablesMap, final Map<String, String> finalColumnsQueryMap, final Pageable pageable, final boolean forVisualization) {
+		final String observationVariableName, final Map<Integer, String> standardDatasetVariablesMap,
+		final Map<String, String> finalColumnsQueryMap, final Pageable pageable, final boolean forVisualization) {
 		try {
 
-			final String sql = this.getObservationUnitTableQuery(searchDto, observationVariableName, standardDatasetVariablesMap.get(TermId.PLOT_NO.getId()), finalColumnsQueryMap, pageable, forVisualization);
+			final String sql = this.getObservationUnitTableQuery(searchDto, observationVariableName,
+				standardDatasetVariablesMap.get(TermId.PLOT_NO.getId()), finalColumnsQueryMap, pageable, forVisualization);
 			final SQLQuery query = this.createQueryAndAddScalar(searchDto, sql, standardDatasetVariablesMap, forVisualization);
 			this.setParameters(searchDto, query, pageable);
 			return query.list();
@@ -648,7 +659,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		// If the visible columns list is not empty, we should only include the columns specified.
 		// Exempted are the columns required by the system (e.g. OBSERVATION_UNIT_ID, FILE_TERM_IDS, FILE_COUNT, etc.)
-		if (!CollectionUtils.isEmpty(visibleColumns) && OBSERVATIONS_TABLE_SYSTEM_COLUMNS.stream().noneMatch(s -> s.equalsIgnoreCase(columnName))) {
+		if (!CollectionUtils.isEmpty(visibleColumns) && OBSERVATIONS_TABLE_SYSTEM_COLUMNS.stream()
+			.noneMatch(s -> s.equalsIgnoreCase(columnName))) {
 			return visibleColumns.stream().anyMatch(s -> s.equalsIgnoreCase(columnName));
 		}
 		// If the visible columns list is not specified, process and retrieve the column by default.
@@ -738,7 +750,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				.append(" NULL AS `%1$s_DraftValue`,")
 				.append(" NULL AS `%1$s_DraftCvalueId`");
 
-			searchDto.getDatasetVariables().forEach((measurementVariable) -> {
+			searchDto.getDatasetVariables().forEach(measurementVariable -> {
 				if (this.isColumnVisible(measurementVariable.getName(), searchDto.getVisibleColumns())) {
 					columns.add(String.format(traitClauseFormat.toString(), measurementVariable.getName()));
 				} else {
@@ -916,27 +928,29 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	private void addFromClause(final StringBuilder sql, final ObservationUnitsSearchDTO searchDto) {
 
-		sql.append(" FROM "
-			+ "	project p "
-			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
-			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id "
-			+ "	LEFT JOIN stock s ON s.stock_id = nde.stock_id "
-			+ " LEFT JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1"
-			+ " LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id "
-			+ " LEFT JOIN cvterm cvterm_entry_variable ON (cvterm_entry_variable.cvterm_id = sp.type_id) "
-			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
-			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
-			+ " LEFT JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id "
+		sql.append(" FROM ")
+			.append(" project p ")
+			.append(" INNER JOIN nd_experiment nde ON nde.project_id = p.project_id ")
+			.append(" INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id ")
+			.append(" LEFT JOIN stock s ON s.stock_id = nde.stock_id ")
+			.append(" LEFT JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1")
+			.append(" LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id ")
+			.append(" LEFT JOIN cvterm cvterm_entry_variable ON (cvterm_entry_variable.cvterm_id = sp.type_id) ")
+			.append(" LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id ")
+			.append(" LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id ")
+			.append(" LEFT JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id ")
 			// Count samples for child dataset (sub-obs)
-			+ " LEFT JOIN (SELECT parent.nd_experiment_id, "
-			+ "       nullif(count(child_sample.sample_id), 0) AS count "
+			.append(" LEFT JOIN (SELECT parent.nd_experiment_id, ")
+			.append("       nullif(count(child_sample.sample_id), 0) AS count ")
 			// Start the join with child to avoid parent_id full index scan
-			+ "     FROM nd_experiment child "
-			+ "            LEFT JOIN sample child_sample ON child.nd_experiment_id = child_sample.nd_experiment_id "
-			+ "            INNER JOIN nd_experiment parent ON child.parent_id = parent.nd_experiment_id "
-			+ "     GROUP BY parent.nd_experiment_id) child_sample_count ON child_sample_count.nd_experiment_id = nde.nd_experiment_id "
+			.append("     FROM nd_experiment child ")
+			.append("            LEFT JOIN sample child_sample ON child.nd_experiment_id = child_sample.nd_experiment_id ")
+			.append("            INNER JOIN nd_experiment parent ON child.parent_id = parent.nd_experiment_id ")
+			.append(
+				"     GROUP BY parent.nd_experiment_id) child_sample_count ON child_sample_count.nd_experiment_id = nde.nd_experiment_id ")
 			// FIXME won't work for sub-sub-obs
-			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
+			.append(
+				" INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
 
 		this.addSelectQueryJoins(sql, searchDto.getGenericGermplasmDescriptors(),
 			searchDto.getFilter());
@@ -1055,8 +1069,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		String orderColumn;
-		String sortBy = "";
-		String direction = "asc";
+		final String sortBy = "";
+		final String direction = "asc";
 		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)
 			&& !plotNoName.equals(observationUnitNoName)) {
 			orderColumn = ObservationUnitsSearchDao.OBSERVATION_UNIT_NO;
@@ -1093,6 +1107,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	private void addHavingClause(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter) {
 
+		// For GERMPLASM NAME, PASSPORT AND ATTRIBUTES columns, we fetch first all the data before
+		// applying the filter condition.
+
 		if (filter == null) {
 			return;
 		}
@@ -1123,7 +1140,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					.equals(variableType)) {
 					final String alias = this.formatVariableAlias(variableId);
 					havingConditions.add(String.format(" %s LIKE :%s_text ", alias, variableId));
-					continue;
 				}
 			}
 
@@ -1131,8 +1147,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				sql.append(" HAVING ");
 				sql.append(havingConditions.stream().collect(Collectors.joining(" AND ")));
 			}
-
-
 
 		}
 
@@ -1164,67 +1178,68 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	private void appendOutOfBoundsTraitsFilteringToQuery(final StringBuilder sql, final String filterByDraftOrValue,
 		final String filterByVariableSQL) {
-		sql.append(" and nde.nd_experiment_id in (select ph2.nd_experiment_id "
-			+ "      from cvterm_relationship cvtrscale "
-			+ "           inner join cvterm scale on cvtrscale.object_id = scale.cvterm_id "
-			+ "           inner join cvterm_relationship cvtrdataType on scale.cvterm_id = cvtrdataType.subject_id and cvtrdataType.type_id = "
-			+ TermId.HAS_TYPE.getId()
-			+ "           inner join cvterm dataType on cvtrdataType.object_id = dataType.cvterm_id "
-			+ "           left join cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id and scaleMaxRange.type_id = "
-			+ TermId.MAX_VALUE.getId()
-			+ "           left join cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id and scaleMinRange.type_id = "
-			+ TermId.MIN_VALUE.getId()
-			+ " inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id "
-			+ "    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id "
-			+ "           inner join project p2 on nde2.project_id = p2.project_id "
-			+ "           left join variable_overrides vo on vo.cvterm_id = ph2.observable_id and p2.program_uuid = vo.program_uuid "
-			+ "      where ph2." + filterByDraftOrValue + " is not null  and ph2." + filterByDraftOrValue + "!= 'missing'"
-			+ filterByVariableSQL
-			+ "        and cvtrscale.type_id = " + TermId.HAS_SCALE.getId()
-			+ "        and case "
-			+ "        when dataType.cvterm_id = " + TermId.CATEGORICAL_VARIABLE.getId()
-				/* get the categoricals whose value != category value (out-of-bound)
-				in other words, the set where ph.value = category value NOT exists*/
-			+ "          then not exists( "
-			+ "          select 1 "
-			+ "            from cvterm_relationship cvtrcategory "
-			+ "                 inner join cvterm category on cvtrcategory.object_id = category.cvterm_id "
-			+ "            where scale.cvterm_id = cvtrcategory.subject_id "
-			+ "              and cvtrcategory.type_id = " + TermId.HAS_VALUE.getId()
-			+ "              and ph2." + filterByDraftOrValue + " = category.name "
-			+ "          ) "
-			+ "        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId()
+		sql.append(" and nde.nd_experiment_id in (select ph2.nd_experiment_id ")
+			.append("      from cvterm_relationship cvtrscale ")
+			.append("           inner join cvterm scale on cvtrscale.object_id = scale.cvterm_id ")
+			.append(
+				"           inner join cvterm_relationship cvtrdataType on scale.cvterm_id = cvtrdataType.subject_id and cvtrdataType.type_id = ")
+			.append(TermId.HAS_TYPE.getId())
+			.append("           inner join cvterm dataType on cvtrdataType.object_id = dataType.cvterm_id ")
+			.append(
+				"           left join cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id and scaleMaxRange.type_id = ")
+			.append(TermId.MAX_VALUE.getId())
+			.append(
+				"           left join cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id and scaleMinRange.type_id = ")
+			.append(TermId.MIN_VALUE.getId())
+			.append(" inner join phenotype ph2 on cvtrscale.subject_id = ph2.observable_id ")
+			.append("    inner join nd_experiment nde2 on ph2.nd_experiment_id = nde2.nd_experiment_id ")
+			.append("           inner join project p2 on nde2.project_id = p2.project_id ")
+			.append("           left join variable_overrides vo on vo.cvterm_id = ph2.observable_id and p2.program_uuid = vo.program_uuid ")
+			.append("      where ph2." + filterByDraftOrValue + " is not null  and ph2." + filterByDraftOrValue + "!= 'missing'")
+			.append(filterByVariableSQL)
+			.append("        and cvtrscale.type_id = " + TermId.HAS_SCALE.getId())
+			.append("        and case ")
+			.append("        when dataType.cvterm_id = " + TermId.CATEGORICAL_VARIABLE.getId())
+			/* get the categoricals whose value != category value (out-of-bound)
+			in other words, the set where ph.value = category value NOT exists*/
+			.append("          then not exists( ")
+			.append("          select 1 ")
+			.append("            from cvterm_relationship cvtrcategory ")
+			.append("                 inner join cvterm category on cvtrcategory.object_id = category.cvterm_id ")
+			.append("            where scale.cvterm_id = cvtrcategory.subject_id ")
+			.append("              and cvtrcategory.type_id = " + TermId.HAS_VALUE.getId())
+			.append("              and ph2." + filterByDraftOrValue + " = category.name ")
+			.append("          ) ")
+			.append("        when dataType.cvterm_id = " + TermId.NUMERIC_VARIABLE.getId())
 			// get the numericals whose value is not within bounds
 			// cast strings to decimal (+ 0) to compare
-			+ "          then ph2." + filterByDraftOrValue + " + 0 < scaleMinRange.value "
-			+ "            or ph2." + filterByDraftOrValue + " + 0 > scaleMaxRange.value "
-			+ "            or ph2." + filterByDraftOrValue + " + 0 < vo.expected_min "
-			+ "            or ph2." + filterByDraftOrValue + " + 0 > vo.expected_max "
-			+ "        else false "
-			+ "        end "
-			+ "    )");
+			.append("          then ph2." + filterByDraftOrValue + " + 0 < scaleMinRange.value ")
+			.append("            or ph2." + filterByDraftOrValue + " + 0 > scaleMaxRange.value ")
+			.append("            or ph2." + filterByDraftOrValue + " + 0 < vo.expected_min ")
+			.append("            or ph2." + filterByDraftOrValue + " + 0 > vo.expected_max ")
+			.append("        else false ")
+			.append("        end ")
+			.append("    )");
 	}
 
 	private void appendTraitStatusFilterToQuery(final StringBuilder sql, final String filterByVariableSQL, final String filterClause) {
-		sql.append(
-			" and EXISTS ( "
-				+ "    SELECT 1 "
-				+ "    FROM phenotype ph2 "
-				+ "    WHERE ph2.nd_experiment_id = nde.nd_experiment_id "
-				+ filterByVariableSQL
-				+ filterClause + ") ");
+		sql.append(" and EXISTS ( ")
+			.append("    SELECT 1 ")
+			.append("    FROM phenotype ph2 ")
+			.append("    WHERE ph2.nd_experiment_id = nde.nd_experiment_id ")
+			.append(filterByVariableSQL)
+			.append(filterClause + ") ");
 	}
 
 	private void appendTraitValueFilteringToQuery(final StringBuilder sql, final String filterByDraftOrValue, final String variableId,
 		final boolean performLikeOperation) {
 		final String matchClause = performLikeOperation ? " LIKE :" + variableId + "_text " : " IN (:" + variableId + "_values) ";
-		sql.append(
-			" and EXISTS ( "
-				+ "    SELECT 1 "
-				+ "    FROM phenotype ph2 "
-				+ "    WHERE ph2.observable_id = :" + variableId + "_Id"
-				+ "    AND ph2.nd_experiment_id = nde.nd_experiment_id "
-				+ "    and ph2.").append(filterByDraftOrValue).append(matchClause).append(") ");
+		sql.append(" and EXISTS ( ")
+			.append("    SELECT 1 ")
+			.append("    FROM phenotype ph2 ")
+			.append("    WHERE ph2.observable_id = :" + variableId + "_Id")
+			.append("    AND ph2.nd_experiment_id = nde.nd_experiment_id ")
+			.append("    and ph2.").append(filterByDraftOrValue).append(matchClause).append(") ");
 	}
 
 	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType,
@@ -1247,9 +1262,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		// Otherwise, look in "props" tables
 		// If doing text searching, perform LIKE operation. Otherwise perform value "IN" operation
 		if (EXP_PROPS_VAR_TYPES.contains(variableType)) {
-			sql.append(" AND EXISTS ( SELECT 1 FROM nd_experimentprop xp "
-				+ "WHERE xp.nd_experiment_id = plot.nd_experiment_id AND xp.type_id = :" + variableId
-				+ "_Id AND value ").append(matchClause).append(" )");
+			sql.append(" AND EXISTS ( SELECT 1 FROM nd_experimentprop xp ")
+				.append("WHERE xp.nd_experiment_id = plot.nd_experiment_id AND xp.type_id = :" + variableId)
+				.append("_Id AND value ").append(matchClause).append(" )");
 
 		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType) || VariableType.ENTRY_DETAIL.name().equals(variableType)) {
 			// IF searching by list of values, search for the values in:
@@ -1258,10 +1273,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			// Otherwise, search the value like a text by LIKE operation
 			final String stockMatchClause = performLikeOperation ? "sp.value LIKE :" + variableId + "_text " :
 				" (cvt.name IN (:" + variableId + "_values) OR sp.value IN (:" + variableId + "_values ))";
-			sql.append(" AND EXISTS ( SELECT 1 FROM stockprop sp "
-				+ "LEFT JOIN cvterm cvt ON cvt.cvterm_id = sp.value "
-				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId
-				+ "_Id AND ").append(stockMatchClause).append(" )");
+			sql.append(" AND EXISTS ( SELECT 1 FROM stockprop sp ")
+				.append("LEFT JOIN cvterm cvt ON cvt.cvterm_id = sp.value ")
+				.append("WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId)
+				.append("_Id AND ").append(stockMatchClause).append(" )");
 		}
 	}
 
@@ -1322,7 +1337,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					query.setParameter(observableId + "_Id", observableId);
 				}
 
-				if(String.valueOf(TermId.STOCK_ID.getId()).equals(observableId)){
+				if (String.valueOf(TermId.STOCK_ID.getId()).equals(observableId)) {
 					// Stock_Id, whose Id is -1727, will cause an error as query parameter. Remove the "-" from the ID as workaround
 					final String finalId = observableId.replace("-", "");
 					query.setParameter(finalId + "_text", "%" + filteredTextValues.get(observableId) + "%");
@@ -1428,7 +1443,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (results != null && !results.isEmpty()) {
 			for (final Map<String, Object> row : results) {
-				final ObservationUnitRow observationUnitRow = this.getObservationUnitRow(searchDto, observationVariableName, row, standardVariableNameMap);
+				final ObservationUnitRow observationUnitRow =
+					this.getObservationUnitRow(searchDto, observationVariableName, row, standardVariableNameMap);
 				observationUnitRows.add(observationUnitRow);
 			}
 		}
@@ -1473,7 +1489,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		observationUnitRow.setSamplesCount((String) row.get(SUM_OF_SAMPLES));
 		observationUnitRow.setFileCount((Integer) row.get(FILE_COUNT));
 		final Object fileTermIds = row.get(FILE_TERM_IDS);
-		observationUnitRow.setFileVariableIds(fileTermIds != null ? ((String) fileTermIds).split(",") : new String[]{});
+		observationUnitRow.setFileVariableIds(fileTermIds != null ? ((String) fileTermIds).split(",") : new String[] {});
 
 		final String gidColumnName = standardVariableNameMap.get(TermId.GID.getId());
 		final Integer gid = (Integer) row.get(gidColumnName);
@@ -1481,7 +1497,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			observationUnitRow.setGid(gid);
 			observationVariables.put(gidColumnName, new ObservationUnitData(TermId.GID.getId(), gid.toString()));
 		}
-
 
 		final String designationColumnName = standardVariableNameMap.get(TermId.DESIG.getId());
 		final String designation = (String) row.get(designationColumnName);
@@ -1528,12 +1543,14 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (!CollectionUtils.isEmpty(searchDto.getPassportAndAttributes())) {
 			searchDto.getPassportAndAttributes().forEach(variable ->
-				observationVariables.put(variable.getName(), new ObservationUnitData(variable.getId(), (String) row.get(this.formatVariableAlias(variable.getId())))));
+				observationVariables.put(variable.getName(),
+					new ObservationUnitData(variable.getId(), (String) row.get(this.formatVariableAlias(variable.getId())))));
 		}
 
 		if (!CollectionUtils.isEmpty(searchDto.getNameTypes())) {
 			searchDto.getNameTypes().forEach(variable ->
-				observationVariables.put(variable.getName(), new ObservationUnitData((String) row.get(this.formatNameAlias(variable.getId())))));
+				observationVariables.put(variable.getName(),
+					new ObservationUnitData((String) row.get(this.formatNameAlias(variable.getId())))));
 		}
 
 		// Variables retrieved from Environment Details/Conditions are loaded in a separate Map object to ensure that no duplicate variables are
@@ -1569,7 +1586,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			final Map<String, String> finalColumnsQueryMap = new HashMap<>();
 			final Map<Integer, String> standardDatasetVariablesMap = this.getStandardDatasetVariablesMap(finalColumnsQueryMap);
 			final List<Map<String, Object>> resultList =
-				this.getObservationUnitsQueryResult(searchDto, observationVariableName, standardDatasetVariablesMap, finalColumnsQueryMap, pageable, true);
+				this.getObservationUnitsQueryResult(searchDto, observationVariableName, standardDatasetVariablesMap, finalColumnsQueryMap,
+					pageable, true);
 			return this.convertSelectionAndTraitColumnsValueType(resultList, searchDto.getDatasetVariables());
 
 		} catch (final Exception e) {
@@ -1610,7 +1628,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private boolean checkFilterContainsFactor(final ObservationUnitsSearchDTO.Filter filter, final int variableId) {
-		return !CollectionUtils.isEmpty(filter.getFilteredTextValues()) && filter.getFilteredTextValues().keySet().contains(String.valueOf(variableId));
+		return !CollectionUtils.isEmpty(filter.getFilteredTextValues()) && filter.getFilteredTextValues().keySet()
+			.contains(String.valueOf(variableId));
 	}
 
 	private String formatVariableAlias(final Object variableId) {
@@ -1669,7 +1688,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				query.setParameter("femaleGid", femaleGid); //
 			}
 
-			final List<Integer> gids =  query.list();
+			final List<Integer> gids = query.list();
 			if (!gids.isEmpty()) {
 				preFilteredGids.addAll(gids);
 			}
@@ -1700,7 +1719,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				query.setParameter("maleGid", maleGid); //
 			}
 
-			final List<Integer> gids =  query.list();
+			final List<Integer> gids = query.list();
 			if (!gids.isEmpty()) {
 				preFilteredGids.addAll(gids);
 			}
