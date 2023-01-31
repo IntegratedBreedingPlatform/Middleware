@@ -185,7 +185,8 @@
                                     NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = ntype) LIMIT 1;
 
                                 UPDATE names name SET name.ntype = (SELECT fldno FROM udflds where fcode='LNAME'
-                                    AND ftable = 'NAMES' AND ftype = 'NAME')
+                                    AND ftable = 'NAMES' AND ftype = 'NAME'),
+                                    name.nstat = 1
                                     WHERE name.nid = invalidNameId;
 
                                 UPDATE names_invalid_ntype_bkp SET changed_to_lname = 1
