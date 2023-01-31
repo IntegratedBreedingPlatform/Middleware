@@ -68,7 +68,8 @@ public class ExperimentModelSaver {
 		if (experimentId != 0) {
 			for (final Variable variable : values.getVariableList().getVariables()) {
 				final int val = this.daoFactory.getPhenotypeDAO()
-					.updatePhenotypesByExperimentIdAndObervableId(experimentId, variable.getVariableType().getId(), variable.getValue());
+					.updatePhenotypesByExperimentIdAndObervableId(experimentId, variable.getVariableType().getId(), variable.getValue(),
+						loggedInUserId);
 				if (val == 0) {
 					this.phenotypeSaver.save(experimentId, variable, loggedInUserId);
 				}

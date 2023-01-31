@@ -309,7 +309,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
 
-		this.phenotypeDao.updatePhenotypesByExperimentIdAndObervableId(experiment.getNdExperimentId(), phenotype.getObservableId(), "1000");
+		this.phenotypeDao.updatePhenotypesByExperimentIdAndObervableId(experiment.getNdExperimentId(), phenotype.getObservableId(), "1000",
+			1);
 		phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("1000", phenotype.getValue());
 	}

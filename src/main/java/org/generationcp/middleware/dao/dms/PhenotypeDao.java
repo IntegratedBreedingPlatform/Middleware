@@ -681,7 +681,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 	}
 
-	public int updatePhenotypesByExperimentIdAndObervableId(final Integer experimentId, final Integer cvTermId, final String value) {
+	public int updatePhenotypesByExperimentIdAndObervableId(final Integer experimentId, final Integer cvTermId, final String value,
+		final Integer userId) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
 			// of synch with
@@ -691,11 +692,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			// update the value of phenotypes
 			final String sql = "UPDATE phenotype pheno "
-				+ "SET pheno.value = '" + value + "'"
+				+ "SET pheno.value = '" + value + "',"
+				+ "    pheno.updated_date = CURRENT_TIMESTAMP, pheno.updated_by = :userId"
 				+ " WHERE pheno.nd_experiment_id = " + experimentId
 				+ " AND pheno.observable_id = " + cvTermId;
 
 			final SQLQuery statement = this.getSession().createSQLQuery(sql);
+			statement.setParameter("userId", userId);
 			return statement.executeUpdate();
 
 		} catch (final HibernateException e) {

@@ -776,7 +776,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		values.getVariableList().add(
 			DMSVariableTestDataInitializer.createVariable(1002, "1000", DataType.NUMERIC_VARIABLE.getId(), VariableType.TRAIT));
 
-		this.manager.updateExperimentValues(Arrays.asList(values), 1);
+		this.manager.updateExperimentValues(Arrays.asList(values), 1, 1);
 
 		updatedPhenotype =
 			this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);

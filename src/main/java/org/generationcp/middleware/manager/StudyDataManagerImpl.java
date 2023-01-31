@@ -472,7 +472,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	}
 
-	void updateExperimentValues(final List<ExperimentValues> experimentValues, final Integer projectId) {
+	void updateExperimentValues(final List<ExperimentValues> experimentValues, final Integer projectId, final Integer loggedInUserId) {
 		for (final ExperimentValues exp : experimentValues) {
 			if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
 				final ExperimentModel experimentModel =
@@ -480,7 +480,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				for (final Variable variable : exp.getVariableList().getVariables()) {
 					final int val =
 						this.daoFactory.getPhenotypeDAO().updatePhenotypesByExperimentIdAndObervableId(experimentModel.getNdExperimentId(),
-							variable.getVariableType().getId(), variable.getValue());
+							variable.getVariableType().getId(), variable.getValue(), loggedInUserId);
 					if (val == 0) {
 						this.getPhenotypeSaver().save(experimentModel.getNdExperimentId(), variable,
 							this.userService.getCurrentlyLoggedInUserId());
