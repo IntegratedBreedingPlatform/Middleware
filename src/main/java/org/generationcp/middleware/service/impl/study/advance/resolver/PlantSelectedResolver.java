@@ -59,7 +59,7 @@ public class PlantSelectedResolver {
 				// the variable works as a boolean. It return 1 if there is a valid value present, otherwise it returns zero.
 				final String plotVariateValue =
 					plotObservation.getVariableValueByVariableId(bulkingRequest.getPlotVariateId());
-				return this.isValidPlotVariateValue(plotVariateValue) ? 1 : 0;
+				return this.isValidPlotVariateValue(plotVariateValue) ? Integer.parseInt(plotVariateValue) : 0;
 			} else {
 				return 1;
 			}
