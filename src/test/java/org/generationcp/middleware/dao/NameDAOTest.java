@@ -52,13 +52,13 @@ public class NameDAOTest extends IntegrationTestBase {
 		NameDAOTest.nameDAO.save(notPreferredName);
 		final Name uncategorizedName =
 				this.createNameTestData(dateIntValue, germplasm.getGid(), 0, NameDAOTest.UNCATEGORIZED_NAME,
-						GermplasmNameType.LINE_NAME);
+						GermplasmNameType.CROSS_NAME);
 		NameDAOTest.nameDAO.save(uncategorizedName);
 		final Name preferredName =
 				this.createNameTestData(dateIntValue, germplasm.getGid(), 1, NameDAOTest.PREFERRED_NAME, GermplasmNameType.LINE_NAME);
 		NameDAOTest.nameDAO.save(preferredName);
 		final Name deletedName =
-				this.createNameTestData(dateIntValue, germplasm.getGid(), 9, NameDAOTest.DELETED_NAME, GermplasmNameType.LINE_NAME);
+				this.createNameTestData(dateIntValue, germplasm.getGid(), 9, NameDAOTest.DELETED_NAME, GermplasmNameType.ALTERNATE_CROSS_NAME);
 		NameDAOTest.nameDAO.save(deletedName);
 		final List<Name> names = NameDAOTest.nameDAO.getByGIDWithFilters(germplasm.getGid(), 0, null);
 		Assert.assertNotNull("The list should not be empty", names);
