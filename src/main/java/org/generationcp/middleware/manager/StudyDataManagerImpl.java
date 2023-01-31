@@ -298,9 +298,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final List<ExperimentValues> experimentValuesList) {
 
 		try {
+			final Integer userId = this.userService.getCurrentlyLoggedInUserId();
 			for (final ExperimentValues experimentValues : experimentValuesList) {
-				this.getExperimentModelSaver().addOrUpdateExperiment(crop, dataSetId, experimentType, experimentValues,
-					this.userService.getCurrentlyLoggedInUserId());
+				this.getExperimentModelSaver().addOrUpdateExperiment(crop, dataSetId, experimentType, experimentValues, userId);
 			}
 
 		} catch (final Exception e) {
