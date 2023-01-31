@@ -1515,7 +1515,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		this.preferredName = germplasm.getPreferredName();
 
 		// Add Preferred Id, nstat = 8 means the name is preferred Id
-		this.preferredId = GermplasmTestDataInitializer.createGermplasmName(this.germplasmGID, "Preferred Id of " + this.germplasmGID, 1);
+		this.preferredId = GermplasmTestDataInitializer.createGermplasmName(this.germplasmGID, "Preferred Id of " + this.germplasmGID, GermplasmNameType.LINE_NAME.getUserDefinedFieldID());
 		this.preferredId.setNstat(8);
 		this.nameDAO.save(this.preferredId);
 
