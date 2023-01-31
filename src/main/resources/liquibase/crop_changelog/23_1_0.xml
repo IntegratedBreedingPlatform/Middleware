@@ -257,6 +257,8 @@
                 DECLARE duplicateNameId INT;
                 DECLARE gid INT;
                 DECLARE nameTypeId INT;
+                DECLARE nameFtype VARCHAR(255);
+                DECLARE nameTable VARCHAR(255);
                 DECLARE nameTypeIndex INT DEFAULT 1;
                 DECLARE baseNameType VARCHAR(255);
                 DECLARE currentNameType VARCHAR(255);
@@ -267,8 +269,9 @@
 
                 -- retrieved entries will not be updated
                 DECLARE names_with_duplicates CURSOR FOR
-                    SELECT name.nid as `nameId`, name.gid as `gid`, name.ntype as `nameTypeId`
+                    SELECT name.nid as `nameId`, name.gid as `gid`, name.ntype as `nameTypeId`, nameType.ftype as `nameFtype`, nameType.ftable as `nameTable`
                     FROM names name
+                    INNER JOIN udflds nameType ON nameType.fldno = name.ntype
                     group by name.gid, name.ntype HAVING COUNT(*) > 1;
 
                 -- duplicate nametypes will be updated to remove duplicates
@@ -286,7 +289,7 @@
                 END;
 
                 OPEN names_with_duplicates;
-                names_loop: LOOP FETCH names_with_duplicates INTO  nameId, gid, nameTypeId;
+                names_loop: LOOP FETCH names_with_duplicates INTO  nameId, gid, nameTypeId, nameFtype, nameTable;
 
                 IF done THEN
                     CLOSE names_with_duplicates;
@@ -325,7 +328,7 @@
 
                         -- Check if nametype is existing
                         SELECT EXISTS(SELECT fcode FROM udflds WHERE fcode = currentNameType
-                            AND ftable = 'NAMES' AND ftype = 'NAME') INTO hasExistingNameType;
+                            AND ftable = nameTable AND ftype = nameFtype) INTO hasExistingNameType;
 
                         IF hasExistingNameType THEN
                             -- Check if existing nametype is used by germplasm
@@ -344,7 +347,7 @@
 
                     -- update the name's nametype
                     UPDATE names name
-                        SET name.ntype = (SELECT fldno FROM udflds WHERE fcode = currentNameType AND ftable = 'NAMES' AND ftype = 'NAME')
+                        SET name.ntype = (SELECT fldno FROM udflds WHERE fcode = currentNameType AND ftable = nameTable AND ftype = nameFtype)
                         WHERE name.nid = duplicateNameId;
                     END LOOP duplicate_names_loop;
                 END LOOP names_loop;
