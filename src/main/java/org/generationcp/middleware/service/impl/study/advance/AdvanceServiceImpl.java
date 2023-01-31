@@ -474,7 +474,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Map<Integer, MeasurementVariable> environmentVariablesByTermId) {
 
 		this.locationDataResolver.resolveEnvironmentLevelData(source, locationsByLocationId);
-		this.seasonDataResolver.resolveEnvironmentLevelData(source, plotDataVariablesByTermId);
+		this.seasonDataResolver.resolveEnvironmentLevelData(source, environmentVariablesByTermId);
 		this.selectionTraitDataResolver
 			.resolveEnvironmentLevelData(environmentDatasetId, selectionTraitRequest, source, environmentVariablesByTermId);
 		this.selectionTraitDataResolver
