@@ -85,7 +85,8 @@
                 <not>
                     <sqlCheck expectedResult="0">
                         SELECT COUNT(*) FROM names name
-                        WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype);
+                        LEFT JOIN udflds nametype ON nametype.fldno = name.ntype
+                        WHERE nametype.fldno IS NULL;
                     </sqlCheck>
                 </not>
                 <not>
@@ -96,8 +97,9 @@
         <comment> Create names_invalid_ntype_bkp table</comment>
         <sql dbms="mysql" splitStatements="true">
             CREATE TABLE names_invalid_ntype_bkp AS
-            SELECT * FROM names name
-            WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype);
+            SELECT name.* FROM names name
+            LEFT JOIN udflds nametype ON nametype.fldno = name.ntype
+            WHERE nametype.fldno IS NULL;
 
             ALTER TABLE names_invalid_ntype_bkp ADD changed_to_lname TINYINT(1) DEFAULT 0 NOT NULL;
         </sql>
