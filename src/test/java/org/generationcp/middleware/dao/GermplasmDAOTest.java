@@ -1812,8 +1812,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			this.daoFactory.getUserDefinedFieldDAO().saveOrUpdate(attributeField);
 		}
 
-		final Name name = GermplasmTestDataInitializer.createGermplasmName(germplasmGID, RandomStringUtils.randomAlphanumeric(50));
-		name.setTypeId(attributeField.getFldno());
+		final Name name = GermplasmTestDataInitializer.createGermplasmName(germplasmGID, RandomStringUtils.randomAlphanumeric(50), attributeField.getFldno());
 		name.setNstat(0); // TODO Review
 		this.daoFactory.getNameDao().save(name);
 

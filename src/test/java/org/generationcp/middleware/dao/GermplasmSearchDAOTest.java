@@ -1514,7 +1514,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		this.preferredName = germplasm.getPreferredName();
 
 		// Add Preferred Id, nstat = 8 means the name is preferred Id
-		this.preferredId = GermplasmTestDataInitializer.createGermplasmName(this.germplasmGID, "Preferred Id of " + this.germplasmGID);
+		this.preferredId = GermplasmTestDataInitializer.createGermplasmName(this.germplasmGID, "Preferred Id of " + this.germplasmGID, 1);
 		this.preferredId.setNstat(8);
 		this.nameDAO.save(this.preferredId);
 
@@ -1522,8 +1522,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		this.code1NameTypeValue = "Code1 Name of " + this.germplasmGID;
 		final UserDefinedField nameType = this.userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", DERIVATIVE_NAME_CODE);
 		final Name code1Name =
-			GermplasmTestDataInitializer.createGermplasmName(this.germplasmGID, this.code1NameTypeValue);
-		code1Name.setTypeId(nameType.getFldno());
+			GermplasmTestDataInitializer.createGermplasmName(this.germplasmGID, this.code1NameTypeValue, nameType.getFldno());
 		code1Name.setNstat(0);
 		this.nameDAO.save(code1Name);
 
@@ -1596,15 +1595,14 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 			// Add Preferred Id, nstat = 8 means the name is preferred Id
 			final Name tempPreferredId =
-				GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Preferred Id of " + tempGermplasmGid);
+				GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Preferred Id of " + tempGermplasmGid, 1);
 			tempPreferredId.setNstat(8);
 			this.nameDAO.save(tempPreferredId);
 
 			// Add name of CODE1 type
 			final UserDefinedField nameType = this.userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", DERIVATIVE_NAME_CODE);
 			final Name code1Name =
-				GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Code1 Name of " + tempGermplasmGid);
-			code1Name.setTypeId(nameType.getFldno());
+				GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Code1 Name of " + tempGermplasmGid, nameType.getFldno());
 			code1Name.setNstat(0);
 			this.nameDAO.save(code1Name);
 
