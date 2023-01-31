@@ -298,8 +298,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final List<ExperimentValues> experimentValuesList) {
 
 		try {
+			final Integer userId = this.userService.getCurrentlyLoggedInUserId();
 			for (final ExperimentValues experimentValues : experimentValuesList) {
-				this.getExperimentModelSaver().addOrUpdateExperiment(crop, dataSetId, experimentType, experimentValues);
+				this.getExperimentModelSaver().addOrUpdateExperiment(crop, dataSetId, experimentType, experimentValues, userId);
 			}
 
 		} catch (final Exception e) {
@@ -481,7 +482,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 						this.daoFactory.getPhenotypeDAO().updatePhenotypesByExperimentIdAndObervableId(experimentModel.getNdExperimentId(),
 							variable.getVariableType().getId(), variable.getValue());
 					if (val == 0) {
-						this.getPhenotypeSaver().save(experimentModel.getNdExperimentId(), variable);
+						this.getPhenotypeSaver().save(experimentModel.getNdExperimentId(), variable,
+							this.userService.getCurrentlyLoggedInUserId());
 					}
 				}
 			}

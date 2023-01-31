@@ -47,15 +47,21 @@ public class ExperimentModelSaver {
 
 	public ExperimentModel addExperiment(final CropType crop, final int projectId, final ExperimentType experimentType,
 		final Values values) {
+		return this.addExperiment(crop, projectId, experimentType, values, null);
+	}
+
+	public ExperimentModel addExperiment(final CropType crop, final int projectId, final ExperimentType experimentType,
+		final Values values, final Integer loggedInUserId) {
 		final ExperimentModel experimentModel = this.create(crop, projectId, values, experimentType);
 
 		this.daoFactory.getExperimentDao().save(experimentModel);
-		this.phenotypeSaver.savePhenotypes(experimentModel, values.getVariableList());
+		this.phenotypeSaver.savePhenotypes(experimentModel, values.getVariableList(), loggedInUserId);
 
 		return experimentModel;
 	}
 
-	public void addOrUpdateExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
+	public void addOrUpdateExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values,
+		final Integer loggedInUserId) {
 		final int experimentId =
 			this.daoFactory.getExperimentDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
 				values.getGermplasmId());
@@ -64,7 +70,7 @@ public class ExperimentModelSaver {
 				final int val = this.daoFactory.getPhenotypeDAO()
 					.updatePhenotypesByExperimentIdAndObervableId(experimentId, variable.getVariableType().getId(), variable.getValue());
 				if (val == 0) {
-					this.phenotypeSaver.save(experimentId, variable);
+					this.phenotypeSaver.save(experimentId, variable, loggedInUserId);
 				}
 			}
 		} else {
@@ -72,7 +78,7 @@ public class ExperimentModelSaver {
 			final ExperimentModel experimentModel = this.create(crop, projectId, values, type);
 
 			this.daoFactory.getExperimentDao().save(experimentModel);
-			this.phenotypeSaver.savePhenotypes(experimentModel, values.getVariableList());
+			this.phenotypeSaver.savePhenotypes(experimentModel, values.getVariableList(), loggedInUserId);
 		}
 	}
 
