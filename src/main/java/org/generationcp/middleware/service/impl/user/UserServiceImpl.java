@@ -387,6 +387,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public List<WorkbenchUser> getUsersByPersonFirstNameOrLastNameContains(final String value) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByPersonFirstNameOrLastNameContains(value);
+	}
+
+	@Override
 	public Integer getCurrentlyLoggedInUserId() {
 		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null) {

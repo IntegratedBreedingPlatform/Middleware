@@ -107,6 +107,7 @@ public class StockBuilder extends Builder {
 		return value;
 	}
 
+	@Deprecated
 	public long countStocks(int datasetId) throws MiddlewareQueryException {
 		return this.daoFactory.getExperimentDao().countStocksByDatasetId(datasetId);
 	}

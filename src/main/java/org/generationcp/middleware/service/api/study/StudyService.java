@@ -3,11 +3,15 @@ package org.generationcp.middleware.service.api.study;
 
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudyDetailsDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
+import org.generationcp.middleware.api.study.StudySearchResponse;
+import org.generationcp.middleware.domain.dms.FolderReference;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface StudyService {
 
@@ -34,8 +38,10 @@ public interface StudyService {
 
 	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
 
+	@Deprecated
 	List<StudyDTO> getFilteredStudies(String programUUID, StudySearchRequest studySearchRequest, Pageable pageable);
 
+	@Deprecated
 	long countFilteredStudies(String programUUID, StudySearchRequest studySearchRequest);
 
 	/**
@@ -54,5 +60,13 @@ public interface StudyService {
 	boolean isLocationUsedInStudy(Integer locationId);
 
 	void deleteNameTypeFromStudies(Integer nameTypeId);
+
+	List<StudySearchResponse> searchStudies(String programUUID, StudySearchRequest studySearchRequest, Pageable pageable);
+
+	long countSearchStudies(String programUUID, StudySearchRequest studySearchRequest);
+
+	Optional<FolderReference> getFolderByParentAndName(Integer parentId, String folderName, String programUUID);
+
+	StudyDetailsDTO getStudyDetails(final String programUUID, Integer studyId);
 
 }

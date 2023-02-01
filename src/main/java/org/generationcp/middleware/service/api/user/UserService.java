@@ -182,6 +182,7 @@ public interface UserService {
 
 	long countAllActiveUsers();
 
-	Integer getCurrentlyLoggedInUserId();
+	List<WorkbenchUser> getUsersByPersonFirstNameOrLastNameContains(String value);
 
+	Integer getCurrentlyLoggedInUserId();
 }

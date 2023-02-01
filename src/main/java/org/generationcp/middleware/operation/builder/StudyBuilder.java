@@ -80,6 +80,7 @@ public class StudyBuilder extends Builder {
 
 		study.setConditions(this.getStudyVariableBuilder().create(project, experiment, conditionVariableTypes));
 		study.setConstants(this.getStudyVariableBuilder().create(project, experiment, constantVariableTypes));
+		study.setFolder(project.isFolder());
 
 		return study;
 	}
