@@ -749,7 +749,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final List<ObservationUnitRow> list = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
 		if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
-			final Set<Integer> gids = list.stream().map(s -> s.getGid()).collect(Collectors.toSet());
+			final Set<Integer> gids = list.stream().filter(s -> s.getGid() != null).map(s -> s.getGid()).collect(Collectors.toSet());
 			this.addParentsFromPedigreeTable(gids, list);
 		}
 		return list;
@@ -1691,6 +1691,11 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<ObservationUnitRow> list) {
+
+		if (CollectionUtils.isEmpty(gids)) {
+			return;
+		}
+
 		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
 		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable =
 			this.pedigreeDataManager.generatePedigreeTable(gids, level, false);
