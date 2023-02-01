@@ -121,7 +121,7 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.GERMPLASM_ATTRIBUTE.getId(),
 		VariableType.GERMPLASM_PASSPORT.getId());
 
-	protected static final List<Integer> ENVIRONMENT_DATASET_VARIABLE_TYPES = Lists.newArrayList(
+	public static final List<Integer> ENVIRONMENT_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.ENVIRONMENT_DETAIL.getId(),
 		VariableType.ENVIRONMENT_CONDITION.getId());
 
@@ -209,7 +209,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Boolean draftMode) {
 		final DatasetDTO datasetDTO = this.getDataset(observationSetId);
 		// Analysis Summary Variables
-		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
+		if (DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId() == datasetDTO.getDatasetTypeId()) {
 			final List<MeasurementVariable> columns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
 				Collections.singletonList(VariableType.ANALYSIS_SUMMARY.getId()));
 			// Sort by TermId to group related summary statics variables together
@@ -219,12 +219,14 @@ public class DatasetServiceImpl implements DatasetService {
 			columns.get(0).setAlias(LOCATION_NAME);
 			this.addVariableColumn(studyId, columns, TermId.TRIAL_INSTANCE_FACTOR.getId(), 0);
 			return columns;
-		} else if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.MEANS_DATA.getId())) {
+		} else if (DatasetTypeEnum.MEANS_DATA.getId() == datasetDTO.getDatasetTypeId()) {
 			final List<MeasurementVariable> columns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
 				MEANS_VARIABLE_TYPES);
 			this.addVariableColumn(studyId, columns, TermId.OBS_UNIT_ID.getId(), 2);
 			this.addVariableColumn(studyId, columns, TermId.TRIAL_INSTANCE_FACTOR.getId(), 0);
 			return columns;
+		} else if (DatasetTypeEnum.SUMMARY_DATA.getId() == datasetDTO.getDatasetTypeId()) {
+			return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId, ENVIRONMENT_DATASET_VARIABLE_TYPES);
 		} else {
 			return this.getObservationsColumns(datasetDTO, studyId, draftMode);
 		}

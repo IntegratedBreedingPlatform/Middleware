@@ -25,7 +25,7 @@ public enum PermissionsEnum {
 	MANAGE_STUDIES,
 	MS_MANAGE_OBSERVATION_UNITS,
 	MS_MANAGE_FILES,
-	BROWSE_STUDIES,
+	VIEW_STUDIES,
 	HEAD_TO_HEAD_QUERY,
 	MULTI_TRAIT_QUERY,
 	IMPORT_DATASETS,
@@ -41,24 +41,6 @@ public enum PermissionsEnum {
 	GERMPLASM_LIST_LABEL_PRINTING,
 	DELETE_GERMPLASM_LIST,
 	LOCK_UNLOCK_GERMPLASM_LIST;
-
-	/**
-	 * Indicates a group of permissions that enables access to the manage studies module
-	 * Enabling some services that are immediately called on load, in order to avoid
-	 * ajax errors and allow navigation. In a future, a proper "manage studies view" permission
-	 * might be combined with individual permission to make this constant unnecessary.
-	 * <br/>
-	 * E.g get datasets tabs
-	 */
-	public static final String HAS_MANAGE_STUDIES_VIEW = " or hasAnyAuthority('ADMIN'"
-		+ ", 'STUDIES'"
-		+ ", 'MANAGE_STUDIES'"
-		+ ", 'MS_MANAGE_OBSERVATION_UNITS'"
-		+ ", 'MS_WITHDRAW_INVENTORY'"
-		+ ", 'MS_CREATE_PENDING_WITHDRAWALS'"
-		+ ", 'MS_CREATE_CONFIRMED_WITHDRAWALS'"
-		+ ", 'MS_MANAGE_FILES'"
-		+ ", 'MS_CREATE_LOTS')";
 
 	public static final String HAS_CREATE_LOTS_BATCH = " or hasAnyAuthority('ADMIN'"
 		+ ", 'STUDIES'"

@@ -412,4 +412,13 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return (long) criteria.uniqueResult();
 	}
 
+	public List<WorkbenchUser> getUsersByPersonFirstNameOrLastNameContains(final String value) {
+		final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class, "user");
+		criteria.createAlias("person", "person");
+		criteria.add(Restrictions.or(
+			Restrictions.like("person.firstName", "%" + value + "%"),
+			Restrictions.like("person.lastName", "%" + value + "%")));
+		return criteria.list();
+	}
+
 }
