@@ -20,7 +20,9 @@ import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -99,6 +101,12 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 	@Override
 	public MultiKeyMap getAnalysisMethodsOfTraits(final List<Integer> variableIds, final List<Integer> methodIds) {
 		return this.daoFactory.getCvTermRelationshipDao().retrieveAnalysisMethodsOfTraits(variableIds, methodIds);
+	}
+
+	@Override
+	public List<Variable> searchVariables(final VariableFilter filter) {
+		final Collection<Variable> results = this.daoFactory.getCvTermDao().getVariablesWithFilterById(filter).values();
+		return new ArrayList<>(results);
 	}
 
 	private Integer createAnalysisStandardVariable(final Variable traitVariable, final String alias, final CVTerm method,

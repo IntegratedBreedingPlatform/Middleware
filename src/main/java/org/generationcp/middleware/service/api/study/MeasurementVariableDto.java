@@ -6,11 +6,14 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 //FIXME This class should be removed and try to use MeasurementVariable instead
 public class MeasurementVariableDto {
 
-	private final Integer id;
+	private Integer id;
 
-	private final String name;
+	private String name;
 
 	private transient int hashCode;
+
+	public MeasurementVariableDto() {
+	}
 
 	public MeasurementVariableDto(final Integer id, final String name) {
 		this.id = id;

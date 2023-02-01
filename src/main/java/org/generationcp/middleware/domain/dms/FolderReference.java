@@ -25,27 +25,30 @@ public class FolderReference extends Reference {
 
 	private List<FolderReference> subFolders;
 
-	public FolderReference(Integer id, String name) {
+	public FolderReference() {
+	}
+
+	public FolderReference(final Integer id, final String name) {
 		super.setId(id);
 		super.setName(name);
 	}
 
-	public FolderReference(Integer id, String name, String description) {
+	public FolderReference(final Integer id, final String name, final String description) {
 		this(id, name);
 		super.setDescription(description);
 	}
 
-	public FolderReference(Integer id, String name, String description, String programUUID) {
+	public FolderReference(final Integer id, final String name, final String description, final String programUUID) {
 		this(id, name, description);
 		super.setProgramUUID(programUUID);
 	}
 
-	public FolderReference(Integer parentId, Integer id, String name, String description) {
+	public FolderReference(final Integer parentId, final Integer id, final String name, final String description) {
 		this(id, name, description);
 		this.parentFolderId = parentId;
 	}
 
-	public FolderReference(Integer parentId, Integer id, String name, String description, String programUUID) {
+	public FolderReference(final Integer parentId, final Integer id, final String name, final String description, final String programUUID) {
 		this(id, name, description, programUUID);
 		this.parentFolderId = parentId;
 	}
@@ -60,7 +63,7 @@ public class FolderReference extends Reference {
 	/**
 	 * @param parentFolderId the parentFolderId to set
 	 */
-	public void setParentFolderId(Integer parentFolderId) {
+	public void setParentFolderId(final Integer parentFolderId) {
 		this.parentFolderId = parentFolderId;
 	}
 
@@ -74,7 +77,7 @@ public class FolderReference extends Reference {
 	/**
 	 * @param subFolders the subFolders to set
 	 */
-	public void setSubFolders(List<FolderReference> subFolders) {
+	public void setSubFolders(final List<FolderReference> subFolders) {
 		this.subFolders = subFolders;
 	}
 
