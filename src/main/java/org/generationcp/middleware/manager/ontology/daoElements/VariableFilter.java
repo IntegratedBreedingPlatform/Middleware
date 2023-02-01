@@ -5,15 +5,18 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class VariableFilter {
+
 	private String programUuid;
 	private boolean fetchAll;
 	private boolean favoritesOnly;
 	private boolean showObsoletes = true;
+	private SqlTextFilter nameFilter;
 
 	private final List<Integer> methodIds = new ArrayList<>();
 	private final List<Integer> propertyIds = new ArrayList<>();
@@ -158,6 +161,14 @@ public class VariableFilter {
 
 	public void setShowObsoletes(final boolean showObsoletes) {
 		this.showObsoletes = showObsoletes;
+	}
+
+	public SqlTextFilter getNameFilter() {
+		return nameFilter;
+	}
+
+	public void setNameFilter(final SqlTextFilter nameFilter) {
+		this.nameFilter = nameFilter;
 	}
 
 	@Override

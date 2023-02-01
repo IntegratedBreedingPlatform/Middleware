@@ -1,27 +1,106 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	<changeSet author="cuenyad" id="v23.1.0-1">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="1">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'BROWSE_STUDIES' AND P.PARENT_ID = (SELECT PERMISSION_ID FROM PERMISSION WHERE NAME = 'STUDIES');
+             </sqlCheck>
+ 		</preConditions>
+         <comment>Browse Studies permission migration</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @browse_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'BROWSE_STUDIES');
+			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
-    <changeSet author="mderamos" id="v21.3.0-5">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT count(*) FROM permission where name = 'DELETE_SAMPLES'
-            </sqlCheck>
-        </preConditions>
-        <comment>Add Sample Lists "Delete Samples" permission</comment>
-        <sql dbms="mysql" splitStatements="true">
-            set @samples_lists_id = (select permission_id from permission where name = 'SAMPLES_LISTS');
+			# Set Manage Studies permission as a parent of Browse Studies permission
+			UPDATE permission SET parent_id = @mg_studies_permission_id WHERE name = 'BROWSE_STUDIES';
 
-            insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
-            values ('DELETE_SAMPLES', 'Delete Samples', @samples_lists_id, null);
+			# Migrate permission cases.
 
-            SET @delete_samples_id = (SELECT permission_id FROM permission where name = 'DELETE_SAMPLES');
+			# Delete BROWSE_STUDIES permission for each role_id that has MANAGE_STUDIES, and BROWSE_STUDIES
+			DELETE role_permission FROM role_permission
+				WHERE permission_id = @browse_studies_permission_id
+					AND role_id IN ( SELECT subB.rid FROM ( SELECT rp.role_id AS rid FROM role_permission rp
+                                                	WHERE rp.permission_id in (@browse_studies_permission_id , @mg_studies_permission_id)
+                                                		GROUP BY rp.role_id
+                                                		HAVING COUNT(DISTINCT rp.permission_id) = 2) AS subB );
 
-            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @delete_samples_id, '1');
-            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @delete_samples_id, '1');
-            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @delete_samples_id, '1');
-        </sql>
-    </changeSet>
+			# Insert BROWSE_STUDIES permission for each role_id that has any permission inherited from MANAGE_STUDIES and has not the BROWSE_STUDIES permission.
+			INSERT INTO role_permission(role_id, permission_id)
+			SELECT DISTINCT(rp.role_id), @browse_studies_permission_id FROM role_permission rp
+			WHERE rp.role_id IN (SELECT rp.role_id AS rid
+			                     FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+									 		WHERE p.name IN ('MS_MANAGE_OBSERVATION_UNITS','MS_CREATE_LOTS','MS_WITHDRAW_INVENTORY',
+												  'MS_CREATE_PENDING_WITHDRAWALS','MS_CREATE_CONFIRMED_WITHDRAWALS',
+												  'MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES')
+								 GROUP BY rp.role_id)
+				AND NOT EXISTS (SELECT 1 FROM role_permission r WHERE rp.role_id = r.role_id AND r.permission_id = @browse_studies_permission_id);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="lkovacic" id="v23.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(*) FROM workbench_tool WHERE name = 'study_manager_fieldbook_web' AND path = '/Fieldbook/TrialManager';
+			</sqlCheck>
+		</preConditions>
+		<comment>Change 'study-manager' tool paths</comment>
+		<sql dbms="mysql" splitStatements="true">
+		  UPDATE workbench_tool SET path = '/ibpworkbench/controller/jhipster#study-manager', version = '23.1' WHERE name = 'study_manager_fieldbook_web';
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.1.0-3">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="1">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'BROWSE_STUDIES';
+             </sqlCheck>
+ 		</preConditions>
+         <comment>Migrate Browse Studies as View Studies permission</comment>
+		<sql>
+		  UPDATE PERMISSION SET NAME = 'VIEW_STUDIES', DESCRIPTION = 'View Studies', WORKBENCH_SIDEBAR_CATEGORY_LINK_ID = (SELECT SIDEBAR_CATEGORY_LINK_ID FROM
+						WORKBENCH_SIDEBAR_CATEGORY_LINK WHERE TOOL_NAME='study_manager_fieldbook_web') WHERE NAME = 'BROWSE_STUDIES';
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.1.0-4">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="1">
+                 SELECT COUNT(*) > 0 FROM PERMISSION WHERE WORKBENCH_SIDEBAR_CATEGORY_LINK_ID IS NOT NULL
+                       AND NAME IN ('MS_MANAGE_OBSERVATION_UNITS','MS_CREATE_LOTS',
+                                    'MS_WITHDRAW_INVENTORY','MS_CREATE_PENDING_WITHDRAWALS','MS_CREATE_CONFIRMED_WITHDRAWALS',
+									'MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES');
+             </sqlCheck>
+ 		</preConditions>
+         <comment>Remove link from some permissions. Explicit VIEW permission are needed now to access Manage Studies</comment>
+		<sql>
+		  UPDATE PERMISSION SET WORKBENCH_SIDEBAR_CATEGORY_LINK_ID = NULL
+		    	WHERE NAME IN ('MS_MANAGE_OBSERVATION_UNITS','MS_CREATE_LOTS',
+						 	'MS_WITHDRAW_INVENTORY','MS_CREATE_PENDING_WITHDRAWALS','MS_CREATE_CONFIRMED_WITHDRAWALS',
+							'MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES');
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v23.1.0-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*) FROM permission where name = 'DELETE_SAMPLES'
+			</sqlCheck>
+		</preConditions>
+		<comment>Add Sample Lists "Delete Samples" permission</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @samples_lists_id = (select permission_id from permission where name = 'SAMPLES_LISTS');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('DELETE_SAMPLES', 'Delete Samples', @samples_lists_id, null);
+
+			SET @delete_samples_id = (SELECT permission_id FROM permission where name = 'DELETE_SAMPLES');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @delete_samples_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @delete_samples_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @delete_samples_id, '1');
+		</sql>
+	</changeSet>
 </databaseChangeLog>

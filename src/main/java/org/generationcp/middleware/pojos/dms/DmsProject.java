@@ -380,4 +380,8 @@ public class DmsProject implements Serializable {
 			 .orElse(0) + 1;
 	}
 
+	public boolean isFolder() {
+		return this.studyType == null;
+	}
+
 }

@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.study;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+@Deprecated
 @AutoProperty
 public class StudyDTO {
 
