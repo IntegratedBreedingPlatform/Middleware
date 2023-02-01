@@ -61,7 +61,7 @@ public class SeasonResolver extends CategoricalKeyCodeResolverBase {
 
 		if (possibleValues != null) {
 			for (final ValueReference valueReference : possibleValues) {
-				if (valueReference.getDescription().equals(description)) {
+				if (valueReference.getDescription().equals(description) || valueReference.getId().toString().equals(description)) {
 					return Optional.of(valueReference);
 				}
 			}
