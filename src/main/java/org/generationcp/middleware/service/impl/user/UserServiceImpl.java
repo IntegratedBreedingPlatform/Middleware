@@ -384,6 +384,11 @@ public class UserServiceImpl implements UserService {
 		return this.workbenchDaoFactory.getWorkbenchUserDAO().countAllActiveUsers();
 	}
 
+	@Override
+	public List<WorkbenchUser> getUsersByPersonFirstNameOrLastNameContains(final String value) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByPersonFirstNameOrLastNameContains(value);
+	}
+
 	private UserRole buildNewUserRole(final WorkbenchUser user, final UserRoleDto userRoleDto) {
 		final Role role = new Role(userRoleDto.getRole().getId());
 

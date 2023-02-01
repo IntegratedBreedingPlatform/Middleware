@@ -18,6 +18,7 @@ import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLeve
 import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
+import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.util.CommonQueryConstants;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -34,6 +35,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -47,6 +49,7 @@ import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.FormulaUtils;
+import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -79,6 +82,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -2010,6 +2014,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return count.intValue() == datasetIds.size();
 	}
 
+	@Deprecated
 	public List<StudyDTO> filterStudies(final String programUUID, final StudySearchRequest studySearchRequest, final Pageable pageable) {
 
 		final ProjectionList projectionList = Projections.projectionList();
@@ -2029,6 +2034,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return criteria.list();
 	}
 
+	@Deprecated
 	public long countFilteredStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
 		final Criteria criteria = this.getBaseFilteredStudiesCriteria(programUUID);
 		this.addStudySearchFilters(criteria, studySearchRequest);
@@ -2036,6 +2042,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return (Long) criteria.uniqueResult();
 	}
 
+	@Deprecated
 	private Criteria getBaseFilteredStudiesCriteria(final String programUUID) {
 		return this.getSession().createCriteria(this.getPersistentClass())
 			.createAlias("studyType", "studyType")
@@ -2046,9 +2053,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.setResultTransformer(Transformers.aliasToBean(StudyDTO.class));
 	}
 
+	@Deprecated
 	private void addStudySearchFilters(final Criteria criteria, final StudySearchRequest request) {
-		if (!StringUtils.isEmpty(request.getStudyName())) {
-			criteria.add(Restrictions.like("name", "%" + request.getStudyName() + "%"));
+		final SqlTextFilter studyNameFilter = request.getStudyNameFilter();
+		if (studyNameFilter != null && !studyNameFilter.isEmpty()) {
+			criteria.add(Restrictions.like("name", "%" + studyNameFilter.getValue() + "%"));
 		}
 	}
 
@@ -2070,4 +2079,66 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
+	public List<StudySearchResponse> searchStudies(final String programUUID, final StudySearchRequest request,
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds,
+		final List<Integer> userIds, final Pageable pageable) {
+		final SQLQueryBuilder queryBuilder =
+			StudySearchDAOQuery.getSelectQuery(request, categoricalValueReferenceIdsByVariablesIds, locationIds, userIds, pageable);
+		queryBuilder.setParameter("programUUID", programUUID);
+
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		queryBuilder.addParamsToQuery(query);
+
+		query.addScalar(StudySearchDAOQuery.STUDY_ID_ALIAS);
+		query.addScalar(StudySearchDAOQuery.STUDY_NAME_ALIAS);
+		query.addScalar(StudySearchDAOQuery.STUDY_DESCRIPTION_ALIAS);
+		query.addScalar(StudySearchDAOQuery.STUDY_TYPE_NAME_ALIAS);
+		query.addScalar(StudySearchDAOQuery.LOCKED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(StudySearchDAOQuery.STUDY_OWNER_ALIAS);
+		query.addScalar(StudySearchDAOQuery.START_DATE_ALIAS);
+		query.addScalar(StudySearchDAOQuery.END_DATE_ALIAS);
+		query.addScalar(StudySearchDAOQuery.UPDATE_DATE_ALIAS);
+		query.addScalar(StudySearchDAOQuery.PARENT_FOLDER_NAME_ALIAS);
+		query.addScalar(StudySearchDAOQuery.OBJECTIVE_ALIAS);
+		query.setResultTransformer(Transformers.aliasToBean(StudySearchResponse.class));
+
+		GenericDAO.addPaginationToSQLQuery(query, pageable);
+
+		return (List<StudySearchResponse>) query.list();
+	}
+
+	public long countSearchStudies(final String programUUID, final StudySearchRequest request,
+		final Map<Integer, List<Integer>> categoricalValueReferenceIdsByVariablesIds, final List<Integer> locationIds,
+		final List<Integer> userIds) {
+		final SQLQueryBuilder queryBuilder =
+			StudySearchDAOQuery.getCountQuery(request, categoricalValueReferenceIdsByVariablesIds, locationIds, userIds);
+		queryBuilder.setParameter("programUUID", programUUID);
+
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		queryBuilder.addParamsToQuery(query);
+
+		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
+	public Optional<FolderReference> getFolderByParentAndName(final Integer parentId, final String folderName, final String programUUID) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("parent.projectId", parentId));
+		criteria.add(Restrictions.eq("name", folderName));
+		criteria.add(Restrictions.eq("programUUID", programUUID));
+		criteria.add(Restrictions.isNull("studyType"));
+		criteria.add(Restrictions.eq("deleted", false));
+
+		final ProjectionList projectionList = Projections.projectionList();
+		projectionList.add(Projections.property("projectId"), "id");
+		projectionList.add(Projections.property("name"), "name");
+		projectionList.add(Projections.property("description"), "description");
+		projectionList.add(Projections.property("programUUID"), "programUUID");
+		projectionList.add(Projections.property("parent.projectId"), "parentFolderId");
+		criteria.setProjection(projectionList);
+		criteria.setResultTransformer(Transformers.aliasToBean(FolderReference.class));
+
+		return Optional.ofNullable((FolderReference) criteria.uniqueResult());
+	}
+
 }

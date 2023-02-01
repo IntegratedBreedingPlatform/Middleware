@@ -79,7 +79,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final String ENVIRONMENT_COLUMN_NAME_SUFFIX = "_ENVIRONMENT";
 	private static final List<String> EXP_PROPS_VAR_TYPES =
 		Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.name(), VariableType.TREATMENT_FACTOR.name());
-	private static final String GERMPLASM_JOIN = " INNER JOIN germplsm g on g.gid = s.dbxref_id ";
+	private static final String GERMPLASM_JOIN = " LEFT JOIN germplsm g on g.gid = s.dbxref_id ";
 	private static final String NAME_JOIN = " INNER JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1 ";
 	private static final String IMMEDIATE_SOURCE_NAME_JOIN =
 		" LEFT JOIN names immediateSource  ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";

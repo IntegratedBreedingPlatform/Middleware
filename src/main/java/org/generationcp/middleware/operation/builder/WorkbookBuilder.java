@@ -70,6 +70,7 @@ public class WorkbookBuilder extends Builder {
 		TermId.STUDY_DATA_TYPE.getId(), TermId.DATASET_DATA_TYPE.getId(), TermId.GERMPLASM_LIST_DATA_TYPE.getId(),
 		TermId.BREEDING_METHOD_DATA_TYPE.getId());
 
+	// TODO: move to common constants
 	public static final List<Integer> EXPERIMENTAL_DESIGN_VARIABLES = Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
 		TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId(), TermId.BLOCKS_PER_REPLICATE.getId(),
 		TermId.PERCENTAGE_OF_REPLICATION.getId(),
@@ -306,6 +307,7 @@ public class WorkbookBuilder extends Builder {
 		return projPropRoleMap;
 	}
 
+	@Deprecated
 	public Workbook createStudyVariableSettings(final int id) {
 		final Workbook workbook = new Workbook();
 		final Study study = this.getStudyBuilder().createStudy(id);
