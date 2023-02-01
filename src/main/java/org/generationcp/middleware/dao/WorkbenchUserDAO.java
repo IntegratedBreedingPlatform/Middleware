@@ -1,6 +1,7 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.user.UserSearchRequest;
 import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersQuery;
 import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
 import org.generationcp.middleware.dao.workbench.ProgramMembersQuery;
@@ -412,4 +413,66 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return (long) criteria.uniqueResult();
 	}
 
+	public long countSearchUsers(final UserSearchRequest userSearchRequest) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
+
+			criteria.createAlias("person", "person", CriteriaSpecification.LEFT_JOIN);
+			criteria.createAlias("person.crops", "crops", CriteriaSpecification.LEFT_JOIN);
+
+			if (userSearchRequest.getStatus() != null) {
+				criteria.add(Restrictions.eq("status", userSearchRequest.getStatus()));
+
+			}
+
+			if (userSearchRequest.getRoleId() != null) {
+				criteria.createAlias("roles", "roles");
+				criteria.add(Restrictions.eq("roles.id", userSearchRequest.getRoleId()));
+			}
+
+			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+			return criteria.list().size();
+
+		} catch (final HibernateException e) {
+			final String message = "Error with countSearchUsers() query from User: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<UserDto> searchUsers(final UserSearchRequest userSearchRequest, final Pageable pageable) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
+
+			criteria.createAlias("person", "person", CriteriaSpecification.LEFT_JOIN);
+			criteria.createAlias("person.crops", "crops", CriteriaSpecification.LEFT_JOIN);
+
+			if (userSearchRequest.getStatus() != null) {
+				criteria.add(Restrictions.eq("status", userSearchRequest.getStatus()));
+
+			}
+
+			if (userSearchRequest.getRoleId() != null) {
+				criteria.createAlias("roles", "roles");
+				criteria.add(Restrictions.eq("roles.id", userSearchRequest.getRoleId()));
+			}
+
+			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+			addPagination(criteria, pageable);
+			addOrder(criteria, pageable);
+			final List<WorkbenchUser> workbenchUsers = criteria.list();
+
+			final List<UserDto> users = new ArrayList<>();
+			if (workbenchUsers != null) {
+				for (final WorkbenchUser workbenchUser : workbenchUsers) {
+					users.add(new UserDto(workbenchUser));
+				}
+			}
+			return users;
+		} catch (final HibernateException e) {
+			final String message = "Error with searchUsers() query from User: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }
