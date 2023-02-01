@@ -55,7 +55,7 @@ public class PlantSelectedResolver {
 		final AdvanceStudyRequest.BulkingRequest bulkingRequest = request.getBulkingRequest();
 		if (isBulkMethod) {
 			if (bulkingRequest != null && (bulkingRequest.getAllPlotsSelected() == null || !bulkingRequest.getAllPlotsSelected())) {
-				// User has selected a variable that defines the number of lines selected from each plot. 
+				// User has selected a variable that defines the number of lines selected from each plot.
 				final String plotVariateValue =
 					plotObservation.getVariableValueByVariableId(bulkingRequest.getPlotVariateId());
 				return this.isValidPlotVariateValue(plotVariateValue) ? Integer.parseInt(plotVariateValue) : 0;
