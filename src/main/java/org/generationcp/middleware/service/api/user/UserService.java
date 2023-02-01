@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.user;
 
+import org.generationcp.middleware.api.user.UserSearchRequest;
 import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
 import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
@@ -182,4 +183,7 @@ public interface UserService {
 
 	long countAllActiveUsers();
 
+	long countSearchUsers(UserSearchRequest userSearchRequest);
+
+	List<UserDto> searchUsers(UserSearchRequest userSearchRequest, Pageable pageable);
 }
