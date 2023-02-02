@@ -204,7 +204,7 @@
 
             -- create temporary table for names with valid ntype and no valid preferred name
             CREATE TEMPORARY TABLE valid_names AS
-             n.gid AS gid, min(n.nid) AS nid FROM names n
+             SELECT n.gid AS gid, min(n.nid) AS nid FROM names n
                 INNER JOIN invalid_name_types inv ON inv.gid = n.gid
                 INNER JOIN udflds nametype ON nametype.fldno = n.ntype
                 WHERE inv.total_count > inv.invalid_count AND inv.invalid_preferred_count = inv.total_preferred_count;
