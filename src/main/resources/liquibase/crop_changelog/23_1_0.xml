@@ -253,7 +253,7 @@
 
             -- Delete the invalid names
             DELETE n FROM names n
-                INNER JOIN invalid_names bkp ON bkp.nid = n.nid
+                INNER JOIN names_invalid_ntype_bkp bkp ON bkp.nid = n.nid
                 WHERE bkp.changed_to_lname = 0;
 
             -- drop the temporary tables
