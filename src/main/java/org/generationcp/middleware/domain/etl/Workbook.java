@@ -188,36 +188,6 @@ public class Workbook {
 		return this.measurementDatasetVariables;
 	}
 
-	public List<MeasurementRow> arrangeMeasurementObservation(final List<MeasurementRow> observations) {
-
-		if (this.columnOrderedLists != null && !this.columnOrderedLists.isEmpty()) {
-			for (final MeasurementRow row : observations) {
-				// we need to arrange each data list
-				final List<MeasurementData> measureDataList = row.getDataList();
-				final List<MeasurementData> newMeasureData = new ArrayList<>();
-				for (final Integer termId : this.columnOrderedLists) {
-					int index;
-					boolean isFound = false;
-					for (index = 0; index < measureDataList.size(); index++) {
-						final MeasurementData measurementData = measureDataList.get(index);
-						if (termId == measurementData.getMeasurementVariable().getTermId()) {
-							newMeasureData.add(measurementData);
-							isFound = true;
-							break;
-						}
-					}
-					if (isFound) {
-						// we remove it from the list
-						measureDataList.remove(index);
-					}
-				}
-				newMeasureData.addAll(measureDataList);
-				row.setDataList(newMeasureData);
-			}
-		}
-		return observations;
-	}
-
 	public List<MeasurementVariable> arrangeMeasurementVariables(final List<MeasurementVariable> varList) {
 		final List<MeasurementVariable> tempVarList = new ArrayList<>();
 		final List<MeasurementVariable> copyVarList = new ArrayList<>();

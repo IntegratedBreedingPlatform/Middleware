@@ -109,15 +109,6 @@ public interface FieldbookService {
 			CrossExpansionProperties crossExpansionProperties);
 
 	/**
-	 * Gets the dataset references.
-	 *
-	 * @param studyId
-	 *            the study id of the datasets
-	 * @return the dataset references belonging to the given study id
-	 */
-	List<DatasetReference> getDatasetReferences(int studyId);
-
-	/**
 	 * Gets the study.
 	 *
 	 * @param studyId
@@ -456,15 +447,6 @@ public interface FieldbookService {
 			PhenotypicType role, String programUUID);
 
 	void setTreatmentFactorValues(List<TreatmentVariable> treatmentFactors, int measurementDatasetID);
-
-	/**
-	 * Return the measurement rows of a given dataset.
-	 *
-	 * @param datasetId
-	 *            the dataset id
-	 * @return the complete dataset
-	 */
-	Workbook getCompleteDataset(int datasetId);
 
 	/**
 	 * Gets the germplasm name types.

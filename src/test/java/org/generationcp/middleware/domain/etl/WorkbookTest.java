@@ -75,33 +75,6 @@ public class WorkbookTest {
 	}
 
 	@Test
-	public void testArrangeMeasurementObservation() {
-		final Workbook workbook = new Workbook();
-		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
-		final MeasurementRow row = new MeasurementRow();
-		final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
-		dataList.add(WorkbookTestDataInitializer.createMeasurementData(10));
-		dataList.add(WorkbookTestDataInitializer.createMeasurementData(20));
-		dataList.add(WorkbookTestDataInitializer.createMeasurementData(30));
-		row.setDataList(dataList);
-		observations.add(row);
-
-		final List<Integer> columnOrderedList = new ArrayList<Integer>();
-		columnOrderedList.add(new Integer(20));
-		columnOrderedList.add(new Integer(30));
-		columnOrderedList.add(new Integer(10));
-		workbook.setColumnOrderedLists(columnOrderedList);
-		final List<MeasurementRow> newObservations = workbook.arrangeMeasurementObservation(observations);
-
-		assertEquals("1st element should have term id 20", 20, newObservations.get(0).getDataList().get(0).getMeasurementVariable()
-				.getTermId());
-		assertEquals("1st element should have term id 30", 30, newObservations.get(0).getDataList().get(1).getMeasurementVariable()
-				.getTermId());
-		assertEquals("1st element should have term id 10", 10, newObservations.get(0).getDataList().get(2).getMeasurementVariable()
-				.getTermId());
-	}
-
-	@Test
 	public void testGetTrialObservationByTrialInstanceNo() {
 		final int noOfInstances = 2;
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, StudyTypeDto.getTrialDto());
