@@ -36,6 +36,7 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
@@ -2132,6 +2133,16 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			paramBuilder.setParameterList("variableTypeNames", variableFilter.getVariableTypes().stream().map(VariableType::getName).collect(
 				Collectors.toList()));
 		}
+
+		final SqlTextFilter nameFilter = variableFilter.getNameFilter();
+		if (nameFilter != null && !nameFilter.isEmpty()) {
+			final String value = nameFilter.getValue();
+			final SqlTextFilter.Type type = nameFilter.getType();
+			final String operator = GenericDAO.getOperator(type);
+			paramBuilder.append(" AND variable.name ").append(operator).append(":variableName");
+			paramBuilder.setParameter("variableName", GenericDAO.getParameter(type, value));
+		}
+
 		// TODO Complete
 	}
 }

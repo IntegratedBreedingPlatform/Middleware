@@ -37,6 +37,7 @@ import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.generationcp.middleware.service.api.study.StudyTreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
@@ -73,6 +74,7 @@ public interface StudyDataManager {
 	 */
 	Integer getStudyIdByNameAndProgramUUID(String studyName, String programUUID);
 
+	// TODO: move to StudyTreeService
 	/**
 	 * Returns list of root or top-level folders and studies.
 	 *
@@ -81,6 +83,7 @@ public interface StudyDataManager {
 	 */
 	List<Reference> getRootFolders(String programUUID);
 
+	// TODO: move to StudyTreeService
 	/**
 	 * Returns list of children of a folder given its ID.
 	 *
@@ -328,6 +331,8 @@ public interface StudyDataManager {
 	boolean isStudy(int id);
 
 	/**
+	 * Deprecated. Please, instead use @{link {@link StudyTreeService#createStudyTreeFolder(int, String, String)}}}
+	 *
 	 * Adds a subFolder. Accepts a parentFolderId, the name and description of the folder. It will throw an exception if the parentFolderId
 	 * is not existing in the local database and the name of the folder is not unique
 	 *
@@ -338,6 +343,7 @@ public interface StudyDataManager {
 	 * @param objective
 	 * @return ID of the folder created
 	 */
+	@Deprecated
 	int addSubFolder(int parentFolderId, String name, String description, String programUUID, String objective);
 
 	/**
@@ -348,6 +354,7 @@ public interface StudyDataManager {
 	 * @param programUUID   the program UUID
 	 * @return true, if successful
 	 */
+	@Deprecated
 	boolean renameSubFolder(String newFolderName, int folderId, String programUUID);
 
 	/**
