@@ -57,6 +57,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.study.StudyEntryGermplasmDescriptorColumns;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -174,6 +175,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private RoleService roleService;
+
+	@Autowired
+	private UserService userService;
 
 	@Autowired
 	private DerivedVariableService derivedVariableService;
@@ -589,8 +593,13 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public ObservationDto createObservation(final ObservationDto observation) {
 		final Phenotype phenotype = new Phenotype();
+		final Integer loggedInUser = this.userService.getCurrentlyLoggedInUserId();
+
 		phenotype.setCreatedDate(new Date());
 		phenotype.setUpdatedDate(new Date());
+		phenotype.setCreatedBy(loggedInUser);
+		phenotype.setUpdatedBy(loggedInUser);
+
 		phenotype.setcValue(observation.getCategoricalValueId());
 		final Integer variableId = observation.getVariableId();
 		phenotype.setObservableId(variableId);
@@ -607,13 +616,17 @@ public class DatasetServiceImpl implements DatasetService {
 		// Also update the status of phenotypes of the same observation unit for variables using it as input variable
 		this.updateDependentPhenotypesAsOutOfSync(observableId, Sets.newHashSet(observationUnitId));
 
+		this.alignObservationValues(observation, savedRecord);
+
+		return observation;
+	}
+
+	private void alignObservationValues(final ObservationDto observation, final Phenotype savedRecord) {
 		observation.setObservationId(savedRecord.getPhenotypeId());
 		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 		observation.setCreatedDate(dateFormat.format(savedRecord.getCreatedDate()));
 		observation.setUpdatedDate(dateFormat.format(savedRecord.getUpdatedDate()));
 		observation.setStatus(savedRecord.getValueStatus() != null ? savedRecord.getValueStatus().getName() : null);
-
-		return observation;
 	}
 
 	@Override
@@ -633,6 +646,8 @@ public class DatasetServiceImpl implements DatasetService {
 			this.resolveObservationStatus(observableId, phenotype);
 		}
 
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setUpdatedBy(this.userService.getCurrentlyLoggedInUserId());
 		phenotypeDao.update(phenotype);
 
 		if (!observationDto.isDraftMode()) {
@@ -672,7 +687,8 @@ public class DatasetServiceImpl implements DatasetService {
 			.isEmpty(observationUnitIds)) {
 			final List<Integer> targetVariableIds = Lists.transform(formulaList, formula -> formula.getTargetCVTerm().getCvTermId());
 			this.daoFactory.getPhenotypeDAO()
-				.updateOutOfSyncPhenotypes(observationUnitIds, Sets.newHashSet(targetVariableIds));
+				.updateOutOfSyncPhenotypes(observationUnitIds, Sets.newHashSet(targetVariableIds),
+					this.userService.getCurrentlyLoggedInUserId());
 		}
 
 	}
@@ -680,7 +696,8 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void updateOutOfSyncPhenotypes(final Set<Integer> targetVariableIds, final Set<Integer> observationUnitIds) {
 		if (!targetVariableIds.isEmpty()) {
-			this.daoFactory.getPhenotypeDAO().updateOutOfSyncPhenotypes(observationUnitIds, targetVariableIds);
+			this.daoFactory.getPhenotypeDAO().updateOutOfSyncPhenotypes(observationUnitIds, targetVariableIds,
+				this.userService.getCurrentlyLoggedInUserId());
 		}
 
 	}
@@ -1517,7 +1534,8 @@ public class DatasetServiceImpl implements DatasetService {
 		final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variableId);
 		final boolean isDerivedTrait = formula != null;
 		final Integer cvalueId = Integer.valueOf(0).equals(newCValueId) ? null : newCValueId;
-		this.daoFactory.getPhenotypeDAO().updatePhenotypes(phenotypeIds, cvalueId, newValue, draftMode, isDerivedTrait);
+		final Integer loggedInUser = this.userService.getCurrentlyLoggedInUserId();
+		this.daoFactory.getPhenotypeDAO().updatePhenotypes(phenotypeIds, cvalueId, newValue, draftMode, isDerivedTrait, loggedInUser);
 	}
 
 	void addStudyVariablesToUnitRows(final List<ObservationUnitRow> observationUnits, final List<MeasurementVariable> studyVariables) {
@@ -1620,6 +1638,8 @@ public class DatasetServiceImpl implements DatasetService {
 			phenotype.setChanged(true); // to set out-of-sync
 		}
 
+		phenotype.setUpdatedDate(new Date());
+		phenotype.setUpdatedBy(this.userService.getCurrentlyLoggedInUserId());
 		phenotypeDao.update(phenotype);
 		return phenotype;
 	}
@@ -1628,6 +1648,10 @@ public class DatasetServiceImpl implements DatasetService {
 		final Phenotype phenotype = new Phenotype();
 		phenotype.setCreatedDate(new Date());
 		phenotype.setUpdatedDate(new Date());
+
+		final Integer loggedInUser = this.userService.getCurrentlyLoggedInUserId();
+		phenotype.setCreatedBy(loggedInUser);
+		phenotype.setUpdatedBy(loggedInUser);
 
 		final Integer variableId = observation.getVariableId();
 		phenotype.setObservableId(variableId);
@@ -1648,11 +1672,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
-		observation.setObservationId(savedRecord.getPhenotypeId());
-		final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-		observation.setCreatedDate(dateFormat.format(savedRecord.getCreatedDate()));
-		observation.setUpdatedDate(dateFormat.format(savedRecord.getUpdatedDate()));
-		observation.setStatus(savedRecord.getValueStatus() != null ? savedRecord.getValueStatus().getName() : null);
+		this.alignObservationValues(observation, savedRecord);
 
 		return phenotype;
 	}

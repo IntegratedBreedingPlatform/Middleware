@@ -191,11 +191,12 @@ public class PhenotypeDaoTest {
 		final int projectId = 1;
 		final int cvTermId = 5157;
 		final String value = "1.5678";
-		this.dao.updatePhenotypesByExperimentIdAndObervableId(projectId, cvTermId, value);
+		this.dao.updatePhenotypesByExperimentIdAndObervableId(projectId, cvTermId, value, 1);
 
 		Mockito.verify(this.session).flush();
 		final String updateSql = "UPDATE phenotype pheno "
-			+ "SET pheno.value = '" + value + "'"
+			+ "SET pheno.value = '" + value + "',"
+			+ "    pheno.updated_date = CURRENT_TIMESTAMP, pheno.updated_by = :userId"
 			+ " WHERE pheno.nd_experiment_id = " + projectId
 			+ " AND pheno.observable_id = " + cvTermId;
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);

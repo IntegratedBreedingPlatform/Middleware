@@ -47,6 +47,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorTest;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -107,6 +108,7 @@ public class DatasetServiceImplTest {
 	public static final String PLOT_NO = "PLOT_NO";
 	public static final String REP_NO = "REP_NO";
 	private static final String EXPECTED = "5";
+	private static final Integer USER_ID = 1;
 
 	@Mock
 	private DaoFactory daoFactory;
@@ -131,6 +133,9 @@ public class DatasetServiceImplTest {
 
 	@Mock
 	private StudyService studyService;
+
+	@Mock
+	private UserService userService;
 
 	@Mock
 	private ProjectPropertyDao projectPropertyDao;
@@ -204,8 +209,9 @@ public class DatasetServiceImplTest {
 		targetVariableIds.add(1001);
 		final Set<Integer> observationUnitIds = new HashSet<>();
 		observationUnitIds.add(201);
+		when(this.userService.getCurrentlyLoggedInUserId()).thenReturn(USER_ID);
 		this.datasetService.updateOutOfSyncPhenotypes(targetVariableIds, observationUnitIds);
-		verify(this.phenotypeDao).updateOutOfSyncPhenotypes(observationUnitIds, targetVariableIds);
+		verify(this.phenotypeDao).updateOutOfSyncPhenotypes(observationUnitIds, targetVariableIds, USER_ID);
 	}
 
 	@Test
@@ -326,6 +332,7 @@ public class DatasetServiceImplTest {
 		when(this.formulaDao.getByTargetVariableId(observableId)).thenReturn(new Formula());
 		when(this.phenotypeDao.getById(observationId)).thenReturn(existingPhenotype);
 
+		when(this.userService.getCurrentlyLoggedInUserId()).thenReturn(USER_ID);
 		final ObservationDto savedObservation =
 			this.datasetService.updatePhenotype(observationId, observationDto);
 
@@ -365,7 +372,7 @@ public class DatasetServiceImplTest {
 		Mockito.doReturn(new ArrayList<Formula>()).when(this.formulaDao).getByInputId(variableId);
 		this.datasetService.updateDependentPhenotypesAsOutOfSync(variableId, Sets.newHashSet(observationUnitId));
 		Mockito.verify(this.phenotypeDao, Mockito.never())
-			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet(), ArgumentMatchers.eq(USER_ID));
 	}
 
 	@Test
@@ -382,10 +389,11 @@ public class DatasetServiceImplTest {
 		term2.setCvTermId(ran.nextInt());
 		formula2.setTargetCVTerm(term2);
 		Mockito.doReturn(Arrays.asList(formula1, formula2)).when(this.formulaDao).getByInputId(variableId);
+		Mockito.doReturn(USER_ID).when(this.userService).getCurrentlyLoggedInUserId();
 		this.datasetService.updateDependentPhenotypesAsOutOfSync(variableId, Sets.newHashSet(observationUnitId));
 		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(
 			new HashSet<Integer>(Arrays.asList(observationUnitId)),
-			new HashSet<Integer>(Arrays.asList(term1.getCvTermId(), term2.getCvTermId())));
+			new HashSet<Integer>(Arrays.asList(term1.getCvTermId(), term2.getCvTermId())), USER_ID);
 	}
 
 	@Test
@@ -626,6 +634,7 @@ public class DatasetServiceImplTest {
 		term2.setCvTermId(random.nextInt());
 		formula2.setTargetCVTerm(term2);
 		Mockito.doReturn(Arrays.asList(formula1, formula2)).when(this.formulaDao).getByInputId(observableId);
+		Mockito.doReturn(USER_ID).when(this.userService).getCurrentlyLoggedInUserId();
 
 		this.datasetService.deletePhenotype(phenotypeId);
 		final ArgumentCaptor<ExperimentModel> experimentModelArgumentCaptor = ArgumentCaptor.forClass(ExperimentModel.class);
@@ -633,7 +642,7 @@ public class DatasetServiceImplTest {
 		Assert.assertTrue(CollectionUtils.isEmpty(experimentModelArgumentCaptor.getValue().getPhenotypes()));
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotype);
 		Mockito.verify(this.phenotypeDao).updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(observationUnitId)),
-			new HashSet<>(Arrays.asList(term1.getCvTermId(), term2.getCvTermId())));
+			new HashSet<>(Arrays.asList(term1.getCvTermId(), term2.getCvTermId())), USER_ID);
 
 	}
 
@@ -709,6 +718,7 @@ public class DatasetServiceImplTest {
 		final Integer targetVariableId = new Random().nextInt();
 		this.setupTargetVariable(studyId, variableId, targetVariableId);
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.userService.getCurrentlyLoggedInUserId()).thenReturn(USER_ID);
 		this.datasetService.acceptAllDatasetDraftData(studyId, datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
@@ -718,7 +728,8 @@ public class DatasetServiceImplTest {
 		Assert.assertNull(phenotypeArgumentCaptorValue.getDraftValue());
 		Assert.assertTrue(phenotype.isChanged());
 		Mockito.verify(this.phenotypeDao)
-			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(observationUnitId)), new HashSet<>(Arrays.asList(targetVariableId)));
+			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(observationUnitId)), new HashSet<>(Arrays.asList(targetVariableId)),
+				USER_ID);
 
 	}
 
@@ -774,7 +785,7 @@ public class DatasetServiceImplTest {
 
 		Assert.assertNull(phenotypeArgumentCaptorValue.getDraftValue());
 		Mockito.verify(this.phenotypeDao, Mockito.never())
-			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet(), ArgumentMatchers.eq(USER_ID));
 	}
 
 	@Test
@@ -815,7 +826,7 @@ public class DatasetServiceImplTest {
 		Assert.assertTrue(phenotype.isChanged());
 		// Variable is not used as input to formula hence nothing to update as out of sync
 		Mockito.verify(this.phenotypeDao, Mockito.never())
-			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet(), ArgumentMatchers.eq(USER_ID));
 
 	}
 
@@ -853,7 +864,7 @@ public class DatasetServiceImplTest {
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
 		Mockito.verify(this.phenotypeDao, Mockito.never())
-			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet(), ArgumentMatchers.eq(USER_ID));
 	}
 
 	@Test
@@ -891,7 +902,7 @@ public class DatasetServiceImplTest {
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
 		Mockito.verify(this.phenotypeDao, Mockito.never())
-			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet());
+			.updateOutOfSyncPhenotypes(ArgumentMatchers.anySet(), ArgumentMatchers.anySet(), ArgumentMatchers.eq(USER_ID));
 	}
 
 	@Test
@@ -928,13 +939,15 @@ public class DatasetServiceImplTest {
 		this.setupTargetVariable(studyId, variableId, targetVariableId);
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.daoFactory.getPhenotypeDAO().getById(phenotypeId)).thenReturn(phenotype);
+		Mockito.when(this.userService.getCurrentlyLoggedInUserId()).thenReturn(USER_ID);
 		this.datasetService.acceptAllDatasetDraftData(studyId, datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
 		Assert.assertTrue(phenotype.isChanged());
 		Mockito.verify(this.phenotypeDao)
-			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(observationUnitId)), new HashSet<>(Arrays.asList(targetVariableId)));
+			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(observationUnitId)), new HashSet<>(Arrays.asList(targetVariableId)),
+				USER_ID);
 	}
 
 	@Test
@@ -979,6 +992,7 @@ public class DatasetServiceImplTest {
 		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
 		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES))
 			.thenReturn(variables);
+		Mockito.when(this.userService.getCurrentlyLoggedInUserId()).thenReturn(USER_ID);
 		this.datasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
@@ -987,7 +1001,8 @@ public class DatasetServiceImplTest {
 		Assert.assertEquals(EXPECTED, phenotypeArgumentCaptorValue.getValue());
 		Assert.assertNull(phenotypeArgumentCaptorValue.getDraftValue());
 		Mockito.verify(this.phenotypeDao)
-			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(observationUnitId)), new HashSet<>(Arrays.asList(targetVariableId)));
+			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(observationUnitId)), new HashSet<>(Arrays.asList(targetVariableId)),
+				USER_ID);
 	}
 
 	@Test
