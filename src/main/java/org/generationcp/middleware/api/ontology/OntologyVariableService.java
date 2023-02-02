@@ -22,4 +22,7 @@ public interface OntologyVariableService {
 	Multimap<Integer, VariableType> getVariableTypesOfVariables(List<Integer> variableIds);
 
 	MultiKeyMap getAnalysisMethodsOfTraits(List<Integer> variableIds, List<Integer> methodIds);
+
+	List<Variable> searchVariables(VariableFilter filter);
+
 }

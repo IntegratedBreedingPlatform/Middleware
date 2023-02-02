@@ -589,6 +589,7 @@ public class ExperimentBuilder extends Builder {
 		return variable;
 	}
 
+	@Deprecated
 	public boolean hasFieldLayout(final int datasetId) {
 		return this.daoFactory.getExperimentDao().hasFieldLayout(datasetId);
 	}

@@ -183,6 +183,9 @@ public interface UserService {
 
 	long countAllActiveUsers();
 
+	List<WorkbenchUser> getUsersByPersonFirstNameOrLastNameContains(String value);
+
+	Integer getCurrentlyLoggedInUserId();
 	long countSearchUsers(UserSearchRequest userSearchRequest);
 
 	List<UserDto> searchUsers(UserSearchRequest userSearchRequest, Pageable pageable);

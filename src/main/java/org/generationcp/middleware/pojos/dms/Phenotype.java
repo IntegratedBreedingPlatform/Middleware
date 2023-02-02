@@ -116,6 +116,12 @@ public class Phenotype implements Serializable {
 	@Column(name = "updated_date", updatable = false, insertable = false)
 	private Date updatedDate;
 
+	@Column(name = "created_by")
+	private Integer createdBy;
+
+	@Column(name = "updated_by")
+	private Integer updatedBy;
+
 	@Column(name = "draft_value")
 	private String draftValue;
 
@@ -280,6 +286,22 @@ public class Phenotype implements Serializable {
 		this.externalReferences = externalReferences;
 	}
 
+	public Integer getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(final Integer createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Integer getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(final Integer updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o)
@@ -337,6 +359,8 @@ public class Phenotype implements Serializable {
 			.append("draftCValueId", this.draftCValueId)
 			.append("changed", this.changed)
 			.append("isDerivedTrait", this.isDerivedTrait)
+			.append("createdBy", this.createdBy)
+			.append("updatedBy", this.updatedBy)
 			.toString();
 	}
 }
