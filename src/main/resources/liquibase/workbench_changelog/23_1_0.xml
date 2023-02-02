@@ -83,4 +83,17 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="v23.1.0-5">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="1">
+                 SELECT COUNT(*) FROM workbench_tool WHERE name = 'study_browser';
+             </sqlCheck>
+ 		</preConditions>
+         <comment>Delete browse studies tool</comment>
+		<sql>
+		  	DELETE FROM workbench_sidebar_category_link WHERE tool_name = 'study_browser';
+			DELETE FROM workbench_tool WHERE name = 'study_browser';
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
