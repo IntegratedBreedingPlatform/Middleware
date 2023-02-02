@@ -42,6 +42,7 @@ import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.PoiUtil;
 import org.generationcp.middleware.util.StringUtil;
@@ -99,6 +100,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Resource
 	private LocationService locationService;
+
+	@Resource
+	private UserService userService;
 
 	private DaoFactory daoFactory;
 
@@ -1147,7 +1151,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final TimerWatch timerWatch = new TimerWatch("saveProjectData (grand total)");
 
 		try {
-
+			workbook.setUserId(this.userService.getCurrentlyLoggedInUserId());
 			this.workbookSaver.saveProjectData(workbook, programUUID, crop);
 
 		} catch (final Exception e) {

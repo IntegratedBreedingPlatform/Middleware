@@ -26,6 +26,8 @@ import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -387,6 +389,15 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<WorkbenchUser> getUsersByPersonFirstNameOrLastNameContains(final String value) {
 		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByPersonFirstNameOrLastNameContains(value);
+	}
+
+	@Override
+	public Integer getCurrentlyLoggedInUserId() {
+		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null) {
+			return 0;
+		}
+		return this.getUserByUsername(authentication.getName()).getUserid();
 	}
 
 	private UserRole buildNewUserRole(final WorkbenchUser user, final UserRoleDto userRoleDto) {
