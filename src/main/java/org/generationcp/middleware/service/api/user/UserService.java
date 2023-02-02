@@ -184,4 +184,5 @@ public interface UserService {
 
 	List<WorkbenchUser> getUsersByPersonFirstNameOrLastNameContains(String value);
 
+	Integer getCurrentlyLoggedInUserId();
 }

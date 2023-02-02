@@ -77,7 +77,7 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 		//Save the experiment
-		this.experimentModelSaver.addOrUpdateExperiment(new CropType(), 1, ExperimentType.STUDY_INFORMATION, values);
+		this.experimentModelSaver.addOrUpdateExperiment(new CropType(), 1, ExperimentType.STUDY_INFORMATION, values, 1);
 		this.sessionProvder.getSession().flush();
 		final List<String> treatmentFactorValues = this.experimentPropertyDao.getTreatmentFactorValues(1001, 1002, 1);
 		assertEquals(1, treatmentFactorValues.size());
