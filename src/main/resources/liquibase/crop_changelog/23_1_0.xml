@@ -107,289 +107,149 @@
 
     <changeSet author="mderamos" id="v23.1.0-3">
         <preConditions onFail="MARK_RAN">
-            <and>
-                <sqlCheck expectedResult="0">
-                    SELECT COUNT(*) FROM information_schema.routines
-                    WHERE routine_schema = DATABASE() AND specific_name = 'fix_names_with_invalid_name_type';
-                </sqlCheck>
-                <tableExists tableName="names_invalid_ntype_bkp"/>
-            </and>
+            <tableExists tableName="names_invalid_ntype_bkp"/>
         </preConditions>
         <comment>
-            Create stored procedure to "fix" names with invalid name types. Names with invalid nametype will be deleted
+            "Fix" names with invalid name types. Names with invalid nametype will be deleted
             except for cases where all nametypes for a germplasm is invalid. The deleted name entries will be added
             to a names backup table.
         </comment>
         <sql dbms="mysql" splitStatements="false">
-            <![CDATA[
-            CREATE PROCEDURE `fix_names_with_invalid_name_type`()
-            BEGIN
-                DECLARE gid INT;
-                DECLARE isPreferredNameInvalid INT DEFAULT false;
-                DECLARE hasValidNames INT DEFAULT false;
-                DECLARE hasValidPreferredName INT DEFAULT false;
-                DECLARE hasInvalidPreferredName INT DEFAULT false;
-                DECLARE done INT DEFAULT false;
-                DECLARE validNameId INT;
-                DECLARE invalidNameId INT;
+            CREATE TEMPORARY TABLE invalid_name_types AS
+            SELECT d.gid,
+                (SELECT count(*) FROM names_invalid_ntype_bkp WHERE gid = d.gid) AS invalid_count,
+                (SELECT count(*) FROM names WHERE gid = d.gid) AS total_count,
+                (SELECT count(*) FROM names_invalid_ntype_bkp WHERE gid = d.gid AND nstat = 1) AS invalid_preferred_count,
+                (SELECT count(*) FROM names WHERE gid = d.gid AND nstat = 1) AS total_preferred_count
+                FROM (SELECT distinct(gid) AS gid FROM names_invalid_ntype_bkp) d;
 
+            -- create temporary table for names with valid ntype and no valid preferred name
+            CREATE TEMPORARY TABLE valid_names AS
+            SELECT min(n.nid) AS nid, n.gid AS gid FROM names n
+                INNER JOIN invalid_name_types inv ON inv.gid = n.gid
+                INNER JOIN udflds nametype ON nametype.fldno = n.ntype
+                WHERE inv.invalid_count < inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count;
 
-                -- retrieve germplasm with invalid preferred name types
-                DECLARE gid_with_invalid_name_types CURSOR FOR
-                    SELECT DISTINCT(name.gid) as `gid` FROM names_invalid_ntype_bkp name;
+            -- Set the nstat of valid name to 1
+            UPDATE names n
+                INNER JOIN valid_names valid ON valid.nid = n.nid
+                SET n.nstat = 1;
 
-                DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+            -- create temporary table for names with no valid ntype and invalid preferred name
+            CREATE TEMPORARY TABLE invalid_preferred_names AS
+            SELECT min(n.nid) AS nid, n.gid AS gid FROM names n
+                INNER JOIN invalid_name_types inv ON inv.gid = n.gid
+                WHERE inv.invalid_count = inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count
+                AND n.nstat = 1 AND inv.total_preferred_count > 0;
 
-                DECLARE EXIT HANDLER FOR SQLEXCEPTION
-                BEGIN
-                    ROLLBACK;
-                    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error in fixing names with invalid nameTypes.';
-                END;
+            -- Set the ntype of the invalid preferred name to LNAME
+            UPDATE names n
+                INNER JOIN invalid_preferred_names inv ON inv.nid = n.nid
+                SET n.ntype = (SELECT nametype.fldno FROM udflds nametype
+                WHERE nametype.ftable = "NAMES" AND nametype.ftype = "NAME" AND nametype.fcode="LNAME");
 
-                OPEN gid_with_invalid_name_types;
-                gid_with_invalid_name_types_loop: LOOP FETCH gid_with_invalid_name_types INTO gid;
-                    IF done THEN
-                        CLOSE gid_with_invalid_name_types;
-                        LEAVE gid_with_invalid_name_types_loop;
-                    END IF;
+            --  Update the changed to lname value in back up table
+            UPDATE names_invalid_ntype_bkp bkp
+                INNER JOIN invalid_preferred_names inv ON inv.nid = bkp.nid
+                SET changed_to_lname = 1;
 
-                    SELECT EXISTS (SELECT name.gid FROM names name
-                        WHERE name.gid = gid AND name.nstat = 1 AND
-                        EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype)) INTO hasValidPreferredName;
+            -- create temporary table for names with no valid ntype and no preferred name
+            CREATE TEMPORARY TABLE invalid_names AS
+                SELECT min(n.nid) AS nid, n.gid AS gid FROM names n
+                INNER JOIN invalid_name_types inv ON inv.gid = n.gid
+                WHERE inv.invalid_count = inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count
+                AND inv.total_preferred_count = 0;
 
-                    IF !hasValidPreferredName THEN
-                        SELECT EXISTS (SELECT name.gid FROM names name
-                            WHERE name.gid = gid AND
-                            EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype)) INTO hasValidNames;
+            -- Set the ntype of the invalid name to LNAME
+            UPDATE names n
+                INNER JOIN invalid_names inv ON inv.nid = n.nid
+                SET n.ntype = (SELECT nametype.fldno FROM udflds nametype
+                WHERE nametype.ftable = "NAMES" AND nametype.ftype = "NAME" AND nametype.fcode="LNAME"),
+                n.nstat = 1;
 
-                        -- check if there are valid names for the germplasm and set one of them as the preferred
-                        IF hasValidNames THEN
-                            SELECT name.nid INTO validNameId FROM names name WHERE name.gid = gid AND
-                                EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = ntype) LIMIT 1;
+            --  Update the changed to lname value in back up table
+            UPDATE names_invalid_ntype_bkp bkp
+                INNER JOIN invalid_preferred_names inv ON inv.nid = bkp.nid
+                SET changed_to_lname = 1;
 
-                            UPDATE names SET nstat = 1 WHERE nid = validNameId;
-                        ELSE
-                            SELECT EXISTS (SELECT name.gid FROM names name
-                                WHERE name.gid = gid AND name.nstat = 1 AND
-                                NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = name.ntype)) INTO hasInvalidPreferredName;
+            -- Delete the invalid names
+            DELETE n FROM names n
+                INNER JOIN invalid_names bkp ON bkp.nid = n.nid
+                WHERE bkp.changed_to_lname = 0;
 
-                            IF hasInvalidPreferredName THEN
-                                -- if all names have invalid nametype, change the nametype of the preferred to LNAME
-                                UPDATE names name SET name.ntype = (SELECT fldno FROM udflds where fcode='LNAME'
-                                    AND ftable = 'NAMES' AND ftype = 'NAME')
-                                    WHERE name.gid = gid AND name.nstat = 1;
-
-                                UPDATE names_invalid_ntype_bkp SET changed_to_lname = 1
-                                    WHERE gid = gid AND nstat = 1;
-                            ELSE
-                                -- if there is no preferred name with invalid ntype, select the first name and change the ntype to 'lname'
-                                SELECT name.nid INTO invalidNameId FROM names name WHERE name.gid = gid AND
-                                    NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = ntype) LIMIT 1;
-
-                                UPDATE names name SET name.ntype = (SELECT fldno FROM udflds where fcode='LNAME'
-                                    AND ftable = 'NAMES' AND ftype = 'NAME'),
-                                    name.nstat = 1
-                                    WHERE name.nid = invalidNameId;
-
-                                UPDATE names_invalid_ntype_bkp SET changed_to_lname = 1
-                                    WHERE nid = invalidNameId;
-                            END IF;
-                        END IF;
-                    END IF;
-                END LOOP gid_with_invalid_name_types_loop;
-
-                DELETE FROM names WHERE NOT EXISTS (SELECT * from udflds nametype WHERE nametype.fldno = ntype);
-                COMMIT;
-            END;
-            ]]>
+            -- drop the temporary tables
+            DROP TABLE invalid_name_types;
+            DROP TABLE valid_names;
+            DROP TABLE invalid_preferred_names;
+            DROP TABLE invalid_names;
         </sql>
     </changeSet>
 
     <changeSet author="mderamos" id="v23.1.0-4">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">
-                SELECT COUNT(*) FROM information_schema.routines
-                WHERE routine_schema = DATABASE() AND specific_name = 'fix_names_with_invalid_name_type';
-            </sqlCheck>
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM
+                    (SELECT COUNT(*) FROM names GROUP BY gid, ntype HAVING COUNT(*) > 1) nametype_duplicates;
+                </sqlCheck>
+            </not>
         </preConditions>
         <comment>
-            Call stored procedure fix_names_with_invalid_name_type for "fixing" names with invalid nametypes.
+            Enforcing unique germplasm's name nametypes and creating new nametypes for the duplicates.
         </comment>
-        <sql dbms="mysql" splitStatements="true">
-            CALL fix_names_with_invalid_name_type();
+        <sql dbms="mysql" splitStatements="false">
+            -- Create a temporary table for names with duplicates
+            CREATE temporary TABLE name_with_duplicates
+                SELECT name.nid, name.gid, name.ntype, nameType.fcode, nameType.ftype, nameType.ftable
+                    FROM names name
+                    INNER JOIN udflds nameType ON nameType.fldno = name.ntype
+                    GROUP  BY name.gid, name.ntype
+                    HAVING Count(*) > 1;
+
+            -- Assign duplicate name with incremented number
+            CREATE temporary TABLE name_with_incremented_number
+            SELECT nid, gid, ntype,
+                CASE WHEN nameincrement = 0
+                    THEN fcode
+                ELSE Concat(fcode, '_', nameincrement)
+                    END AS fcode_with_increment
+                FROM (SELECT names.nid, names.gid, names.ntype, name_with_duplicates.fcode, name_with_duplicates.ftype,
+                    CASE WHEN @previousgid = names.gid  AND @previousntype = names.ntype THEN
+                        @runninggroup := @runninggroup + 1
+                    ELSE @runninggroup := 0
+                        end AS nameIncrement, @previousgid := names.gid, @previousntype := names.ntype
+                    FROM names
+                    INNER JOIN name_with_duplicates ON names.gid = name_with_duplicates.gid AND names.ntype = name_with_duplicates.ntype,
+                    (SELECT @runninggroup := 0) AS b,
+                    (SELECT @previousgid := 0) AS prevGid,
+                    (SELECT @previousntype := 0) AS previousNType
+                    ORDER  BY names.gid, names.ntype, name_with_duplicates.ftype) T;
+
+            -- Create new udflds records for names with incremented number that don't yet exist
+            INSERT INTO udflds (ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid)
+            SELECT udflds.ftable, udflds.ftype, toCreate.fcode_with_increment, udflds.fname, udflds.ffmt, udflds.fdesc, udflds.lfldno,
+                udflds.fuid, udflds.fdate, udflds.scaleid
+                FROM (SELECT DISTINCT name_with_incremented_number.ntype, name_with_incremented_number.fcode_with_increment
+                    FROM name_with_incremented_number
+                    WHERE NOT EXISTS (SELECT 1
+                        FROM udflds
+                        WHERE name_with_incremented_number.fcode_with_increment = udflds.fcode
+                            AND udflds.ftable = 'NAMES')) toCreate
+                        INNER JOIN udflds ON toCreate.ntype = udflds.fldno;
+
+            -- Update the duplicated names with newly created names
+            UPDATE names n
+                INNER JOIN name_with_incremented_number ON n.nid = name_with_incremented_number.nid
+                LEFT JOIN udflds ON name_with_incremented_number.fcode_with_increment = udflds.fcode AND udflds.ftable = 'NAMES'
+                SET n.ntype = udflds.fldno;
+
+            -- Cleanup temporary table
+            DROP TABLE name_with_duplicates;
+            DROP TABLE name_with_incremented_number;
         </sql>
     </changeSet>
 
     <changeSet author="mderamos" id="v23.1.0-5">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">
-                SELECT COUNT(*) FROM information_schema.routines
-                WHERE routine_schema = DATABASE() AND specific_name = 'fix_names_with_invalid_name_type';
-            </sqlCheck>
-        </preConditions>
-        <comment>Drop procedure fix_names_with_invalid_name_type</comment>
-        <sql dbms="mysql" splitStatements="false">
-            DROP PROCEDURE fix_names_with_invalid_name_type;
-        </sql>
-    </changeSet>
-
-    <changeSet author="mderamos" id="v23.1.0-6">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <sqlCheck expectedResult="0">
-                    SELECT COUNT(*) FROM information_schema.routines
-                    WHERE routine_schema = DATABASE() AND specific_name = 'enforce_unique_germplasm_name_type';
-                </sqlCheck>
-                <not>
-                    <sqlCheck expectedResult="0">
-                        SELECT COUNT(*) FROM
-                        (SELECT COUNT(*) FROM names GROUP BY gid, ntype HAVING COUNT(*) > 1) nametype_duplicates;
-                    </sqlCheck>
-                </not>
-            </and>
-        </preConditions>
-        <comment>
-            Create stored procedure enforce_unique_germplasm_name_type for enforcing unique germplasm's name nametypes
-            and creating new nametypes for the duplicates.
-        </comment>
-        <sql dbms="mysql" splitStatements="false">
-			<![CDATA[
-            CREATE PROCEDURE `enforce_unique_germplasm_name_type`()
-            BEGIN
-                DECLARE nameId INT;
-                DECLARE duplicateNameId INT;
-                DECLARE gid INT;
-                DECLARE nameTypeId INT;
-                DECLARE nameFtype VARCHAR(255);
-                DECLARE nameTable VARCHAR(255);
-                DECLARE nameTypeIndex INT DEFAULT 1;
-                DECLARE baseNameType VARCHAR(255);
-                DECLARE currentNameType VARCHAR(255);
-
-                DECLARE hasExistingNameType INT DEFAULT FALSE;
-                DECLARE isNameTypeUsedByGermplasm INT DEFAULT TRUE;
-                DECLARE done INT DEFAULT FALSE;
-
-                -- retrieved entries will not be updated
-                DECLARE names_with_duplicates CURSOR FOR
-                    SELECT name.nid as `nameId`, name.gid as `gid`, name.ntype as `nameTypeId`, nameType.ftype as `nameFtype`, nameType.ftable as `nameTable`
-                    FROM names name
-                    INNER JOIN udflds nameType ON nameType.fldno = name.ntype
-                    group by name.gid, name.ntype HAVING COUNT(*) > 1;
-
-                -- duplicate nametypes will be updated to remove duplicates
-                DECLARE duplicate_names CURSOR FOR
-                    SELECT name.nid as `duplicateNameId`
-                    FROM names name
-                    WHERE name.gid = gid AND name.ntype = nameTypeId and name.nid != nameId;
-
-                DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-                DECLARE EXIT HANDLER FOR SQLEXCEPTION
-                BEGIN
-                    ROLLBACK;
-                    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error in enforcing unique germplasm name type.';
-                END;
-
-                OPEN names_with_duplicates;
-                names_loop: LOOP FETCH names_with_duplicates INTO  nameId, gid, nameTypeId, nameFtype, nameTable;
-
-                IF done THEN
-                    CLOSE names_with_duplicates;
-                    LEAVE names_loop;
-                END IF;
-
-                -- reset index to 0
-                SET nameTypeIndex = 0;
-
-                SELECT nameType.fcode INTO baseNameType
-                    FROM udflds nameType
-                    WHERE nameType.fldno = nameTypeId;
-
-                IF baseNameType REGEXP '_[0-9]$' THEN
-                    -- Get the base name, ie: LNAME_1 will return LNAME
-                    SELECT LEFT(nameType.fcode, CHAR_LENGTH(nameType.fcode) - LOCATE('_', REVERSE(nameType.fcode))) INTO baseNameType
-                        from udflds nameType
-                        WHERE nameType.fldno = nameTypeId;
-                END IF;
-
-                OPEN duplicate_names;
-                duplicate_names_loop: LOOP FETCH duplicate_names INTO duplicateNameId;
-                    IF done THEN
-                        -- set done to false for Outer loop's Continue handling
-                        SET done = false;
-                        CLOSE duplicate_names;
-                        LEAVE duplicate_names_loop;
-                    END IF;
-
-                    -- set initially to TRUE to enter loop
-                    SET isNameTypeUsedByGermplasm = TRUE;
-
-                    WHILE isNameTypeUsedByGermplasm DO
-                        SELECT (nameTypeIndex + 1) INTO nameTypeIndex;
-                        SELECT CONCAT(baseNameType, CONCAT('_', nameTypeIndex)) INTO currentNameType;
-
-                        -- Check if nametype is existing
-                        SELECT EXISTS(SELECT fcode FROM udflds WHERE fcode = currentNameType
-                            AND ftable = nameTable AND ftype = nameFtype) INTO hasExistingNameType;
-
-                        IF hasExistingNameType THEN
-                            -- Check if existing nametype is used by germplasm
-                            SELECT EXISTS(SELECT name.ntype  FROM names name
-                                INNER JOIN udflds nametype ON name.ntype = nametype.fldno
-                                WHERE nametype.fcode = currentNameType AND name.gid = gid) INTO isNameTypeUsedByGermplasm;
-                        ELSE
-                            -- Create a new nametype if not yet existing in Database
-                            INSERT INTO udflds(ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid)
-                                SELECT nametype.ftable, nametype.ftype, currentNameType, nametype.fname, nametype.ffmt,
-                                nametype.fdesc, nametype.lfldno, nametype.fuid, nametype.fdate, nametype.scaleid
-                                FROM udflds nametype WHERE nametype.fldno = nameTypeId;
-                            SET isNameTypeUsedByGermplasm = FALSE;
-                        END IF;
-                    END WHILE;
-
-                    -- update the name's nametype
-                    UPDATE names name
-                        SET name.ntype = (SELECT fldno FROM udflds WHERE fcode = currentNameType AND ftable = nameTable AND ftype = nameFtype)
-                        WHERE name.nid = duplicateNameId;
-                    END LOOP duplicate_names_loop;
-                END LOOP names_loop;
-                COMMIT;
-            END;
-            ]]>
-		</sql>
-    </changeSet>
-
-    <changeSet author="mderamos" id="v23.1.0-7">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">
-                SELECT COUNT(*) FROM information_schema.routines
-                WHERE routine_schema = DATABASE() AND specific_name = 'enforce_unique_germplasm_name_type';
-            </sqlCheck>
-        </preConditions>
-        <comment>
-            Call stored procedure enforce_unique_germplasm_name_type for enforcing unique germplasm's name nametypes
-            and creating new nametypes for the duplicates.
-        </comment>
-        <sql dbms="mysql" splitStatements="true">
-            CALL enforce_unique_germplasm_name_type();
-        </sql>
-    </changeSet>
-
-    <changeSet author="mderamos" id="v23.1.0-8">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">
-                SELECT COUNT(*) FROM information_schema.routines
-                WHERE routine_schema = DATABASE() AND specific_name = 'enforce_unique_germplasm_name_type';
-            </sqlCheck>
-        </preConditions>
-        <comment>Drop procedure enforce_unique_germplasm_name_type</comment>
-        <sql dbms="mysql" splitStatements="false">
-            DROP PROCEDURE enforce_unique_germplasm_name_type;
-        </sql>
-    </changeSet>
-
-    <changeSet author="mderamos" id="v23.1.0-9">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
