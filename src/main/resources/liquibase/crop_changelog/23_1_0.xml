@@ -194,18 +194,20 @@
         <sql dbms="mysql" splitStatements="true">
             CREATE TEMPORARY TABLE invalid_name_types AS
             SELECT d.gid,
-                   (SELECT count(*) FROM names_invalid_ntype_bkp WHERE gid = d.gid) AS invalid_count,
-                   (SELECT count(*) FROM names WHERE gid = d.gid) AS total_count,
-                   (SELECT count(*) FROM names_invalid_ntype_bkp WHERE gid = d.gid AND nstat = 1) AS invalid_preferred_count,
-                   (SELECT count(*) FROM names WHERE gid = d.gid AND nstat = 1) AS total_preferred_count
-            FROM (SELECT distinct(gid) AS gid FROM names_invalid_ntype_bkp) d;
+                (SELECT count(nid) FROM names n where n.gid = d.gid
+                    AND NOT EXISTS(SELECT nametype.fldno FROM udflds nametype WHERE n.ntype = nametype.fldno)) AS invalid_count,
+                (SELECT count(nid) FROM names where gid = d.gid) as total_count,
+                (SELECT count(nid) FROM names n where n.gid = d.gid
+                    AND NOT EXISTS(SELECT nametype.fldno FROM udflds nametype WHERE n.ntype = nametype.fldno) and nstat = 1) AS invalid_preferred_count,
+                (SELECT count(nid) FROM names where gid = d.gid and nstat = 1) AS total_preferred_count
+                FROM (SELECT distinct(gid) AS gid FROM names_invalid_ntype_bkp) d;
 
             -- create temporary table for names with valid ntype and no valid preferred name
             CREATE TEMPORARY TABLE valid_names AS
-            SELECT n.gid AS gid, min(n.nid) AS nid FROM names n
-                                                            INNER JOIN invalid_name_types inv ON inv.gid = n.gid
-                                                            INNER JOIN udflds nametype ON nametype.fldno = n.ntype
-            WHERE inv.total_count > inv.invalid_count AND inv.invalid_preferred_count = inv.total_preferred_count;
+             n.gid AS gid, min(n.nid) AS nid FROM names n
+                INNER JOIN invalid_name_types inv ON inv.gid = n.gid
+                INNER JOIN udflds nametype ON nametype.fldno = n.ntype
+                WHERE inv.total_count > inv.invalid_count AND inv.invalid_preferred_count = inv.total_preferred_count;
 
             -- Set the nstat of valid name to 1
             UPDATE names n
@@ -215,15 +217,15 @@
             -- create temporary table for names with no valid ntype and invalid preferred name
             CREATE TEMPORARY TABLE invalid_preferred_names AS
             SELECT n.gid AS gid, min(n.nid) AS nid FROM names n
-                                                            INNER JOIN invalid_name_types inv ON inv.gid = n.gid
-            WHERE inv.invalid_count = inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count
-              AND n.nstat = 1 AND inv.total_preferred_count > 0;
+                INNER JOIN invalid_name_types inv ON inv.gid = n.gid
+                WHERE inv.invalid_count = inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count
+                AND n.nstat = 1 AND inv.total_preferred_count > 0;
 
             -- Set the ntype of the invalid preferred name to LNAME
             UPDATE names n
                 INNER JOIN invalid_preferred_names inv ON inv.nid = n.nid
                 SET n.ntype = (SELECT nametype.fldno FROM udflds nametype
-                    WHERE nametype.ftable = "NAMES" AND nametype.ftype = "NAME" AND nametype.fcode="LNAME");
+                WHERE nametype.ftable = "NAMES" AND nametype.ftype = "NAME" AND nametype.fcode="LNAME");
 
             --  Update the changed to lname value in back up table
             UPDATE names_invalid_ntype_bkp bkp
@@ -232,10 +234,10 @@
 
             -- create temporary table for names with no valid ntype and no preferred name
             CREATE TEMPORARY TABLE invalid_names AS
-            SELECT n.gid AS gid, min(n.nid) AS nid FROM names n
-                                                            INNER JOIN invalid_name_types inv ON inv.gid = n.gid
-            WHERE inv.invalid_count = inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count
-              AND inv.total_preferred_count = 0;
+                SELECT n.gid AS gid, min(n.nid) AS nid FROM names n
+                INNER JOIN invalid_name_types inv ON inv.gid = n.gid
+                WHERE inv.invalid_count = inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count
+                AND inv.total_preferred_count = 0;
 
             -- Set the ntype of the invalid name to LNAME
             UPDATE names n
