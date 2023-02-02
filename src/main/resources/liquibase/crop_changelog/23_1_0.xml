@@ -114,7 +114,7 @@
             except for cases where all nametypes for a germplasm is invalid. The deleted name entries will be added
             to a names backup table.
         </comment>
-        <sql dbms="mysql" splitStatements="false">
+        <sql dbms="mysql" splitStatements="true">
             CREATE TEMPORARY TABLE invalid_name_types AS
             SELECT d.gid,
                 (SELECT count(*) FROM names_invalid_ntype_bkp WHERE gid = d.gid) AS invalid_count,
@@ -197,7 +197,7 @@
         <comment>
             Enforcing unique germplasm's name nametypes and creating new nametypes for the duplicates.
         </comment>
-        <sql dbms="mysql" splitStatements="false">
+        <sql dbms="mysql" splitStatements="true">
             -- Create a temporary table for names with duplicates
             CREATE temporary TABLE name_with_duplicates
                 SELECT name.nid, name.gid, name.ntype, nameType.fcode, nameType.ftype, nameType.ftable
