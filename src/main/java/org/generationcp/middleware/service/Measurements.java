@@ -97,7 +97,7 @@ public class Measurements {
 
 				this.phenotypeSaver.saveOrUpdate(measurementRow.getExperimentId(), measurementVariable.getTermId(),
 						measurementData.getcValueId() != null && !"".equals(measurementData.getcValueId()) ? measurementData.getcValueId()
-								: measurementData.getValue(), phenotype, measurementData.getMeasurementVariable().getDataTypeId(), measurementData.getValueStatus());
+								: measurementData.getValue(), phenotype, measurementData.getMeasurementVariable().getDataTypeId(), measurementData.getValueStatus(), null);
 				// This is not great but essential because the workbook
 				// object must be updated so that it has new phenotype id. This
 				// id is then piped back to the UI and is used in subsequent calls to

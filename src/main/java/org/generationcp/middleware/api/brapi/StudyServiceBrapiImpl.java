@@ -653,15 +653,20 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 		final Optional<Phenotype> phenotypeOptional =
 			!CollectionUtils.isEmpty(experimentModel.getPhenotypes()) ? experimentModel.getPhenotypes().stream()
 				.filter(p -> p.getObservableId() == variableId).findAny() : Optional.empty();
+		final Integer loggedInUser = this.userService.getCurrentlyLoggedInUserId();
+
 		if (phenotypeOptional.isPresent()) {
 			final Phenotype phenotype = phenotypeOptional.get();
 			phenotype.setUpdatedDate(new Date());
+			phenotype.setUpdatedBy(loggedInUser);
 			phenotype.setValue(value);
 			this.daoFactory.getPhenotypeDAO().update(phenotype);
 		} else {
 			final Phenotype phenotype = new Phenotype(variableId, value, experimentModel);
 			phenotype.setCreatedDate(new Date());
 			phenotype.setUpdatedDate(new Date());
+			phenotype.setCreatedBy(loggedInUser);
+			phenotype.setUpdatedBy(loggedInUser);
 			phenotype.setName(String.valueOf(variableId));
 			this.daoFactory.getPhenotypeDAO().save(phenotype);
 		}

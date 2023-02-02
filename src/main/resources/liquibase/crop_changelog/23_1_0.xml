@@ -63,8 +63,85 @@
 			select 'names', coalesce(ceil(max(nid) / 500), 1) from names;
         </sql>
     </changeSet>
+	<changeSet author="cheryleigh" id="v23.1.0-5">
+ 		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="phenotype"/>
+				<not>
+					<columnExists tableName="phenotype" columnName="created_by"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment> Add created_by to phenotype table </comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE phenotype
+				ADD COLUMN created_by INT(11) NULL;
+		</sql>
+	</changeSet>
 
-    <changeSet author="mderamos" id="v23.1.0-1">
+	<changeSet author="cheryleigh" id="v23.1.0-6">
+ 		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="phenotype"/>
+				<not>
+					<columnExists tableName="phenotype" columnName="updated_by"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment> Add updated_by to phenotype table </comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE phenotype
+				ADD COLUMN updated_by INT(11) NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v23.1.0-7">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="phenotype_aud"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create audit table 'phenotype_aud'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE phenotype_aud (
+				aud_id           int auto_increment primary key,
+				rev_type         tinyint       not null,
+				phenotype_id     int           not null,
+				uniquename       varchar(255)  null,
+				name             varchar(255)  null,
+				observable_id int null,
+				attr_id int null,
+				value varchar(255) null,
+				cvalue_id int null,
+				status varchar(45) null,
+				assay_id int(11) null,
+				nd_experiment_id int not null,
+				draft_value varchar(255) null,
+				draft_cvalue_id int(11) null,
+				created_date     timestamp     null,
+				created_by    int            null,
+				updated_date    timestamp     null,
+				updated_by   int                      null
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v23.1.0-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(1) FROM audit_cfg where table_name = 'PHENOTYPE';</sqlCheck>
+		</preConditions>
+		<comment>
+            Add data to 'audit_cfg' table
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO audit_cfg (table_name, is_audited)
+			VALUES ('PHENOTYPE', 1);
+        </sql>
+	</changeSet>
+
+    <changeSet author="mderamos" id="v23.1.0-9">
         <preConditions onFail="MARK_RAN">
             <not>
                 <sqlCheck expectedResult="0">
@@ -79,7 +156,7 @@
         </sql>
     </changeSet>
 
-    <changeSet author="mderamos" id="v23.1.0-2">
+    <changeSet author="mderamos" id="v23.1.0-10">
         <preConditions onFail="MARK_RAN">
             <and>
                 <not>
@@ -98,14 +175,14 @@
         <sql dbms="mysql" splitStatements="true">
             CREATE TABLE names_invalid_ntype_bkp AS
             SELECT name.* FROM names name
-            LEFT JOIN udflds nametype ON nametype.fldno = name.ntype
+                                   LEFT JOIN udflds nametype ON nametype.fldno = name.ntype
             WHERE nametype.fldno IS NULL;
 
             ALTER TABLE names_invalid_ntype_bkp ADD changed_to_lname TINYINT(1) DEFAULT 0 NOT NULL;
         </sql>
     </changeSet>
 
-    <changeSet author="mderamos" id="v23.1.0-3">
+    <changeSet author="mderamos" id="v23.1.0-11">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="names_invalid_ntype_bkp"/>
         </preConditions>
@@ -117,18 +194,18 @@
         <sql dbms="mysql" splitStatements="true">
             CREATE TEMPORARY TABLE invalid_name_types AS
             SELECT d.gid,
-                (SELECT count(*) FROM names_invalid_ntype_bkp WHERE gid = d.gid) AS invalid_count,
-                (SELECT count(*) FROM names WHERE gid = d.gid) AS total_count,
-                (SELECT count(*) FROM names_invalid_ntype_bkp WHERE gid = d.gid AND nstat = 1) AS invalid_preferred_count,
-                (SELECT count(*) FROM names WHERE gid = d.gid AND nstat = 1) AS total_preferred_count
-                FROM (SELECT distinct(gid) AS gid FROM names_invalid_ntype_bkp) d;
+                   (SELECT count(*) FROM names_invalid_ntype_bkp WHERE gid = d.gid) AS invalid_count,
+                   (SELECT count(*) FROM names WHERE gid = d.gid) AS total_count,
+                   (SELECT count(*) FROM names_invalid_ntype_bkp WHERE gid = d.gid AND nstat = 1) AS invalid_preferred_count,
+                   (SELECT count(*) FROM names WHERE gid = d.gid AND nstat = 1) AS total_preferred_count
+            FROM (SELECT distinct(gid) AS gid FROM names_invalid_ntype_bkp) d;
 
             -- create temporary table for names with valid ntype and no valid preferred name
             CREATE TEMPORARY TABLE valid_names AS
             SELECT n.gid AS gid, min(n.nid) AS nid FROM names n
-                INNER JOIN invalid_name_types inv ON inv.gid = n.gid
-                INNER JOIN udflds nametype ON nametype.fldno = n.ntype
-                WHERE inv.total_count > inv.invalid_count AND inv.invalid_preferred_count = inv.total_preferred_count;
+                                                            INNER JOIN invalid_name_types inv ON inv.gid = n.gid
+                                                            INNER JOIN udflds nametype ON nametype.fldno = n.ntype
+            WHERE inv.total_count > inv.invalid_count AND inv.invalid_preferred_count = inv.total_preferred_count;
 
             -- Set the nstat of valid name to 1
             UPDATE names n
@@ -138,15 +215,15 @@
             -- create temporary table for names with no valid ntype and invalid preferred name
             CREATE TEMPORARY TABLE invalid_preferred_names AS
             SELECT n.gid AS gid, min(n.nid) AS nid FROM names n
-                INNER JOIN invalid_name_types inv ON inv.gid = n.gid
-                WHERE inv.invalid_count = inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count
-                AND n.nstat = 1 AND inv.total_preferred_count > 0;
+                                                            INNER JOIN invalid_name_types inv ON inv.gid = n.gid
+            WHERE inv.invalid_count = inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count
+              AND n.nstat = 1 AND inv.total_preferred_count > 0;
 
             -- Set the ntype of the invalid preferred name to LNAME
             UPDATE names n
                 INNER JOIN invalid_preferred_names inv ON inv.nid = n.nid
                 SET n.ntype = (SELECT nametype.fldno FROM udflds nametype
-                WHERE nametype.ftable = "NAMES" AND nametype.ftype = "NAME" AND nametype.fcode="LNAME");
+                    WHERE nametype.ftable = "NAMES" AND nametype.ftype = "NAME" AND nametype.fcode="LNAME");
 
             --  Update the changed to lname value in back up table
             UPDATE names_invalid_ntype_bkp bkp
@@ -155,17 +232,17 @@
 
             -- create temporary table for names with no valid ntype and no preferred name
             CREATE TEMPORARY TABLE invalid_names AS
-                SELECT n.gid AS gid, min(n.nid) AS nid FROM names n
-                INNER JOIN invalid_name_types inv ON inv.gid = n.gid
-                WHERE inv.invalid_count = inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count
-                AND inv.total_preferred_count = 0;
+            SELECT n.gid AS gid, min(n.nid) AS nid FROM names n
+                                                            INNER JOIN invalid_name_types inv ON inv.gid = n.gid
+            WHERE inv.invalid_count = inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count
+              AND inv.total_preferred_count = 0;
 
             -- Set the ntype of the invalid name to LNAME
             UPDATE names n
                 INNER JOIN invalid_names inv ON inv.nid = n.nid
                 SET n.ntype = (SELECT nametype.fldno FROM udflds nametype
-                WHERE nametype.ftable = "NAMES" AND nametype.ftype = "NAME" AND nametype.fcode="LNAME"),
-                n.nstat = 1;
+                    WHERE nametype.ftable = "NAMES" AND nametype.ftype = "NAME" AND nametype.fcode="LNAME"),
+                    n.nstat = 1;
 
             --  Update the changed to lname value in back up table
             UPDATE names_invalid_ntype_bkp bkp
@@ -185,7 +262,7 @@
         </sql>
     </changeSet>
 
-    <changeSet author="mderamos" id="v23.1.0-4">
+    <changeSet author="mderamos" id="v23.1.0-12">
         <preConditions onFail="MARK_RAN">
             <not>
                 <sqlCheck expectedResult="0">
@@ -200,42 +277,42 @@
         <sql dbms="mysql" splitStatements="true">
             -- Create a temporary table for names with duplicates
             CREATE temporary TABLE name_with_duplicates
-                SELECT name.nid, name.gid, name.ntype, nameType.fcode, nameType.ftype, nameType.ftable
-                    FROM names name
-                    INNER JOIN udflds nameType ON nameType.fldno = name.ntype
-                    GROUP  BY name.gid, name.ntype
-                    HAVING Count(*) > 1;
+            SELECT name.nid, name.gid, name.ntype, nameType.fcode, nameType.ftype, nameType.ftable
+            FROM names name
+                     INNER JOIN udflds nameType ON nameType.fldno = name.ntype
+            GROUP  BY name.gid, name.ntype
+            HAVING Count(*) > 1;
 
             -- Assign duplicate name with incremented number
             CREATE temporary TABLE name_with_incremented_number
             SELECT nid, gid, ntype,
-                CASE WHEN nameincrement = 0
-                    THEN fcode
-                ELSE Concat(fcode, '_', nameincrement)
-                    END AS fcode_with_increment
-                FROM (SELECT names.nid, names.gid, names.ntype, name_with_duplicates.fcode, name_with_duplicates.ftype,
-                    CASE WHEN @previousgid = names.gid  AND @previousntype = names.ntype THEN
-                        @runninggroup := @runninggroup + 1
-                    ELSE @runninggroup := 0
-                        end AS nameIncrement, @previousgid := names.gid, @previousntype := names.ntype
-                    FROM names
-                    INNER JOIN name_with_duplicates ON names.gid = name_with_duplicates.gid AND names.ntype = name_with_duplicates.ntype,
-                    (SELECT @runninggroup := 0) AS b,
-                    (SELECT @previousgid := 0) AS prevGid,
-                    (SELECT @previousntype := 0) AS previousNType
-                    ORDER  BY names.gid, names.ntype, name_with_duplicates.ftype) T;
+                   CASE WHEN nameincrement = 0
+                            THEN fcode
+                        ELSE Concat(fcode, '_', nameincrement)
+                       END AS fcode_with_increment
+            FROM (SELECT names.nid, names.gid, names.ntype, name_with_duplicates.fcode, name_with_duplicates.ftype,
+                         CASE WHEN @previousgid = names.gid  AND @previousntype = names.ntype THEN
+                                  @runninggroup := @runninggroup + 1
+                              ELSE @runninggroup := 0
+                             end AS nameIncrement, @previousgid := names.gid, @previousntype := names.ntype
+                  FROM names
+                      INNER JOIN name_with_duplicates ON names.gid = name_with_duplicates.gid AND names.ntype = name_with_duplicates.ntype,
+                      (SELECT @runninggroup := 0) AS b,
+                      (SELECT @previousgid := 0) AS prevGid,
+                      (SELECT @previousntype := 0) AS previousNType
+                  ORDER  BY names.gid, names.ntype, name_with_duplicates.ftype) T;
 
             -- Create new udflds records for names with incremented number that don't yet exist
             INSERT INTO udflds (ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid)
             SELECT udflds.ftable, udflds.ftype, toCreate.fcode_with_increment, udflds.fname, udflds.ffmt, udflds.fdesc, udflds.lfldno,
-                udflds.fuid, udflds.fdate, udflds.scaleid
-                FROM (SELECT DISTINCT name_with_incremented_number.ntype, name_with_incremented_number.fcode_with_increment
-                    FROM name_with_incremented_number
-                    WHERE NOT EXISTS (SELECT 1
-                        FROM udflds
-                        WHERE name_with_incremented_number.fcode_with_increment = udflds.fcode
-                            AND udflds.ftable = 'NAMES')) toCreate
-                        INNER JOIN udflds ON toCreate.ntype = udflds.fldno;
+                   udflds.fuid, udflds.fdate, udflds.scaleid
+            FROM (SELECT DISTINCT name_with_incremented_number.ntype, name_with_incremented_number.fcode_with_increment
+                  FROM name_with_incremented_number
+                  WHERE NOT EXISTS (SELECT 1
+                                    FROM udflds
+                                    WHERE name_with_incremented_number.fcode_with_increment = udflds.fcode
+                                      AND udflds.ftable = 'NAMES')) toCreate
+                     INNER JOIN udflds ON toCreate.ntype = udflds.fldno;
 
             -- Update the duplicated names with newly created names
             UPDATE names n
@@ -249,7 +326,7 @@
         </sql>
     </changeSet>
 
-    <changeSet author="mderamos" id="v23.1.0-5">
+    <changeSet author="mderamos" id="v23.1.0-13">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS

@@ -92,6 +92,8 @@ public class Workbook {
 
 	private List<MeasurementVariable> entryDetails;
 
+	private Integer userId;
+
 	public Workbook() {
 		this.reset();
 		this.trialObservations = new ArrayList<>();
@@ -1072,5 +1074,13 @@ public class Workbook {
 
 	public void setEntryDetails(final List<MeasurementVariable> entryDetails) {
 		this.entryDetails = entryDetails;
+	}
+
+	public Integer getUserId() {
+		return this.userId;
+	}
+
+	public void setUserId(final Integer userId) {
+		this.userId = userId;
 	}
 }

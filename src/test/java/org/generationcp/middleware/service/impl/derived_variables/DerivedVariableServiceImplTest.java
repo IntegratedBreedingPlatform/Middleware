@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -28,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
@@ -56,6 +58,7 @@ public class DerivedVariableServiceImplTest {
 	private static final int VARIABLE4_TERMID = 999;
 	public static final int STUDY_ID = 1000;
 	private static final int TERM_ID = 19001;
+	private static final int USER_ID = 1;
 
 	@Mock
 	private FormulaService formulaService;
@@ -74,6 +77,9 @@ public class DerivedVariableServiceImplTest {
 
 	@Mock
 	private ProjectPropertyDao projectPropertyDao;
+
+	@Mock
+	private UserService userService;
 
 	@Mock
 	private DaoFactory factory;
@@ -382,6 +388,7 @@ public class DerivedVariableServiceImplTest {
 		// When observationId is null, it means there's no phenotype existing yet.
 		final Integer observationId = null;
 
+		when(this.userService.getCurrentlyLoggedInUserId()).thenReturn(USER_ID);
 		this.derivedVariableService.saveCalculatedResult(value, categoricalId, observationUnitId, observationId, measurementVariable);
 
 		final ArgumentCaptor<Phenotype> captor = ArgumentCaptor.forClass(Phenotype.class);

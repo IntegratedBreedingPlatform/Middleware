@@ -57,7 +57,7 @@ public class MeasurementsTest {
 
 		this.measurements.saveMeasurementData(rowList);
 		Mockito.verify(this.mockPhenotypeSaver, Mockito.never()).saveOrUpdate(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-				Mockito.any(Phenotype.class), Mockito.anyInt(), Mockito.any(Phenotype.ValueStatus.class));
+				Mockito.any(Phenotype.class), Mockito.anyInt(), Mockito.any(Phenotype.ValueStatus.class), Mockito.isNull());
 
 	}
 
@@ -146,7 +146,7 @@ public class MeasurementsTest {
 
 		this.measurements.saveMeasurementData(Collections.<MeasurementRow>singletonList(measurementRow));
 		Mockito.verify(this.mockPhenotypeSaver, Mockito.times(0)).saveOrUpdate(Matchers.anyInt(), Matchers.anyInt(), Matchers.anyString(),
-				(Phenotype) Matchers.anyObject(), Matchers.anyInt(), Matchers.any(Phenotype.ValueStatus.class));
+				(Phenotype) Matchers.anyObject(), Matchers.anyInt(), Matchers.any(Phenotype.ValueStatus.class), Matchers.isNull());
 	}
 
 	@Test
@@ -217,7 +217,7 @@ public class MeasurementsTest {
 
 		Mockito.verify(this.mockPhenotypeSaver, Mockito.times(1)).saveOrUpdate(Matchers.eq(measurementRow.getExperimentId()),
 				Matchers.eq(MeasurementsTest.TEST_TERM_ID), Matchers.eq(value), (Phenotype) Matchers.anyObject(),
-				Matchers.eq(variableDataTypeId), Matchers.any(Phenotype.ValueStatus.class));
+				Matchers.eq(variableDataTypeId), Matchers.any(Phenotype.ValueStatus.class), Matchers.isNull());
 	}
 
 }
