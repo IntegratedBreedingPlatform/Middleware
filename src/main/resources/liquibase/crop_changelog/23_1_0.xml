@@ -128,7 +128,7 @@
             SELECT min(n.nid) AS nid, n.gid AS gid FROM names n
                 INNER JOIN invalid_name_types inv ON inv.gid = n.gid
                 INNER JOIN udflds nametype ON nametype.fldno = n.ntype
-                WHERE inv.invalid_count < inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count;
+                WHERE inv.total_count > inv.invalid_count AND inv.invalid_preferred_count = inv.total_preferred_count;
 
             -- Set the nstat of valid name to 1
             UPDATE names n
