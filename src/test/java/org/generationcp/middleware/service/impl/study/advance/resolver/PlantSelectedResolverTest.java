@@ -130,7 +130,7 @@ public class PlantSelectedResolverTest {
 	 * - the same bulking breeding Method for each advance
 	 * - a variate that defines which plots were selected
 	 * <p>
-	 * Should return 1
+	 * Should return the number of lines defined by the plot variable
 	 */
 	@Test
 	public void resolvePlantSelected_usingSameBulkingBreedingMethodAndVariateForPlots() {
@@ -149,7 +149,7 @@ public class PlantSelectedResolverTest {
 
 		final Integer plantSelected =
 			this.plantSelectedResolver.resolveAdvanceStudyPlantSelected(advanceStudyRequest, observationUnitRow, new HashMap<>(), isBulkMethod);
-		assertThat(plantSelected, is(1));
+		assertThat(plantSelected, is(linesSelected));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.never()).getMethodVariateId();
@@ -358,7 +358,7 @@ public class PlantSelectedResolverTest {
 	 * - a variate that defines a bulking breeding method for each advance
 	 * - a variate that defines which plots were selected
 	 * <p>
-	 * Should return 1
+	 * Should return the number of lines defined by the plot variable
 	 */
 	@Test
 	public void resolvePlantSelected_usingBulkingBreedingVariateMethodAndVariateForPlots() {
@@ -384,7 +384,7 @@ public class PlantSelectedResolverTest {
 
 		final Integer plantSelected =
 			this.plantSelectedResolver.resolveAdvanceStudyPlantSelected(advanceStudyRequest, observationUnitRow, breedingMethodsByCode, isBulkMethod);
-		assertThat(plantSelected, is(1));
+		assertThat(plantSelected, is(linesSelected));
 
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(1)).getBreedingMethodId();
 		Mockito.verify(advanceStudyRequest.getBreedingMethodSelectionRequest(), Mockito.times(2)).getMethodVariateId();

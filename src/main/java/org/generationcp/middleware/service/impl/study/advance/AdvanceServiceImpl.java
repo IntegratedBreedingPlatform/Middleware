@@ -474,7 +474,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Map<Integer, MeasurementVariable> environmentVariablesByTermId) {
 
 		this.locationDataResolver.resolveEnvironmentLevelData(source, locationsByLocationId);
-		this.seasonDataResolver.resolveEnvironmentLevelData(source, plotDataVariablesByTermId);
+		this.seasonDataResolver.resolveEnvironmentLevelData(source, environmentVariablesByTermId);
 		this.selectionTraitDataResolver
 			.resolveEnvironmentLevelData(environmentDatasetId, selectionTraitRequest, source, environmentVariablesByTermId);
 		this.selectionTraitDataResolver
@@ -501,7 +501,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	private void createAdvancedGermplasm(final CropType cropType, final AdvancingSource advancingSource) {
 
-		for (int i = 0; i < advancingSource.getPlantsSelected(); i++) {
+		final Integer advancedGermplasmCount = advancingSource.isBulkingMethod() ? 1 : advancingSource.getPlantsSelected();
+		for (int i = 0; i < advancedGermplasmCount; i++) {
 			final BasicGermplasmDTO originGermplasm = advancingSource.getOriginGermplasm();
 			final Germplasm advancedGermplasm = new Germplasm();
 			if (originGermplasm.getGpid1() == 0 || (advancingSource.getSourceMethod() != null && advancingSource.getSourceMethod()
