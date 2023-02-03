@@ -1,9 +1,9 @@
 package org.generationcp.middleware.service.api;
 
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.ListMetadata;
-import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.service.impl.study.SamplePlateInfo;
 import org.springframework.data.domain.Pageable;
@@ -124,7 +124,7 @@ public interface SampleListService {
 
 	String getObservationVariableName(Integer sampleListId);
 
-	List<Sample> getSampleListEntries(Integer sampleListId, List<Integer> sampleIds);
+	List<SampleDTO> getSampleListEntries(Integer sampleListId, List<Integer> sampleIds);
 
-	void deleteSampleListEntries(Integer sampleListId, List<Integer> selectedEntries);
+	void deleteSamples(Integer sampleListId, List<Integer> sampleIds);
 }

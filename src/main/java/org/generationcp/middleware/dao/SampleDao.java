@@ -265,13 +265,9 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			).setResultTransformer(Transformers.aliasToBean(SampleDetailsBean.class));
 	}
 
-	public List<Sample> getSamples(final Integer sampleListId, final List<Integer> sampleIds) {
-		final Criteria criteria = this.getSession().createCriteria(Sample.class, SAMPLE)
-			.createAlias("sample.sampleList", "sampleList")
-			.add(Restrictions.eq("sampleList.id", sampleListId))
-			.add(Restrictions.in("sampleId", sampleIds));
-		return criteria.list();
-
+	public List<SampleDTO> getSamples(final Integer sampleListId, final List<Integer> sampleIds) {
+		return this.getSampleDTOS(this.getSession().createCriteria(Sample.class, SAMPLE) //
+				.add(Restrictions.in(SAMPLE_ID, sampleIds)));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -450,7 +446,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
-	public void deleteByListAndEntryIds(final Integer sampleListId, final List<Integer> sampleIds) {
+	public void deleteBySampleIds(final Integer sampleListId, final List<Integer> sampleIds) {
 		Preconditions.checkNotNull(sampleListId, "sampleListId can not be null.");
 		Preconditions.checkArgument(org.apache.commons.collections.CollectionUtils.isNotEmpty(sampleIds), "sampleIds passed cannot be empty.");
 		final String query =
@@ -466,9 +462,9 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	/**
 	 * Reset the entry numbers (entry_no) based on the order of current entry_no.
 	 *
-	 * @param listId
+	 * @param sampleListId
 	 */
-	public void reOrderEntries(final Integer listId) {
+	public void reOrderEntries(final Integer sampleListId) {
 		final String sql = "UPDATE sample s \n"
 				+ "    JOIN (SELECT @position \\:= 0) r\n"
 				+ "    INNER JOIN (\n"
@@ -480,7 +476,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				+ "SET s.entry_no = @position \\:= @position + 1\n"
 				+ "WHERE s.sample_list = :listId";
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
-		sqlQuery.setParameter("listId", listId);
+		sqlQuery.setParameter("listId", sampleListId);
 		sqlQuery.executeUpdate();
 	}
 

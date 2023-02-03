@@ -7,7 +7,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
-import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
@@ -496,13 +496,13 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public List<Sample> getSampleListEntries(final Integer sampleListId, final List<Integer> sampleIds) {
+	public List<SampleDTO> getSampleListEntries(final Integer sampleListId, final List<Integer> sampleIds) {
 		return this.daoFactory.getSampleDao().getSamples(sampleListId, sampleIds);
 	}
 
 	@Override
-	public void deleteSampleListEntries(final Integer sampleListId, final List<Integer> selectedEntries) {
-		this.daoFactory.getSampleDao().deleteByListAndEntryIds(sampleListId, selectedEntries);
+	public void deleteSamples(final Integer sampleListId, final List<Integer> sampleIds) {
+		this.daoFactory.getSampleDao().deleteBySampleIds(sampleListId, sampleIds);
 		this.daoFactory.getSampleDao().reOrderEntries(sampleListId);
 	}
 
