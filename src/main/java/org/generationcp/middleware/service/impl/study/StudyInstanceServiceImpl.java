@@ -26,6 +26,7 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -50,6 +51,9 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 	@Resource
 	private DatasetService datasetService;
+
+	@Resource
+	private UserService userService;
 
 	@Resource
 	private ExperimentDesignService experimentDesignService;
@@ -217,6 +221,10 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 			new Phenotype(variableId, instanceObservationData.getValue(), experimentModel);
 		phenotype.setCreatedDate(new Date());
 		phenotype.setUpdatedDate(new Date());
+
+		final Integer loggedInUser = this.userService.getCurrentlyLoggedInUserId();
+		phenotype.setCreatedBy(loggedInUser);
+		phenotype.setUpdatedBy(loggedInUser);
 		phenotype.setcValue(instanceObservationData.getCategoricalValueId());
 		phenotype.setName(String.valueOf(variableId));
 
@@ -245,6 +253,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		phenotype.setValue(instanceObservationData.getValue());
 		phenotype.setcValue(instanceObservationData.getCategoricalValueId());
 		phenotype.setUpdatedDate(new Date());
+		phenotype.setUpdatedBy(this.userService.getCurrentlyLoggedInUserId());
 		phenotypeDAO.update(phenotype);
 
 		// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.

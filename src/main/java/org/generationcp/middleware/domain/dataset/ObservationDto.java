@@ -92,9 +92,7 @@ public class ObservationDto {
 		return this.observationUnitId;
 	}
 
-	public void setObservationUnitId(final Integer observationUnitId) {
-		this.observationUnitId = observationUnitId;
-	}
+	public void setObservationUnitId(final Integer observationUnitId) {	this.observationUnitId = observationUnitId; }
 
 	public Integer getDraftCategoricalValueId() {
 		return this.draftCategoricalValueId;

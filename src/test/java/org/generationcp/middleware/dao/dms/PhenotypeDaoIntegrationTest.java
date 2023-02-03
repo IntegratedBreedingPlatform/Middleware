@@ -309,7 +309,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
 
-		this.phenotypeDao.updatePhenotypesByExperimentIdAndObervableId(experiment.getNdExperimentId(), phenotype.getObservableId(), "1000");
+		this.phenotypeDao.updatePhenotypesByExperimentIdAndObervableId(experiment.getNdExperimentId(), phenotype.getObservableId(), "1000",
+			1);
 		phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("1000", phenotype.getValue());
 	}
@@ -377,7 +378,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		this.phenotypeDao
-			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(experimentId)), new HashSet<>(Arrays.asList(variableId)));
+			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(experimentId)), new HashSet<>(Arrays.asList(variableId)), 1);
 		Assert.assertTrue(this.phenotypeDao.hasOutOfSync(datasetId));
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experimentId, variableId);
 		Assert.assertEquals(Phenotype.ValueStatus.OUT_OF_SYNC, phenotype.getValueStatus());
@@ -421,7 +422,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
 		final Integer variableId = this.trait.getCvTermId();
 		this.phenotypeDao
-			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(experimentId)), new HashSet<>(Arrays.asList(variableId)));
+			.updateOutOfSyncPhenotypes(new HashSet<>(Arrays.asList(experimentId)), new HashSet<>(Arrays.asList(variableId)), 1);
 		this.sessionProvder.getSession().flush();
 
 		final Map<Integer, Long> outOfSyncMap = this.phenotypeDao.countOutOfSyncDataOfDatasetsInStudy(this.study.getProjectId());
