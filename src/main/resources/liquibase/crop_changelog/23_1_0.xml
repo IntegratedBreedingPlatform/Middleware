@@ -141,4 +141,61 @@
 			VALUES ('PHENOTYPE', 1);
         </sql>
 	</changeSet>
+
+	<changeSet author="clarysabel" id="v23.1.0-9">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="germplasm_trial_details"/>
+		</preConditions>
+		<comment>
+            Drop germplasm_trial_details view
+        </comment>
+        <dropView viewName="germplasm_trial_details"/>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v23.1.0-10">
+		<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT
+						COUNT(*)
+					FROM
+						information_schema.routines
+					WHERE
+						routine_schema = DATABASE()
+						AND specific_name = 'h2h_traitXenv';
+				</sqlCheck>
+		</preConditions>
+		<comment>
+            Drop h2h_traitXenv store procedure
+        </comment>
+        <dropProcedure procedureName="h2h_traitXenv"/>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v23.1.0-11">
+		<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT
+						COUNT(*)
+					FROM
+						information_schema.routines
+					WHERE
+						routine_schema = DATABASE()
+						AND specific_name = 'h2h_traitXenv_summary';
+				</sqlCheck>
+		</preConditions>
+		<comment>
+            Drop h2h_traitXenv_summary store procedure
+        </comment>
+        <dropProcedure procedureName="h2h_traitXenv_summary"/>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v23.1.0-12">
+		<preConditions onFail="MARK_RAN">
+			<viewExists viewName="h2h_details"/>
+		</preConditions>
+		<comment>
+            Drop h2h_details view
+        </comment>
+        <dropView viewName="h2h_details"/>
+	</changeSet>
+
 </databaseChangeLog>

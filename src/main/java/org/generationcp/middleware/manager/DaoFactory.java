@@ -3,7 +3,6 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.AttributeExternalReferenceDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
-import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CopMatrixDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.CropParameterDAO;
@@ -377,10 +376,6 @@ public class DaoFactory {
 		final CropTypeDAO cropTypeDAO = new CropTypeDAO();
 		cropTypeDAO.setSession(this.sessionProvider.getSession());
 		return cropTypeDAO;
-	}
-
-	public BreedersQueryDao getBreedersQueryDao() {
-		return new BreedersQueryDao(this.sessionProvider.getSession());
 	}
 
 	public VariableOverridesDao getVariableProgramOverridesDao() {
