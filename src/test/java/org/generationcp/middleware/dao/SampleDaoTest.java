@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -310,6 +311,80 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertNull(sample.getObservationUnitId());
 		Assert.assertNotNull(sample.getSamplingDate());
 		Assert.assertTrue(sample.getDatasets().isEmpty());
+	}
+
+	@Test
+	public void testGetSamples() {
+		final Pageable pageable = Mockito.mock(Pageable.class);
+		Mockito.when(pageable.getPageSize()).thenReturn(10);
+		Mockito.when(pageable.getPageNumber()).thenReturn(0);
+
+		final Integer listId =
+				this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+
+		final List<SampleDTO> samples = this.sampleDao.filter(this.ndExperimentId, listId, pageable);
+		final List<SampleDTO> sampleDTOS = this.sampleDao.getSamples(listId, Collections.singletonList(samples.get(0).getSampleId()));
+
+
+		final SampleDTO sample = sampleDTOS.get(0);
+		Assert.assertNotNull(sample.getSampleId());
+		Assert.assertEquals("SAMPLE-" + SAMPLE_LIST_NAME_FOR_PLOT_DATA + ":" + 1, sample.getSampleName());
+		Assert.assertEquals("BUSINESS-KEY-" + SAMPLE_LIST_NAME_FOR_PLOT_DATA + 1, sample.getSampleBusinessKey());
+		Assert.assertEquals(SAMPLE_LIST_NAME_FOR_PLOT_DATA, sample.getSampleList());
+		Assert.assertNotNull(sample.getGid());
+		Assert.assertNotNull(sample.getDesignation());
+		Assert.assertEquals(1, sample.getEntryNo().intValue());
+		Assert.assertEquals("PLATEID-" + 1, sample.getPlateId());
+		Assert.assertEquals("WELL-" + 1, sample.getWell());
+		Assert.assertNull(sample.getSampleNumber());
+		Assert.assertNull(sample.getStudyId());
+		Assert.assertNull(sample.getStudyName());
+		Assert.assertNull(sample.getDatasetType());
+		Assert.assertEquals(this.workbenchUser.getUserid(), sample.getTakenByUserId());
+		Assert.assertNull(sample.getEnumerator());
+		Assert.assertNull(sample.getObservationUnitId());
+		Assert.assertNotNull(sample.getSamplingDate());
+		Assert.assertTrue(sample.getDatasets().isEmpty());
+	}
+
+	@Test
+	public void testDeleteBySampleIds() {
+		final Pageable pageable = Mockito.mock(Pageable.class);
+		Mockito.when(pageable.getPageSize()).thenReturn(10);
+		Mockito.when(pageable.getPageNumber()).thenReturn(0);
+
+		final Integer listId =
+				this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+
+		final List<SampleDTO> samples = this.sampleDao.filter(this.ndExperimentId, listId, pageable);
+		List<SampleDTO> sampleDTOS = this.sampleDao.getSamples(listId, Collections.singletonList(samples.get(0).getSampleId()));
+		Assert.assertFalse(CollectionUtils.isEmpty(sampleDTOS));
+		this.sampleDao.deleteBySampleIds(listId, Collections.singletonList(sampleDTOS.get(0).getSampleId()));
+		sampleDTOS = this.sampleDao.getSamples(listId, Collections.singletonList(samples.get(0).getSampleId()));
+		Assert.assertFalse(CollectionUtils.isEmpty(sampleDTOS));
+	}
+
+	@Test
+	public void testReOrderEntries() {
+		final Pageable pageable = Mockito.mock(Pageable.class);
+		Mockito.when(pageable.getPageSize()).thenReturn(10);
+		Mockito.when(pageable.getPageNumber()).thenReturn(0);
+
+		final Integer listId =
+				this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+
+		List<SampleDTO> samples = this.sampleDao.filter(this.ndExperimentId, listId, pageable);
+		final SampleDTO secondEntry = samples.get(1);
+		Assert.assertEquals("1", samples.get(0).getEntryNo().toString());
+		Assert.assertEquals("2", secondEntry.getEntryNo().toString());
+
+		//delete the first entry
+		this.sampleDao.deleteBySampleIds(listId, Collections.singletonList(samples.get(0).getSampleId()));
+		this.sampleDao.reOrderEntries(listId);
+
+		samples = this.sampleDao.filter(this.ndExperimentId, listId, pageable);
+		Assert.assertEquals("1", samples.get(0).getEntryNo().toString());
+		Assert.assertEquals(secondEntry.getSampleId(), samples.get(0).getSampleId());
 	}
 
 	@Test

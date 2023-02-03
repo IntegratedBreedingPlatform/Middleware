@@ -563,6 +563,23 @@ public class SampleListServiceImplTest {
 		Assert.assertEquals(Integer.valueOf(variableValue).longValue(), sampleListArgumentCaptor.getValue().getSamples().size());
 	}
 
+	@Test
+	public void testGetSampleListEntries() {
+		final Integer sampleListId = 1;
+		final List<Integer> sampleIds = Arrays.asList(1, 2);
+		this.sampleListService.getSampleListEntries(sampleListId, sampleIds);
+		Mockito.verify(this.sampleDao).getSamples(sampleListId, sampleIds);
+	}
+
+	@Test
+	public void testDeleteSamples() {
+		final Integer sampleListId = 1;
+		final List<Integer> sampleIds = Arrays.asList(1, 2);
+		this.sampleListService.deleteSamples(sampleListId, sampleIds);
+		Mockito.verify(this.sampleDao).deleteBySampleIds(sampleListId, sampleIds);
+		Mockito.verify(this.sampleDao).reOrderEntries(sampleListId);
+	}
+
 	private void createSampleList(final String variableValue, final String preferredNameGid) {
 		final int studyId = 1;
 		this.study.setId(studyId);
