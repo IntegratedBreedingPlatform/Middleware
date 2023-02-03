@@ -277,6 +277,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 		studyDetailsDTO.setStartDate(studyData.getStartDate());
 		studyDetailsDTO.setEndDate(studyData.getEndDate());
 		studyDetailsDTO.setLastUpdateDate(studyData.getUpdateDate());
+		studyDetailsDTO.setLocked(studyData.isLocked());
+		studyDetailsDTO.setOwnerId(studyData.getOwnerId());
 
 		final DatasetDTO plotDataset =
 			this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId())).get(0);
