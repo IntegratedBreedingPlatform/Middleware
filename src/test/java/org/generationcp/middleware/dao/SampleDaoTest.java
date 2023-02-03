@@ -361,28 +361,29 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Assert.assertFalse(CollectionUtils.isEmpty(sampleDTOS));
 		this.sampleDao.deleteBySampleIds(listId, Collections.singletonList(sampleDTOS.get(0).getSampleId()));
 		sampleDTOS = this.sampleDao.getSamples(listId, Collections.singletonList(samples.get(0).getSampleId()));
-		Assert.assertFalse(CollectionUtils.isEmpty(sampleDTOS));
+		Assert.assertTrue(CollectionUtils.isEmpty(sampleDTOS));
 	}
 
 	@Test
 	public void testReOrderEntries() {
-		final Pageable pageable = Mockito.mock(Pageable.class);
-		Mockito.when(pageable.getPageSize()).thenReturn(10);
-		Mockito.when(pageable.getPageNumber()).thenReturn(0);
-
 		final Integer listId =
 				this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
-		List<SampleDTO> samples = this.sampleDao.filter(this.ndExperimentId, listId, pageable);
+		final Set<String> sampleUIDs = new HashSet<>();
+		for (int i = 1; i < TEST_SAMPLE_RECORD_COUNT + 1; i++) {
+			sampleUIDs.add("BUSINESS-KEY-" + SAMPLE_LIST_NAME_FOR_PLOT_DATA + i);
+		}
+		List<SampleDTO> samples = this.sampleDao.getBySampleBks(sampleUIDs);
 		final SampleDTO secondEntry = samples.get(1);
 		Assert.assertEquals("1", samples.get(0).getEntryNo().toString());
 		Assert.assertEquals("2", secondEntry.getEntryNo().toString());
 
-		//delete the first entry
+		//delete the first entry and reorder
 		this.sampleDao.deleteBySampleIds(listId, Collections.singletonList(samples.get(0).getSampleId()));
 		this.sampleDao.reOrderEntries(listId);
 
-		samples = this.sampleDao.filter(this.ndExperimentId, listId, pageable);
+
+		samples = this.sampleDao.getSamples(listId, Collections.singletonList(secondEntry.getSampleId()));
 		Assert.assertEquals("1", samples.get(0).getEntryNo().toString());
 		Assert.assertEquals(secondEntry.getSampleId(), samples.get(0).getSampleId());
 	}
