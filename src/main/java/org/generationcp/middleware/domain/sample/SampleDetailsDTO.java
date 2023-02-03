@@ -45,6 +45,7 @@ public class SampleDetailsDTO implements Serializable {
 	private String well;
 	private Integer observationUnitNumber;
 	private Integer sampleNumber;
+	private Integer sampleId;
 
 	public SampleDetailsDTO() {
 
@@ -310,5 +311,13 @@ public class SampleDetailsDTO implements Serializable {
 
 	public void setGermplasmUUID(final String germplasmUUID) {
 		this.germplasmUUID = germplasmUUID;
+	}
+
+	public Integer getSampleId() {
+		return this.sampleId;
+	}
+
+	public void setSampleId(final Integer sampleId) {
+		this.sampleId = sampleId;
 	}
 }
