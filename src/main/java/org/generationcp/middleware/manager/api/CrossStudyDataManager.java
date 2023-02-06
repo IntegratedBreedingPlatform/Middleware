@@ -15,14 +15,12 @@ import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
-import org.generationcp.middleware.domain.h2h.GermplasmLocationInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 
 import java.util.List;
-import java.util.Set;
 
 public interface CrossStudyDataManager {
 
@@ -134,20 +132,4 @@ public interface CrossStudyDataManager {
 	 */
 	TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds, final String programUUID);
 
-	/**
-	 * Retrieve a list of germplasm and location information matching a given set of trial environment ids. Empty list if no matches are
-	 * found. Never returns {@code null}.
-	 *
-	 * @param environmentIds
-	 * @return
-	 */
-	List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(Set<Integer> environmentIds);
-
-	/**
-	 * Retrieve the environment info for a list of Germplasm. Find out which experiments plants have been involved in.
-	 *
-	 * @param gids : germplasm ids
-	 * @return envIds : environmentIds
-	 */
-	List<Integer> getTrialEnvironmentIdsForGermplasm(Set<Integer> gids);
 }

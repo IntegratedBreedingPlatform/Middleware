@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -9,6 +10,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
 
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ public class GermplasmTestDataGenerator {
 	private static final Integer TEST_METHOD_ID = 101;
 	public static final String TEST_METHOD_NAME = "Single cross";
 
-	private HibernateSessionProvider sessionProvider;
+	private final HibernateSessionProvider sessionProvider;
 	private final DaoFactory daoFactory;
 
 	public GermplasmTestDataGenerator(final HibernateSessionProvider sessionProvider,
@@ -55,7 +57,12 @@ public class GermplasmTestDataGenerator {
 		this.sessionProvider.getSession().flush();
 		this.daoFactory.getGermplasmDao().refresh(germplasm);
 		this.daoFactory.getNameDao().save(preferredName);
-		final Name otherName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid(), "Other Name ");
+
+		final UserDefinedField attributeField =
+			new UserDefinedField(null, "NAMES", "NAME", RandomStringUtils.randomAlphanumeric(10), "", "", "", 0, 0, 0, 0);
+		this.daoFactory.getUserDefinedFieldDAO().saveOrUpdate(attributeField);
+
+		final Name otherName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid(), "Other Name ", attributeField.getFldno());
 		otherName.setNstat(0);
 		this.daoFactory.getNameDao().save(otherName);
 		return germplasm;
