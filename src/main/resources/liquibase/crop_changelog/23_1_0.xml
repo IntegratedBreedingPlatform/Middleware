@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 	<changeSet author="lkovacic" id="vTBD-1">
@@ -63,7 +63,6 @@
 			select 'names', coalesce(ceil(max(nid) / 500), 1) from names;
         </sql>
     </changeSet>
-
 	<changeSet author="cheryleigh" id="v23.1.0-5">
  		<preConditions onFail="MARK_RAN">
 			<and>
@@ -141,4 +140,259 @@
 			VALUES ('PHENOTYPE', 1);
         </sql>
 	</changeSet>
+
+    <changeSet author="clarysabel" id="v23.1.0-9">
+        <preConditions onFail="MARK_RAN">
+            <viewExists viewName="germplasm_trial_details"/>
+        </preConditions>
+        <comment>
+            Drop germplasm_trial_details view
+        </comment>
+        <dropView viewName="germplasm_trial_details"/>
+    </changeSet>
+
+    <changeSet author="clarysabel" id="v23.1.0-10">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT
+                    COUNT(*)
+                FROM
+                    information_schema.routines
+                WHERE
+                    routine_schema = DATABASE()
+                  AND specific_name = 'h2h_traitXenv';
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Drop h2h_traitXenv store procedure
+        </comment>
+        <dropProcedure procedureName="h2h_traitXenv"/>
+    </changeSet>
+
+    <changeSet author="clarysabel" id="v23.1.0-11">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT
+                    COUNT(*)
+                FROM
+                    information_schema.routines
+                WHERE
+                    routine_schema = DATABASE()
+                  AND specific_name = 'h2h_traitXenv_summary';
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Drop h2h_traitXenv_summary store procedure
+        </comment>
+        <dropProcedure procedureName="h2h_traitXenv_summary"/>
+    </changeSet>
+
+    <changeSet author="clarysabel" id="v23.1.0-12">
+        <preConditions onFail="MARK_RAN">
+            <viewExists viewName="h2h_details"/>
+        </preConditions>
+        <comment>
+            Drop h2h_details view
+        </comment>
+        <dropView viewName="h2h_details"/>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v23.1.0-13">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) from names where nstat=9;
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <comment> Remove germplasm names with deleted status(9)
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            DELETE FROM names where nstat=9;
+        </sql>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v23.1.0-14">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <not>
+                    <sqlCheck expectedResult="0">
+                        SELECT COUNT(*) FROM names name
+                        LEFT JOIN udflds nametype ON nametype.fldno = name.ntype
+                        WHERE nametype.fldno IS NULL;
+                    </sqlCheck>
+                </not>
+                <not>
+                    <tableExists tableName="names_invalid_ntype_bkp"/>
+                </not>
+            </and>
+        </preConditions>
+        <comment> Create names_invalid_ntype_bkp table</comment>
+        <sql dbms="mysql" splitStatements="true">
+            CREATE TABLE names_invalid_ntype_bkp AS
+            SELECT name.* FROM names name
+                                   LEFT JOIN udflds nametype ON nametype.fldno = name.ntype
+            WHERE nametype.fldno IS NULL;
+
+            ALTER TABLE names_invalid_ntype_bkp ADD changed_to_lname TINYINT(1) DEFAULT 0 NOT NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v23.1.0-15">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="names_invalid_ntype_bkp"/>
+        </preConditions>
+        <comment>
+            "Fix" names with invalid name types. Names with invalid nametype will be deleted
+            except for cases where all nametypes for a germplasm is invalid. The deleted name entries will be added
+            to a names backup table.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            CREATE TEMPORARY TABLE invalid_name_types AS
+            SELECT d.gid,
+                (SELECT count(nid) FROM names n where n.gid = d.gid
+                    AND NOT EXISTS(SELECT nametype.fldno FROM udflds nametype WHERE n.ntype = nametype.fldno)) AS invalid_count,
+                (SELECT count(nid) FROM names where gid = d.gid) as total_count,
+                (SELECT count(nid) FROM names n where n.gid = d.gid
+                    AND NOT EXISTS(SELECT nametype.fldno FROM udflds nametype WHERE n.ntype = nametype.fldno) and nstat = 1) AS invalid_preferred_count,
+                (SELECT count(nid) FROM names where gid = d.gid and nstat = 1) AS total_preferred_count
+                FROM (SELECT distinct(gid) AS gid FROM names_invalid_ntype_bkp) d;
+
+            -- create temporary table for names with valid ntype and no valid preferred name
+            CREATE TEMPORARY TABLE valid_names AS
+             SELECT n.gid AS gid, min(n.nid) AS nid FROM names n
+                INNER JOIN invalid_name_types inv ON inv.gid = n.gid
+                INNER JOIN udflds nametype ON nametype.fldno = n.ntype
+                WHERE inv.total_count > inv.invalid_count AND inv.invalid_preferred_count = inv.total_preferred_count;
+
+            -- Set the nstat of valid name to 1
+            UPDATE names n
+                INNER JOIN valid_names valid ON valid.nid = n.nid
+                SET n.nstat = 1;
+
+            -- create temporary table for names with no valid ntype and invalid preferred name
+            CREATE TEMPORARY TABLE invalid_preferred_names AS
+            SELECT n.gid AS gid, min(n.nid) AS nid FROM names n
+                INNER JOIN invalid_name_types inv ON inv.gid = n.gid
+                WHERE inv.invalid_count = inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count
+                AND n.nstat = 1 AND inv.total_preferred_count > 0;
+
+            -- Set the ntype of the invalid preferred name to LNAME
+            UPDATE names n
+                INNER JOIN invalid_preferred_names inv ON inv.nid = n.nid
+                SET n.ntype = (SELECT nametype.fldno FROM udflds nametype
+                WHERE nametype.ftable = "NAMES" AND nametype.ftype = "NAME" AND nametype.fcode="LNAME");
+
+            --  Update the changed to lname value in back up table
+            UPDATE names_invalid_ntype_bkp bkp
+                INNER JOIN invalid_preferred_names inv ON inv.nid = bkp.nid
+                SET changed_to_lname = 1;
+
+            -- create temporary table for names with no valid ntype and no preferred name
+            CREATE TEMPORARY TABLE invalid_names AS
+                SELECT n.gid AS gid, min(n.nid) AS nid FROM names n
+                INNER JOIN invalid_name_types inv ON inv.gid = n.gid
+                WHERE inv.invalid_count = inv.total_count and inv.invalid_preferred_count = inv.total_preferred_count
+                AND inv.total_preferred_count = 0;
+
+            -- Set the ntype of the invalid name to LNAME
+            UPDATE names n
+                INNER JOIN invalid_names inv ON inv.nid = n.nid
+                SET n.ntype = (SELECT nametype.fldno FROM udflds nametype
+                    WHERE nametype.ftable = "NAMES" AND nametype.ftype = "NAME" AND nametype.fcode="LNAME"),
+                    n.nstat = 1;
+
+            --  Update the changed to lname value in back up table
+            UPDATE names_invalid_ntype_bkp bkp
+                INNER JOIN invalid_preferred_names inv ON inv.nid = bkp.nid
+                SET changed_to_lname = 1;
+
+            -- Delete the invalid names
+            DELETE n FROM names n
+                INNER JOIN names_invalid_ntype_bkp bkp ON bkp.nid = n.nid
+                WHERE bkp.changed_to_lname = 0;
+
+            -- drop the temporary tables
+            DROP TABLE invalid_name_types;
+            DROP TABLE valid_names;
+            DROP TABLE invalid_preferred_names;
+            DROP TABLE invalid_names;
+        </sql>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v23.1.0-16">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM
+                    (SELECT COUNT(*) FROM names GROUP BY gid, ntype HAVING COUNT(*) > 1) nametype_duplicates;
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <comment>
+            Enforcing unique germplasm's name nametypes and creating new nametypes for the duplicates.
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            -- Create a temporary table for names with duplicates
+            CREATE temporary TABLE name_with_duplicates
+            SELECT name.nid, name.gid, name.ntype, nameType.fcode, nameType.ftype, nameType.ftable
+            FROM names name
+                     INNER JOIN udflds nameType ON nameType.fldno = name.ntype
+            GROUP  BY name.gid, name.ntype
+            HAVING Count(*) > 1;
+
+            -- Assign duplicate name with incremented number
+            CREATE temporary TABLE name_with_incremented_number
+            SELECT nid, gid, ntype,
+                   CASE WHEN nameincrement = 0
+                            THEN fcode
+                        ELSE Concat(fcode, '_', nameincrement)
+                       END AS fcode_with_increment
+            FROM (SELECT names.nid, names.gid, names.ntype, name_with_duplicates.fcode, name_with_duplicates.ftype,
+                         CASE WHEN @previousgid = names.gid  AND @previousntype = names.ntype THEN
+                                  @runninggroup := @runninggroup + 1
+                              ELSE @runninggroup := 0
+                             end AS nameIncrement, @previousgid := names.gid, @previousntype := names.ntype
+                  FROM names
+                      INNER JOIN name_with_duplicates ON names.gid = name_with_duplicates.gid AND names.ntype = name_with_duplicates.ntype,
+                      (SELECT @runninggroup := 0) AS b,
+                      (SELECT @previousgid := 0) AS prevGid,
+                      (SELECT @previousntype := 0) AS previousNType
+                  ORDER  BY names.gid, names.ntype, name_with_duplicates.ftype) T;
+
+            -- Create new udflds records for names with incremented number that don't yet exist
+            INSERT INTO udflds (ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid)
+            SELECT udflds.ftable, udflds.ftype, toCreate.fcode_with_increment, udflds.fname, udflds.ffmt, udflds.fdesc, udflds.lfldno,
+                   udflds.fuid, udflds.fdate, udflds.scaleid
+            FROM (SELECT DISTINCT name_with_incremented_number.ntype, name_with_incremented_number.fcode_with_increment
+                  FROM name_with_incremented_number
+                  WHERE NOT EXISTS (SELECT 1
+                                    FROM udflds
+                                    WHERE name_with_incremented_number.fcode_with_increment = udflds.fcode
+                                      AND udflds.ftable = 'NAMES')) toCreate
+                     INNER JOIN udflds ON toCreate.ntype = udflds.fldno;
+
+            -- Update the duplicated names with newly created names
+            UPDATE names n
+                INNER JOIN name_with_incremented_number ON n.nid = name_with_incremented_number.nid
+                LEFT JOIN udflds ON name_with_incremented_number.fcode_with_increment = udflds.fcode AND udflds.ftable = 'NAMES'
+                SET n.ntype = udflds.fldno;
+
+            -- Cleanup temporary table
+            DROP TABLE name_with_duplicates;
+            DROP TABLE name_with_incremented_number;
+        </sql>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v23.1.0-17">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+                WHERE TABLE_NAME = 'names' AND CONSTRAINT_NAME='names_uc1' and TABLE_SCHEMA = DATABASE();
+            </sqlCheck>
+        </preConditions>
+        <comment>Add unique constraint to names table for gid and ntype columns</comment>
+        <addUniqueConstraint columnNames="gid, ntype" constraintName="names_uc1" tableName="names" />
+    </changeSet>
+
 </databaseChangeLog>
