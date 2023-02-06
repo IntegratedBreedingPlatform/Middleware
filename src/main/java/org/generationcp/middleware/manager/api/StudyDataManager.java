@@ -285,15 +285,6 @@ public interface StudyDataManager {
 	String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId);
 
 	/**
-	 * Checks if the name specified is an already existing project name.
-	 *
-	 * @param name        the name
-	 * @param programUUID the program UUID
-	 * @return true or false
-	 */
-	boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID);
-
-	/**
 	 * Gets the field map information (entries, reps, plots and count) of the given study id and study type.
 	 *
 	 * @param studyIdList the study id list
@@ -399,32 +390,12 @@ public interface StudyDataManager {
 	boolean moveDmsProject(int sourceId, int targetId);
 
 	/**
-	 * Retrieves the study details of the given study type from from both selected DB instance ordered by db instance then study name.
-	 *
-	 * @param studyType Can be any of the types defined in {@link StudyType}
-	 * @param start     The start index of the rows to retrieve
-	 * @param numOfRows The number of items to retrieve
-	 * @return The list of study details having the given study type
-	 */
-	List<StudyDetails> getStudyDetails(StudyTypeDto studyType, String programUUID, int start, int numOfRows);
-
-	/**
 	 * Gets the study details.
 	 *
 	 * @param id the id
 	 * @return the study details
 	 */
 	StudyDetails getStudyDetails(int id);
-
-	/**
-	 * Retrieves the study details of the all nurseries and trials from both selected DB instance ordered by study name.
-	 *
-	 * @param programUUID unique ID of the currently selected program
-	 * @param start       The start index of the rows to retrieve
-	 * @param numOfRows   The number of items to retrieve
-	 * @return The list of study details of Nurseries and Trials
-	 */
-	List<StudyDetails> getNurseryAndTrialStudyDetails(String programUUID, int start, int numOfRows);
 
 	/**
 	 * Retrieves all the study details of the given study type from both central and local ordered by db instance then study name.
@@ -434,23 +405,6 @@ public interface StudyDataManager {
 	 * @return The list of study details having the given study type
 	 */
 	List<StudyDetails> getAllStudyDetails(StudyTypeDto studyType, String programUUID);
-
-	/**
-	 * Count all studies of the given study type from both central and local.
-	 *
-	 * @param studyType   Can be any of the types defined in {@link StudyType}
-	 * @param programUUID unique ID of the currently selected program
-	 * @return The list of study details having the given study type
-	 */
-	long countAllStudyDetails(StudyTypeDto studyType, String programUUID);
-
-	/**
-	 * Count all nurseries and trials
-	 *
-	 * @param programUUID unique ID of the currently selected program
-	 * @return The list of study details from the currently selected program
-	 */
-	long countAllNurseryAndTrialStudyDetails(String programUUID);
 
 	/**
 	 * Count plots with plants selected of dataset.
@@ -579,8 +533,6 @@ public interface StudyDataManager {
 	List<StudyTypeDto> getAllStudyTypes();
 
 	StudyTypeDto getStudyTypeByName(String name);
-
-	StudyTypeDto getStudyTypeByLabel(String label);
 
 	List<StudyTypeDto> getAllVisibleStudyTypes();
 
