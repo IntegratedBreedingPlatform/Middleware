@@ -15,7 +15,6 @@ import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
-import org.generationcp.middleware.domain.h2h.GermplasmLocationInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
@@ -26,9 +25,7 @@ import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Implementation of the CrossStudyDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -108,21 +105,4 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 		return this.trialEnvironmentBuilder.getEnvironmentsForTraits(traitIds, programUUID);
 	}
 
-	@Override
-	public List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(final Set<Integer> environmentIds) {
-		final List<GermplasmLocationInfo> result = new ArrayList<>();
-		if (environmentIds != null && !environmentIds.isEmpty()) {
-			result.addAll(this.daoFactory.getBreedersQueryDao().getGermplasmLocationInfoByEnvironmentIds(environmentIds));
-		}
-		return result;
-	}
-
-	@Override
-	public List<Integer> getTrialEnvironmentIdsForGermplasm(final Set<Integer> gids) {
-		final List<Integer> result = new ArrayList<>();
-		if (gids != null && !gids.isEmpty()) {
-			result.addAll(this.daoFactory.getBreedersQueryDao().getTrialEnvironmentIdsForGermplasm(gids));
-		}
-		return result;
-	}
 }
