@@ -343,12 +343,12 @@
 
             -- Assign duplicate name with incremented number
             CREATE temporary TABLE name_with_incremented_number
-            SELECT nid, gid, ntype,
+            SELECT nid, gid, ntype, ftable, ftype,
                    CASE WHEN nameincrement = 0
                             THEN fcode
                         ELSE Concat(fcode, '_', nameincrement)
                        END AS fcode_with_increment
-            FROM (SELECT names.nid, names.gid, names.ntype, name_with_duplicates.fcode, name_with_duplicates.ftype,
+            FROM (SELECT names.nid, names.gid, names.ntype, name_with_duplicates.fcode, name_with_duplicates.ftable, name_with_duplicates.ftype,
                          CASE WHEN @previousgid = names.gid  AND @previousntype = names.ntype THEN
                                   @runninggroup := @runninggroup + 1
                               ELSE @runninggroup := 0
@@ -369,13 +369,14 @@
                   WHERE NOT EXISTS (SELECT 1
                                     FROM udflds
                                     WHERE name_with_incremented_number.fcode_with_increment = udflds.fcode
-                                      AND udflds.ftable = 'NAMES')) toCreate
+                                      AND udflds.ftable = name_with_incremented_number.ftable AND udflds.ftype = name_with_incremented_number.ftype)) toCreate
                      INNER JOIN udflds ON toCreate.ntype = udflds.fldno;
 
             -- Update the duplicated names with newly created names
             UPDATE names n
                 INNER JOIN name_with_incremented_number ON n.nid = name_with_incremented_number.nid
-                LEFT JOIN udflds ON name_with_incremented_number.fcode_with_increment = udflds.fcode AND udflds.ftable = 'NAMES'
+                LEFT JOIN udflds ON name_with_incremented_number.fcode_with_increment = udflds.fcode AND udflds.ftable = name_with_incremented_number.ftable
+                    AND udflds.ftype = name_with_incremented_number.ftype
                 SET n.ntype = udflds.fldno;
 
             -- Cleanup temporary table
