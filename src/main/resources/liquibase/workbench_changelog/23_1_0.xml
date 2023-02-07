@@ -96,4 +96,24 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="mderamos" id="v23.1.0-6">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*) FROM permission where name = 'DELETE_SAMPLES'
+			</sqlCheck>
+		</preConditions>
+		<comment>Add Sample Lists "Delete Samples" permission</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @samples_lists_id = (select permission_id from permission where name = 'SAMPLES_LISTS');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('DELETE_SAMPLES', 'Delete Samples', @samples_lists_id, null);
+
+			SET @delete_samples_id = (SELECT permission_id FROM permission where name = 'DELETE_SAMPLES');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @delete_samples_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @delete_samples_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @delete_samples_id, '1');
+		</sql>
+	</changeSet>
 </databaseChangeLog>
