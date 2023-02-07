@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.dao;
 
+import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.SampleDetailsBean;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -264,6 +265,11 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			).setResultTransformer(Transformers.aliasToBean(SampleDetailsBean.class));
 	}
 
+	public List<SampleDTO> getSamples(final Integer sampleListId, final List<Integer> sampleIds) {
+		return this.getSampleDTOS(this.getSession().createCriteria(Sample.class, SAMPLE) //
+				.add(Restrictions.in(SAMPLE_ID, sampleIds)));
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<SampleDTO> convertToSampleDTOs(final List<SampleDetailsBean> sampleDetailsBeans) {
 		if (sampleDetailsBeans.isEmpty()) {
@@ -438,6 +444,40 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createCountSamplesQueryString(requestDTO));
 		this.addSampleSearchParameters(sqlQuery, requestDTO);
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+	}
+
+	public void deleteBySampleIds(final Integer sampleListId, final List<Integer> sampleIds) {
+		Preconditions.checkNotNull(sampleListId, "sampleListId can not be null.");
+		Preconditions.checkArgument(org.apache.commons.collections.CollectionUtils.isNotEmpty(sampleIds), "sampleIds passed cannot be empty.");
+		final String query =
+				"DELETE s FROM sample s "
+					+ " WHERE s.sample_id IN (:sampleIds) AND s.sample_list = :sampleListId";
+
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
+		sqlQuery.setParameterList("sampleIds", sampleIds);
+		sqlQuery.setParameter("sampleListId", sampleListId);
+		sqlQuery.executeUpdate();
+	}
+
+	/**
+	 * Reset the entry numbers (entry_no) based on the order of current entry_no.
+	 *
+	 * @param sampleListId
+	 */
+	public void reOrderEntries(final Integer sampleListId) {
+		final String sql = "UPDATE sample s \n"
+				+ "    JOIN (SELECT @position \\:= 0) r\n"
+				+ "    INNER JOIN (\n"
+				+ "        SELECT sample_id, entry_no\n"
+				+ "        FROM sample innerSample\n"
+				+ "        WHERE innerSample.sample_list = :listId \n"
+				+ "        ORDER BY innerSample.entry_no ASC) AS tmp\n"
+				+ "    ON s.sample_id = tmp.sample_id\n"
+				+ "SET s.entry_no = @position \\:= @position + 1\n"
+				+ "WHERE s.sample_list = :listId";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+		sqlQuery.setParameter("listId", sampleListId);
+		sqlQuery.executeUpdate();
 	}
 
 	private String createCountSamplesQueryString(final SampleSearchRequestDTO requestDTO) {
