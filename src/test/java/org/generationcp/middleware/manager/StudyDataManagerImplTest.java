@@ -408,17 +408,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCheckIfProjectNameIsExisting() {
-		final DmsProject project = this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
-		boolean isExisting = this.manager.checkIfProjectNameIsExistingInProgram(project.getName(), this.commonTestProject.getUniqueID());
-		Assert.assertTrue(isExisting);
-
-		final String name = "SHOULDNOTEXISTSTUDY";
-		isExisting = this.manager.checkIfProjectNameIsExistingInProgram(name, this.commonTestProject.getUniqueID());
-		Assert.assertFalse(isExisting);
-	}
-
-	@Test
 	public void testGetParentFolder() {
 		final String uniqueId = "001";
 		final DmsProject project = this.studyTDI.createFolderTestData(uniqueId);
@@ -515,34 +504,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		}
 	}
 
-	@Test
-	public void testGetStudyDetailsByStudyType() throws Exception {
-		final List<StudyDetails> trialStudyDetails =
-			this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
-		final int sizeBeforeAddingNewTrial = trialStudyDetails.size();
-		final StudyReference newStudy = this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW STUDY");
-		final List<StudyDetails> updatedStudyDetails =
-			this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
-		final int sizeAfterAddingNewStudy = updatedStudyDetails.size();
-		Assert.assertEquals("The size after adding new study should be equal to the size before adding a new study + 1",
-			sizeAfterAddingNewStudy, sizeBeforeAddingNewTrial + 1);
-		for (final StudyDetails details : updatedStudyDetails) {
-			if (this.studyReference.getId().equals(details.getId())) {
-				Assert.assertEquals(this.studyReference.getName(), details.getStudyName());
-				Assert.assertEquals(this.studyReference.getStudyType(), details.getStudyType());
-				Assert.assertEquals(this.studyReference.getOwnerId().toString(), details.getCreatedBy());
-			} else if (newStudy.getId().equals(details.getId())) {
-				Assert.assertEquals(newStudy.getName(), details.getStudyName());
-				Assert.assertEquals(newStudy.getStudyType(), details.getStudyType());
-				Assert.assertEquals(newStudy.getOwnerId().toString(), details.getCreatedBy());
-			}
-			// Do not verify unseeded data like study templates which are also retrieved
-			if (details.getProgramUUID() != null) {
-				this.verifyCommonStudyDetails(details);
-			}
-		}
-	}
-
 	private void verifyCommonStudyDetails(final StudyDetails details) {
 		Assert.assertEquals(StudyTestDataInitializer.STUDY_DESCRIPTION, details.getDescription());
 		Assert.assertEquals(StudyTestDataInitializer.START_DATE, details.getStartDate());
@@ -550,33 +511,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(StudyTestDataInitializer.OBJECTIVE, details.getObjective());
 		Assert.assertEquals(this.commonTestProject.getUniqueID(), details.getProgramUUID());
 		Assert.assertFalse(details.getIsLocked());
-	}
-
-	@Test
-	public void testGetNurseryAndTrialStudyDetails() throws Exception {
-		final List<StudyDetails> studyDetailsList =
-			this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
-		final int sizeBeforeAddingNewStudy = studyDetailsList.size();
-		final StudyReference nursery = this.studyTDI.addTestStudy(StudyTypeDto.getNurseryDto(), "NEW NURSERY");
-		final StudyReference trial = this.studyTDI.addTestStudy(StudyTypeDto.getTrialDto(), "NEW TRIAL");
-		final List<StudyDetails> newStudyDetailsList =
-			this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
-		final int sizeAfterAddingNewStudy = newStudyDetailsList.size();
-		Assert.assertEquals("The new size should be equal to the size before adding a new study plus 2.", sizeAfterAddingNewStudy,
-			sizeBeforeAddingNewStudy + 2);
-		for (final StudyDetails details : newStudyDetailsList) {
-			if (nursery.getId().equals(details.getId())) {
-				Assert.assertEquals(nursery.getName(), details.getStudyName());
-				Assert.assertEquals(nursery.getStudyType(), details.getStudyType());
-			} else if (trial.getId().equals(details.getId())) {
-				Assert.assertEquals(trial.getName(), details.getStudyName());
-				Assert.assertEquals(trial.getStudyType(), details.getStudyType());
-			}
-			// Do not verify unseeded data like study templates which are also retrieved
-			if (details.getProgramUUID() != null) {
-				this.verifyCommonStudyDetails(details);
-			}
-		}
 	}
 
 	@Test

@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api;
 
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.ListMetadata;
@@ -89,12 +90,6 @@ public interface SampleListService {
 	 */
 	Map<Integer, ListMetadata> getListMetadata(final List<SampleList> sampleLists);
 
-	/**
-	 * @param listId - the list Id
-	 * @return - List of SampleList POJOs
-	 */
-	SampleList getSampleListByListId(final Integer listId);
-
 	SampleList getLastSavedSampleListByUserId(final Integer userId, final String programUuid);
 
 	/**
@@ -128,4 +123,8 @@ public interface SampleListService {
 	void updateSamplePlateInfo(Integer sampleListId, Map<String, SamplePlateInfo> plateInfoMap);
 
 	String getObservationVariableName(Integer sampleListId);
+
+	List<SampleDTO> getSampleListEntries(Integer sampleListId, List<Integer> sampleIds);
+
+	void deleteSamples(Integer sampleListId, List<Integer> sampleIds);
 }

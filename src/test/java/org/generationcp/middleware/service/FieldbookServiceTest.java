@@ -8,7 +8,6 @@ import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
-import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -114,17 +113,6 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 		Assert.assertTrue(
 			"Should return true since the workbook is not null",
 			this.fieldbookService.setOrderVariableByRank(workbook));
-	}
-
-	@Test
-	public void testGetCompleteDataset() throws Exception {
-		final Integer id = this.studyReference.getId();
-		final DatasetReference datasetReference = this.studyTDI.addTestDataset(id);
-		final Workbook workbook = this.fieldbookService.getCompleteDataset(datasetReference.getId());
-		Assert.assertNotNull(workbook.getObservations());
-		Assert.assertNotNull(workbook.getFactors());
-		Assert.assertNotNull(workbook.getVariates());
-		Assert.assertNotNull(workbook.getMeasurementDatasetVariables());
 	}
 
 	@Test

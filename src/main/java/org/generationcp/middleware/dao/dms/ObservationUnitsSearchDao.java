@@ -109,6 +109,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
 
 	static {
+		geolocSpecialFactorsMap.put("TRIAL_INSTANCE", "gl.description");
 		geolocSpecialFactorsMap.put("SITE_LAT", "gl.latitude");
 		geolocSpecialFactorsMap.put("SITE_LONG", "gl.longitude");
 		geolocSpecialFactorsMap.put("SITE_ALT", "gl.altitude");
@@ -721,15 +722,15 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		// Only variables at observation level are supported in filtering columns. Variables at environment level are automatically excluded if filterColumns has values.
 		if (noFilterVariables && !CollectionUtils.isEmpty(searchDto.getEnvironmentDetails())) {
-			final String envFactorFormat =
-				"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) '%s'";
-			final String geolocEnvFactorFormat =
-				" %s AS '%s'";
 			for (final MeasurementVariableDto envFactor : searchDto.getEnvironmentDetails()) {
 				if (geolocSpecialFactorsMap.containsKey(envFactor.getName())) {
+					final String geolocEnvFactorFormat =
+						" %s AS '%s'";
 					final String column = geolocSpecialFactorsMap.get(envFactor.getName());
 					columns.add(String.format(geolocEnvFactorFormat, column, this.getEnvironmentColumnName(envFactor.getName())));
 				} else {
+					final String envFactorFormat =
+						"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) '%s'";
 					columns.add(String.format(envFactorFormat, envFactor.getName(), this.getEnvironmentColumnName(envFactor.getName())));
 				}
 			}
