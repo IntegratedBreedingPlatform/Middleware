@@ -21,7 +21,6 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
-import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
@@ -173,11 +172,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int geolocationId,
 			final CrossExpansionProperties crossExpansionProperties) {
 		return this.studyDataManager.getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, crossExpansionProperties);
-	}
-
-	@Override
-	public List<DatasetReference> getDatasetReferences(final int studyId) {
-		return this.studyDataManager.getDatasetReferences(studyId);
 	}
 
 	@Override
@@ -616,13 +610,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public void setTreatmentFactorValues(final List<TreatmentVariable> treatmentFactors, final int measurementDatasetID) {
 		this.workbookBuilder.setTreatmentFactorValues(treatmentFactors, measurementDatasetID);
-	}
-
-	@Override
-	public Workbook getCompleteDataset(final int datasetId) {
-		final Workbook workbook = this.dataSetBuilder.buildCompleteDataset(datasetId);
-		this.setOrderVariableByRank(workbook, datasetId);
-		return workbook;
 	}
 
 	@Override
