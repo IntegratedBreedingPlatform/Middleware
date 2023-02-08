@@ -1866,7 +1866,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		query.addScalar(StudySearchDAOQuery.STUDY_DESCRIPTION_ALIAS);
 		query.addScalar(StudySearchDAOQuery.STUDY_TYPE_NAME_ALIAS);
 		query.addScalar(StudySearchDAOQuery.LOCKED_ALIAS, BooleanType.INSTANCE);
-		query.addScalar(StudySearchDAOQuery.STUDY_OWNER_ALIAS);
+		query.addScalar(StudySearchDAOQuery.STUDY_OWNER_NAME_ALIAS);
+		query.addScalar(StudySearchDAOQuery.STUDY_OWNER_ID_ALIAS);
 		query.addScalar(StudySearchDAOQuery.START_DATE_ALIAS);
 		query.addScalar(StudySearchDAOQuery.END_DATE_ALIAS);
 		query.addScalar(StudySearchDAOQuery.UPDATE_DATE_ALIAS);
