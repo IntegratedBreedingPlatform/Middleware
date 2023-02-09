@@ -7,13 +7,11 @@ import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigInteger;
 import java.util.List;
 
 public class RoleDAO extends GenericDAO<Role, Integer> {
@@ -61,7 +59,7 @@ public class RoleDAO extends GenericDAO<Role, Integer> {
 		return role;
 	}
 
-	public long countRolesUsers(final RoleSearchDto roleSearchDto) {
+	public long countRoles(final RoleSearchDto roleSearchDto) {
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Role.class);

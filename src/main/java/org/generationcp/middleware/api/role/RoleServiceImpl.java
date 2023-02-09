@@ -52,8 +52,8 @@ public class RoleServiceImpl implements RoleService {
 	}
 
 	@Override
-	public long countRolesUsers(final RoleSearchDto roleSearchDto) {
-		return this.workbenchDaoFactory.getRoleDao().countRolesUsers(roleSearchDto);
+	public long countRoles(final RoleSearchDto roleSearchDto) {
+		return this.workbenchDaoFactory.getRoleDao().countRoles(roleSearchDto);
 	}
 
 	@Override

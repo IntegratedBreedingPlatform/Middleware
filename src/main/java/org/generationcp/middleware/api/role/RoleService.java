@@ -20,7 +20,7 @@ import java.util.Optional;
 
 public interface RoleService {
 
-	long countRolesUsers(RoleSearchDto roleSearchDto);
+	long countRoles(RoleSearchDto roleSearchDto);
 
 	List<RoleDto> searchRoles(RoleSearchDto roleSearchDto, Pageable pageable);
 
