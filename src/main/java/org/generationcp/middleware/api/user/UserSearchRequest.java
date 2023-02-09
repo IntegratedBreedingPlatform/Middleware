@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.user;
 
+import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
@@ -23,5 +24,21 @@ public class UserSearchRequest {
 
 	public void setRoleId(final Integer roleId) {
 		this.roleId = roleId;
+	}
+
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
 	}
 }
