@@ -81,7 +81,7 @@ public class RoleDAO extends GenericDAO<Role, Integer> {
 			return criteria.list().size();
 
 		} catch (final HibernateException e) {
-			final String message = "Error with countRolesUsers query from RoleDAO: " + e.getMessage();
+			final String message = "Error with countRoles query from RoleDAO: " + e.getMessage();
 			RoleDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
