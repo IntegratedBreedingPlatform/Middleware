@@ -22,6 +22,7 @@ import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -51,8 +52,13 @@ public class RoleServiceImpl implements RoleService {
 	}
 
 	@Override
-	public List<RoleDto> getRoles(final RoleSearchDto roleSearchDto) {
-		final List<Role> list = this.workbenchDaoFactory.getRoleDao().getRoles(roleSearchDto);
+	public long countRoles(final RoleSearchDto roleSearchDto) {
+		return this.workbenchDaoFactory.getRoleDao().countRoles(roleSearchDto);
+	}
+
+	@Override
+	public List<RoleDto> searchRoles(final RoleSearchDto roleSearchDto, Pageable pageable) {
+		final List<Role> list = this.workbenchDaoFactory.getRoleDao().searchRoles(roleSearchDto, pageable);
 		final List<RoleDto> roles = list.stream()
 			.map(role -> new RoleDto(role))
 			.collect(Collectors.toList());
@@ -95,7 +101,7 @@ public class RoleServiceImpl implements RoleService {
 	public Optional<RoleDto> getRoleByName(final String name) {
 		final RoleSearchDto roleSearchDto = new RoleSearchDto();
 		roleSearchDto.setName(name);
-		final List<Role> roles = this.workbenchDaoFactory.getRoleDao().getRoles(roleSearchDto);
+		final List<Role> roles = this.workbenchDaoFactory.getRoleDao().searchRoles(roleSearchDto, null);
 		return roles.isEmpty() ? Optional.empty() : Optional.of(new RoleDto(roles.get(0)));
 	}
 

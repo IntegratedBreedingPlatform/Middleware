@@ -13,13 +13,16 @@ package org.generationcp.middleware.api.role;
 import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.RoleGeneratorInput;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface RoleService {
 
-	List<RoleDto> getRoles(RoleSearchDto roleSearchDto);
+	long countRoles(RoleSearchDto roleSearchDto);
+
+	List<RoleDto> searchRoles(RoleSearchDto roleSearchDto, Pageable pageable);
 
 	RoleDto saveRole(RoleGeneratorInput dto);
 
