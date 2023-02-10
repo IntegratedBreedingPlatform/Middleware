@@ -32,6 +32,8 @@ public class StudyReference extends Reference {
 	
 	private String ownerName;
 
+	private String ownerUserName;
+
 	public StudyReference(final Integer id, final String name) {
 		super.setId(id);
 		super.setName(name);
@@ -108,6 +110,14 @@ public class StudyReference extends Reference {
 	
 	public void setOwnerName(String ownerName) {
 		this.ownerName = ownerName;
+	}
+
+	public String getOwnerUserName() {
+		return ownerUserName;
+	}
+
+	public void setOwnerUserName(final String ownerUserName) {
+		this.ownerUserName = ownerUserName;
 	}
 
 	@Override

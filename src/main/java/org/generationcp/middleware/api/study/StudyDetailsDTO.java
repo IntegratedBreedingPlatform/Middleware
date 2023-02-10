@@ -22,6 +22,8 @@ public class StudyDetailsDTO {
 	private Date startDate;
 	private Date endDate;
 	private Date lastUpdateDate;
+	private boolean locked;
+	private Integer ownerId;
 
 	private Integer numberOfEntries;
 	private Integer numberOfPlots;
@@ -113,6 +115,22 @@ public class StudyDetailsDTO {
 
 	public void setLastUpdateDate(final Date lastUpdateDate) {
 		this.lastUpdateDate = lastUpdateDate;
+	}
+
+	public boolean isLocked() {
+		return locked;
+	}
+
+	public void setLocked(final boolean locked) {
+		this.locked = locked;
+	}
+
+	public Integer getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(final Integer ownerId) {
+		this.ownerId = ownerId;
 	}
 
 	public Integer getNumberOfEntries() {
