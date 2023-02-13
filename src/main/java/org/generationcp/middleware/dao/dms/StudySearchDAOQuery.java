@@ -28,7 +28,7 @@ public class StudySearchDAOQuery {
 		STUDY_NAME(STUDY_NAME_ALIAS),
 		STUDY_TYPE_NAME(STUDY_TYPE_NAME_ALIAS),
 		LOCKED(LOCKED_ALIAS),
-		STUDY_OWNER(STUDY_OWNER_ALIAS),
+		STUDY_OWNER_NAME(STUDY_OWNER_NAME_ALIAS),
 		START_DATE(START_DATE_ALIAS),
 		PARENT_FOLDER_NAME(PARENT_FOLDER_NAME_ALIAS),
 		OBJECTIVE(OBJECTIVE_ALIAS);
@@ -62,7 +62,8 @@ public class StudySearchDAOQuery {
 	static final String STUDY_DESCRIPTION_ALIAS = "description";
 	static final String STUDY_TYPE_NAME_ALIAS = "studyTypeName";
 	static final String LOCKED_ALIAS = "locked";
-	static final String STUDY_OWNER_ALIAS = "ownerName";
+	static final String STUDY_OWNER_NAME_ALIAS = "ownerName";
+	static final String STUDY_OWNER_ID_ALIAS = "ownerId";
 	static final String START_DATE_ALIAS = "startDate";
 	static final String END_DATE_ALIAS = "endDate";
 	static final String UPDATE_DATE_ALIAS = "updateDate";
@@ -81,7 +82,8 @@ public class StudySearchDAOQuery {
 		+ " study.description AS " + STUDY_DESCRIPTION_ALIAS + ", "
 		+ " studyType.label AS " + STUDY_TYPE_NAME_ALIAS + ", "
 		+ " study.locked AS " + LOCKED_ALIAS + ", "
-		+ " user.uname AS " + STUDY_OWNER_ALIAS + ", "
+		+ " user.uname AS " + STUDY_OWNER_NAME_ALIAS + ", "
+		+ " user.userid AS " + STUDY_OWNER_ID_ALIAS + ", "
 		+ " STR_TO_DATE (convert(study.start_date,char), '%Y%m%d') AS " + START_DATE_ALIAS + ", "
 		+ " CASE WHEN study.end_date = '' THEN null ELSE ((STR_TO_DATE(convert(study.end_date, char), '%Y%m%d'))) END as " + END_DATE_ALIAS
 		+ ", "

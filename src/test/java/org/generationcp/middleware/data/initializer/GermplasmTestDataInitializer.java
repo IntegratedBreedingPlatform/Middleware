@@ -71,17 +71,17 @@ public class GermplasmTestDataInitializer {
 	}
 
 	public static Name createGermplasmName(final int gid) {
-		return GermplasmTestDataInitializer.createGermplasmName(gid, "Name " + gid);
+		return GermplasmTestDataInitializer.createGermplasmName(gid, "Name " + gid, 1);
 	}
 
-	public static Name createGermplasmName(final int gid, final String germplasmName) {
+	public static Name createGermplasmName(final int gid, final String germplasmName, final Integer typeId) {
 		final Name name = new Name();
 		name.setGermplasm(new Germplasm(gid));
 		name.setNval(germplasmName);
 		name.setLocationId(1);
 		name.setNdate(20160101);
 		name.setReferenceId(1);
-		name.setTypeId(1);
+		name.setTypeId(typeId);
 		name.setNstat(1);
 
 		return name;

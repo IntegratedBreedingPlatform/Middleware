@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.impl.user;
 
+import org.generationcp.middleware.api.user.UserSearchRequest;
 import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
@@ -398,6 +399,16 @@ public class UserServiceImpl implements UserService {
 			return 0;
 		}
 		return this.getUserByUsername(authentication.getName()).getUserid();
+	}
+
+	@Override
+	public long countSearchUsers(final UserSearchRequest userSearchRequest) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().countSearchUsers(userSearchRequest);
+	}
+
+	@Override
+	public List<UserDto> searchUsers(final UserSearchRequest userSearchRequest, final Pageable pageable) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().searchUsers(userSearchRequest, pageable);
 	}
 
 	private UserRole buildNewUserRole(final WorkbenchUser user, final UserRoleDto userRoleDto) {

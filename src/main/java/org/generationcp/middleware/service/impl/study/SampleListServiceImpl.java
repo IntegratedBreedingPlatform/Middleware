@@ -7,6 +7,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
@@ -381,12 +382,6 @@ public class SampleListServiceImpl implements SampleListService {
 			throw new MiddlewareQueryException("Error in moveSampleList in SampleListServiceImpl: " + e.getMessage(), e);
 		}
 	}
-
-	@Override
-	public SampleList getSampleListByListId(final Integer listId) {
-		return this.daoFactory.getSampleListDao().getById(listId);
-	}
-
 	@Override
 	public SampleList getLastSavedSampleListByUserId(final Integer userId, final String programUuid) {
 		return this.daoFactory.getSampleListDao().getLastCreatedByUserID(userId, programUuid);
@@ -498,6 +493,17 @@ public class SampleListServiceImpl implements SampleListService {
 	public String getObservationVariableName(final Integer sampleListId) {
 		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDatasetOfSampleList(sampleListId);
 		return this.daoFactory.getObservationUnitsSearchDAO().getObservationVariableName(datasetDTO.getDatasetId());
+	}
+
+	@Override
+	public List<SampleDTO> getSampleListEntries(final Integer sampleListId, final List<Integer> sampleIds) {
+		return this.daoFactory.getSampleDao().getSamples(sampleListId, sampleIds);
+	}
+
+	@Override
+	public void deleteSamples(final Integer sampleListId, final List<Integer> sampleIds) {
+		this.daoFactory.getSampleDao().deleteBySampleIds(sampleListId, sampleIds);
+		this.daoFactory.getSampleDao().reOrderEntries(sampleListId);
 	}
 
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {

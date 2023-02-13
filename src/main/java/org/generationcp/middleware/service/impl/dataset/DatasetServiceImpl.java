@@ -923,19 +923,6 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 	}
 
-	@Override
-	public void deleteDataset(final int datasetId) {
-
-		try {
-
-			this.daoFactory.getDmsProjectDAO().deleteDataset(datasetId);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in deleteDataSet " + e.getMessage(), e);
-		}
-	}
-
 	// TODO consolidate with getObservationSetVariables
 	@Override
 	public List<MeasurementVariableDto> getDatasetVariablesByType(final Integer datasetId, final VariableType variableType) {

@@ -30,6 +30,7 @@ import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearc
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -441,7 +442,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertNotNull(germplasm.getGid());
 
 		final Name name1 = new Name();
-		name1.setTypeId(5);
+		name1.setTypeId(GermplasmNameType.GERMPLASM_BANK_ACCESSION_NUMBER.getUserDefinedFieldID());
 		name1.setNstat(1);
 		name1.setNval("Name1");
 		name1.setLocationId(1);
@@ -449,7 +450,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		name1.setReferenceId(0);
 
 		final Name name2 = new Name();
-		name2.setTypeId(5);
+		name2.setTypeId(GermplasmNameType.LINE_NAME.getUserDefinedFieldID());
 		name2.setNstat(1);
 		name2.setNval("Name2");
 		name2.setLocationId(1);
@@ -787,7 +788,17 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountGermplasmDTOs_FilterByAccessionNumbers() {
-		final List<String> names = this.saveGermplasmWithNames(GermplasmImportRequest.ACCNO_NAME_TYPE);
+		final Germplasm germplasm1 =
+				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
+		this.germplasmTestDataGenerator.addGermplasm(germplasm1, germplasm1.getPreferredName(), this.cropType);
+
+		final Germplasm germplasm2 =
+				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
+		this.germplasmTestDataGenerator.addGermplasm(germplasm2, germplasm2.getPreferredName(), this.cropType);
+
+		this.sessionProvder.getSession().flush();
+
+		final List<String> names =  Arrays.asList(germplasm1.getNames().get(0).getNval(), germplasm2.getNames().get(0).getNval());
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();
 		request.setAccessionNumbers(names);
 		final Long count = this.daoFactory.getGermplasmDao().countGermplasmDTOs(request);
@@ -807,7 +818,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	public void testCountGermplasmDTOs_FilterBySynonyms() {
 		final List<String> allNames = new ArrayList<>();
 		allNames.addAll(this.saveGermplasmWithNames(GermplasmImportRequest.GENUS_NAME_TYPE));
-		allNames.addAll(this.saveGermplasmWithNames(GermplasmImportRequest.ACCNO_NAME_TYPE));
+		allNames.addAll(this.saveGermplasmWithNames(GermplasmImportRequest.PUI_NAME_TYPE));
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();
 		request.setSynonyms(allNames);
 		final Long count = this.daoFactory.getGermplasmDao().countGermplasmDTOs(request);
@@ -1812,8 +1823,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			this.daoFactory.getUserDefinedFieldDAO().saveOrUpdate(attributeField);
 		}
 
-		final Name name = GermplasmTestDataInitializer.createGermplasmName(germplasmGID, RandomStringUtils.randomAlphanumeric(50));
-		name.setTypeId(attributeField.getFldno());
+		final Name name = GermplasmTestDataInitializer.createGermplasmName(germplasmGID, RandomStringUtils.randomAlphanumeric(50), attributeField.getFldno());
 		name.setNstat(0); // TODO Review
 		this.daoFactory.getNameDao().save(name);
 

@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -66,6 +64,7 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -76,7 +75,6 @@ import org.generationcp.middleware.util.Util;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,6 +84,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -148,11 +147,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public boolean checkIfProjectNameIsExistingInProgram(final String name, final String programUUID) {
-		return this.daoFactory.getDmsProjectDAO().checkIfProjectNameIsExistingInProgram(name, programUUID);
-	}
-
-	@Override
 	public List<Reference> getRootFolders(final String programUUID) {
 		final List<Reference> references = this.daoFactory.getDmsProjectDAO().getRootFolders(programUUID, null);
 		this.populateStudyOwnerName(references);
@@ -211,20 +205,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				studyReferences.add((StudyReference) reference);
 			}
 		}
-		if (!studyReferences.isEmpty()) {
-			final List<Integer> userIds = Lists.transform(studyReferences, new Function<StudyReference, Integer>() {
-
-				@Nullable
-				@Override
-				public Integer apply(@Nullable final StudyReference input) {
-					return input.getOwnerId();
-				}
-			});
-			if (!userIds.isEmpty()) {
-				final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
+		if (!CollectionUtils.isEmpty(studyReferences)) {
+			final Set<Integer> userIds = studyReferences.stream().map(StudyReference::getOwnerId).collect(Collectors.toSet());
+			if (!CollectionUtils.isEmpty(userIds)) {
+				final Map<Integer, WorkbenchUser> usersByIds = this.userService.getUsersByIds(new ArrayList<>(userIds)).stream()
+					.collect(Collectors.toMap(WorkbenchUser::getUserid, Function
+						.identity()));
 				for (final StudyReference study : studyReferences) {
-					if (study.getOwnerId() != null) {
-						study.setOwnerName(userIDFullNameMap.get(study.getOwnerId()));
+					if (study.getOwnerId() != null && usersByIds.get(study.getOwnerId()) != null) {
+						final WorkbenchUser user = usersByIds.get(study.getOwnerId());
+						study.setOwnerName(user.getPerson().getFirstName() + " " + user.getPerson().getLastName());
+						study.setOwnerUserName(user.getName());
 					}
 				}
 			}
@@ -690,26 +681,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<StudyDetails> getStudyDetails(
-		final StudyTypeDto studyType, final String programUUID, final int start,
-		final int numOfRows) {
-		final List<StudyDetails> details = this.daoFactory.getDmsProjectDAO().getAllStudyDetails(studyType, programUUID, start, numOfRows);
-		this.populateSiteAndPersonIfNecessary(details);
-		return details;
-	}
-
-	@Override
 	public StudyDetails getStudyDetails(final int studyId) {
 		final StudyDetails studyDetails = this.daoFactory.getDmsProjectDAO().getStudyDetails(studyId);
 		this.populateSiteAnPersonIfNecessary(studyDetails);
 		return studyDetails;
-	}
-
-	@Override
-	public List<StudyDetails> getNurseryAndTrialStudyDetails(final String programUUID, final int start, final int numOfRows) {
-		final List<StudyDetails> list = this.daoFactory.getDmsProjectDAO().getAllStudyDetails(programUUID, start, numOfRows);
-		this.populateSiteAndPersonIfNecessary(list);
-		return list;
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -722,20 +697,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		this.populateSiteAndPersonIfNecessary(list);
 		return list;
-	}
-
-	@Override
-	public long countAllStudyDetails(final StudyTypeDto studyType, final String programUUID) {
-		long count = 0;
-		count += this.daoFactory.getDmsProjectDAO().countAllStudyDetails(studyType, programUUID);
-		return count;
-	}
-
-	@Override
-	public long countAllNurseryAndTrialStudyDetails(final String programUUID) {
-		long count = 0;
-		count += this.daoFactory.getDmsProjectDAO().countAllStudyDetails(programUUID);
-		return count;
 	}
 
 	@Override
@@ -1024,11 +985,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			return this.getStudyTypeBuilder().createStudyTypeDto(studyTypeByName);
 		}
 		return null;
-	}
-
-	@Override
-	public StudyTypeDto getStudyTypeByLabel(final String label) {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.daoFactory.getStudyTypeDao().getStudyTypeByLabel(label));
 	}
 
 	@Override

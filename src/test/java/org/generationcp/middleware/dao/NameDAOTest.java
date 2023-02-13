@@ -42,7 +42,7 @@ public class NameDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByGIDWithFilters() throws Exception {
+	public void testGetByGIDWithFilters() {
 		final int dateIntValue = Integer.parseInt(new SimpleDateFormat("yyyyMMdd").format(new Date()));
 		final Germplasm germplasm = this.createGermplasmTestData(dateIntValue);
 		NameDAOTest.germplasmDAO.save(germplasm);
@@ -52,13 +52,13 @@ public class NameDAOTest extends IntegrationTestBase {
 		NameDAOTest.nameDAO.save(notPreferredName);
 		final Name uncategorizedName =
 				this.createNameTestData(dateIntValue, germplasm.getGid(), 0, NameDAOTest.UNCATEGORIZED_NAME,
-						GermplasmNameType.DERIVATIVE_NAME);
+						GermplasmNameType.CROSS_NAME);
 		NameDAOTest.nameDAO.save(uncategorizedName);
 		final Name preferredName =
 				this.createNameTestData(dateIntValue, germplasm.getGid(), 1, NameDAOTest.PREFERRED_NAME, GermplasmNameType.LINE_NAME);
 		NameDAOTest.nameDAO.save(preferredName);
 		final Name deletedName =
-				this.createNameTestData(dateIntValue, germplasm.getGid(), 9, NameDAOTest.DELETED_NAME, GermplasmNameType.LINE_NAME);
+				this.createNameTestData(dateIntValue, germplasm.getGid(), 9, NameDAOTest.DELETED_NAME, GermplasmNameType.CULTIVAR_NAME);
 		NameDAOTest.nameDAO.save(deletedName);
 		final List<Name> names = NameDAOTest.nameDAO.getByGIDWithFilters(germplasm.getGid(), 0, null);
 		Assert.assertNotNull("The list should not be empty", names);
@@ -119,7 +119,7 @@ public class NameDAOTest extends IntegrationTestBase {
 			GermplasmNameType.DERIVATIVE_NAME);
 		NameDAOTest.nameDAO.save(name1);
 		final Name name2 = this.createNameTestData(20190910, germplasm.getGid(), 0, "REF 001",
-			GermplasmNameType.DERIVATIVE_NAME);
+			GermplasmNameType.LINE_NAME);
 		NameDAOTest.nameDAO.save(name2);
 
 		this.sessionProvder.getSession().flush();

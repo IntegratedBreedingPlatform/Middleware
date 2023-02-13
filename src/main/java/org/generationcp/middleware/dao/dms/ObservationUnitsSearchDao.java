@@ -119,6 +119,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
 
 	static {
+		geolocSpecialFactorsMap.put("TRIAL_INSTANCE", "gl.description");
 		geolocSpecialFactorsMap.put("SITE_LAT", "gl.latitude");
 		geolocSpecialFactorsMap.put("SITE_LONG", "gl.longitude");
 		geolocSpecialFactorsMap.put("SITE_ALT", "gl.altitude");
@@ -809,16 +810,16 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		// Variables at environment level are automatically excluded if the query is for Visualization.
 		if (!forVisualization && !CollectionUtils.isEmpty(searchDto.getEnvironmentDetails())) {
-			final String envFactorFormat =
-				"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) `%s`";
-			final String geolocEnvFactorFormat =
-				" %s AS `%s`";
 			for (final MeasurementVariableDto envFactor : searchDto.getEnvironmentDetails()) {
 				if (this.isColumnVisible(envFactor.getName(), searchDto.getVisibleColumns()) && geolocSpecialFactorsMap.containsKey(
 					envFactor.getName())) {
+					final String geolocEnvFactorFormat =
+						" %s AS `%s`";
 					final String column = geolocSpecialFactorsMap.get(envFactor.getName());
 					columns.add(String.format(geolocEnvFactorFormat, column, this.getEnvironmentColumnName(envFactor.getName())));
 				} else if (this.isColumnVisible(envFactor.getName(), searchDto.getVisibleColumns())) {
+					final String envFactorFormat =
+						"    (SELECT gprop.value FROM nd_geolocationprop gprop INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.name = '%s' WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id ) `%s`";
 					columns.add(String.format(envFactorFormat, envFactor.getName(), this.getEnvironmentColumnName(envFactor.getName())));
 				} else {
 					columns.add(String.format(" NULL AS `%s`", this.getEnvironmentColumnName(envFactor.getName())));

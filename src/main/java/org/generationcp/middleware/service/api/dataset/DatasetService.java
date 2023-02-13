@@ -316,13 +316,6 @@ public interface DatasetService {
 	 */
 	List<MeasurementVariable> getDatasetMeasurementVariables(Integer datasetId);
 
-	/**
-	 * Delete dataset
-	 *
-	 * @param datasetId
-	 */
-	void deleteDataset(int datasetId);
-
 	List<MeasurementVariable> getDatasetMeasurementVariablesByVariableType(Integer datasetId, List<Integer> variableTypes);
 
 	/**
