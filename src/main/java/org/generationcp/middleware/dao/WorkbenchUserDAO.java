@@ -19,16 +19,13 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.criterion.CriteriaSpecification;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -424,22 +421,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
 	public long countSearchUsers(final UserSearchRequest userSearchRequest) {
 		try {
-			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
-
-			criteria.createAlias("person", "person", CriteriaSpecification.LEFT_JOIN);
-			criteria.createAlias("person.crops", "crops", CriteriaSpecification.LEFT_JOIN);
-
-			if (userSearchRequest.getStatus() != null) {
-				criteria.add(Restrictions.eq("status", userSearchRequest.getStatus()));
-
-			}
-
-			if (userSearchRequest.getRoleId() != null) {
-				criteria.createAlias("roles", "roles");
-				criteria.add(Restrictions.eq("roles.id", userSearchRequest.getRoleId()));
-			}
-
-			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+			final Criteria criteria = this.createUserCriteria(userSearchRequest);
 			return criteria.list().size();
 
 		} catch (final HibernateException e) {
@@ -451,22 +433,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
 	public List<UserDto> searchUsers(final UserSearchRequest userSearchRequest, final Pageable pageable) {
 		try {
-			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
-
-			criteria.createAlias("person", "person", CriteriaSpecification.LEFT_JOIN);
-			criteria.createAlias("person.crops", "crops", CriteriaSpecification.LEFT_JOIN);
-
-			if (userSearchRequest.getStatus() != null) {
-				criteria.add(Restrictions.eq("status", userSearchRequest.getStatus()));
-
-			}
-
-			if (userSearchRequest.getRoleId() != null) {
-				criteria.createAlias("roles", "roles");
-				criteria.add(Restrictions.eq("roles.id", userSearchRequest.getRoleId()));
-			}
-
-			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+			final Criteria criteria = this.createUserCriteria(userSearchRequest);
 			addPagination(criteria, pageable);
 			addOrder(criteria, pageable);
 			final List<WorkbenchUser> workbenchUsers = criteria.list();
@@ -483,5 +450,45 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			WorkbenchUserDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public Criteria createUserCriteria(final UserSearchRequest userSearchRequest) {
+		final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
+
+		criteria.createAlias("person", "person", CriteriaSpecification.LEFT_JOIN);
+		criteria.createAlias("person.crops", "crops", CriteriaSpecification.LEFT_JOIN);
+
+		if (userSearchRequest.getStatus() != null) {
+			criteria.add(Restrictions.eq("status", userSearchRequest.getStatus()));
+		}
+
+		if (StringUtils.isNotEmpty(userSearchRequest.getUserName())) {
+			criteria.add(Restrictions.like("name", userSearchRequest.getUserName(), MatchMode.ANYWHERE));
+		}
+
+		if (StringUtils.isNotEmpty(userSearchRequest.getFirstName())) {
+			criteria.add(Restrictions.like("person.firstName", userSearchRequest.getFirstName(), MatchMode.ANYWHERE));
+		}
+
+		if (StringUtils.isNotEmpty(userSearchRequest.getLastName())) {
+			criteria.add(Restrictions.like("person.firstName", userSearchRequest.getLastName(), MatchMode.ANYWHERE));
+		}
+
+		if (StringUtils.isNotEmpty(userSearchRequest.getEmail())) {
+			criteria.add(Restrictions.like("person.email", userSearchRequest.getEmail(), MatchMode.ANYWHERE));
+		}
+
+		if (!CollectionUtils.isEmpty(userSearchRequest.getRoleIds())) {
+			criteria.createAlias("roles", "roles");
+			criteria.add(Restrictions.in("roles.id", userSearchRequest.getRoleIds()));
+		}
+
+		if (!CollectionUtils.isEmpty(userSearchRequest.getCrops())) {
+			criteria.add(Restrictions.in("crops.cropName", userSearchRequest.getCrops()));
+		}
+
+		criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+
+		return criteria;
 	}
 }
