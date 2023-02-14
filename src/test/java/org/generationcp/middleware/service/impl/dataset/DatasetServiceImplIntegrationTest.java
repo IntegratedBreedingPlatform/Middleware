@@ -35,8 +35,10 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.api.dataset.PhenotypeAuditDTO;
 import org.generationcp.middleware.service.impl.analysis.MeansImportRequest;
 import org.generationcp.middleware.service.impl.analysis.SummaryStatisticsImportRequest;
+import org.generationcp.middleware.service.impl.audit.RevisionType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -238,6 +240,32 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         Assert.assertEquals(searchDto.getFilterColumns().size(), dataMap.size());
         Assert.assertNotNull(dataMap.get("TRIAL_INSTANCE"));
         Assert.assertNull(dataMap.get(TRAIT_NAME));
+    }
+
+    @Test
+    public void testGetPhenotypeAuditList() {
+        final ObservationUnitsParamDTO param = new ObservationUnitsParamDTO();
+        param.setNewValue("2");
+        final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+        searchDTO.setDatasetId(subObsDatasetId);
+        searchDTO.setDraftMode(false);
+        searchDTO.setFilter(searchDTO.new Filter());
+        searchDTO.getFilter().setVariableId(TRAIT_ID);
+        param.setObservationUnitsSearchDTO(searchDTO);
+        this.datasetService.setValueToVariable(subObsDatasetId, param, this.studyId);
+        this.sessionProvder.getSession().flush();
+
+        Map<Integer, List<ObservationUnitRow>> instanceObsUnitRowMap = this.datasetService.getInstanceIdToObservationUnitRowsMap(this.studyId, this.subObsDatasetId, this.instanceIds);
+        List<ObservationUnitRow> observationUnitRows = instanceObsUnitRowMap.get(this.instanceIds.get(0));
+        ObservationUnitRow observation1 = observationUnitRows.get(0);
+
+        final List<PhenotypeAuditDTO> auditList = this.datasetService.getPhenotypeAuditList(observation1.getObsUnitId(),
+            TRAIT_ID,
+            new PageRequest(0, Integer.MAX_VALUE));
+        Assert.assertNotNull(auditList);
+        Assert.assertFalse(auditList.isEmpty());
+        Assert.assertEquals(auditList.get(0).getRevisionType(), RevisionType.CREATION);
+        Assert.assertEquals(observation1.getVariableValueByVariableId(TRAIT_ID), auditList.get(0).getValue());
     }
 
     @Test
