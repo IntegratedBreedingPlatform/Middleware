@@ -123,11 +123,12 @@ public class WorkbenchUserDAOIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountSearchUsers() {
+		this.workbenchUserMap = new HashMap<>();
 		this.createCropType();
 		final WorkbenchUser user = this.createUser(this.cropType);
 		final Role cropRole = this.createRole(RoleType.CROP);
 		assignRoleToUser(user, cropRole, cropType, null);
-		
+
 		final UserSearchRequest userSearchRequest = new UserSearchRequest();
 		userSearchRequest.setUserName(user.getName());
 		userSearchRequest.setEmail(user.getPerson().getEmail());
@@ -141,6 +142,7 @@ public class WorkbenchUserDAOIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchUsers() {
+		this.workbenchUserMap = new HashMap<>();
 		this.createCropType();
 		final WorkbenchUser user = this.createUser(this.cropType);
 		final Role cropRole = this.createRole(RoleType.CROP);
