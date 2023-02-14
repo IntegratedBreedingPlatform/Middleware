@@ -70,9 +70,15 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final String INSTANCE_ID = "instanceId";
 	public static final String LOCATION_ID = "LOCATION_ID";
 	public static final String EXPT_DESIGN = "EXPT_DESIGN";
+	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
+	public static final String GID = "GID";
+	public static final String DESIGNATION = "DESIGNATION";
+	public static final String ENTRY_NO = "ENTRY_NO";
+	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 
-	public static final Set<String> OBSERVATIONS_TABLE_SYSTEM_COLUMNS =
-		Sets.newHashSet(OBSERVATION_UNIT_ID, SUM_OF_SAMPLES, PARENT_OBS_UNIT_ID, FILE_TERM_IDS,
+	protected static final Set<String> OBSERVATIONS_TABLE_SYSTEM_COLUMNS =
+		Sets.newHashSet(TRIAL_INSTANCE, GID, DESIGNATION, ENTRY_NO, OBS_UNIT_ID, OBSERVATION_UNIT_ID, SUM_OF_SAMPLES, PARENT_OBS_UNIT_ID,
+			FILE_TERM_IDS,
 			LOCATION_ID, EXPT_DESIGN, FILE_COUNT);
 
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
@@ -575,7 +581,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			query.setParameterList("instanceIds", searchDto.getInstanceIds());
 		}
 
-		if (!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions())) {
+		if (!CollectionUtils.isEmpty(searchDto.getEnvironmentConditions()) &&
+			searchDto.getEnvironmentConditions().stream().filter(dto -> this.isColumnVisible(dto.getName(), searchDto.getVisibleColumns()))
+				.count() > 0) {
 			query.setParameter("datasetEnvironmentId", String.valueOf(searchDto.getEnvironmentDatasetId()));
 		}
 
@@ -656,7 +664,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		createSQLQuery.addScalar(INSTANCE_ID);
 	}
 
-	private boolean isColumnVisible(final String columnName, final Set<String> visibleColumns) {
+	protected boolean isColumnVisible(final String columnName, final Set<String> visibleColumns) {
 
 		// If the visible columns list is not empty, we should only include the columns specified.
 		// Exempted are the columns required by the system (e.g. OBSERVATION_UNIT_ID, FILE_TERM_IDS, FILE_COUNT, etc.)
