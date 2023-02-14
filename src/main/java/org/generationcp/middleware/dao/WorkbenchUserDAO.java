@@ -456,7 +456,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
 
 		criteria.createAlias("person", "person", CriteriaSpecification.LEFT_JOIN);
-		criteria.createAlias("person.crops", "crops", CriteriaSpecification.LEFT_JOIN);
 
 		if (userSearchRequest.getStatus() != null) {
 			criteria.add(Restrictions.eq("status", userSearchRequest.getStatus()));
@@ -480,10 +479,12 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
 		if (!CollectionUtils.isEmpty(userSearchRequest.getRoleIds())) {
 			criteria.createAlias("roles", "roles");
-			criteria.add(Restrictions.in("roles.id", userSearchRequest.getRoleIds()));
+			criteria.createAlias("roles.role", "role");
+			criteria.add(Restrictions.in("role.id", userSearchRequest.getRoleIds()));
 		}
 
 		if (!CollectionUtils.isEmpty(userSearchRequest.getCrops())) {
+			criteria.createAlias("person.crops", "crops");
 			criteria.add(Restrictions.in("crops.cropName", userSearchRequest.getCrops()));
 		}
 
