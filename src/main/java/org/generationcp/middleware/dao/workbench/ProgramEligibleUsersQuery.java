@@ -2,7 +2,6 @@ package org.generationcp.middleware.dao.workbench;
 
 import com.google.common.base.Joiner;
 import org.generationcp.middleware.domain.workbench.RoleType;
-import org.generationcp.middleware.domain.workbench.UserSearchRequest;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

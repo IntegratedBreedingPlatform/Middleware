@@ -14,6 +14,7 @@ public class StudySearchResponse {
 	private String studyTypeName;
 	private boolean locked;
 	private String ownerName;
+	private Integer ownerId;
 	private Date startDate;
 	private Date endDate;
 	private Date updateDate;
@@ -66,6 +67,14 @@ public class StudySearchResponse {
 
 	public void setOwnerName(final String ownerName) {
 		this.ownerName = ownerName;
+	}
+
+	public Integer getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(final Integer ownerId) {
+		this.ownerId = ownerId;
 	}
 
 	public Date getStartDate() {
