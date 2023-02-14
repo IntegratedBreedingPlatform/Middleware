@@ -20,7 +20,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -116,9 +123,12 @@ public class WorkbenchUserDAOIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountSearchUsers() {
-		this.prepareTestData();
+		this.createCropType();
+		final WorkbenchUser user = this.createUser(this.cropType);
+		final Role cropRole = this.createRole(RoleType.CROP);
+		assignRoleToUser(user, cropRole, cropType, null);
+		
 		final UserSearchRequest userSearchRequest = new UserSearchRequest();
-		final WorkbenchUser user = (WorkbenchUser) this.workbenchUserMap.values().toArray()[0];
 		userSearchRequest.setUserName(user.getName());
 		userSearchRequest.setEmail(user.getPerson().getEmail());
 		userSearchRequest.setFirstName(user.getPerson().getFirstName());
@@ -131,9 +141,12 @@ public class WorkbenchUserDAOIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchUsers() {
-		this.prepareTestData();
+		this.createCropType();
+		final WorkbenchUser user = this.createUser(this.cropType);
+		final Role cropRole = this.createRole(RoleType.CROP);
+		assignRoleToUser(user, cropRole, cropType, null);
+
 		final UserSearchRequest userSearchRequest = new UserSearchRequest();
-		final WorkbenchUser user = (WorkbenchUser) this.workbenchUserMap.values().toArray()[0];
 		userSearchRequest.setUserName(user.getName());
 		userSearchRequest.setEmail(user.getPerson().getEmail());
 		userSearchRequest.setFirstName(user.getPerson().getFirstName());
