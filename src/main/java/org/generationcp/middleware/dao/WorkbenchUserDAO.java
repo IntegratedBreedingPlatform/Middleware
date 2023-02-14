@@ -470,7 +470,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 
 		if (StringUtils.isNotEmpty(userSearchRequest.getLastName())) {
-			criteria.add(Restrictions.like("person.firstName", userSearchRequest.getLastName(), MatchMode.ANYWHERE));
+			criteria.add(Restrictions.like("person.lastName", userSearchRequest.getLastName(), MatchMode.ANYWHERE));
 		}
 
 		if (StringUtils.isNotEmpty(userSearchRequest.getEmail())) {
