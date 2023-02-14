@@ -16,7 +16,7 @@ public class AdvancingSource {
 
 	private BasicGermplasmDTO originGermplasm;
 	private List<BasicNameDTO> names;
-	private ObservationUnitRow plotObservation;
+	private ObservationUnitRow observation;
 
 	//This will be used if we have trial
 	private ObservationUnitRow trialInstanceObservation;
@@ -46,7 +46,7 @@ public class AdvancingSource {
 	private AdvanceGermplasmChangeDetail changeDetail;
 
 	public AdvancingSource(final BasicGermplasmDTO originGermplasm, final List<BasicNameDTO> names,
-		final ObservationUnitRow plotObservation,
+		final ObservationUnitRow observation,
 		final ObservationUnitRow trialInstanceObservation,
 		final Method breedingMethod,
 		final Method sourceMethod,
@@ -55,7 +55,7 @@ public class AdvancingSource {
 
 		this.originGermplasm = originGermplasm;
 		this.names = names;
-		this.plotObservation = plotObservation;
+		this.observation = observation;
 		this.trialInstanceObservation = trialInstanceObservation;
 
 		this.breedingMethod = breedingMethod;
@@ -78,8 +78,8 @@ public class AdvancingSource {
 		return names;
 	}
 
-	public ObservationUnitRow getPlotObservation() {
-		return plotObservation;
+	public ObservationUnitRow getObservation() {
+		return observation;
 	}
 
 	public ObservationUnitRow getTrialInstanceObservation() {
