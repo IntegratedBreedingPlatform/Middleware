@@ -34,7 +34,7 @@ public class UserSearchRequest {
 		return this.roleIds;
 	}
 
-	public void setRoleId(final List<Integer> roleIds) {
+	public void setRoleIds(final List<Integer> roleIds) {
 		this.roleIds = roleIds;
 	}
 
