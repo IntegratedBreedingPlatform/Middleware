@@ -436,7 +436,4 @@ public interface DatasetService {
 
 	List<GermplasmNameTypeDTO> getDatasetNameTypes(Integer datasetId);
 
-	List<PhenotypeAuditDTO> getPhenotypeAuditList(String observationUnitId, Integer variableId, Pageable pageable);
-
-	long countPhenotypeAudit(String observationUnitId, Integer variableId);
 }

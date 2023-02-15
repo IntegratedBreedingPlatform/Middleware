@@ -14,7 +14,7 @@ package org.generationcp.middleware.dao.dms;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.audit.RevisionTypeResolver;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.service.api.dataset.PhenotypeAuditDTO;
+import org.generationcp.middleware.service.api.dataset.ObservationAuditDTO;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
@@ -28,7 +28,7 @@ import java.util.List;
  * DAO class for Phenotype Audit
  */
 @SuppressWarnings("unchecked")
-public class PhenotypeAuditDao extends GenericDAO<PhenotypeAuditDTO, Integer> {
+public class PhenotypeAuditDao extends GenericDAO<ObservationAuditDTO, Integer> {
 
 	private final static String COUNT_PHENOTYPE_AUD_QUERY =
 		" SELECT count(1) "
@@ -53,7 +53,7 @@ public class PhenotypeAuditDao extends GenericDAO<PhenotypeAuditDTO, Integer> {
 			+ "WHERE p.observable_id = :observableId "
 			+ "ORDER BY p.aud_id DESC ";
 
-	public long countPhenotypeAudit(final String observationUnitId, final int observableId) {
+	public long countObservationAudit(final String observationUnitId, final int observableId) {
 		final SQLQuery query = this.getSession().createSQLQuery(COUNT_PHENOTYPE_AUD_QUERY);
 		query.setParameter("observableId", observableId);
 		query.setParameter("obsUnitId", observationUnitId);
@@ -61,7 +61,7 @@ public class PhenotypeAuditDao extends GenericDAO<PhenotypeAuditDTO, Integer> {
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
-	public List<PhenotypeAuditDTO> getPhenotypeAuditByObservationUnitIdAndObservableId(final String observationUnitId,
+	public List<ObservationAuditDTO> getObservationAuditByObservationUnitIdAndObservableId(final String observationUnitId,
 		final int observableId, final Pageable pageable) {
 
 		try {
@@ -74,7 +74,7 @@ public class PhenotypeAuditDao extends GenericDAO<PhenotypeAuditDTO, Integer> {
 				.addScalar("draftValue").addScalar("draftValueChanged", BooleanType.INSTANCE).addScalar("updatedByUserId")
 				.addScalar("updatedDate").addScalar("revisionType", RevisionTypeResolver.INSTANCE).addScalar("updatedBy");
 
-			query.setResultTransformer(Transformers.aliasToBean(PhenotypeAuditDTO.class));
+			query.setResultTransformer(Transformers.aliasToBean(ObservationAuditDTO.class));
 
 			GenericDAO.addPaginationToSQLQuery(query, pageable);
 

@@ -53,7 +53,6 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
-import org.generationcp.middleware.service.api.dataset.PhenotypeAuditDTO;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -1753,18 +1752,6 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<GermplasmNameTypeDTO> getDatasetNameTypes(final Integer datasetId) {
 		return this.daoFactory.getUserDefinedFieldDAO().getDatasetNameTypes(datasetId);
-	}
-
-	@Override
-	public List<PhenotypeAuditDTO> getPhenotypeAuditList(final String observationUnitId, final Integer variableId,
-		final Pageable pageable) {
-		return this.daoFactory.getPhenotypeAuditDao()
-			.getPhenotypeAuditByObservationUnitIdAndObservableId(observationUnitId, variableId, pageable);
-	}
-
-	@Override
-	public long countPhenotypeAudit(final String observationUnitId, final Integer variableId) {
-		return this.daoFactory.getPhenotypeAuditDao().countPhenotypeAudit(observationUnitId, variableId);
 	}
 
 }

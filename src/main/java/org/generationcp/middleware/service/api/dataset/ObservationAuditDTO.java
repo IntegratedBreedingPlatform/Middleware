@@ -7,7 +7,7 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.Date;
 
 @AutoProperty
-public class PhenotypeAuditDTO {
+public class ObservationAuditDTO {
 
 	private Integer phenotypeId;
 	private String value;
@@ -21,10 +21,10 @@ public class PhenotypeAuditDTO {
 	private boolean valueChanged;
 	private boolean draftValueChanged;
 
-	public PhenotypeAuditDTO() {
+	public ObservationAuditDTO() {
 	}
 
-	public PhenotypeAuditDTO(final String value) {
+	public ObservationAuditDTO(final String value) {
 		this.value = value;
 	}
 
