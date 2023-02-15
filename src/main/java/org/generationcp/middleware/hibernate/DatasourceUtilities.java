@@ -85,7 +85,7 @@ public class DatasourceUtilities {
 			JdbcUtils.closeStatement(preparedStatement);
 		} catch (final SQLException e) {
 			throw new IllegalStateException(
-					"Unable to get the list of database that we need to register. Please contanct your administrator for further assistance.",
+					"Unable to get the list of database that we need to register. Please contact your administrator for further assistance.",
 					e);
 		} finally {
 			// Use this helper method so we don't have to check for null
