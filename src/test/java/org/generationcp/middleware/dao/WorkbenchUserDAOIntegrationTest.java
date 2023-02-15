@@ -2,6 +2,8 @@ package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.user.UserSearchRequest;
+import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.pojos.Person;
@@ -11,10 +13,14 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.service.api.user.UserRoleDto;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
@@ -112,6 +119,56 @@ public class WorkbenchUserDAOIntegrationTest extends IntegrationTestBase {
 			assertThat(m.getRole().getDescription(), equalTo(role.getDescription()));
 			assertThat(m.getRole().getRoleType().getName(), equalToIgnoringCase(role.getRoleType().getName()));
 		});
+	}
+
+	@Test
+	public void testCountSearchUsers() {
+		this.workbenchUserMap = new HashMap<>();
+		this.createCropType();
+		final WorkbenchUser user = this.createUser(this.cropType);
+		final Role cropRole = this.createRole(RoleType.CROP);
+		assignRoleToUser(user, cropRole, cropType, null);
+
+		final UserSearchRequest userSearchRequest = new UserSearchRequest();
+		userSearchRequest.setUserName(user.getName());
+		userSearchRequest.setEmail(user.getPerson().getEmail());
+		userSearchRequest.setFirstName(user.getPerson().getFirstName());
+		userSearchRequest.setLastName(user.getPerson().getLastName());
+		userSearchRequest.setStatus(user.getStatus());
+		userSearchRequest.setCrops(Collections.singletonList(this.cropType.getCropName()));
+		userSearchRequest.setRoleIds(Collections.singletonList(user.getRoles().get(0).getRole().getId()));
+		Assert.assertEquals(1, (int)this.workbenchUserDAO.countSearchUsers(userSearchRequest));
+	}
+
+	@Test
+	public void testSearchUsers() {
+		this.workbenchUserMap = new HashMap<>();
+		this.createCropType();
+		final WorkbenchUser user = this.createUser(this.cropType);
+		final Role cropRole = this.createRole(RoleType.CROP);
+		assignRoleToUser(user, cropRole, cropType, null);
+
+		final UserSearchRequest userSearchRequest = new UserSearchRequest();
+		userSearchRequest.setUserName(user.getName());
+		userSearchRequest.setEmail(user.getPerson().getEmail());
+		userSearchRequest.setFirstName(user.getPerson().getFirstName());
+		userSearchRequest.setLastName(user.getPerson().getLastName());
+		userSearchRequest.setStatus(user.getStatus());
+		userSearchRequest.setCrops(Collections.singletonList(this.cropType.getCropName()));
+		userSearchRequest.setRoleIds(Collections.singletonList(user.getRoles().get(0).getRole().getId()));
+
+		final List<UserDto> users = this.workbenchUserDAO.searchUsers(userSearchRequest, null);
+		Assert.assertEquals(1, users.size());
+		final UserDto returnedUser = users.get(0);
+		Assert.assertEquals(user.getName(), returnedUser.getUsername());
+		Assert.assertEquals(user.getPerson().getFirstName(), returnedUser.getFirstName());
+		Assert.assertEquals(user.getPerson().getLastName(), returnedUser.getLastName());
+		Assert.assertEquals(user.getPerson().getEmail(), returnedUser.getEmail());
+		Assert.assertEquals(user.getStatus() == 0, returnedUser.getActive() );
+		final List<String> userCrops = returnedUser.getCrops().stream().map(CropDto::getCropName).collect(Collectors.toList());
+		Assert.assertTrue(userCrops.contains(this.cropType.getCropName()));
+		final List<Integer> userRoleIds = returnedUser.getUserRoles().stream().map(UserRoleDto::getRole).map(RoleDto::getId).collect(Collectors.toList());
+		Assert.assertTrue(userRoleIds.contains(user.getRoles().get(0).getRole().getId()));
 	}
 
 	private void prepareTestData() {
