@@ -21,16 +21,16 @@ public class SelectionTraitDataResolver {
 	/**
 	 * Returns the selection trait value at study level.
 	 *
-	 * @param datasetId
+	 * @param studyId
 	 * @param selectionTraitRequest
 	 * @param studyVariates
 	 * @return the selection trait value
 	 */
 	public String resolveStudyLevelData(
-		final Integer datasetId, final AbstractAdvanceRequest.SelectionTraitRequest selectionTraitRequest,
+		final Integer studyId, final AbstractAdvanceRequest.SelectionTraitRequest selectionTraitRequest,
 		final List<MeasurementVariable> studyVariates) {
 
-		if (!this.shouldResolveLevel(datasetId, selectionTraitRequest)) {
+		if (!this.shouldResolveLevel(studyId, selectionTraitRequest)) {
 			return null;
 		}
 
@@ -84,13 +84,13 @@ public class SelectionTraitDataResolver {
 	}
 
 	/**
-	 * Resolves selection trait value at plot level. The required data will be set into the provided {@link AdvancingSource}
+	 * Resolves selection trait value at plot and sub-observation level. The required data will be set into the provided {@link AdvancingSource}
 	 *
 	 * @param source
 	 * @param row
 	 * @param plotDataVariablesByTermId
 	 */
-	public void resolvePlotLevelData(final Integer datasetId, final AbstractAdvanceRequest.SelectionTraitRequest selectionTraitRequest,
+	public void resolvePlotAndSubObservationLevelData(final Integer datasetId, final AbstractAdvanceRequest.SelectionTraitRequest selectionTraitRequest,
 		final AdvancingSource source, final ObservationUnitRow row,
 		final Map<Integer, MeasurementVariable> plotDataVariablesByTermId) {
 

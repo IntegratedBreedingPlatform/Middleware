@@ -275,7 +275,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 					seasonStudyLevel, selectionTraitStudyLevel, plantsSelected, sampleNumbers);
 
 			// Resolves data related to season, selection trait and location for environment and plot
-			this.resolveEnvironmentAndPlotLevelData(environmentDataset.getDatasetId(), dataset.getDatasetId(),
+			this.resolveEnvironmentAndPlotAndSubObservationLevelData(environmentDataset.getDatasetId(), dataset.getDatasetId(),
 				request.getSelectionTraitRequest(), advancingSource, row, locationsByLocationId, datasetVariablesByTermId,
 				environmentVariablesByTermId);
 
@@ -468,7 +468,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 			.collect(Collectors.toSet());
 	}
 
-	private void resolveEnvironmentAndPlotLevelData(final Integer environmentDatasetId, final Integer plotDatasetId,
+	private void resolveEnvironmentAndPlotAndSubObservationLevelData(final Integer environmentDatasetId, final Integer plotDatasetId,
 		final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest,
 		final AdvancingSource source, final ObservationUnitRow row,
 		final Map<Integer, Location> locationsByLocationId,
@@ -480,7 +480,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		this.selectionTraitDataResolver
 			.resolveEnvironmentLevelData(environmentDatasetId, selectionTraitRequest, source, environmentVariablesByTermId);
 		this.selectionTraitDataResolver
-			.resolvePlotLevelData(plotDatasetId, selectionTraitRequest, source, row, plotDataVariablesByTermId);
+			.resolvePlotAndSubObservationLevelData(plotDatasetId, selectionTraitRequest, source, row, plotDataVariablesByTermId);
 	}
 
 	private ObservationUnitRow getTrialInstanceObservations(final Integer trialInstanceNumber,
