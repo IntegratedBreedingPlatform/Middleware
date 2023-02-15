@@ -422,7 +422,8 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 	public long countSearchUsers(final UserSearchRequest userSearchRequest) {
 		try {
 			final Criteria criteria = this.createUserCriteria(userSearchRequest);
-			return criteria.list().size();
+			criteria.setProjection(Projections.rowCount());
+			return (long)criteria.uniqueResult();
 
 		} catch (final HibernateException e) {
 			final String message = "Error with countSearchUsers() query from User: " + e.getMessage();
