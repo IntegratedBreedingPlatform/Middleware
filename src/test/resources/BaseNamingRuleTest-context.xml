@@ -69,4 +69,8 @@
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
+	<bean id="observationAudit" class="org.generationcp.middleware.service.impl.audit.ObservationAuditServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 </beans>
