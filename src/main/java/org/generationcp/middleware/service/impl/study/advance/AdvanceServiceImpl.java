@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.study.advance;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
@@ -275,7 +276,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 			// Resolves data related to season, selection trait and location for environment and plot
 			this.resolveEnvironmentAndPlotLevelData(environmentDataset.getDatasetId(), plotDataset.getDatasetId(),
-				request.getSelectionTraitRequest(), advancingSource, row, locationsByLocationId, plotDataVariablesByTermId, environmentVariablesByTermId);
+				request.getSelectionTraitRequest(), advancingSource, row, locationsByLocationId, plotDataVariablesByTermId,
+				environmentVariablesByTermId);
 
 			// Creates the lines that are advanced
 			this.createAdvancedGermplasm(cropType, advancingSource);
@@ -374,6 +376,11 @@ public class AdvanceServiceImpl implements AdvanceService {
 			new Sort.Order(Sort.Direction.ASC, "PLOT_NO"),
 			new Sort.Order(Sort.Direction.ASC, "REP_NO"));
 		final PageRequest pageRequest = new PageRequest(0, Integer.MAX_VALUE, sort);
+
+		// Add the required observation table columns necessary for advancing to the visible columns, so that
+		// entry details, attributes, passports and names will be excluded in the observations query.
+		plotDataObservationsSearchDTO.setVisibleColumns(Sets.newHashSet("TRIAL_INSTANCE", "PLOT_NO", "REP_NO"));
+
 		return this.datasetService
 			.getObservationUnitRows(studyId, plotDatasetId, plotDataObservationsSearchDTO, pageRequest);
 	}
