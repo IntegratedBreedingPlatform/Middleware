@@ -1,0 +1,158 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet id="v23.2.0-1" author="mderamos">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM cvterm WHERE cvterm_id = 1817;
+            </sqlCheck>
+        </preConditions>
+        <comment>Add cvterm entry for Genotype Marker</comment>
+        <sql dbms="mysql" splitStatements="true">
+            INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            VALUES (1817, 1041, 'Genotype Marker', 'Genotype Marker', null, 0, 0);
+        </sql>
+    </changeSet>
+
+    <changeSet id="v23.2.0-2" author="mderamos">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="genotype"/>
+            </not>
+        </preConditions>
+        <comment>
+            Create genotype table
+        </comment>
+        <createTable tableName="genotype">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="sample_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_sample_id" references="sample(sample_id)"/>
+            </column>
+            <column name="variabe_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_variabe_id" references="cvterm(cvterm_id)"/>
+            </column>
+            <column name="value" type="varchar(2000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="int" defaultValue="0">
+                <constraints nullable="false" />
+            </column>
+            <column name="modified_date" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="modified_by" type="int">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="v23.2.0-3" author="mderamos">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM cvterm WHERE name = "Genome" AND cv_id = 1020;
+            </sqlCheck>
+        </preConditions>
+        <comment>Add cvterm entry for Method Genome</comment>
+        <sql dbms="mysql" splitStatements="true">
+            INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            VALUES (1020, 'Genome', 'Genome', null, 0, 0);
+        </sql>
+    </changeSet>
+
+    <changeSet id="v23.2.0-4" author="mderamos">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM cvterm WHERE name = "Text" AND cv_id = 1030;
+            </sqlCheck>
+        </preConditions>
+        <comment>Add cvterm entry for Scale Text</comment>
+        <sql dbms="mysql" splitStatements="true">
+            INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            VALUES (1030, 'Text', 'Text', null, 0, 0);
+        </sql>
+    </changeSet>
+
+    <changeSet id="v23.2.0-5" author="mderamos">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM cvterm WHERE name IN ("PZE-101093951", "PZE-0186065237", "PZE-0186365075");
+            </sqlCheck>
+        </preConditions>
+        <comment>Add variables for Genotypes</comment>
+        <sql dbms="mysql" splitStatements="true">
+            set @methodID = (select cvterm_id from cvterm where name = 'Genome' AND cv_id = 1020);
+            set @scaleId = (select cvterm_id from cvterm where name = 'Text' AND cv_id = 1030);
+
+            INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            VALUES (1010, 'Marker Property for PZE-101093951', 'Marker Property for PZE-101093951', null, 0, 0);
+
+            INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            VALUES (1040, 'PZE-101093951', 'PZE-101093951', null, 0, 0);
+
+            set @propertyId = (select cvterm_id from cvterm where name = 'Marker Property for PZE-101093951' AND cv_id = 1010);
+            set @variableId = (select cvterm_id from cvterm where name = 'PZE-101093951' AND cv_id = 1040);
+
+            INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+            VALUES (1200, @variableId, @propertyId);
+
+            INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+            VALUES (1210, @variableId, @methodId);
+
+            INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+            VALUES (1220, @variableId, @scaleId);
+
+            INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+            VALUES (@variableId, 1800, 'Genotype Marker', 0);
+
+            INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            VALUES (1010, 'Marker Property for PZE-0186065237', 'Marker Property for PZE-0186065237', null, 0, 0);
+
+            INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            VALUES (1040, 'PZE-0186065237', 'PZE-0186065237', null, 0, 0);
+
+            set @propertyId = (select cvterm_id from cvterm where name = 'Marker Property for PZE-0186065237' AND cv_id = 1010);
+            set @variableId = (select cvterm_id from cvterm where name = 'PZE-0186065237' AND cv_id = 1040);
+
+            INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+            VALUES (1200, @variableId, @propertyId);
+
+            INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+            VALUES (1210, @variableId, @methodId);
+
+            INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+            VALUES (1220, @variableId, @scaleId);
+
+            INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+            VALUES (@variableId, 1800, 'Genotype Marker', 0);
+
+            INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            VALUES (1010, 'Marker Property for PZE-0186365075', 'Marker Property for PZE-0186365075', null, 0, 0);
+
+            INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            VALUES (1040, 'PZE-0186365075', 'PZE-0186365075', null, 0, 0);
+
+            set @propertyId = (select cvterm_id from cvterm where name = 'Marker Property for PZE-0186365075' AND cv_id = 1010);
+            set @variableId = (select cvterm_id from cvterm where name = 'PZE-0186365075' AND cv_id = 1040);
+
+            INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+            VALUES (1200, @variableId, @propertyId);
+
+            INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+            VALUES (1210, @variableId, @methodId);
+
+            INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+            VALUES (1220, @variableId, @scaleId);
+
+            INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+            VALUES (@variableId, 1800, 'Genotype Marker', 0);
+        </sql>
+    </changeSet>
+</databaseChangeLog>
