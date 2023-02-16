@@ -45,6 +45,7 @@ import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
+import org.generationcp.middleware.dao.dms.PhenotypeAuditDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
@@ -642,4 +643,10 @@ public class DaoFactory {
 		return new StudyEntrySearchDAO(this.sessionProvider.getSession());
 	}
 
+	public PhenotypeAuditDao getPhenotypeAuditDao() {
+		final PhenotypeAuditDao phenotypeAuditDao = new PhenotypeAuditDao();
+		phenotypeAuditDao.setSession(this.sessionProvider.getSession());
+
+		return phenotypeAuditDao;
+	}
 }
