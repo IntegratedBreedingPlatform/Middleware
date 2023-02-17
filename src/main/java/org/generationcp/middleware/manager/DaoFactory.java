@@ -12,6 +12,7 @@ import org.generationcp.middleware.dao.ExperimentExternalReferenceDao;
 import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FileMetadataExternalReferenceDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
+import org.generationcp.middleware.dao.GenotypeDao;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmExternalReferenceDAO;
 import org.generationcp.middleware.dao.GermplasmListExternalReferenceDAO;
@@ -648,5 +649,9 @@ public class DaoFactory {
 		phenotypeAuditDao.setSession(this.sessionProvider.getSession());
 
 		return phenotypeAuditDao;
+	}
+
+	public GenotypeDao getGenotypeDao() {
+		return new GenotypeDao(this.sessionProvider.getSession());
 	}
 }
