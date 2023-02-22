@@ -20,6 +20,8 @@ public class GermplasmOriginDto {
 	private String positionCoordinateX;
 	private String positionCoordinateY;
 	private Map<String, Object> geoCoordinates;
+	private String observationUnitType;
+	private Integer observationUnitNumber;
 
 	public String getProgramUUID() {
 		return this.programUUID;
@@ -99,6 +101,22 @@ public class GermplasmOriginDto {
 
 	public void setPlotNumber(final Integer plotNumber) {
 		this.plotNumber = plotNumber;
+	}
+
+	public String getObservationUnitType() {
+		return observationUnitType;
+	}
+
+	public void setObservationUnitType(final String observationUnitType) {
+		this.observationUnitType = observationUnitType;
+	}
+
+	public Integer getObservationUnitNumber() {
+		return observationUnitNumber;
+	}
+
+	public void setObservationUnitNumber(final Integer observationUnitNumber) {
+		this.observationUnitNumber = observationUnitNumber;
 	}
 
 	@Override

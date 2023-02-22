@@ -89,12 +89,16 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "  (SELECT ndep.value " //
 		+ "   FROM nd_experimentprop ndep " //
 		+ "          INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id " //
-		+ "   WHERE ndep.nd_experiment_id = ne.nd_experiment_id AND ispcvt.name = 'ROW') AS row " //
-		+ "from germplasm_study_source source " //
+		+ "   WHERE ndep.nd_experiment_id = ne.nd_experiment_id AND ispcvt.name = 'ROW') AS row, " //
+		+ "  observationUnit.alias as observationUnitType, " //
+		+ "  ne.observation_unit_no as observationUnitNumber " //
+		+ " from germplasm_study_source source " //
 		+ "       inner join germplsm g on source.gid = g.gid " //
 		+ "       inner join nd_experiment ne on source.nd_experiment_id = ne.nd_experiment_id " //
 		+ "       inner join project plot_dataset on ne.project_id = plot_dataset.project_id " //
 		+ "       inner join project study on plot_dataset.study_id = study.project_id " //
+		+ "       LEFT JOIN projectprop observationUnit on plot_dataset.project_id = observationUnit.project_id "
+		+ "	AND observationUnit.type_id = " + TermId.OBSERVATION_UNIT.getId() //
 		+ "       LEFT JOIN nd_experimentprop plot ON plot.nd_experiment_id = ne.nd_experiment_id AND plot.type_id = "
 		+ TermId.PLOT_NO.getId() //
 		+ "       LEFT JOIN nd_experimentprop fieldMapRow ON fieldMapRow.nd_experiment_id = ne.nd_experiment_id AND fieldMapRow.type_id = "
@@ -179,7 +183,9 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				.addScalar("fieldMapCol").addScalar("plotNumber", new IntegerType()).addScalar("blockNumber", new IntegerType())
 				.addScalar("repNumber", new IntegerType())
 				.addScalar("col")
-				.addScalar("row");
+				.addScalar("row")
+				.addScalar("observationUnitType")
+				.addScalar("observationUnitNumber", IntegerType.INSTANCE);
 
 			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 
@@ -213,6 +219,9 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 				}
 				germplasmOriginDto.setPositionCoordinateX(x);
 				germplasmOriginDto.setPositionCoordinateY(y);
+
+				germplasmOriginDto.setObservationUnitType(result.get("observationUnitType") != null ? (String) result.get("observationUnitType") : null);
+				germplasmOriginDto.setObservationUnitNumber(result.get("observationUnitNumber") != null ? (Integer) result.get("observationUnitNumber") : null);
 
 				return germplasmOriginDto;
 			}
