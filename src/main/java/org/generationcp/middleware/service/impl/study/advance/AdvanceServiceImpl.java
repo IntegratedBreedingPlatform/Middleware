@@ -167,8 +167,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final DatasetDTO environmentDataset =
 			this.datasetService.getDatasetsWithVariables(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId())).get(0);
 
+		final MeasurementVariable observationUnitVariable = this.getObservationUnitVariable(dataset);
 		final Set<String> observationVisibleColumns =
-			request.accept(new GetObservationsVisibleColumnsVisitor(dataset.getDatasetId(), dataset.getVariables()));
+			request.accept(
+				new GetObservationsVisibleColumnsVisitor(dataset.getDatasetId(), observationUnitVariable, dataset.getVariables()));
 		final List<ObservationUnitRow> observations =
 			this.getObservations(studyId, dataset.getDatasetId(), request.getInstanceIds(), request.getSelectedReplications(),
 				observationVisibleColumns);
@@ -271,7 +273,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 						.getTrialInstanceObservations(trialInstanceNumber, trialObservations, studyInstancesByInstanceNumber));
 
 			// To prevent a NPE in the future, filter the observations variables that don't have a variableId assigned, like PARENT_OBS_UNIT_ID
-			row.setVariables(this.filterNullObservations(row.getVariables()));
+			row.setVariables(this.filterNullObservations(row.getVariables(), observationUnitVariable));
 
 			// Creates the advancing source. This object will be useful for expressions used later when the names are being generated
 			final AdvancingSource advancingSource =
@@ -340,7 +342,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 						selectionNumber.get(), sampleNumber, germplasm.getLocationId(),
 						germplasm.getGdate(), plotCodeVariableId, plotNumberVariableId, repNumberVariableId,
 						trialInstanceVariableId, plantNumberVariableId, studyEnvironmentVariables,
-						environmentDataset.getVariables(), locationNameByIds, studyInstancesByInstanceNumber, dataset.getDatasetTypeId());
+						environmentDataset.getVariables(), locationNameByIds, studyInstancesByInstanceNumber, dataset.getDatasetTypeId(),
+						observationUnitVariable);
 
 					final GermplasmStudySourceInput germplasmStudySourceInput = new GermplasmStudySourceInput(germplasm.getGid(), studyId,
 						advancingSource.getObservation().getObservationUnitId(),
@@ -503,16 +506,18 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 		final ObservationUnitRow trialObservations = trialObservationsSupplier.get();
 		// To prevent a NPE in the future, filter the observations variables that don't have a variableId assigned, like PARENT_OBS_UNIT_ID
-		trialObservations.setVariables(this.filterNullObservations(trialObservations.getVariables()));
+		trialObservations.setVariables(this.filterNullObservations(trialObservations.getVariables(), null));
 		return trialObservations;
 	}
 
-	private Map<String, ObservationUnitData> filterNullObservations(final Map<String, ObservationUnitData> observations) {
-		// TODO: add variableId in ObservationUnitsSearchDao
-		observations.computeIfPresent(TermId.PLANT_NO.name(), (s, observationUnitData) -> {
-			observationUnitData.setVariableId(TermId.PLANT_NO.getId());
-			return observationUnitData;
-		});
+	private Map<String, ObservationUnitData> filterNullObservations(final Map<String, ObservationUnitData> observations,
+		final MeasurementVariable observationNameVariable) {
+		if (observationNameVariable != null) {
+			observations.computeIfPresent(observationNameVariable.getName(), (s, observationUnitData) -> {
+				observationUnitData.setVariableId(observationNameVariable.getTermId());
+				return observationUnitData;
+			});
+		}
 
 		return observations.entrySet().stream()
 			.filter(entry -> Objects.nonNull(entry.getValue()) && Objects.nonNull(entry.getValue().getVariableId()))
@@ -577,7 +582,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Integer trialInstanceVariableId, final Integer plantNumberVariableId,
 		final List<MeasurementVariable> studyEnvironmentVariables, final List<MeasurementVariable> environmentVariables,
 		final Map<String, String> locationNameByIds,
-		final Map<Integer, StudyInstance> studyInstancesByInstanceNumber, final Integer datasetTypeId) {
+		final Map<Integer, StudyInstance> studyInstancesByInstanceNumber, final Integer datasetTypeId,
+		final MeasurementVariable observationUnitVariable) {
 
 		final ObservationUnitRow observation = advancingSource.getObservation();
 		final String plotNumber = observation.getVariableValueByVariableId(TermId.PLOT_NO.getId());
@@ -603,7 +609,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 			this.daoFactory.getAttributeDAO().save(replicationNumberAttribute);
 		}
 
-		this.addPlantNumberAttribute(advancedGermplasmGid, plantNumberVariableId, sampleNumber, locationId, date, datasetTypeId, observation);
+		this.addPlantNumberAttribute(advancedGermplasmGid, plantNumberVariableId, sampleNumber, locationId, date, datasetTypeId,
+			observation, observationUnitVariable);
 
 		if (trialInstanceVariableId != null) {
 			final Attribute trialInstanceNumberAttribute =
@@ -640,7 +647,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 	}
 
 	private void addPlantNumberAttribute(final Integer advancedGermplasmGid, final Integer plantNumberVariableId, final String sampleNumber,
-		final Integer locationId, final Integer date, final Integer datasetTypeId, final ObservationUnitRow observation) {
+		final Integer locationId, final Integer date, final Integer datasetTypeId, final ObservationUnitRow observation,
+		final MeasurementVariable observationUnitVariable) {
 
 		if (plantNumberVariableId == null) {
 			return;
@@ -655,7 +663,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		}
 
 		// Adding attribute for plants sub-observations advancement
-		final String plantNumber = observation.getVariableValueByVariableId(TermId.PLANT_NO.getId());
+		final String plantNumber = observation.getVariableValueByVariableId(observationUnitVariable.getTermId());
 		if (DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId() == datasetTypeId && plantNumber != null) {
 			final Attribute plantNumberAttribute =
 				this.createGermplasmAttribute(advancedGermplasmGid, plantNumber, plantNumberVariableId, locationId, date);
@@ -667,6 +675,16 @@ public class AdvanceServiceImpl implements AdvanceService {
 	private Attribute createGermplasmAttribute(final Integer germplasmId, final String value, final Integer typeId,
 		final Integer locationId, final Integer date) {
 		return new Attribute(null, germplasmId, typeId, value, null, locationId, null, date);
+	}
+
+	private MeasurementVariable getObservationUnitVariable(final DatasetDTO datasetDTO) {
+		if (DatasetTypeEnum.PLOT_DATA.getId() != datasetDTO.getDatasetTypeId()) {
+			return datasetDTO.getVariables().stream()
+				.filter(variable -> variable.getVariableType() == VariableType.OBSERVATION_UNIT)
+				.findFirst()
+				.orElse(null);
+		}
+		return null;
 	}
 
 }

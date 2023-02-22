@@ -13,17 +13,25 @@ import java.util.Set;
 public class GetObservationsVisibleColumnsVisitor implements AdvanceRequestVisitor<Set<String>> {
 
 	private final Integer observationDatasetId;
+	private final MeasurementVariable observationUnitVariable;
 	private final List<MeasurementVariable> observationVariables;
 
 	public GetObservationsVisibleColumnsVisitor(final Integer observationDatasetId,
+		final MeasurementVariable observationUnitVariable,
 		final List<MeasurementVariable> observationVariables) {
 		this.observationDatasetId = observationDatasetId;
+		this.observationUnitVariable = observationUnitVariable;
 		this.observationVariables = observationVariables;
 	}
 
 	@Override
 	public Set<String> visit(final AdvanceStudyRequest request) {
 		final Set<String> variableNames = new HashSet<>();
+
+		// Add the name of the observation unit for the given dataset. I.e.: the variable used for plants sub-observations generally is PLANT_NO
+		if (this.observationUnitVariable != null) {
+			variableNames.add(this.observationUnitVariable.getName());
+		}
 
 		this.addSelectionTraitVariableNameFromObservation(request.getSelectionTraitRequest(), variableNames);
 

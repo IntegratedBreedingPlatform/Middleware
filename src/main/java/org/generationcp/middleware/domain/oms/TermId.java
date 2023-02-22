@@ -169,9 +169,6 @@ public enum TermId {
 	, HABITAT_DESIGNATION(3002)
 
 	, PERSON_ID(1901)
-
-	// sub-observations
-	, PLANT_NO(8206)
 	;
 
 	private final int id;
