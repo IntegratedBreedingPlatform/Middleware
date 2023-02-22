@@ -1,10 +1,8 @@
 package org.generationcp.middleware.service.api.phenotype;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
-import org.generationcp.middleware.service.api.BrapiView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -34,7 +32,6 @@ public class ObservationUnitSearchRequestDTO extends SearchRequestDto {
 	private List<String> studyNames;
 	private List<String> trialNames;
 	private List<String> programNames;
-
 
 	// v1 only fields
 	@JsonIgnore

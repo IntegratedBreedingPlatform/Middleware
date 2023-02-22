@@ -372,7 +372,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final List<StudyDetails> studyDetails = new ArrayList<>();
 
 		final StringBuilder sqlString = new StringBuilder().append(
-			"SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
+				"SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
 			.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
 			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, p.created_by as createdBy, p.locked as isLocked ")
 			.append("FROM project p ")
@@ -439,7 +439,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Query query =
 				this.getSession().createSQLQuery(STUDY_DETAILS_SQL).addScalar("name").addScalar("title").addScalar("objective")
 					.addScalar("startDate").addScalar("endDate").addScalar("studyTypeId").addScalar("studyTypeLabel").addScalar(
-					"studyTypeName").addScalar("piName").addScalar("siteName").addScalar("id").addScalar("piId").addScalar("siteId")
+						"studyTypeName").addScalar("piName").addScalar("siteName").addScalar("id").addScalar("piId").addScalar("siteId")
 					.addScalar("folderId").addScalar("programUUID").addScalar("studyUpdate")
 					.addScalar("createdBy").addScalar("isLocked");
 
@@ -1098,82 +1098,91 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<StudyInstance> getDatasetInstances(final int datasetId, final List<Integer> instanceIds) {
 
 		try {
-			final String sql = "select \n	geoloc.nd_geolocation_id as instanceId, \n"
-				+ " geoloc.description as instanceNumber, \n"
-				+ "	max(if(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", loc.locid, null)) as locationId, \n"  // 8190 = cvterm for LOCATION_ID
-				+ "	max(if(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", loc.lname, null)) as locationName, \n" +
-				"	max(if(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", loc.labbr, null)) as locationAbbreviation, \n" + // 8189 = cvterm for LOCATION_ABBR
-				"	max(if(geoprop.type_id = " + TermId.LOCATION_ABBR.getId() + ", geoprop.value, null)) as customLocationAbbreviation, \n"
-				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
+			final StringBuilder sql = new StringBuilder("select geoloc.nd_geolocation_id as instanceId, ")
+				.append(" geoloc.description as instanceNumber, ")
+				.append(" max(if(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", loc.locid, null)) as locationId, ")
+				// 8190 = cvterm for LOCATION_ID
+				.append(" max(if(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", loc.lname, null)) as locationName, ")
+				.append(" max(if(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", loc.labbr, null)) as locationAbbreviation, ")
+				// 8189 = cvterm for LOCATION_ABBR
+				.append(" max(if(geoprop.type_id = " + TermId.LOCATION_ABBR.getId()
+					+ ", geoprop.value, null)) as customLocationAbbreviation, ")
 
+				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
 				// FIXME rewrite to be valid for the whole instance, not just the datasetId
 				// if instance has X/Y coordinates (fieldmap or row/col design)
-				+ CommonQueryConstants.HAS_FIELD_LAYOUT_EXPRESSION +  ", \n"
+				.append(CommonQueryConstants.HAS_FIELD_LAYOUT_EXPRESSION + ", ")
 
 				// FIXME rewrite to be valid for the whole instance, not just the datasetId
 				// if instance has been georeferenced using the geojson editor
-				+ "  max(case when json_props like '%geoCoordinates%' then 1 else 0 end) as hasGeoJSON, \n"
+				.append("  max(case when json_props like '%geoCoordinates%' then 1 else 0 end) as hasGeoJSON, ")
 
 				// if instance obs units are associated to transactions
-				+ "	case when hasInventory.nd_geolocation_id is null then 0 else 1 end as hasInventory, \n"
+				.append("  case when ")
+				.append("    EXISTS(select ne.nd_geolocation_id  ")
+				.append("    from ims_experiment_transaction iet  ")
+				.append("             inner join nd_experiment ne on ne.nd_experiment_id = iet.nd_experiment_id  ")
+				.append("             inner join ims_transaction it on it.trnid = iet.trnid  ")
+				.append(
+					"    where it.trnstat <> 9 and ne.nd_geolocation_id = geoloc.nd_geolocation_id) then 1 else 0 end as hasInventory,  ")
 
 				// If study has any plot experiments, hasExperimentalDesign flag = true
-				+ "  case when (select count(1) FROM nd_experiment exp WHERE exp.type_id = 1155 "
-				+ "  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 then 1 else 0 end as hasExperimentalDesign, "
+				.append("  case when EXISTS(select exp.nd_experiment_id FROM nd_experiment exp WHERE exp.type_id = 1155 ")
+				.append("  AND exp.nd_geolocation_id = geoloc.nd_geolocation_id) then 1 else 0 end as hasExperimentalDesign, ")
 
 				// If study samples
-				+ "  case when (select count(1) \n"
-				+ "               from sample s \n"
-				+ "                        inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 \n"
-				+ "               where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 \n"
+				.append("  case when EXISTS(select s.sample_id ")
+				.append("               from sample s ")
+				.append(
+					"                        inner join nd_experiment exp on exp.nd_experiment_id = s.nd_experiment_id and exp.type_id = 1155 ")
+				.append("               where exp.nd_geolocation_id = geoloc.nd_geolocation_id) ")
 				// or has sub-observations or
-				+ "        or (select count(1) \n"
-				+ "            from nd_experiment exp \n"
-				+ "                     INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 \n"
-				+ "                     INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 \n"
-				+ "            where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 \n"
+				.append("        or EXISTS(select exp.nd_experiment_id ")
+				.append("            from nd_experiment exp ")
+				.append("                     INNER JOIN project pr ON pr.project_id = exp.project_id AND exp.type_id = 1155 ")
+				.append(
+					"                     INNER JOIN dataset_type dt on dt.dataset_type_id = pr.dataset_type_id and is_subobs_type = 1 ")
+				.append("            where exp.nd_geolocation_id = geoloc.nd_geolocation_id) ")
 				// or inventory
-				+ "        or hasInventory.nd_geolocation_id is not null \n"
+				.append("        or EXISTS(select ne.nd_geolocation_id  ")
+				.append("             from ims_experiment_transaction iet  ")
+				.append("             inner join nd_experiment ne on ne.nd_experiment_id = iet.nd_experiment_id  ")
+				.append("             inner join ims_transaction it on it.trnid = iet.trnid  ")
+				.append("             where it.trnstat <> 9 and ne.nd_geolocation_id = geoloc.nd_geolocation_id) ")
 				// or has files
-				+ "        or (select count(1) \n"
-				+ "            from file_metadata f \n"
-				+ "              inner join nd_experiment exp on f.nd_experiment_id = exp.nd_experiment_id \n"
-				+ "              inner join project pr on pr.project_id = exp.project_id \n"
-				+ "                         and exp.type_id = " + TermId.PLOT_EXPERIMENT.getId()
-				+ "            where exp.nd_geolocation_id = geoloc.nd_geolocation_id ) > 0 \n"
+				.append("        or EXISTS(select f.file_id ")
+				.append("            from file_metadata f ")
+				.append("              inner join nd_experiment exp on f.nd_experiment_id = exp.nd_experiment_id ")
+				.append("              inner join project pr on pr.project_id = exp.project_id ")
+				.append("                         and exp.type_id = " + TermId.PLOT_EXPERIMENT.getId())
+				.append("            where exp.nd_geolocation_id = geoloc.nd_geolocation_id ) ")
 				// then canBeDeleted = false
-				+ "             then 0 \n"
-				+ "         else 1 end as canBeDeleted, "
+				.append("             then 0 ")
+				.append("         else 1 end as canBeDeleted, ")
 
 				// if study has any pending or accepted plot observations, hasMeasurements = true
-				+ "  case when (select count(1) from phenotype ph "
-				+ "  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 "
-				+ "  where exp.nd_geolocation_id = geoloc.nd_geolocation_id	 and "
-				+ "  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) > 0 then 1 else 0 end as hasMeasurements "
+				.append("  case when EXISTS(select ph.phenotype_id from phenotype ph ")
+				.append("  inner join nd_experiment exp on exp.nd_experiment_id = ph.nd_experiment_id and exp.type_id = 1155 ")
+				.append("  where exp.nd_geolocation_id = geoloc.nd_geolocation_id and ")
+				.append(
+					"  (ph.value is not null or ph.cvalue_id is not null or draft_value is not null or draft_cvalue_id is not null)) then 1 else 0 end as hasMeasurements ")
 
-				+ " from nd_geolocation geoloc \n"
-				+ " inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ " inner join project proj on proj.project_id = nde.project_id \n"
-				+ " left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "	left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = " + TermId.LOCATION_ID.getId() + " \n"
-				+ " left join (  \n"
-				+ "    select ne.nd_geolocation_id  \n"
-				+ "    from ims_experiment_transaction iet  \n"
-				+ "             inner join nd_experiment ne on ne.nd_experiment_id = iet.nd_experiment_id  \n"
-				+ "             inner join ims_transaction it on it.trnid = iet.trnid  \n"
-				+ "    where it.trnstat <> 9  \n"
-				+ ") hasInventory on hasInventory.nd_geolocation_id = geoloc.nd_geolocation_id "
-				+ " left join nd_experimentprop ndep on nde.nd_experiment_id = ndep.nd_experiment_id "
-				+ " where proj.project_id = :datasetId \n";
+				.append(" from nd_geolocation geoloc ")
+				.append(" inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id ")
+				.append(" inner join project proj on proj.project_id = nde.project_id ")
+				.append(" left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id ")
+				.append(" left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = " + TermId.LOCATION_ID.getId())
+				.append(" ")
+				.append(" left join nd_experimentprop ndep on nde.nd_experiment_id = ndep.nd_experiment_id ")
+				.append(" where proj.project_id = :datasetId ");
 
-			final StringBuilder sb = new StringBuilder(sql);
 			if (!CollectionUtils.isEmpty(instanceIds)) {
-				sb.append(" AND geoloc.nd_geolocation_id IN (:instanceIds) \n");
+				sql.append(" AND geoloc.nd_geolocation_id IN (:instanceIds) ");
 			}
-			sb.append("    group by geoloc.nd_geolocation_id \n");
-			sb.append("    order by (1 * geoloc.description) asc ");
+			sql.append("    group by geoloc.nd_geolocation_id ");
+			sql.append("    order by (1 * geoloc.description) asc ");
 
-			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			query.setParameter("datasetId", datasetId);
 			if (!CollectionUtils.isEmpty(instanceIds)) {
 				query.setParameterList("instanceIds", instanceIds);
@@ -1249,14 +1258,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public DatasetDTO getDatasetByObsUnitDbId(final String observationUnitDbId) {
 		return (DatasetDTO) this.getSession().createQuery("select p.projectId as datasetId, "
-			+ " p.datasetType.datasetTypeId as datasetTypeId,"
-			+ " p.name as name,"
-			+ " p.parent.projectId as parentDatasetId"
-			+ " from DmsProject p "
-			+ "where exists ("
-			+ "   select 1 from ExperimentModel e "
-			+ "   where e.project.projectId = p.projectId"
-			+ "   and e.obsUnitId = :observationUnitDbId)")
+				+ " p.datasetType.datasetTypeId as datasetTypeId,"
+				+ " p.name as name,"
+				+ " p.parent.projectId as parentDatasetId"
+				+ " from DmsProject p "
+				+ "where exists ("
+				+ "   select 1 from ExperimentModel e "
+				+ "   where e.project.projectId = p.projectId"
+				+ "   and e.obsUnitId = :observationUnitDbId)")
 			.setParameter("observationUnitDbId", observationUnitDbId)
 			.setResultTransformer(Transformers.aliasToBean(DatasetDTO.class))
 			.uniqueResult();

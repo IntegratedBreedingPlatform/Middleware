@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.study.advance;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
@@ -57,6 +58,7 @@ import org.generationcp.middleware.service.impl.study.advance.resolver.level.Sel
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetAllPlotsSelectedVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetBreedingMethodVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetExperimentSamplesVisitor;
+import org.generationcp.middleware.service.impl.study.advance.visitor.GetObservationsVisibleColumnsVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetPlantSelectedVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetSampleNumbersVisitor;
 import org.springframework.data.domain.PageRequest;
@@ -164,8 +166,11 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final DatasetDTO environmentDataset =
 			this.datasetService.getDatasetsWithVariables(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId())).get(0);
 
+		final Set<String> observationVisibleColumns =
+			request.accept(new GetObservationsVisibleColumnsVisitor(plotDataset.getDatasetId(), plotDataset.getVariables()));
 		final List<ObservationUnitRow> plotObservations =
-			this.getPlotObservations(studyId, plotDataset.getDatasetId(), request.getInstanceIds(), request.getSelectedReplications());
+			this.getPlotObservations(studyId, plotDataset.getDatasetId(), request.getInstanceIds(), request.getSelectedReplications(),
+				observationVisibleColumns);
 		if (CollectionUtils.isEmpty(plotObservations)) {
 			return new ArrayList<>();
 		}
@@ -275,7 +280,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 			// Resolves data related to season, selection trait and location for environment and plot
 			this.resolveEnvironmentAndPlotLevelData(environmentDataset.getDatasetId(), plotDataset.getDatasetId(),
-				request.getSelectionTraitRequest(), advancingSource, row, locationsByLocationId, plotDataVariablesByTermId, environmentVariablesByTermId);
+				request.getSelectionTraitRequest(), advancingSource, row, locationsByLocationId, plotDataVariablesByTermId,
+				environmentVariablesByTermId);
 
 			// Creates the lines that are advanced
 			this.createAdvancedGermplasm(cropType, advancingSource);
@@ -349,7 +355,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 	}
 
 	private List<ObservationUnitRow> getPlotObservations(final Integer studyId, final Integer plotDatasetId,
-		final List<Integer> instancesIds, final List<Integer> selectedReplications) {
+		final List<Integer> instancesIds, final List<Integer> selectedReplications, final Set<String> observationVisibleColumns) {
 
 		final ObservationUnitsSearchDTO plotDataObservationsSearchDTO = new ObservationUnitsSearchDTO();
 		plotDataObservationsSearchDTO.setInstanceIds(instancesIds);
@@ -374,6 +380,13 @@ public class AdvanceServiceImpl implements AdvanceService {
 			new Sort.Order(Sort.Direction.ASC, "PLOT_NO"),
 			new Sort.Order(Sort.Direction.ASC, "REP_NO"));
 		final PageRequest pageRequest = new PageRequest(0, Integer.MAX_VALUE, sort);
+
+		// Add the required observation table columns necessary for advancing to the visible columns, so that
+		// entry details, attributes, passports and names will be excluded in the observations query.
+		observationVisibleColumns.addAll(Sets.newHashSet("TRIAL_INSTANCE", "PLOT_NO", "REP_NO"));
+
+		plotDataObservationsSearchDTO.setVisibleColumns(observationVisibleColumns);
+
 		return this.datasetService
 			.getObservationUnitRows(studyId, plotDatasetId, plotDataObservationsSearchDTO, pageRequest);
 	}
