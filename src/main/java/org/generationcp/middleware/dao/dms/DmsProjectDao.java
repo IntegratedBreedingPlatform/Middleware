@@ -16,7 +16,6 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.api.study.MyStudiesDTO;
-import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -35,7 +34,6 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -1792,53 +1790,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		criteria.setProjection(Projections.rowCount());
 		final Long count = (Long) criteria.uniqueResult();
 		return count.intValue() == datasetIds.size();
-	}
-
-	@Deprecated
-	public List<StudyDTO> filterStudies(final String programUUID, final StudySearchRequest studySearchRequest, final Pageable pageable) {
-
-		final ProjectionList projectionList = Projections.projectionList();
-		projectionList.add(Projections.property("projectId"), "studyId");
-		projectionList.add(Projections.property("name"), "name");
-		projectionList.add(Projections.property("description"), "description");
-		projectionList.add(Projections.property("programUUID"), "programUUID");
-
-		final Criteria criteria = this.getBaseFilteredStudiesCriteria(programUUID)
-			.setProjection(projectionList)
-			.setResultTransformer(Transformers.aliasToBean(StudyDTO.class));
-
-		addOrder(criteria, pageable);
-		this.addStudySearchFilters(criteria, studySearchRequest);
-		addPagination(criteria, pageable);
-
-		return criteria.list();
-	}
-
-	@Deprecated
-	public long countFilteredStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
-		final Criteria criteria = this.getBaseFilteredStudiesCriteria(programUUID);
-		this.addStudySearchFilters(criteria, studySearchRequest);
-		criteria.setProjection(Projections.rowCount());
-		return (Long) criteria.uniqueResult();
-	}
-
-	@Deprecated
-	private Criteria getBaseFilteredStudiesCriteria(final String programUUID) {
-		return this.getSession().createCriteria(this.getPersistentClass())
-			.createAlias("studyType", "studyType")
-			.createAlias("parent", "parent")
-			.add(Restrictions.isNotNull("studyType"))
-			.add(Restrictions.eq("deleted", false))
-			.add(Restrictions.eq("programUUID", programUUID))
-			.setResultTransformer(Transformers.aliasToBean(StudyDTO.class));
-	}
-
-	@Deprecated
-	private void addStudySearchFilters(final Criteria criteria, final StudySearchRequest request) {
-		final SqlTextFilter studyNameFilter = request.getStudyNameFilter();
-		if (studyNameFilter != null && !studyNameFilter.isEmpty()) {
-			criteria.add(Restrictions.like("name", "%" + studyNameFilter.getValue() + "%"));
-		}
 	}
 
 	public void markProjectsAndChildrenAsDeleted(final List<Integer> projectIds) {
