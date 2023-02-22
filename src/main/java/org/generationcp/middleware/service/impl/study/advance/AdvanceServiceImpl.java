@@ -663,6 +663,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 		}
 
 		// Adding attribute for plants sub-observations advancement
+		if (observationUnitVariable == null) {
+			return;
+		}
+
 		final String plantNumber = observation.getVariableValueByVariableId(observationUnitVariable.getTermId());
 		if (DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId() == datasetTypeId && plantNumber != null) {
 			final Attribute plantNumberAttribute =
