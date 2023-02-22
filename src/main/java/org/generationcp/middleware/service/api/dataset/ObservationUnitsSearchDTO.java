@@ -7,6 +7,7 @@ import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,8 +31,11 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	private Integer environmentDatasetId;
 	private Boolean draftMode;
 
-	/** This is used by Visualization tool, to specify the columns that will be included in the data returned from the server. **/
-	private List<String> filterColumns = new ArrayList<>();
+	/**
+	 * List of columns that will be included and retrieved in the query.
+	 * If no columns are specified, the query will retrieve all columns by default.
+	 */
+	private Set<String> visibleColumns = new HashSet<>();
 
 	/**
 	 * This is used by DataTables to ensure that the Ajax returns from server-side processing requests are drawn in sequence
@@ -42,6 +46,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	private List<MeasurementVariableDto> passportAndAttributes;
 
 	private List<MeasurementVariableDto> nameTypes;
+
 
 	public class Filter {
 
@@ -273,14 +278,6 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		this.filter = filter;
 	}
 
-	public List<String> getFilterColumns() {
-		return this.filterColumns;
-	}
-
-	public void setFilterColumns(final List<String> filterColumns) {
-		this.filterColumns = filterColumns;
-	}
-
 	public List<MeasurementVariableDto> getPassportAndAttributes() {
 		return this.passportAndAttributes;
 	}
@@ -295,6 +292,14 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 
 	public void setNameTypes(final List<MeasurementVariableDto> nameTypes) {
 		this.nameTypes = nameTypes;
+	}
+
+	public Set<String> getVisibleColumns() {
+		return this.visibleColumns;
+	}
+
+	public void setVisibleColumns(final Set<String> visibleColumns) {
+		this.visibleColumns = visibleColumns;
 	}
 
 	@Override
