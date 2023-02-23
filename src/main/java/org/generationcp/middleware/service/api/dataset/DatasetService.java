@@ -240,9 +240,10 @@ public interface DatasetService {
 	 *
 	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
+	 * @param visibleColumns List of columns that will be included in the search query.
 	 * @return List of ObservationUnitRow
 	 */
-	List<ObservationUnitRow> getAllObservationUnitRows(int studyId, int datasetId);
+	List<ObservationUnitRow> getAllObservationUnitRows(int studyId, int datasetId, Set<String> visibleColumns);
 
 	/**
 	 * Validates if dataset name is available

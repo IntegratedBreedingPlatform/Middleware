@@ -10,7 +10,6 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudyDetailsDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.api.study.StudySearchResponse;
@@ -193,17 +192,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<GermplasmStudyDto> getGermplasmStudies(final Integer gid) {
 		return this.daoFactory.getStockDao().getGermplasmStudyDtos(gid);
-	}
-
-	@Override
-	public List<StudyDTO> getFilteredStudies(final String programUUID, final StudySearchRequest studySearchRequest,
-		final Pageable pageable) {
-		return this.daoFactory.getDmsProjectDAO().filterStudies(programUUID, studySearchRequest, pageable);
-	}
-
-	@Override
-	public long countFilteredStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
-		return this.daoFactory.getDmsProjectDAO().countFilteredStudies(programUUID, studySearchRequest);
 	}
 
 	@Override
