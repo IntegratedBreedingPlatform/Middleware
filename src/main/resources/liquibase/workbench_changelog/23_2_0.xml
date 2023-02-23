@@ -166,7 +166,7 @@
 	<changeSet author="cuenyad" id="v23.2.0-9">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MODIFY_COLUMNS_GERMPLASM_AND_CHECKS';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MODIFY_COLUMNS';
              </sqlCheck>
  		</preConditions>
          <comment>Modify Columns permission</comment>
