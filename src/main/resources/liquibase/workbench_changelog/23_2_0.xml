@@ -9,7 +9,7 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'CREATE_STUDIES';
              </sqlCheck>
  		</preConditions>
-         <comment>Create Studies permission</comment>
+		<comment>Create Studies permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
@@ -29,7 +29,7 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'CLOSE_STUDY';
              </sqlCheck>
  		</preConditions>
-         <comment>Close Study permission</comment>
+		<comment>Close Study permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
@@ -49,7 +49,7 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'DELETE_STUDY';
              </sqlCheck>
  		</preConditions>
-         <comment>Delete Study permission</comment>
+		<comment>Delete Study permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
@@ -69,7 +69,7 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'LOCK_STUDY';
              </sqlCheck>
  		</preConditions>
-         <comment>Lock Study permission</comment>
+		<comment>Lock Study permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
@@ -89,7 +89,7 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'GERMPLASM_AND_CHECKS';
              </sqlCheck>
  		</preConditions>
-         <comment>Germplasm and Checks permission</comment>
+		<comment>Germplasm and Checks permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
@@ -109,7 +109,7 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'VIEW_GERMPLASM_AND_CHECKS';
              </sqlCheck>
  		</preConditions>
-         <comment>View Germplasm and Checks permission</comment>
+		<comment>View Germplasm and Checks permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
 
@@ -129,7 +129,7 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'ADD_ENTRY_DETAILS_VARIABLES';
              </sqlCheck>
  		</preConditions>
-         <comment>Add Entry Details Variables permission</comment>
+		<comment>Add Entry Details Variables permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
 
@@ -149,7 +149,7 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'ADD_ENTRY_DETAILS_VALUES';
              </sqlCheck>
  		</preConditions>
-         <comment>Add Entry Details Values permission</comment>
+		<comment>Add Entry Details Values permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
 
@@ -169,7 +169,7 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MODIFY_COLUMNS';
              </sqlCheck>
  		</preConditions>
-         <comment>Modify Columns permission</comment>
+        <comment>Modify Columns permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
 
@@ -189,7 +189,7 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'REPLACE_GERMPLASM';
              </sqlCheck>
  		</preConditions>
-         <comment>Replace Germplasm permission</comment>
+		<comment>Replace Germplasm permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
 
@@ -209,7 +209,7 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'ADD_NEW_ENTRIES';
              </sqlCheck>
  		</preConditions>
-         <comment>Add New Entries permission</comment>
+		<comment>Add New Entries permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
 
@@ -254,7 +254,7 @@
 				</not>
 			</and>
  		</preConditions>
-         <comment>Adding new granular studies permissions in role_permission</comment>
+		<comment>Adding new granular studies permissions in role_permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @create_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'CREATE_STUDIES');
 			SET @close_study_permission_id = (SELECT permission_id FROM permission WHERE name = 'CLOSE_STUDY');
