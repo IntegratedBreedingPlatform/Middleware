@@ -765,7 +765,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final List<ObservationUnitRow> list = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
 		if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
-			final Set<Integer> gids = list.stream().filter(s -> s.getGid() != null).map(s -> s.getGid()).collect(Collectors.toSet());
+			final Set<Integer> gids = list.stream().filter(s -> s.getGid() != null).map(ObservationUnitRow::getGid).collect(Collectors.toSet());
 			this.addParentsFromPedigreeTable(gids, list);
 		}
 		return list;

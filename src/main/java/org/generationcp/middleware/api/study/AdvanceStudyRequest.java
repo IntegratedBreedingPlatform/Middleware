@@ -6,9 +6,18 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 
+	private Integer datasetId;
 	private BreedingMethodSelectionRequest breedingMethodSelectionRequest;
 	private LineSelectionRequest lineSelectionRequest;
 	private BulkingRequest bulkingRequest;
+
+	public Integer getDatasetId() {
+		return datasetId;
+	}
+
+	public void setDatasetId(final Integer datasetId) {
+		this.datasetId = datasetId;
+	}
 
 	public BreedingMethodSelectionRequest getBreedingMethodSelectionRequest() {
 		return breedingMethodSelectionRequest;

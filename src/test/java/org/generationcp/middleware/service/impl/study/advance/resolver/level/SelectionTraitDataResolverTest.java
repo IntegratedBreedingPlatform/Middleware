@@ -208,7 +208,7 @@ public class SelectionTraitDataResolverTest {
 		final AdvancingSource source = Mockito.mock(AdvancingSource.class);
 
 		this.selectionTraitDataResolver
-			.resolvePlotLevelData(DATASET_ID, selectionTraitRequest, source, observationUnitRow, plotDataVariablesByTermId);
+			.resolvePlotAndSubObservationLevelData(DATASET_ID, selectionTraitRequest, source, observationUnitRow, plotDataVariablesByTermId);
 
 		Mockito.verify(selectionTraitVariable).getPossibleValues();
 		Mockito.verify(source).setSelectionTraitValue(SELECTION_TRAIT_VALUE);
@@ -234,7 +234,7 @@ public class SelectionTraitDataResolverTest {
 		final AdvancingSource source = Mockito.mock(AdvancingSource.class);
 
 		this.selectionTraitDataResolver
-			.resolvePlotLevelData(DATASET_ID, selectionTraitRequest, source, observationUnitRow, plotDataVariablesByTermId);
+			.resolvePlotAndSubObservationLevelData(DATASET_ID, selectionTraitRequest, source, observationUnitRow, plotDataVariablesByTermId);
 
 		Mockito.verify(selectionTraitVariable, Mockito.never()).getPossibleValues();
 		Mockito.verify(source).setSelectionTraitValue(SELECTION_TRAIT_VALUE);
