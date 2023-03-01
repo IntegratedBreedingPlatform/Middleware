@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.impl.inventory;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
@@ -11,6 +12,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -23,6 +25,7 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -38,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -222,12 +226,19 @@ public class TransactionServiceImpl implements TransactionService {
 					final ObservationUnitsSearchDTO observationUnitsSearchDTO = (ObservationUnitsSearchDTO) this.searchRequestService
 						.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(), ObservationUnitsSearchDTO.class);
 					final DatasetDTO datasetDTO = this.studyDatasetService.getDataset(observationUnitsSearchDTO.getDatasetId());
+
+					// Add only the required observation table columns necessary for this function
+					final Map<Integer, String> requiredColumns =
+						this.daoFactory.getCvTermDao().getByIds(Lists.newArrayList(TermId.GID.getId(),
+							TermId.OBS_UNIT_ID.getId())).stream().collect(Collectors.toMap(CVTerm::getCvTermId, CVTerm::getName));
+
+					observationUnitsSearchDTO.setVisibleColumns(new HashSet<>(requiredColumns.values()));
+
 					final List<ObservationUnitRow> observationUnitRows =
 						this.studyDatasetService.getObservationUnitRows(datasetDTO.getParentDatasetId(),
 							observationUnitsSearchDTO.getDatasetId(), observationUnitsSearchDTO, null);
 
-
-					Map<String, ExperimentModel> subObsExperimentalMap = this.daoFactory.getExperimentDao()
+					final Map<String, ExperimentModel> subObsExperimentalMap = this.daoFactory.getExperimentDao()
 						.getByObsUnitIds(observationUnitRows.stream().map(ObservationUnitRow::getObsUnitId).collect(
 							Collectors.toList())).stream().collect(Collectors.toMap(ExperimentModel::getObsUnitId, Function.identity()));
 

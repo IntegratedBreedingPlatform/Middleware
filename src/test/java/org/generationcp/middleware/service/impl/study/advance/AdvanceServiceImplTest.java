@@ -426,6 +426,7 @@ public class AdvanceServiceImplTest extends IntegrationTestBase {
 		final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest, final AdvanceStudyRequest.BulkingRequest bulkingRequest,
 		final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest) {
 		final AdvanceStudyRequest request = new AdvanceStudyRequest();
+		request.setDatasetId(this.plotDatasetId);
 		request.setInstanceIds(this.instanceIds);
 		request.setSelectedReplications(selectedReplications);
 		request.setBreedingMethodSelectionRequest(breedingMethodSelectionRequest);

@@ -211,7 +211,8 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getObservationSetColumns(final Integer studyId, final Integer observationSetId,
 		final Boolean draftMode) {
-		final DatasetDTO datasetDTO = this.getDataset(observationSetId);
+		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(observationSetId);
+
 		// Analysis Summary Variables
 		if (DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId() == datasetDTO.getDatasetTypeId()) {
 			final List<MeasurementVariable> columns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
@@ -764,7 +765,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final List<ObservationUnitRow> list = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
 		if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
-			final Set<Integer> gids = list.stream().map(s -> s.getGid()).collect(Collectors.toSet());
+			final Set<Integer> gids = list.stream().filter(s -> s.getGid() != null).map(ObservationUnitRow::getGid).collect(Collectors.toSet());
 			this.addParentsFromPedigreeTable(gids, list);
 		}
 		return list;
@@ -831,7 +832,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<ObservationUnitRow> getAllObservationUnitRows(final int studyId, final int datasetId) {
+	public List<ObservationUnitRow> getAllObservationUnitRows(final int studyId, final int datasetId, final Set<String> visibleColumns) {
 		final DmsProject environmentDataset =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
 		final List<MeasurementVariable> studyVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(
@@ -843,6 +844,7 @@ public class DatasetServiceImpl implements DatasetService {
 		searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
+		searchDTO.setVisibleColumns(visibleColumns);
 		this.updateSearchDto(studyId, datasetId, searchDTO);
 
 		final List<ObservationUnitRow> observationUnits =
@@ -1695,6 +1697,11 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<ObservationUnitRow> list) {
+
+		if (CollectionUtils.isEmpty(gids)) {
+			return;
+		}
+
 		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
 		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable =
 			this.pedigreeDataManager.generatePedigreeTable(gids, level, false);

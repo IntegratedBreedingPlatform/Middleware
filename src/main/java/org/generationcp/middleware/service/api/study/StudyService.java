@@ -2,7 +2,6 @@
 package org.generationcp.middleware.service.api.study;
 
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
-import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudyDetailsDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.api.study.StudySearchResponse;
@@ -37,12 +36,6 @@ public interface StudyService {
 	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId);
 
 	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
-
-	@Deprecated
-	List<StudyDTO> getFilteredStudies(String programUUID, StudySearchRequest studySearchRequest, Pageable pageable);
-
-	@Deprecated
-	long countFilteredStudies(String programUUID, StudySearchRequest studySearchRequest);
 
 	/**
 	 * Soft-delete all program studies

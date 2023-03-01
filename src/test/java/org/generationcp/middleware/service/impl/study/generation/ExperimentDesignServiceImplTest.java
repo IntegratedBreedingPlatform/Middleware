@@ -54,7 +54,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	private static final Integer NO_REPS = 2;
 	private static final Integer NO_ENTRIES = 5;
 	private static final Integer NO_TREATMENTS = 3;
-	private static final List<TermId> GERMPLASM_VARIABLES =	Arrays.asList(TermId.GID, TermId.DESIG);
+	private static final List<TermId> GERMPLASM_VARIABLES = Arrays.asList(TermId.GID, TermId.DESIG);
 	private static final List<TermId> PLOT_VARIABLES = Arrays.asList(TermId.PLOT_NO, TermId.REP_NO);
 	private static final List<TermId> ENTRY_DETAIL_VARIABLES = Arrays.asList(TermId.ENTRY_TYPE, TermId.ENTRY_NO);
 	public static final String LOCATION_ID = "9011";
@@ -133,7 +133,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(
 				instanceNumbers));
 		this.sessionProvder.getSession().flush();
-		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertNotNull(rows);
 
 		// Verify saving of variables
@@ -162,15 +162,17 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	public void testSaveExperimentDesign_IterativeForAllStudyInstances() {
 		// Save design first instance
 		this.experimentDesignService
-			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(Collections.singletonList(1)));
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(),
+				this.createObservationUnitRows(Collections.singletonList(1)));
 
 		// Save design for other instances
 		this.experimentDesignService
-			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(Arrays.asList(2, 3)));
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(),
+				this.createObservationUnitRows(Arrays.asList(2, 3)));
 
 		this.sessionProvder.getSession().flush();
 
-		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertNotNull(rows);
 
 		// Verify saving of variables
@@ -199,10 +201,11 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	public void testSaveExperimentDesign_IterativeAndRegeneratePreviousInstance() {
 		// Save design - first 2 instances
 		this.experimentDesignService
-			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows((Arrays.asList(1, 2))));
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(),
+				this.createObservationUnitRows((Arrays.asList(1, 2))));
 		this.sessionProvder.getSession().flush();
 
-		final List<ObservationUnitRow> previousRows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		final List<ObservationUnitRow> previousRows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertEquals(2 * NO_ENTRIES * NO_REPS * NO_TREATMENTS, previousRows.size());
 		// Save fieldmap info for instance1
 		final Integer geolocationId1 = this.daoFactory.getGeolocationDao()
@@ -210,18 +213,20 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertFalse(this.daoFactory.getGeolocationPropertyDao()
 			.getGeoLocationPropertyByVariableId(this.environmentDatasetId, geolocationId1)
 			.containsKey(TermId.BLOCK_ID.getId()));
-		this.daoFactory.getGeolocationPropertyDao().save(this.createGeolocationProperty(geolocationId1, TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5)));
+		this.daoFactory.getGeolocationPropertyDao()
+			.save(this.createGeolocationProperty(geolocationId1, TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5)));
 		Assert.assertTrue(this.daoFactory.getGeolocationPropertyDao()
 			.getGeoLocationPropertyByVariableId(this.environmentDatasetId, geolocationId1)
 			.containsKey(TermId.BLOCK_ID.getId()));
 
 		// Save design - overwrite first instance, generate experiments for 3rd
 		this.experimentDesignService
-			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), this.createObservationUnitRows(Arrays.asList(1, 3)));
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(),
+				this.createObservationUnitRows(Arrays.asList(1, 3)));
 
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
-		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertNotNull(rows);
 
 		// Verify saving of variables
@@ -261,7 +266,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), instanceRowsMap);
 		this.sessionProvder.getSession().flush();
 
-		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertNotNull(rows);
 
 		// Verify saving of variables
@@ -299,7 +304,8 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 				TermId.BLOCK_ID.getId(), "BLOCK_ID"));
 		final Geolocation geolocation1 = this.daoFactory.getGeolocationDao()
 			.getEnvironmentGeolocationsForInstances(this.studyId, Collections.singletonList(1)).get(0);
-		this.daoFactory.getGeolocationPropertyDao().save(this.createGeolocationProperty(geolocation1.getLocationId(), TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5)));
+		this.daoFactory.getGeolocationPropertyDao().save(
+			this.createGeolocationProperty(geolocation1.getLocationId(), TermId.BLOCK_ID.getId(), RandomStringUtils.randomAlphabetic(5)));
 
 		List<Integer> environmentVariableIds =
 			this.daoFactory.getProjectPropertyDAO().getVariableIdsForDataset(this.environmentDatasetId);
@@ -307,13 +313,13 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertTrue(environmentVariableIds.contains(TermId.NUMBER_OF_REPLICATES.getId()));
 		Assert.assertTrue(environmentVariableIds.contains(TermId.BLOCK_ID.getId()));
 		Assert.assertTrue(this.daoFactory.getGeolocationPropertyDao()
-			.getGeoLocationPropertyByVariableId(this.environmentDatasetId,geolocation1.getLocationId())
+			.getGeoLocationPropertyByVariableId(this.environmentDatasetId, geolocation1.getLocationId())
 			.containsKey(TermId.BLOCK_ID.getId()));
 
 		// Delete experiment design
 		this.experimentDesignService.deleteStudyExperimentDesign(this.studyId);
 
-		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		final List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertTrue(rows.isEmpty());
 
 		environmentVariableIds =
@@ -343,7 +349,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 
 		// Delete Design
 		this.experimentDesignService.deleteStudyExperimentDesign(this.studyId);
-		List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		List<ObservationUnitRow> rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertTrue(rows.isEmpty());
 
 		final List<Integer> environmentVariableIds =
@@ -360,15 +366,14 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertFalse(plotVariableIds.contains(this.treatmentFactorLabel.getCvTermId()));
 		this.verifyGeolocationPropRecords(false, instanceNumbers);
 
-
 		// Save instances again
 		instanceNumbers = Arrays.asList(1, 3);
 		final Map<Integer, List<ObservationUnitRow>> instanceRowsMap = this.createObservationUnitRows(instanceNumbers);
 		this.experimentDesignService
-			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(),instanceRowsMap);
+			.saveExperimentDesign(new CropType(), this.studyId, this.createMeasurementVariables(), instanceRowsMap);
 		this.sessionProvder.getSession().flush();
 
-		rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId);
+		rows = this.datasetService.getAllObservationUnitRows(this.studyId, this.plotDatasetId, null);
 		Assert.assertNotNull(rows);
 
 		// Verify saving of variables
@@ -482,10 +487,12 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			final Integer instanceNumber = Integer.valueOf(geolocation.getDescription());
 
 			if (shouldExist && instanceNumbers.contains(instanceNumber)) {
-				Assert.assertNotNull("Expecting EXP_DESIGN factor for instance " + instanceNumber, propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
+				Assert.assertNotNull("Expecting EXP_DESIGN factor for instance " + instanceNumber,
+					propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
 				Assert.assertEquals(String.valueOf(ExperimentDesignType.RANDOMIZED_COMPLETE_BLOCK.getTermId()),
 					propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()).getValue());
-				Assert.assertNotNull("Expecting NO_REPS factor for instance " + instanceNumber, propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()));
+				Assert.assertNotNull("Expecting NO_REPS factor for instance " + instanceNumber,
+					propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()));
 				Assert.assertEquals(NO_REPS.toString(), propertiesMap.get(TermId.NUMBER_OF_REPLICATES.getId()).getValue());
 			} else {
 				Assert.assertNull(propertiesMap.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
