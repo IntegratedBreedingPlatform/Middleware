@@ -146,16 +146,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-8">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'ADD_ENTRY_DETAILS_VALUES';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MODIFY_ENTRY_DETAILS_VALUES';
              </sqlCheck>
  		</preConditions>
-		<comment>Add Entry Details Values permission</comment>
+		<comment>Modify Entry Details Values permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('ADD_ENTRY_DETAILS_VALUES', 'Add Entry Details Values', @germplasm_and_checks_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MODIFY_ENTRY_DETAILS_VALUES', 'Modify Entry Details Values', @germplasm_and_checks_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'ADD_ENTRY_DETAILS_VALUES');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MODIFY_ENTRY_DETAILS_VALUES');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
