@@ -83,7 +83,6 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 	private HibernateSessionProvider sessionProvider;
 	private DaoFactory daoFactory;
 	private WorkbenchDaoFactory workbenchDaoFactory;
-	private StudyMeasurements studyMeasurements;
 
 	public TrialServiceBrapiImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -93,7 +92,6 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.workbenchDaoFactory = new WorkbenchDaoFactory(workbenchSessionProvider);
 		this.sessionProvider = sessionProvider;
-		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
 	}
 
 	@Override
@@ -103,6 +101,9 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 
 	@Override
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier, final Integer instanceDbId) {
+
+		final StudyMeasurements studyMeasurements = new StudyMeasurements(this.sessionProvider.getSession());
+
 		final List<MeasurementVariableDto> traits =
 			this.daoFactory.getProjectPropertyDAO().getVariables(studyIdentifier, VariableType.TRAIT.getId());
 
@@ -110,7 +111,7 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 			o1.getId() - o2.getId()).immutableSortedCopy(traits);
 
 		final List<Object[]> results =
-			this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, measurementVariables, instanceDbId);
+			studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, measurementVariables, instanceDbId);
 
 		final List<Integer> observationVariableDbIds = new ArrayList<>();
 
