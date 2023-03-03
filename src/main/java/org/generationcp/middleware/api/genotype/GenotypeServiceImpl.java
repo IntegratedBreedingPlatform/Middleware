@@ -30,6 +30,7 @@ public class GenotypeServiceImpl implements GenotypeService{
             genotype.setSample(new Sample(Integer.valueOf(importRequestDto.getSampleId())));
             final CVTerm variable = new CVTerm();
             variable.setCvTermId(Integer.valueOf(importRequestDto.getVariableId()));
+            genotype.setVariable(variable);
             genotype.setValue(importRequestDto.getValue());
             this.daoFactory.getGenotypeDao().save(genotype);
             genotypeIds.add(genotype.getId());
