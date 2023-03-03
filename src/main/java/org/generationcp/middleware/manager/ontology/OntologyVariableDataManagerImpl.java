@@ -80,6 +80,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	private static final String NAMES = "names";
 	private static final String PROPERTY_IDS = "propertyIds";
 	private static final String VARIABLE_IDS = "variableIds";
+
+	private static final String VARIABLE_TYPE_NAMES = "variableTypeNames";
 	private static final String SCALE_IDS = "scaleIds";
 	private static final String DATASET_IDS = "datasetIds";
 	private static final String GERMPLASM_UUIDS = "germplasmUUIDs";
@@ -155,6 +157,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			final Map<String, List<? extends Object>> listParameters = new HashMap<>();
 
 			String filterClause = "";
+			String variableTypesInnerJoin = "";
 
 			// Execute only if fetchAll is false
 			if (!variableFilter.isFetchAll()) {
@@ -251,29 +254,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 				// check of variable type list is not empty then get variables by variable types and add filter clause of it
 				if (!variableFilter.getVariableTypes().isEmpty()) {
-
+					variableTypesInnerJoin += " INNER JOIN cvtermprop vartypeProp ON vartypeProp.cvterm_id = v.cvterm_id "
+						+ " AND vartypeProp.type_id = 1800 and vartypeProp.value in (:variableTypeNames) ";
 					final List<String> variableTypeNames =
 						Util.convertAll(variableFilter.getVariableTypes(), VariableType::getName);
-
-					final SQLQuery vSQLQuery = this.getActiveSession()
-						.createSQLQuery("select cvterm_id from cvtermprop where type_id = 1800 and value in (:variableTypeNames)");
-					vSQLQuery.setParameterList("variableTypeNames", variableTypeNames);
-					final List queryResults = vSQLQuery.list();
-
-					if (!listParameters.containsKey(VARIABLE_IDS)) {
-						filterClause += " and v.cvterm_id in (:variableIds)";
-						listParameters.put(VARIABLE_IDS, variableFilter.getVariableIds());
-					}
-
-					final List<Integer> variableIds = (List<Integer>) listParameters.get(VARIABLE_IDS);
-					for (final Object row : queryResults) {
-						variableIds.add(Util.typeSafeObjectToInteger(row));
-					}
-
-					// Filtering with variable types that is not used or invalid. So no further iteration required.
-					if (variableIds.isEmpty()) {
-						return new ArrayList<>();
-					}
+					listParameters.put(VARIABLE_TYPE_NAMES, variableTypeNames);
 				}
 
 				// check of variable name or alias if program uuid is set
@@ -338,6 +323,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 						+ "left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
 						+ "left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
 						+ "left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
+						+ variableTypesInnerJoin
 						+ leftJoinsProgramUUIDDependant
 						+ "WHERE (v.cv_id = 1040) " + filterClause)
 				.addScalar("vid").addScalar("vn").addScalar("vd").addScalar("pid").addScalar("pn").addScalar("pd").addScalar("mid")

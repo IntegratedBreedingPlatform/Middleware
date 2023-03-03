@@ -93,6 +93,10 @@ public class Sample implements Serializable {
 
 	}
 
+	public Sample(final Integer sampleId) {
+		this.sampleId = sampleId;
+	}
+
 	public Integer getCreatedBy() {
 		return createdBy;
 	}
