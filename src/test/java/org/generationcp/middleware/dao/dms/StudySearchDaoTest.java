@@ -114,16 +114,12 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetStudiesByNameWhenNameIsEmpty() {
-		this.studySearchDao.setSession(this.mockSession);
-		
 		this.studySearchDao.getStudiesByName("", StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID);
 		Mockito.verify(this.mockSession, Mockito.never()).createSQLQuery(Matchers.anyString());
 	}
 	
 	@Test
 	public void testGetStudiesByNameWhenNameIsNull() {
-		this.studySearchDao.setSession(this.mockSession);
-		
 		this.studySearchDao.getStudiesByName(null, StudySearchMatchingOption.MATCHES_STARTING_WITH, StudySearchDaoTest.PROGRAM_UUID);
 		Mockito.verify(this.mockSession, Mockito.never()).createSQLQuery(Matchers.anyString());
 	}
@@ -174,8 +170,6 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetStudiesByLocationIdsWhenNoLocationIdsSpecified() {
-		this.studySearchDao.setSession(this.mockSession);
-		
 		this.studySearchDao.getStudiesByLocationIds(new ArrayList<Integer>(), StudySearchDaoTest.PROGRAM_UUID);
 		Mockito.verify(this.mockSession, Mockito.never()).createSQLQuery(Matchers.anyString());
 	}
@@ -247,8 +241,6 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetStudiesBySeasonWhenNoSeasonSpecified() {
-		this.studySearchDao.setSession(this.mockSession);
-		
 		this.studySearchDao.getStudiesBySeason(null, StudySearchDaoTest.PROGRAM_UUID);
 		Mockito.verify(this.mockSession, Mockito.never()).createSQLQuery(Matchers.anyString());
 	}
@@ -272,8 +264,6 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetStudiesByStartDateWhenNoStartDateSpecified() {
-		this.studySearchDao.setSession(this.mockSession);
-		
 		this.studySearchDao.getStudiesByStartDate(null, StudySearchDaoTest.PROGRAM_UUID);
 		Mockito.verify(this.mockSession, Mockito.never()).createSQLQuery(Matchers.anyString());
 	}
@@ -298,8 +288,6 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	
 	@Test
 	public void testSearchStudiesWhenNoSearchFilterSpecified() {
-		this.studySearchDao.setSession(this.mockSession);
-		
 		final BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
 		this.studySearchDao.searchStudies(filter, new ArrayList<Integer>());
 		

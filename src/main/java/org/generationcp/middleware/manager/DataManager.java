@@ -124,7 +124,6 @@ public abstract class DataManager {
 	@SuppressWarnings("rawtypes")
 	public long countAll(final GenericDAO dao) {
 		long count = 0;
-		dao.setSession(this.getActiveSession());
 		count = count + dao.countAll();
 		return count;
 	}
@@ -143,14 +142,13 @@ public abstract class DataManager {
 	 * </code>
 	 * </pre>
 	 *
-	 * @param dao      The DAO to call the method from
+	 * @param dao The DAO to call the method from
 	 * @return The number of entities
 	 * @
 	 */
 	@SuppressWarnings("rawtypes")
 	long countFromInstance(final GenericDAO dao) {
 		long count = 0;
-		dao.setSession(this.getActiveSession());
 		count = count + dao.countAll();
 		return count;
 	}
