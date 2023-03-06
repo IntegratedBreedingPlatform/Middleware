@@ -76,6 +76,10 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		+ "      FROM listdata "
 		+ "      WHERE listid = :srcListid ";
 
+	public GermplasmListDataDAO(final Session session) {
+		super(session);
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<GermplasmListData> getByListId(final Integer id) {
 		// Make sure parameters are not null.

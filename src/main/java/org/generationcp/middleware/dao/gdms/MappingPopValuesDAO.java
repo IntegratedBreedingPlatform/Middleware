@@ -19,6 +19,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
@@ -97,7 +98,9 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MappingPopValuesDAO.class);
 
-
+	public MappingPopValuesDAO(final Session session) {
+		super(session);
+	}
 
 	/**
 	 * Gets the allelic values based on the given dataset id. The result is limited by the start and numOfRows parameters.

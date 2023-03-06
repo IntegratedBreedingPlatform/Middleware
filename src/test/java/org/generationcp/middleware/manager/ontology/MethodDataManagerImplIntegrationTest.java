@@ -46,13 +46,14 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 	private DaoFactory daoFactory;
 
 	private CVTermDao cvTermDao;
-	private final CvTermPropertyDao propertyDao = new CvTermPropertyDao();
+	private CvTermPropertyDao propertyDao;
 
 	@Before
 	public void setUp() throws Exception {
 		daoFactory = new DaoFactory(this.sessionProvder);
 		cvTermDao = daoFactory.getCvTermDao();
-		this.propertyDao.setSession(this.sessionProvder.getSession());
+
+		this.propertyDao = new CvTermPropertyDao(this.sessionProvder.getSession());
 	}
 
 	/*

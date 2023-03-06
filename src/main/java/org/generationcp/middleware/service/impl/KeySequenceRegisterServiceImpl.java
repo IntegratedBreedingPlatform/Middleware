@@ -21,8 +21,7 @@ public class KeySequenceRegisterServiceImpl implements KeySequenceRegisterServic
 	}
 
 	public KeySequenceRegisterServiceImpl(final HibernateSessionProvider sessionProvider) {
-		this.keySequenceRegisterDAO = new KeySequenceRegisterDAO();
-		this.keySequenceRegisterDAO.setSession(sessionProvider.getSession());
+		this.keySequenceRegisterDAO = new KeySequenceRegisterDAO(sessionProvider.getSession());
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 

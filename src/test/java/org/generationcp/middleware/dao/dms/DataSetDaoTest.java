@@ -28,8 +28,7 @@ public class DataSetDaoTest {
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		
-		this.dao = new DataSetDao();
-		this.dao.setSession(this.mockSession);
+		this.dao = new DataSetDao(this.mockSession);
 		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockQuery);
 	}
 

@@ -26,6 +26,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -70,6 +71,10 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			+ "  LEFT JOIN location l ON l.locid = gp.value " + "  LEFT JOIN location prov ON prov.locid = l.snl1id "
 			+ "  LEFT JOIN cntry c ON c.cntryid = l.cntryid "
 			+ " WHERE gp.type_id = " + TermId.LOCATION_ID.getId() +  " AND p.deleted = 0 ";
+
+	public GeolocationDao(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public Set<Geolocation> findInDataSet(final int datasetId) {

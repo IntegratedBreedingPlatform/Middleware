@@ -2,11 +2,16 @@ package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.hibernate.Criteria;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.List;
 
 public class StudyTypeDAO extends GenericDAO<StudyType, Integer> {
+
+	public StudyTypeDAO(final Session session) {
+		super(session);
+	}
 
 	public List<StudyType> getAllVisibleStudyTypes() {
 		final Criteria criteria = this.getSession().createCriteria(StudyType.class);

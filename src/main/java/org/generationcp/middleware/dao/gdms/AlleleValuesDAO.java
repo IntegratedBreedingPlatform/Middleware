@@ -21,6 +21,7 @@ import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
@@ -125,6 +126,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AlleleValuesDAO.class);
 
+	public AlleleValuesDAO(final Session session) {
+		super(session);
+	}
 
 	/**
 	 * Gets the allelic values based on the given dataset id. The result is limited by the start and numOfRows parameters.

@@ -19,8 +19,7 @@ public class VariableOverridesDaoTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		VariableOverridesDaoTest.dao = new VariableOverridesDao();
-		VariableOverridesDaoTest.dao.setSession(this.sessionProvder.getSession());
+		VariableOverridesDaoTest.dao = new VariableOverridesDao(this.sessionProvder.getSession());
 	}
 
 	@Test

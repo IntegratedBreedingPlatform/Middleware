@@ -13,9 +13,7 @@ public class NamingConfigurationDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		final Session session = this.sessionProvder.getSession();
-		this.namingConfigurationDAO = new NamingConfigurationDAO();
-		this.namingConfigurationDAO.setSession(session);
+		this.namingConfigurationDAO = new NamingConfigurationDAO(this.sessionProvder.getSession());
 	}
 
 	@Test

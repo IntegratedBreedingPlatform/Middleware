@@ -18,6 +18,7 @@ import org.generationcp.middleware.pojos.LocdesType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,10 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 			+ " 	where block.locid in (:blockIds) and block.dtype = " + LocdesType.BLOCK_PARENT.getId() + ")"
 			+ " AND parent.locid not in (select oth_block.dval from locdes oth_block"
 			+ " 	where oth_block.locid not in (:blockIds) and oth_block.dtype = " + LocdesType.BLOCK_PARENT.getId() + ")";
+
+	public LocdesDAO(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Locdes> getByLocation(final Integer locId) throws MiddlewareQueryException {

@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingData;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -33,6 +34,10 @@ public class MappingDataDAO extends GenericDAO<MappingData, Integer> {
 
 	public static final String GET_MAP_INFO_BY_MAP_NAME = "SELECT marker_id, marker_name, map_name, linkage_group, start_position "
 			+ "FROM gdms_mapping_data " + "WHERE map_name = :mapName " + "ORDER BY linkage_group, start_position, marker_name";
+
+	public MappingDataDAO(final Session session) {
+		super(session);
+	}
 
 	/**
 	 * Gets the map info by map name.

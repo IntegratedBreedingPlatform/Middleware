@@ -126,8 +126,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			this.nameDAO = new NameDAO(this.sessionProvder.getSession());
 		}
 		if (this.germplasmExternalReferenceDAO == null) {
-			this.germplasmExternalReferenceDAO = new GermplasmExternalReferenceDAO();
-			this.germplasmExternalReferenceDAO.setSession(this.sessionProvder.getSession());
+			this.germplasmExternalReferenceDAO = new GermplasmExternalReferenceDAO(this.sessionProvder.getSession());
 		}
 
 		if (this.germplasmTestDataGenerator == null) {

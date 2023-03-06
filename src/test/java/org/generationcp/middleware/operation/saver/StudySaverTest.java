@@ -24,8 +24,7 @@ public class StudySaverTest extends IntegrationTestBase {
 	@Before
 	public void setup() {
 		this.studySaver = new StudySaver(this.sessionProvder);
-		this.experimentDao = new ExperimentDao();
-		this.experimentDao.setSession(this.sessionProvder.getSession());
+		this.experimentDao = new ExperimentDao(this.sessionProvder.getSession());
 		this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
 	}
 

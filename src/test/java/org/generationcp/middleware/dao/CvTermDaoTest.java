@@ -56,10 +56,8 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		CvTermDaoTest.cvTermDao = this.daoFactory.getCvTermDao();
 		CvTermDaoTest.cvTermRelationshipDao = this.daoFactory.getCvTermRelationshipDao();
 
-		CvTermDaoTest.cvDao = new CVDao();
-		CvTermDaoTest.cvDao.setSession(this.sessionProvder.getSession());
-		CvTermDaoTest.cvTermSynonymDao = new CvTermSynonymDao();
-		CvTermDaoTest.cvTermSynonymDao.setSession(this.sessionProvder.getSession());
+		CvTermDaoTest.cvDao = new CVDao(this.sessionProvder.getSession());
+		CvTermDaoTest.cvTermSynonymDao = new CvTermSynonymDao(this.sessionProvder.getSession());
 	}
 
 	@Test

@@ -70,8 +70,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	public void init() throws Exception {
 		MockitoAnnotations.initMocks(this);
 
-		this.studySearchDao = new StudySearchDao();
-		this.studySearchDao.setSession(this.sessionProvder.getSession());
+		this.studySearchDao = new StudySearchDao(this.sessionProvder.getSession());
 
 		this.createTestStudies();
 	}

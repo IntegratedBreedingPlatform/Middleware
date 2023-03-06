@@ -27,6 +27,10 @@ import java.util.List;
  */
 public class UserInfoDAO extends GenericDAO<UserInfo, Integer> {
 
+	public UserInfoDAO(final Session session) {
+		super(session);
+	}
+
 	public UserInfo getUserInfoByToken(String token) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(UserInfo.class).add(Restrictions.eq("resetToken", token));

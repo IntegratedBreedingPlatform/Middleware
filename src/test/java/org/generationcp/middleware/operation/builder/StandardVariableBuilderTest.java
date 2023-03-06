@@ -61,10 +61,8 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		this.standardVariableBuilder = new StandardVariableBuilder(this.sessionProvder);
 		this.projectPropertySaver = new ProjectPropertySaver(this.sessionProvder);
 		this.standardVariableSaver = new StandardVariableSaver(this.sessionProvder);
-		this.cvTermDao = new CVTermDao();
-		this.cvTermDao.setSession(this.sessionProvder.getSession());
-		this.variableOverridesDao = new VariableOverridesDao();
-		this.variableOverridesDao.setSession(this.sessionProvder.getSession());
+		this.cvTermDao = new CVTermDao(this.sessionProvder.getSession());
+		this.variableOverridesDao = new VariableOverridesDao(this.sessionProvder.getSession());
 	}
 
 	@Test
@@ -79,8 +77,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testCreateObsoleteVariable() {
-		final CVTermDao cvtermDao = new CVTermDao();
-		cvtermDao.setSession(this.sessionProvder.getSession());
+		final CVTermDao cvtermDao = new CVTermDao(this.sessionProvder.getSession());
 
 		// set variable to obsolete
 		final int id = TermId.TRIAL_INSTANCE_FACTOR.getId();

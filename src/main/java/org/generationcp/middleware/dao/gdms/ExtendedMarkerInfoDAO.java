@@ -10,6 +10,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.ExtendedMarkerInfo;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 
 /**
  * Created by IntelliJ IDEA. User: Daniel Villafuerte Date: 9/4/2014 Time: 11:37 AM
@@ -38,6 +39,10 @@ public class ExtendedMarkerInfoDAO extends GenericDAO<ExtendedMarkerInfo, Intege
 
 	public static final String GET_BY_MARKER_NAMES = ExtendedMarkerInfoDAO.SELECT_STRING + ExtendedMarkerInfoDAO.FROM_STRING
 			+ " where marker_name in (:markerNames)";
+
+	public ExtendedMarkerInfoDAO(final Session session) {
+		super(session);
+	}
 
 	public List<ExtendedMarkerInfo> getByMarkerType(String type/* , int start, int numOfRows */) throws MiddlewareQueryException {
 		if (type == null) {

@@ -62,8 +62,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 
 	@Test
 	public void testGetPropertyById_DontFilterObsolete() throws Exception {
-		CVTermDao cvtermDao = new CVTermDao();
-		cvtermDao.setSession(this.sessionProvder.getSession());
+		CVTermDao cvtermDao = new CVTermDao(this.sessionProvder.getSession());
 
 		// set testProperty to obsolete
 		int id = this.testProperty.getId();

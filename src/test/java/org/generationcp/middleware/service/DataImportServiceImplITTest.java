@@ -63,8 +63,7 @@ public class DataImportServiceImplITTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() {
-		this.geolocationDao = new GeolocationDao();
-		this.geolocationDao.setSession(this.sessionProvder.getSession());
+		this.geolocationDao = new GeolocationDao(this.sessionProvder.getSession());
 
 		this.cropType = new CropType();
 		this.cropType.setPlotCodePrefix(this.cropPrefix);

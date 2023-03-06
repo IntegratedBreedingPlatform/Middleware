@@ -14,6 +14,7 @@ import org.generationcp.middleware.util.projection.CustomProjections;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
@@ -58,6 +59,10 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 
 	static {
 		RESTRICTED_LIST = Restrictions.not(Restrictions.eq("type", SampleListType.SAMPLE_LIST));
+	}
+
+	public SampleListDao(final Session session) {
+		super(session);
 	}
 
 	public SampleList getRootSampleList() {

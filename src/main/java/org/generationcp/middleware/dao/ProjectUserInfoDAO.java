@@ -16,6 +16,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,10 @@ import java.util.List;
 public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ProjectActivityDAO.class);
+
+	public ProjectUserInfoDAO(final Session session) {
+		super(session);
+	}
 
 	public void deleteAllProjectUserInfo(final String programUUID) {
 		try {

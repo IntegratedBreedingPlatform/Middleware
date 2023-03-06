@@ -39,6 +39,10 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbenchUserDAO.class);
 
+	public WorkbenchUserDAO(final Session session) {
+		super(session);
+	}
+
 	public boolean isUsernameExists(final String username) {
 		try {
 			if (username != null) {

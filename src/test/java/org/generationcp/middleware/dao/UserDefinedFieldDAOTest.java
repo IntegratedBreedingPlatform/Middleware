@@ -36,8 +36,7 @@ public class UserDefinedFieldDAOTest extends IntegrationTestBase {
 		}
 		
 		if (this.attributeDao == null) {
-			this.attributeDao = new AttributeDAO();
-			this.attributeDao.setSession(session);
+			this.attributeDao = new AttributeDAO(session);
 		}
 		
 		if (this.nameDao == null) {

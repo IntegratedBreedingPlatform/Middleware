@@ -40,8 +40,7 @@ public class PhenotypeDaoTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		this.dao = new PhenotypeDao();
-		this.dao.setSession(this.session);
+		this.dao = new PhenotypeDao(this.session);
 
 		Mockito.when(this.query.addScalar(Matchers.anyString())).thenReturn(this.query);
 		Mockito.when(this.query.addScalar(Matchers.anyString(), Matchers.any(Type.class))).thenReturn(this.query);

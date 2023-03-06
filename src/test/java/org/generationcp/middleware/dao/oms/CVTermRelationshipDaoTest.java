@@ -68,38 +68,31 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		if (this.cvtermRelationshipDao == null) {			
-			this.cvtermRelationshipDao = new CVTermRelationshipDao();
-			this.cvtermRelationshipDao.setSession(this.sessionProvder.getSession());
+			this.cvtermRelationshipDao = new CVTermRelationshipDao(this.sessionProvder.getSession());
 		}
 		
 		if (this.cvtermDao == null) {			
-			this.cvtermDao = new CVTermDao();
-			this.cvtermDao.setSession(this.sessionProvder.getSession());
+			this.cvtermDao = new CVTermDao(this.sessionProvder.getSession());
 		}
 		
 		if (this.projectDao == null) {			
-			this.projectDao = new DmsProjectDao();
-			this.projectDao.setSession(this.sessionProvder.getSession());
+			this.projectDao = new DmsProjectDao(this.sessionProvder.getSession());
 		}
 		
 		if (this.projectPropDao == null) {			
-			this.projectPropDao = new ProjectPropertyDao();
-			this.projectPropDao.setSession(this.sessionProvder.getSession());
+			this.projectPropDao = new ProjectPropertyDao(this.sessionProvder.getSession());
 		}
 		
 		if (this.experimentDao == null) {			
-			this.experimentDao = new ExperimentDao();
-			this.experimentDao.setSession(this.sessionProvder.getSession());
+			this.experimentDao = new ExperimentDao(this.sessionProvder.getSession());
 		}
 		
 		if (this.experimentPropDao == null) {			
-			this.experimentPropDao = new ExperimentPropertyDao();
-			this.experimentPropDao.setSession(this.sessionProvder.getSession());
+			this.experimentPropDao = new ExperimentPropertyDao(this.sessionProvder.getSession());
 		}
 		
 		if (this.phenotypeDao == null) {			
-			this.phenotypeDao = new PhenotypeDao();
-			this.phenotypeDao.setSession(this.sessionProvder.getSession());
+			this.phenotypeDao = new PhenotypeDao(this.sessionProvder.getSession());
 		}
 		
 		if (this.germplasmDao == null) {
@@ -107,23 +100,19 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		}
 		
 		if (this.stockDao == null) {			
-			this.stockDao = new StockDao();
-			this.stockDao.setSession(this.sessionProvder.getSession());
+			this.stockDao = new StockDao(this.sessionProvder.getSession());
 		}
 		
 		if (this.stockPropDao == null) {			
-			this.stockPropDao = new StockPropertyDao();
-			this.stockPropDao.setSession(this.sessionProvder.getSession());
+			this.stockPropDao = new StockPropertyDao(this.sessionProvder.getSession());
 		}
 		
 		if (this.geolocationDao == null) {			
-			this.geolocationDao = new GeolocationDao();
-			this.geolocationDao.setSession(this.sessionProvder.getSession());
+			this.geolocationDao = new GeolocationDao(this.sessionProvder.getSession());
 		}
 		
 		if (this.geolocPropDao == null) {			
-			this.geolocPropDao = new GeolocationPropertyDao();
-			this.geolocPropDao.setSession(this.sessionProvder.getSession());
+			this.geolocPropDao = new GeolocationPropertyDao(this.sessionProvder.getSession());
 		}
 		
 		this.createTestStudy();

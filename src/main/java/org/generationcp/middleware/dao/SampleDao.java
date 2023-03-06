@@ -14,6 +14,7 @@ import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
@@ -82,6 +83,10 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	private static final String EXPERIMENT = "experiment";
 	private static final String SAMPLE_BUSINESS_KEY = "sampleBusinessKey";
 	public static final String SAMPLE_ID = "sampleId";
+
+	public SampleDao(final Session session) {
+		super(session);
+	}
 
 	public List<SampleDTO> filter(final Integer ndExperimentId, final Integer listId, final Pageable pageable) {
 

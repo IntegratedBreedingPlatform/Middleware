@@ -1,11 +1,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.mbdt.MBDTGenerationDAO;
 import org.generationcp.middleware.dao.mbdt.MBDTProjectDAO;
 import org.generationcp.middleware.dao.mbdt.SelectedGenotypeDAO;
@@ -19,10 +14,14 @@ import org.generationcp.middleware.pojos.mbdt.MBDTProjectData;
 import org.generationcp.middleware.pojos.mbdt.SelectedGenotype;
 import org.generationcp.middleware.pojos.mbdt.SelectedMarker;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA. User: Daniel Villafuerte
@@ -38,9 +37,9 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 	private static final Logger LOG = LoggerFactory.getLogger(MBDTDataManagerImpl.class);
 
 	public MBDTDataManagerImpl() {
-		
+
 	}
-	
+
 	public MBDTDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
@@ -290,7 +289,8 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 	}
 
 	@Override
-	public void setParentData(MBDTGeneration generation, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException {
+	public void setParentData(MBDTGeneration generation, SelectedGenotypeEnum genotypeEnum, List<Integer> gids)
+		throws MiddlewareQueryException {
 
 		if (gids == null || gids.isEmpty()) {
 			return;
@@ -300,7 +300,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 		if (genotypeEnum.equals(SelectedGenotypeEnum.SD) || genotypeEnum.equals(SelectedGenotypeEnum.SR)) {
 			throw new MiddlewareQueryException(
-					"Set Parent Data only takes in Recurrent or Donor as possible types. Use setSelectedAccession to mark / create entries as Selected Recurrent / Selected Donor");
+				"Set Parent Data only takes in Recurrent or Donor as possible types. Use setSelectedAccession to mark / create entries as Selected Recurrent / Selected Donor");
 		}
 
 		this.prepareGenerationDAO();
@@ -364,41 +364,29 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 	protected MBDTProjectDAO prepareProjectDAO() {
 		if (this.projectDAO == null) {
-			this.projectDAO = new MBDTProjectDAO();
+			this.projectDAO = new MBDTProjectDAO(this.getActiveSession());
 		}
-
-		this.projectDAO.setSession(this.getActiveSession());
-
 		return this.projectDAO;
 	}
 
 	protected MBDTGenerationDAO prepareGenerationDAO() {
 		if (this.generationDAO == null) {
-			this.generationDAO = new MBDTGenerationDAO();
+			this.generationDAO = new MBDTGenerationDAO(this.getActiveSession());
 		}
-
-		this.generationDAO.setSession(this.getActiveSession());
-
 		return this.generationDAO;
 	}
 
 	protected SelectedMarkerDAO prepareSelectedMarkerDAO() {
 		if (this.selectedMarkerDAO == null) {
-			this.selectedMarkerDAO = new SelectedMarkerDAO();
+			this.selectedMarkerDAO = new SelectedMarkerDAO(this.getActiveSession());
 		}
-
-		this.selectedMarkerDAO.setSession(this.getActiveSession());
-
 		return this.selectedMarkerDAO;
 	}
 
 	protected SelectedGenotypeDAO prepareSelectedGenotypeDAO() {
 		if (this.selectedGenotypeDAO == null) {
-			this.selectedGenotypeDAO = new SelectedGenotypeDAO();
+			this.selectedGenotypeDAO = new SelectedGenotypeDAO(this.getActiveSession());
 		}
-
-		this.selectedGenotypeDAO.setSession(this.getActiveSession());
-
 		return this.selectedGenotypeDAO;
 	}
 
