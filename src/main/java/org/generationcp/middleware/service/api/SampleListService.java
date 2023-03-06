@@ -127,4 +127,6 @@ public interface SampleListService {
 	List<SampleDTO> getSampleListEntries(Integer sampleListId, List<Integer> sampleIds);
 
 	void deleteSamples(Integer sampleListId, List<Integer> sampleIds);
+
+	boolean hasImportedGenotypes(Integer listId);
 }

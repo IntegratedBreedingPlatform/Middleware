@@ -30,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import javax.annotation.Nullable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -260,6 +261,21 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 				return folderMetaData.getListId();
 			}
 		});
+	}
+
+	public boolean hasImportedGenotypes(final Integer listId) {
+		try {
+			final String sql = "SELECT COUNT(1) FROM sample s "
+					+ " INNER JOIN sample_list list ON s.sample_list = list.list_id "
+					+ " INNER JOIN genotype g ON g.sample_id = s.sample_id "
+					+ " WHERE list.list_id = :listId ";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("listId", listId);
+			return ((BigInteger) query.uniqueResult()).longValue() > 0;
+		} catch (final HibernateException e) {
+			final String message = "Error with hasImportedGenotypes(listId=" + listId + "): " + e.getMessage();
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 
 	@Nullable
