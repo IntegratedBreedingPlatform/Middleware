@@ -42,7 +42,7 @@ public class PhenotypeAuditDao extends GenericDAO<ObservationAuditDTO, Integer> 
 			+ "p.draft_value as draftValue, "
 			+ "IF((p.draft_value is null AND prev_p_aud.draft_value is null) OR p.draft_value = coalesce(prev_p_aud.draft_value, p.draft_value), false, true) as draftValueChanged, "
 			+ "p.updated_by as updatedByUserId, p.updated_date  as updatedDate, p.rev_type as revisionType, "
-			+ "(SELECT uname FROM workbench.users WHERE users.userid = p.created_by) as updatedBy "
+			+ "(SELECT uname FROM workbench.users WHERE users.userid = p.updated_by) as updatedBy "
 			+ "FROM phenotype_aud p "
 			+ "  INNER JOIN nd_experiment e ON p.nd_experiment_id = e.nd_experiment_id AND e.obs_unit_id = :obsUnitId "
 			+ "  LEFT JOIN phenotype_aud prev_p_aud ON prev_p_aud.aud_id = "
