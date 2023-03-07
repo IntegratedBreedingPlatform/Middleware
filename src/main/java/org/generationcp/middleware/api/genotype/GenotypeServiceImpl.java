@@ -1,11 +1,14 @@
 package org.generationcp.middleware.api.genotype;
 
+import org.generationcp.middleware.domain.genotype.GenotypeDTO;
 import org.generationcp.middleware.domain.genotype.GenotypeImportRequestDto;
+import org.generationcp.middleware.domain.genotype.GenotypeSearchRequestDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Genotype;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,5 +39,20 @@ public class GenotypeServiceImpl implements GenotypeService{
             genotypeIds.add(genotype.getId());
         }
         return genotypeIds;
+    }
+
+    @Override
+    public List<GenotypeDTO> searchGenotypes(GenotypeSearchRequestDTO searchRequestDTO, Pageable pageable) {
+        return this.daoFactory.getGenotypeDao().searchGenotypes(searchRequestDTO, pageable);
+    }
+
+    @Override
+    public long countGenotypes(final GenotypeSearchRequestDTO searchRequestDTO) {
+        return this.daoFactory.getGenotypeDao().countGenotypes(searchRequestDTO);
+    }
+
+    @Override
+    public long countFilteredGenotypes(final GenotypeSearchRequestDTO searchRequestDTO) {
+        return this.daoFactory.getGenotypeDao().countFilteredGenotypes(searchRequestDTO);
     }
 }
