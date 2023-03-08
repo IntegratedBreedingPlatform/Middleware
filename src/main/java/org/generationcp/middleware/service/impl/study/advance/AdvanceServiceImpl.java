@@ -25,6 +25,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
@@ -33,14 +34,17 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmStudySourceType;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.generator.SeedSourceGenerator;
 import org.generationcp.middleware.ruleengine.naming.context.AdvanceContext;
 import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
+import org.generationcp.middleware.ruleengine.pojo.AdvancedGermplasm;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -62,6 +66,8 @@ import org.generationcp.middleware.service.impl.study.advance.visitor.GetExperim
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetObservationsVisibleColumnsVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetPlantSelectedVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetSampleNumbersVisitor;
+import org.generationcp.middleware.service.pedigree.PedigreeFactory;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -77,6 +83,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -134,6 +141,12 @@ public class AdvanceServiceImpl implements AdvanceService {
 	@Resource
 	private StudyDataManager studyDataManager;
 
+	@Resource
+	private CrossExpansionProperties crossExpansionProperties;
+
+	@Resource
+	private PedigreeService pedigreeService;
+
 	private final HibernateSessionProvider sessionProvider;
 	private final DaoFactory daoFactory;
 
@@ -149,19 +162,30 @@ public class AdvanceServiceImpl implements AdvanceService {
 		this.selectionTraitDataResolver = new SelectionTraitDataResolver();
 		this.locationDataResolver = new LocationDataResolver();
 		this.trialInstanceObservationsResolver = new TrialInstanceObservationsResolver();
+
+		this.pedigreeService = this.getPedigreeService();
 	}
 
 	@Override
 	public List<Integer> advanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
-		return this.advance(studyId, request);
+		return this.advance(studyId, request, false, null);
+	}
+
+	@Override
+	public List<AdvancedGermplasm> advanceStudyPreview(final Integer studyId, final AdvanceStudyRequest request) {
+		final List<AdvancedGermplasm> advancedGermplasms = new ArrayList<>();
+		this.advance(studyId, request, true, advancedGermplasms);
+
+		return advancedGermplasms;
 	}
 
 	@Override
 	public List<Integer> advanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
-		return this.advance(studyId, request);
+		return this.advance(studyId, request, false, null);
 	}
 
-	private List<Integer> advance(final Integer studyId, final AdvanceRequest request) {
+	private List<Integer> advance(final Integer studyId, final AdvanceRequest request,
+		final boolean isPreview, final List<AdvancedGermplasm> advancedGermplasms) {
 
 		final DatasetDTO dataset = request.accept(new GetDatasetVisitor(studyId, this.datasetService));
 		final DatasetDTO environmentDataset =
@@ -309,13 +333,30 @@ public class AdvanceServiceImpl implements AdvanceService {
 				locations.stream().collect(Collectors.toMap(location -> String.valueOf(location.getLocid()), Location::getLname,
 					(locationName1, locationName2) -> locationName1));
 
+			final Map<Integer, String> pedigreeStringMap = new HashMap<>();
+
+			if (isPreview) {
+				pedigreeStringMap.putAll(this.pedigreeService.getCrossExpansions(new HashSet<>(gids), null, this.crossExpansionProperties));
+			}
+
 			final Integer plotCodeVariableId = this.germplasmService.getPlotCodeField().getId();
 			final Integer plotNumberVariableId = this.getVariableId(PLOT_NUMBER_VARIABLE_NAME);
 			final Integer repNumberVariableId = this.getVariableId(REP_NUMBER_VARIABLE_NAME);
 			final Integer trialInstanceVariableId = this.getVariableId(TRIAL_INSTANCE_VARIABLE_NAME);
 			final Integer plantNumberVariableId = this.getVariableId(PLANT_NUMBER_VARIABLE_NAME);
+			final AtomicInteger previewRowNumber = new AtomicInteger(1);
+
 			advancingSources.forEach(advancingSource -> {
 				final AtomicInteger selectionNumber = new AtomicInteger(1);
+
+				final ObservationUnitRow observation = advancingSource.getObservation();
+				final Integer trialInstance = observation.getTrialInstance();
+				final String plotNumber = observation.getVariableValueByVariableId(TermId.PLOT_NO.getId());
+				final String entryNumber = observation.getVariableValueByVariableId(TermId.ENTRY_NO.getId());
+				final List<BasicNameDTO> originGermplasmNames = advancingSource.getNames();
+				final String originGermplasmName = originGermplasmNames.isEmpty() ? "" : originGermplasmNames.get(0).getNval();
+				final String pedigreeString = pedigreeStringMap.get(observation.getGid());
+
 				advancingSource.getAdvancedGermplasm().forEach(germplasm -> {
 
 					// inherit 'selection history at fixation' and code names of parent if parent is part of a group (= has mgid)
@@ -327,8 +368,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 					// Finally, persisting the new advanced line with its derivative name. Also, it has the selection history at fixation and
 					// code name of the parent if it corresponds.
-					this.daoFactory.getGermplasmDao().save(germplasm);
-					advancedGermplasmGids.add(germplasm.getGid());
+					if (!isPreview) {
+						this.daoFactory.getGermplasmDao().save(germplasm);
+						advancedGermplasmGids.add(germplasm.getGid());
+					}
 
 					final Iterator<Integer> sampleNumberIterator = advancingSource.getSampleNumbers().iterator();
 					final String sampleNumber = (sampleNumberIterator.hasNext()) ? String.valueOf(sampleNumberIterator.next()) : null;
@@ -336,21 +379,36 @@ public class AdvanceServiceImpl implements AdvanceService {
 					// Get all plots selection
 					final Boolean allPlotsSelected = request.accept(new GetAllPlotsSelectedVisitor());
 
-					// Adding attributes to the advanced germplasm
-					this.createGermplasmAttributes(study.getName(), advancingSource,
-						allPlotsSelected, germplasm.getGid(),
-						selectionNumber.get(), sampleNumber, germplasm.getLocationId(),
-						germplasm.getGdate(), plotCodeVariableId, plotNumberVariableId, repNumberVariableId,
-						trialInstanceVariableId, plantNumberVariableId, studyEnvironmentVariables,
-						environmentDataset.getVariables(), locationNameByIds, studyInstancesByInstanceNumber, dataset.getDatasetTypeId(),
-						observationUnitVariable);
+					if (isPreview) {
+						final List<Name> currentGermplasmNames = germplasm.getNames();
 
-					final GermplasmStudySourceInput germplasmStudySourceInput = new GermplasmStudySourceInput(germplasm.getGid(), studyId,
-						advancingSource.getObservation().getObservationUnitId(),
-						GermplasmStudySourceType.ADVANCE);
-					this.germplasmStudySourceService.saveGermplasmStudySources(Arrays.asList(germplasmStudySourceInput));
+						advancedGermplasms.add(
+							new AdvancedGermplasm(previewRowNumber.get(), trialInstance == null ? "" : trialInstance.toString(),
+								locationsByLocationId.get(germplasm.getLocationId()).getLname(),
+								entryNumber, plotNumber, sampleNumber, pedigreeString,
+								originGermplasmName, germplasm.getMethod().getMcode(),
+								currentGermplasmNames.isEmpty() ? "" : currentGermplasmNames.get(0).getNval()));
 
-					selectionNumber.incrementAndGet();
+						previewRowNumber.incrementAndGet();
+					} else {
+						// Adding attributes to the advanced germplasm
+						this.createGermplasmAttributes(study.getName(), advancingSource,
+							allPlotsSelected, germplasm.getGid(),
+							selectionNumber.get(), sampleNumber, germplasm.getLocationId(),
+							germplasm.getGdate(), plotCodeVariableId, plotNumberVariableId, repNumberVariableId,
+							trialInstanceVariableId, plantNumberVariableId, studyEnvironmentVariables,
+							environmentDataset.getVariables(), locationNameByIds, studyInstancesByInstanceNumber,
+							dataset.getDatasetTypeId(),
+							observationUnitVariable);
+
+						final GermplasmStudySourceInput germplasmStudySourceInput =
+							new GermplasmStudySourceInput(germplasm.getGid(), studyId,
+								advancingSource.getObservation().getObservationUnitId(),
+								GermplasmStudySourceType.ADVANCE);
+						this.germplasmStudySourceService.saveGermplasmStudySources(Arrays.asList(germplasmStudySourceInput));
+
+						selectionNumber.incrementAndGet();
+					}
 				});
 			});
 		}
@@ -691,4 +749,11 @@ public class AdvanceServiceImpl implements AdvanceService {
 		return null;
 	}
 
+	private PedigreeService getPedigreeService() {
+		if (ManagerFactory.getCurrentManagerFactoryThreadLocal().get() != null) {
+			return ManagerFactory.getCurrentManagerFactoryThreadLocal().get().getPedigreeService();
+		}
+		// we will just return default pedigree service
+		return PedigreeFactory.getPedigreeService(this.sessionProvider, null, null);
+	}
 }
