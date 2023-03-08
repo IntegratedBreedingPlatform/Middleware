@@ -6,6 +6,7 @@ import org.pojomatic.Pojomatic;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class GenotypeSearchRequestDTO extends SearchRequestDto {
 
@@ -67,9 +68,7 @@ public class GenotypeSearchRequestDTO extends SearchRequestDto {
 
         private String sampleName;
 
-        private List<Integer> variableIdsList;
-
-        private String value;
+        private Map<Integer, String> variableMap;
 
         public List<Integer> getGidList() {
             return gidList;
@@ -111,20 +110,12 @@ public class GenotypeSearchRequestDTO extends SearchRequestDto {
             this.sampleName = sampleName;
         }
 
-        public List<Integer> getVariableIdsList() {
-            return variableIdsList;
+        public Map<Integer, String> getVariableMap() {
+            return this.variableMap;
         }
 
-        public void setVariableIdsList(List<Integer> variableIdsList) {
-            this.variableIdsList = variableIdsList;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
+        public void setVariableMap(Map<Integer, String> variableMap) {
+            this.variableMap = variableMap;
         }
 
         @Override

@@ -3,10 +3,10 @@ package org.generationcp.middleware.domain.genotype;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.List;
+
 @AutoProperty
 public class GenotypeDTO {
-
-    private Integer genotypeId;
 
     private Integer gid;
 
@@ -18,17 +18,7 @@ public class GenotypeDTO {
 
     private String sampleName;
 
-    private String variableName;
-
-    private String value;
-
-    public Integer getGenotypeId() {
-        return genotypeId;
-    }
-
-    public void setGenotypeId(Integer genotypeId) {
-        this.genotypeId = genotypeId;
-    }
+    private List<GenotypeData> genotypeDataList;
 
     public Integer getGid() {
         return gid;
@@ -70,21 +60,14 @@ public class GenotypeDTO {
         this.sampleName = sampleName;
     }
 
-    public String getVariableName() {
-        return variableName;
+    public List<GenotypeData> getGenotypeDataList() {
+        return genotypeDataList;
     }
 
-    public void setVariableName(String variableName) {
-        this.variableName = variableName;
+    public void setGenotypeDataList(List<GenotypeData> genotypeDataList) {
+        this.genotypeDataList = genotypeDataList;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
 
     @Override
     public int hashCode() {

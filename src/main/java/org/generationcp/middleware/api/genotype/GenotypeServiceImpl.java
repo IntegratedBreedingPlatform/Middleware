@@ -43,6 +43,7 @@ public class GenotypeServiceImpl implements GenotypeService{
 
     @Override
     public List<GenotypeDTO> searchGenotypes(GenotypeSearchRequestDTO searchRequestDTO, Pageable pageable) {
+        searchRequestDTO.getFilter().setVariableMap(this.daoFactory.getCvTermDao().getGenotypeVariablesMap(searchRequestDTO.getStudyId()));
         return this.daoFactory.getGenotypeDao().searchGenotypes(searchRequestDTO, pageable);
     }
 
