@@ -12,7 +12,7 @@ public class GenotypeSearchRequestDTO extends SearchRequestDto {
 
     private int studyId;
 
-    private GenotypeSearchRequestDTO.Filter filter;
+    private GenotypeFilter filter;
 
     public int getStudyId() {
         return this.studyId;
@@ -22,11 +22,11 @@ public class GenotypeSearchRequestDTO extends SearchRequestDto {
         this.studyId = studyId;
     }
 
-    public GenotypeSearchRequestDTO.Filter getFilter() {
+    public GenotypeFilter getFilter() {
         return this.filter;
     }
 
-    public void setFilter(final GenotypeSearchRequestDTO.Filter filter) {
+    public void setFilter(final GenotypeFilter filter) {
         this.filter = filter;
     }
 
@@ -45,7 +45,7 @@ public class GenotypeSearchRequestDTO extends SearchRequestDto {
         return Pojomatic.equals(this, o);
     }
 
-    public static class Filter {
+    public static class GenotypeFilter {
         public static final String GID = "gid";
         public static final String DESIGNATION = "designation";
         public static final String PLOT_NO = "plotNumber";

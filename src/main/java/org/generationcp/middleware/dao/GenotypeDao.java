@@ -64,7 +64,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
         }
         sql.append(GENOTYPE_SEARCH_FROM_QUERY);
         addSearchQueryFilters(new SqlQueryParamBuilder(sql), searchRequestDTO.getFilter());
-        addPageRequestOrderBy(sql, pageable, GenotypeSearchRequestDTO.Filter.SORTABLE_FIELDS);
+        addPageRequestOrderBy(sql, pageable, GenotypeSearchRequestDTO.GenotypeFilter.SORTABLE_FIELDS);
 
         final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
         addSearchQueryFilters(new SqlQueryParamBuilder(query), searchRequestDTO.getFilter());
@@ -120,7 +120,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
     private static void addSearchQueryFilters(
             final SqlQueryParamBuilder paramBuilder,
-            final GenotypeSearchRequestDTO.Filter filter) {
+            final GenotypeSearchRequestDTO.GenotypeFilter filter) {
 
         if (filter != null) {
             final List<Integer> gidList = filter.getGidList();
