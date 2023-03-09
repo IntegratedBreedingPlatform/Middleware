@@ -684,6 +684,86 @@
  	</changeSet>
 
 	<changeSet author="cuenyad" id="v23.2.0-35">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SAMPLE_LIST';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Add Study Sample List permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_SAMPLE_LIST', 'Sample List', @mg_studies_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-36">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_SAMPLE_LIST';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>View Sample List permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_SAMPLE_LIST', 'View Sample List', @environment_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_SAMPLE_LIST');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-37">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPORT_SAMPLE_LIST';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>Export Sample List permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_SAMPLE_LIST', 'Export Sample List', @environment_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPORT_SAMPLE_LIST');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-38">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_DELETE_SAMPLES';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>Export Sample List permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DELETE_SAMPLES', 'Export Sample List', @environment_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DELETE_SAMPLES');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-39">
          <preConditions onFail="MARK_RAN">
 			<and>
             	<sqlCheck expectedResult="0">
