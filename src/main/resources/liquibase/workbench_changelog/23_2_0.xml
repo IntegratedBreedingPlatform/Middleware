@@ -644,12 +644,53 @@
  	</changeSet>
 
 	<changeSet author="cuenyad" id="v23.2.0-33">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'STUDY_INVENTORY';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Add Study Inventory permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('STUDY_INVENTORY', 'Inventory', @mg_studies_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'STUDY_INVENTORY');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-34">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'VIEW_STUDY_INVENTORY';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>View Study Inventory permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'STUDY_INVENTORY');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('VIEW_STUDY_INVENTORY', 'View Inventory', @environment_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'VIEW_STUDY_INVENTORY');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-35">
          <preConditions onFail="MARK_RAN">
 			<and>
             	<sqlCheck expectedResult="0">
                 	SELECT count(*) > 1 FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
 					WHERE p.name IN ('CREATE_STUDIES', 'CLOSE_STUDY', 'DELETE_STUDY', 'LOCK_STUDY', 'GERMPLASM_AND_CHECKS',
-									 'TREATMENT_FACTORS', 'EXPERIMENTAL_DESIGN', 'ENVIRONMENT', 'STUDY_SETTINGS');
+									 'TREATMENT_FACTORS', 'EXPERIMENTAL_DESIGN', 'ENVIRONMENT', 'STUDY_SETTINGS',
+									 'CROSSES_AND_SELECTIONS', 'CROSSES_AND_SELECTIONS', 'STUDY_INVENTORY');
             	</sqlCheck>
 				<not>
 					<tableExists tableName="roles_affected_temporary"></tableExists>
@@ -668,6 +709,8 @@
 			SET @environment_permission_id = (SELECT permission_id FROM permission WHERE name = 'ENVIRONMENT');
 			SET @study_settings_permission_id = (SELECT permission_id FROM permission WHERE name = 'STUDY_SETTINGS');
 			SET @crosses_and_selections_permission_id = (SELECT permission_id FROM permission WHERE name = 'CROSSES_AND_SELECTIONS');
+			SET @study_inventory_permission_id = (SELECT permission_id FROM permission WHERE name = 'STUDY_INVENTORY');
+
 
 			#Create roles_affected_temporary Table
 			CREATE TEMPORARY TABLE roles_affected_temporary (
@@ -712,6 +755,9 @@
 
 			INSERT INTO role_permission(role_id, permission_id)
 			SELECT rp.role_id, @crosses_and_selections_permission_id FROM roles_affected_temporary rp;
+
+			INSERT INTO role_permission(role_id, permission_id)
+			SELECT rp.role_id, @study_inventory_permission_id FROM roles_affected_temporary rp;
 
 			#Delete roles_affected_temporary Table
 			DROP TABLE roles_affected_temporary;
