@@ -129,5 +129,4 @@ public interface SampleListService {
 
 	void deleteSamples(Integer sampleListId, List<Integer> sampleIds);
 
-	long countSampleGenotypesBySampleList(Integer listId);
 }

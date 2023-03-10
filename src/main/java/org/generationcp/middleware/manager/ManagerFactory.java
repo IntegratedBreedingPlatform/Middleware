@@ -431,4 +431,8 @@ public class ManagerFactory implements Serializable {
 		return new AdvanceServiceImpl(this.sessionProvider);
 	}
 
+	public SampleGenotypeService getSampleGenotypeService() {
+		return new SampleGenotypeServiceImpl(this.sessionProvider);
+	}
+
 }

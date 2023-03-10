@@ -506,11 +506,6 @@ public class SampleListServiceImpl implements SampleListService {
 		this.daoFactory.getSampleDao().reOrderEntries(sampleListId);
 	}
 
-	@Override
-	public long countSampleGenotypesBySampleList(final Integer listId) {
-		return this.daoFactory.getSampleListDao().countSampleGenotypesBySampleList(listId);
-	}
-
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
 		this.studyMeasurements = studyMeasurements;
 	}

@@ -16,4 +16,6 @@ public interface SampleGenotypeService {
     long countSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO);
 
     long countFilteredSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO);
+
+    long countSampleGenotypesBySampleList(Integer listId);
 }

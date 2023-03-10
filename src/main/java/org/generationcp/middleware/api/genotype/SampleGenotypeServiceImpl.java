@@ -58,4 +58,9 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	public long countFilteredSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
 		return this.daoFactory.getGenotypeDao().countFilteredGenotypes(searchRequestDTO);
 	}
+
+	@Override
+	public long countSampleGenotypesBySampleList(final Integer listId) {
+		return this.daoFactory.getSampleListDao().countSampleGenotypesBySampleList(listId);
+	}
 }
