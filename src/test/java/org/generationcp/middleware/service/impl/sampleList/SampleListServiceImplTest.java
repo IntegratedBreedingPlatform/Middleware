@@ -565,10 +565,9 @@ public class SampleListServiceImplTest {
 
 	@Test
 	public void testGetSampleListEntries() {
-		final Integer sampleListId = 1;
 		final List<Integer> sampleIds = Arrays.asList(1, 2);
-		this.sampleListService.getSampleListEntries(sampleListId, sampleIds);
-		Mockito.verify(this.sampleDao).getSamples(sampleListId, sampleIds);
+		this.sampleListService.getSampleListEntries(sampleIds);
+		Mockito.verify(this.sampleDao).getSamples(sampleIds);
 	}
 
 	@Test

@@ -2,7 +2,11 @@ package org.generationcp.middleware.dao;
 
 import com.google.common.collect.Ordering;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.dms.*;
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.GeolocationDao;
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
@@ -14,7 +18,11 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.dms.*;
+import org.generationcp.middleware.pojos.dms.DatasetType;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
@@ -25,7 +33,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SampleDaoTest extends IntegrationTestBase {
 
@@ -320,11 +334,10 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Mockito.when(pageable.getPageNumber()).thenReturn(0);
 
 		final Integer listId =
-				this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final List<SampleDTO> samples = this.sampleDao.filter(this.ndExperimentId, listId, pageable);
-		final List<SampleDTO> sampleDTOS = this.sampleDao.getSamples(listId, Collections.singletonList(samples.get(0).getSampleId()));
-
+		final List<SampleDTO> sampleDTOS = this.sampleDao.getSamples(Collections.singletonList(samples.get(0).getSampleId()));
 
 		final SampleDTO sample = sampleDTOS.get(0);
 		Assert.assertNotNull(sample.getSampleId());
@@ -354,20 +367,20 @@ public class SampleDaoTest extends IntegrationTestBase {
 		Mockito.when(pageable.getPageNumber()).thenReturn(0);
 
 		final Integer listId =
-				this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final List<SampleDTO> samples = this.sampleDao.filter(this.ndExperimentId, listId, pageable);
-		List<SampleDTO> sampleDTOS = this.sampleDao.getSamples(listId, Collections.singletonList(samples.get(0).getSampleId()));
+		List<SampleDTO> sampleDTOS = this.sampleDao.getSamples(Collections.singletonList(samples.get(0).getSampleId()));
 		Assert.assertFalse(CollectionUtils.isEmpty(sampleDTOS));
 		this.sampleDao.deleteBySampleIds(listId, Collections.singletonList(sampleDTOS.get(0).getSampleId()));
-		sampleDTOS = this.sampleDao.getSamples(listId, Collections.singletonList(samples.get(0).getSampleId()));
+		sampleDTOS = this.sampleDao.getSamples(Collections.singletonList(samples.get(0).getSampleId()));
 		Assert.assertTrue(CollectionUtils.isEmpty(sampleDTOS));
 	}
 
 	@Test
 	public void testReOrderEntries() {
 		final Integer listId =
-				this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
+			this.createStudyWithPlot(this.study, this.workbenchUser, SAMPLE_LIST_NAME_FOR_PLOT_DATA, TEST_SAMPLE_RECORD_COUNT);
 
 		final Set<String> sampleUIDs = new HashSet<>();
 		for (int i = 1; i < TEST_SAMPLE_RECORD_COUNT + 1; i++) {
@@ -382,8 +395,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 		this.sampleDao.deleteBySampleIds(listId, Collections.singletonList(samples.get(0).getSampleId()));
 		this.sampleDao.reOrderEntries(listId);
 
-
-		samples = this.sampleDao.getSamples(listId, Collections.singletonList(secondEntry.getSampleId()));
+		samples = this.sampleDao.getSamples(Collections.singletonList(secondEntry.getSampleId()));
 		Assert.assertEquals("1", samples.get(0).getEntryNo().toString());
 		Assert.assertEquals(secondEntry.getSampleId(), samples.get(0).getSampleId());
 	}
