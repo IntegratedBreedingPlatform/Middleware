@@ -507,8 +507,8 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public boolean hasImportedGenotypes(final Integer listId) {
-		return this.daoFactory.getSampleListDao().hasImportedGenotypes(listId);
+	public long countSampleGenotypesBySampleList(final Integer listId) {
+		return this.daoFactory.getSampleListDao().countSampleGenotypesBySampleList(listId);
 	}
 
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
