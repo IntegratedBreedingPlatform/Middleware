@@ -85,12 +85,11 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		query.setParameter("studyId", searchRequestDTO.getStudyId());
 		addPaginationToSQLQuery(query, pageable);
 		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-		LOG.error(query.getQueryString());
-		return this.getGenotypeResults(searchRequestDTO, query.list());
+		return this.getGenotypeResults(searchRequestDTO, query.list(), variableNames);
 	}
 
 	private List<GenotypeDTO> getGenotypeResults(final SampleGenotypeSearchRequestDTO searchRequestDTO,
-		final List<Map<String, Object>> results) {
+		final List<Map<String, Object>> results, final List<String> variableNames) {
 		final List<GenotypeDTO> genotypeDTOList = new ArrayList<>();
 		if (results != null && !results.isEmpty()) {
 			for (final Map<String, Object> row : results) {
@@ -101,8 +100,8 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 				genotypeDTO.setSampleNo((Integer) row.get("sampleNo"));
 				genotypeDTO.setSampleName((String) row.get("sampleName"));
 				genotypeDTO.setGenotypeDataList(new ArrayList<>());
-				if (!CollectionUtils.isEmpty(searchRequestDTO.getFilter().getVariableMap())) {
-					for (final String varName : searchRequestDTO.getFilter().getVariableMap().values()) {
+				if (!CollectionUtils.isEmpty(variableNames)) {
+					for (final String varName : variableNames) {
 						final GenotypeData data = new GenotypeData();
 						data.setValue((String) row.get(varName));
 						data.setGenotypeId((Integer) row.get(varName + "_genotypeId"));
