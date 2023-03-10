@@ -749,11 +749,11 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_DELETE_SAMPLES';
              </sqlCheck>
  		</preConditions>
-		<comment>Export Sample List permission</comment>
+		<comment>Delete Samples permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DELETE_SAMPLES', 'Export Sample List', @environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DELETE_SAMPLES', 'Delete Samples', @environment_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DELETE_SAMPLES');
 
