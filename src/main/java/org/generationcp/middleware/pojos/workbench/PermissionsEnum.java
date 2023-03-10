@@ -42,7 +42,10 @@ public enum PermissionsEnum {
 	GERMPLASM_LABEL_PRINTING,
 	GERMPLASM_LIST_LABEL_PRINTING,
 	DELETE_GERMPLASM_LIST,
-	LOCK_UNLOCK_GERMPLASM_LIST;
+	LOCK_UNLOCK_GERMPLASM_LIST,
+	MS_SAMPLE_LIST,
+	MS_EXPORT_SAMPLE_LIST,
+	MS_DELETE_SAMPLES;
 
 	public static final String HAS_CREATE_LOTS_BATCH = " or hasAnyAuthority('ADMIN'"
 		+ ", 'STUDIES'"
@@ -62,4 +65,10 @@ public enum PermissionsEnum {
 	public static final List<String> SITE_ADMIN_PERMISSIONS = Arrays.asList(SITE_ADMIN.name(), ADMINISTRATION.name(), ADMIN.name());
 
 	public static final List<String> MANAGE_STUDIES_PERMISSIONS = Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name());
+
+	// Sample List Export List
+	public static final List<String> EXPORT_FILE_SAMPLE_LIST_PERMISSIONS =
+		Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name(), MS_SAMPLE_LIST.name(), MS_EXPORT_SAMPLE_LIST.name());
+	public static final List<String> DELETE_SAMPLES_PERMISSIONS =
+		Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name(), MS_SAMPLE_LIST.name(), MS_DELETE_SAMPLES.name());
 }
