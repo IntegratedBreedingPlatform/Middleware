@@ -45,8 +45,8 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 
 	@Override
 	public List<GenotypeDTO> searchSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO, final Pageable pageable) {
-		searchRequestDTO.getFilter().setVariableMap(this.daoFactory.getCvTermDao().getGenotypeVariablesMap(searchRequestDTO.getStudyId()));
-		return this.daoFactory.getGenotypeDao().searchGenotypes(searchRequestDTO, pageable);
+		final List<String> variableNames = this.daoFactory.getCvTermDao().getGenotypeVariables(searchRequestDTO.getStudyId());
+		return this.daoFactory.getGenotypeDao().searchGenotypes(searchRequestDTO, variableNames, pageable);
 	}
 
 	@Override

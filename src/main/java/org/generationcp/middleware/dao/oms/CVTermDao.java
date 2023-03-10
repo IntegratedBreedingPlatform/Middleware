@@ -208,9 +208,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return stdVarMap;
 	}
 
-	public Map<Integer, String> getGenotypeVariablesMap(final Integer studyId) {
+	public List<String> getGenotypeVariables(final Integer studyId) {
 		try {
-			final String queryString = "SELECT DISTINCT(var.cvterm_id) as variableId, var.name as variableName \n" +
+			final String queryString = "SELECT DISTINCT(var.name) as variableName \n" +
 					"FROM genotype geno \n" +
 					"INNER JOIN sample s ON s.sample_id = geno.sample_id \n" +
 					"INNER JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id \n" +
@@ -219,15 +219,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					"WHERE p.study_id = :studyId";
 			final SQLQuery query = this.getSession().createSQLQuery(queryString);
 			query.setParameter("studyId", studyId);
-			query.addScalar("variableId", IntegerType.INSTANCE);
 			query.addScalar("variableName", StringType.INSTANCE);
 
-			final List<Object[]> results = query.list();
-			final Map<Integer, String> genotypeVariablesMap = new HashMap<>();
-			for (final Object[] result : results) {
-				genotypeVariablesMap.put((Integer) result[0], (String) result[1]);
-			}
-			return genotypeVariablesMap;
+			return query.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error at getGenotypeVariablesMap(studyId=" + studyId + ") query on CVTermDao", e);
 		}

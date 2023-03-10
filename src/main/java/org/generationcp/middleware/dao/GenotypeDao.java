@@ -49,11 +49,11 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		super(session);
 	}
 
-	public List<GenotypeDTO> searchGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO, final Pageable pageable) {
+	public List<GenotypeDTO> searchGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO, final List<String> variableNames, final Pageable pageable) {
 		final StringBuilder sql = new StringBuilder(GENOTYPE_SEARCH_QUERY);
 
-		if (!CollectionUtils.isEmpty(searchRequestDTO.getFilter().getVariableMap())) {
-			for (final String varName : searchRequestDTO.getFilter().getVariableMap().values()) {
+		if (!CollectionUtils.isEmpty(variableNames)) {
+			for (final String varName : variableNames) {
 				final StringBuilder genotypeVariablesClause =
 					new StringBuilder(", MAX(IF(cvterm_variable.name = '%1$s', geno.value, NULL)) AS `%1$s`,")
 						.append(" MAX(IF(cvterm_variable.name = '%1$s', geno.id, NULL)) AS `%1$s_genotypeId`,")
@@ -74,8 +74,8 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		query.addScalar("plotNumber", new IntegerType());
 		query.addScalar("sampleNo", new IntegerType());
 		query.addScalar("sampleName");
-		if (!CollectionUtils.isEmpty(searchRequestDTO.getFilter().getVariableMap())) {
-			for (final String varName : searchRequestDTO.getFilter().getVariableMap().values()) {
+		if (!CollectionUtils.isEmpty(variableNames)) {
+			for (final String varName : variableNames) {
 				query.addScalar(varName); // Value
 				query.addScalar(varName + "_genotypeId", new IntegerType()); // genotypeId
 				query.addScalar(varName + "_variableId", new IntegerType()); // Variable Id
