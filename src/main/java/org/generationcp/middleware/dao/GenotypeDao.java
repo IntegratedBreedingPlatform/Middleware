@@ -89,7 +89,8 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		return this.getGenotypeResults(searchRequestDTO, query.list());
 	}
 
-	private List<GenotypeDTO> getGenotypeResults(final SampleGenotypeSearchRequestDTO searchRequestDTO, final List<Map<String, Object>> results) {
+	private List<GenotypeDTO> getGenotypeResults(final SampleGenotypeSearchRequestDTO searchRequestDTO,
+		final List<Map<String, Object>> results) {
 		final List<GenotypeDTO> genotypeDTOList = new ArrayList<>();
 		if (results != null && !results.isEmpty()) {
 			for (final Map<String, Object> row : results) {
@@ -161,7 +162,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		addSearchQueryFilters(new SqlQueryParamBuilder(subQuery), sampleGenotypeSearchRequestDTO.getFilter());
 
 		final StringBuilder mainSql = new StringBuilder("SELECT COUNT(*) FROM ( \n");
-		mainSql.append(subQuery.toString());
+		mainSql.append(subQuery);
 		mainSql.append(") a \n");
 
 		final SQLQuery query = this.getSession().createSQLQuery(mainSql.toString());
@@ -175,7 +176,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		final StringBuilder subQuery = new StringBuilder(GENOTYPE_SEARCH_QUERY);
 		subQuery.append(GENOTYPE_SEARCH_FROM_QUERY);
 		final StringBuilder mainSql = new StringBuilder("SELECT COUNT(*) FROM ( \n");
-		mainSql.append(subQuery.toString());
+		mainSql.append(subQuery);
 		mainSql.append(") a \n");
 
 		final SQLQuery query = this.getSession().createSQLQuery(mainSql.toString());
