@@ -8,6 +8,8 @@ import java.util.Map;
 @AutoProperty
 public class GenotypeDTO {
 
+	private Integer observationUnitId;
+
 	private Integer gid;
 
 	private String designation;
@@ -19,6 +21,14 @@ public class GenotypeDTO {
 	private String sampleName;
 
 	private Map<String, GenotypeData> genotypeDataMap;
+
+	public Integer getObservationUnitId() {
+		return this.observationUnitId;
+	}
+
+	public void setObservationUnitId(final Integer observationUnitId) {
+		this.observationUnitId = observationUnitId;
+	}
 
 	public Integer getGid() {
 		return this.gid;

@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.genotype;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.GenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDto;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
@@ -23,6 +24,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 
@@ -200,6 +202,45 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals("C", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
 		Assert.assertEquals("G", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_2).getValue());
 		Assert.assertEquals("T", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_3).getValue());
+	}
+
+	@Test
+	public void testGetSampleGenotypesVariables() {
+
+		final List<ExperimentModel>
+			experimentModels =
+			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plotDataset, null, this.trialInstance1, 1);
+
+		final SampleList sampleList =
+			this.testDataInitializer.createTestSampleList(RandomStringUtils.randomAlphabetic(10), this.user.getUserid());
+
+		// Add one sample in the list
+		final List<Sample> samples = this.testDataInitializer.addSamples(experimentModels, sampleList, this.user.getUserid());
+
+		Assert.assertEquals("1 sample should be created", 1, samples.size());
+
+		final Sample sample = samples.get(0);
+
+		// Create Sample Genotype records
+		final List<SampleGenotypeImportRequestDto> genotypes = new ArrayList<>();
+		genotypes.add(this.createSampleGenotypeImportRequestDto(sample, DEFAULT_MARKER_1, "C"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(sample, DEFAULT_MARKER_2, "G"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(sample, DEFAULT_MARKER_3, "T"));
+		this.sampleGenotypeService.importSampleGenotypes(genotypes);
+
+		// Get the marker genotype variables available in the study.
+		final Map<Integer, MeasurementVariable> variableMap =
+			this.sampleGenotypeService.getSampleGenotypeVariables(this.study.getProjectId());
+		Assert.assertEquals(3, variableMap.size());
+		Assert.assertTrue(
+			variableMap.values().stream().filter(measurementVariable -> measurementVariable.getName().equalsIgnoreCase(DEFAULT_MARKER_1))
+				.findAny().isPresent());
+		Assert.assertTrue(
+			variableMap.values().stream().filter(measurementVariable -> measurementVariable.getName().equalsIgnoreCase(DEFAULT_MARKER_2))
+				.findAny().isPresent());
+		Assert.assertTrue(
+			variableMap.values().stream().filter(measurementVariable -> measurementVariable.getName().equalsIgnoreCase(DEFAULT_MARKER_3))
+				.findAny().isPresent());
 	}
 
 	private SampleGenotypeImportRequestDto createSampleGenotypeImportRequestDto(final Sample sample, final String markerVariableName,

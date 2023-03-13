@@ -27,7 +27,9 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GenotypeDao.class);
 
-	private static final String GENOTYPE_SEARCH_QUERY = "SELECT g.gid AS `gid`, " +
+	private static final String GENOTYPE_SEARCH_QUERY = "SELECT " +
+		"nde.nd_experiment_id AS `observationUnitId`, " +
+		"g.gid AS `gid`, " +
 		"n.nval AS `designation`, " +
 		"IFNULL (plot_no.value, " +
 		"(SELECT ep.value FROM nd_experimentprop ep WHERE ep.nd_experiment_id = nde.parent_id AND ep.type_id = 8200)) AS `plotNumber`, \n" +
@@ -72,6 +74,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 		addSearchQueryFilters(new SqlQueryParamBuilder(query), searchRequestDTO.getFilter());
 
+		query.addScalar("observationUnitId", new IntegerType());
 		query.addScalar("gid", new IntegerType());
 		query.addScalar("designation", new StringType());
 		query.addScalar("plotNumber", new IntegerType());
@@ -88,15 +91,15 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		query.setParameter("studyId", searchRequestDTO.getStudyId());
 		addPaginationToSQLQuery(query, pageable);
 		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-		return this.getGenotypeResults(searchRequestDTO, query.list(), variableNames);
+		return this.mapGenotypeResults(query.list(), variableNames);
 	}
 
-	private List<GenotypeDTO> getGenotypeResults(final SampleGenotypeSearchRequestDTO searchRequestDTO,
-		final List<Map<String, Object>> results, final List<String> variableNames) {
+	private List<GenotypeDTO> mapGenotypeResults(final List<Map<String, Object>> results, final List<String> variableNames) {
 		final List<GenotypeDTO> genotypeDTOList = new ArrayList<>();
 		if (results != null && !results.isEmpty()) {
 			for (final Map<String, Object> row : results) {
 				final GenotypeDTO genotypeDTO = new GenotypeDTO();
+				genotypeDTO.setObservationUnitId((Integer) row.get("observationUnitId"));
 				genotypeDTO.setGid((Integer) row.get("gid"));
 				genotypeDTO.setDesignation((String) row.get("designation"));
 				genotypeDTO.setPlotNumber((Integer) row.get("plotNumber"));
@@ -169,15 +172,11 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 	}
 
 	public long countFilteredGenotypes(final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO) {
-		final StringBuilder subQuery = new StringBuilder(GENOTYPE_SEARCH_QUERY);
-		subQuery.append(GENOTYPE_SEARCH_FROM_QUERY);
-		addSearchQueryFilters(new SqlQueryParamBuilder(subQuery), sampleGenotypeSearchRequestDTO.getFilter());
+		final StringBuilder sql = new StringBuilder("SELECT COUNT(1) ");
+		sql.append(GENOTYPE_SEARCH_FROM_QUERY);
+		addSearchQueryFilters(new SqlQueryParamBuilder(sql), sampleGenotypeSearchRequestDTO.getFilter());
 
-		final StringBuilder mainSql = new StringBuilder("SELECT COUNT(*) FROM ( \n");
-		mainSql.append(subQuery);
-		mainSql.append(") a \n");
-
-		final SQLQuery query = this.getSession().createSQLQuery(mainSql.toString());
+		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 		addSearchQueryFilters(new SqlQueryParamBuilder(query), sampleGenotypeSearchRequestDTO.getFilter());
 
 		query.setParameter("studyId", sampleGenotypeSearchRequestDTO.getStudyId());

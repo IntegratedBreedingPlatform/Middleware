@@ -208,22 +208,24 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return stdVarMap;
 	}
 
-	public List<String> getGenotypeVariables(final Integer studyId) {
+	public Map<Integer, MeasurementVariable> getGenotypeVariables(final Integer studyId) {
 		try {
-			final String queryString = "SELECT DISTINCT(var.name) as variableName \n" +
-					"FROM genotype geno \n" +
-					"INNER JOIN sample s ON s.sample_id = geno.sample_id \n" +
-					"INNER JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id \n" +
-					"INNER JOIN project p ON p.project_id = nde.project_id \n" +
-					"INNER JOIN cvterm var ON var.cvterm_id = geno.variabe_id \n" +
-					"WHERE p.study_id = :studyId";
+			final String queryString = "SELECT DISTINCT(var.cvterm_id) as variableId " +
+				"FROM genotype geno " +
+				"INNER JOIN sample s ON s.sample_id = geno.sample_id " +
+				"INNER JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id " +
+				"INNER JOIN project p ON p.project_id = nde.project_id " +
+				"INNER JOIN cvterm var ON var.cvterm_id = geno.variabe_id " +
+				"WHERE p.study_id = :studyId";
 			final SQLQuery query = this.getSession().createSQLQuery(queryString);
 			query.setParameter("studyId", studyId);
-			query.addScalar("variableName", StringType.INSTANCE);
+			query.addScalar("variableId", new StringType());
 
-			return query.list();
+			final List<String> genotypeVariablesInStudy = query.list();
+
+			return this.getVariablesByIdsAndVariableTypes(genotypeVariablesInStudy, Arrays.asList(VariableType.GENOTYPE_MARKER.getName()));
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at getGenotypeVariablesMap(studyId=" + studyId + ") query on CVTermDao", e);
+			throw new MiddlewareQueryException("Error at getGenotypeVariables(studyId=" + studyId + ") query on CVTermDao", e);
 		}
 	}
 
@@ -1123,7 +1125,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
 				.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.HAS_PROPERTY.getId())
 				.append(" AND cvr.object_id  IN (:propertyIds) ")
-				.append("INNER JOIN cvtermprop cvp ON cvp.cvterm_id = cvt.cvterm_id AND cvp.type_id = ").append(TermId.VARIABLE_TYPE.getId())
+				.append("INNER JOIN cvtermprop cvp ON cvp.cvterm_id = cvt.cvterm_id AND cvp.type_id = ")
+				.append(TermId.VARIABLE_TYPE.getId())
 				.append(" and cvp.value = '").append(VariableType.TRAIT.getName())
 				.append("' ORDER BY cvr.object_id ");
 
@@ -1488,7 +1491,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.in("name", termNames));
 			criteria.add(Restrictions.eq("cvId", cvId.getId()));
-			if(!showObsoletes) {
+			if (!showObsoletes) {
 				criteria.add(Restrictions.eq("isObsolete", 0));
 			}
 
@@ -2149,8 +2152,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		if (!isEmpty(variableFilter.getVariableTypes())) {
 			paramBuilder.append(" and cpvartype.value in (:variableTypeNames) ");
-			paramBuilder.setParameterList("variableTypeNames", variableFilter.getVariableTypes().stream().map(VariableType::getName).collect(
-				Collectors.toList()));
+			paramBuilder.setParameterList("variableTypeNames",
+				variableFilter.getVariableTypes().stream().map(VariableType::getName).collect(
+					Collectors.toList()));
 		}
 
 		final SqlTextFilter nameFilter = variableFilter.getNameFilter();
