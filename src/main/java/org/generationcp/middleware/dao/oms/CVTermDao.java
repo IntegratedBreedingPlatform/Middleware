@@ -208,7 +208,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return stdVarMap;
 	}
 
-	public Map<Integer, MeasurementVariable> getGenotypeVariables(final Integer studyId, final Integer datasetId) {
+	public List<Integer> getSampleGenotypeVariableIds(final Integer studyId, final Integer datasetId) {
 		try {
 			final StringBuilder queryString = new StringBuilder("SELECT DISTINCT(var.cvterm_id) as variableId " +
 				"FROM genotype geno " +
@@ -226,13 +226,13 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			if (datasetId != null) {
 				query.setParameter("datasetId", datasetId);
 			}
-			query.addScalar("variableId", new StringType());
+			query.addScalar("variableId", new IntegerType());
 
-			final List<String> genotypeVariablesInStudy = query.list();
+			return query.list();
 
-			return this.getVariablesByIdsAndVariableTypes(genotypeVariablesInStudy, Arrays.asList(VariableType.GENOTYPE_MARKER.getName()));
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at getGenotypeVariables(studyId=" + studyId + ") query on CVTermDao", e);
+			throw new MiddlewareQueryException(
+				"Error at getSampleGenotypeVariableIds(studyId=" + studyId + ",datasetId=" + datasetId + ") query on CVTermDao", e);
 		}
 	}
 
