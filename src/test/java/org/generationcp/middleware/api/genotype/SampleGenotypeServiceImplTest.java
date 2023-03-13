@@ -230,7 +230,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 
 		// Get the marker genotype variables available in the study.
 		final Map<Integer, MeasurementVariable> variableMap =
-			this.sampleGenotypeService.getSampleGenotypeVariables(this.study.getProjectId());
+			this.sampleGenotypeService.getSampleGenotypeVariables(this.study.getProjectId(), this.plotDataset.getProjectId());
 		Assert.assertEquals(3, variableMap.size());
 		Assert.assertTrue(
 			variableMap.values().stream().filter(measurementVariable -> measurementVariable.getName().equalsIgnoreCase(DEFAULT_MARKER_1))

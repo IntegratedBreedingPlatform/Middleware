@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.genotype;
 
+import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenotypeDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.GenotypeDTO;
@@ -49,7 +50,9 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 
 	@Override
 	public List<GenotypeDTO> searchSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO, final Pageable pageable) {
-		final Map<Integer, MeasurementVariable> genotypeVariablesMap = this.getSampleGenotypeVariables(searchRequestDTO.getStudyId());
+		final Map<Integer, MeasurementVariable> genotypeVariablesMap =
+			this.getSampleGenotypeVariables(searchRequestDTO.getStudyId(),
+				searchRequestDTO.getFilter() != null ? searchRequestDTO.getFilter().getDatasetId() : null);
 		if (!CollectionUtils.isEmpty(genotypeVariablesMap)) {
 			final List<String> genotypeVariableNames =
 				genotypeVariablesMap.values().stream().map(MeasurementVariable::getName).collect(
@@ -75,7 +78,8 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	}
 
 	@Override
-	public Map<Integer, MeasurementVariable> getSampleGenotypeVariables(final Integer studyId) {
-		return this.daoFactory.getCvTermDao().getGenotypeVariables(studyId);
+	public Map<Integer, MeasurementVariable> getSampleGenotypeVariables(final Integer studyId, final Integer datasetId) {
+		Preconditions.checkNotNull(studyId);
+		return this.daoFactory.getCvTermDao().getGenotypeVariables(studyId, datasetId);
 	}
 }
