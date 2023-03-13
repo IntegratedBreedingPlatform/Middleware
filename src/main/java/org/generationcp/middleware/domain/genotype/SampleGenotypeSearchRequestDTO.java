@@ -59,6 +59,10 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 		public static final List<String> SORTABLE_FIELDS = Collections.unmodifiableList(Arrays
 			.asList(GID, DESIGNATION, PLOT_NO, SAMPLE_NO, SAMPLE_NAME, VARIABLE_NAME, VALUE));
 
+		private Integer datasetId;
+
+		private List<Integer> instanceIds;
+
 		private List<Integer> gidList;
 
 		private String designation;
@@ -117,6 +121,22 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 
 		public void setVariableMap(final Map<Integer, String> variableMap) {
 			this.variableMap = variableMap;
+		}
+
+		public Integer getDatasetId() {
+			return this.datasetId;
+		}
+
+		public void setDatasetId(final Integer datasetId) {
+			this.datasetId = datasetId;
+		}
+
+		public List<Integer> getInstanceIds() {
+			return this.instanceIds;
+		}
+
+		public void setInstanceIds(final List<Integer> instanceIds) {
+			this.instanceIds = instanceIds;
 		}
 
 		@Override

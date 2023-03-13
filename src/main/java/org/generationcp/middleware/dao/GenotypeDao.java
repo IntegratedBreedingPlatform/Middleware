@@ -19,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,21 +36,22 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 	private static final String GENOTYPE_SEARCH_FROM_QUERY = "FROM sample s " +
 		"LEFT JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id " +
-		"LEFT JOIN  project p ON p.project_id = nde.project_id " +
-		"INNER JOIN  genotype geno ON s.sample_id = geno.sample_id " +
+		"LEFT JOIN project p ON p.project_id = nde.project_id " +
+		"INNER JOIN genotype geno ON s.sample_id = geno.sample_id " +
 		"LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = geno.variabe_id " +
 		"LEFT JOIN stock st ON st.stock_id = nde.stock_id " +
 		"LEFT JOIN germplsm g ON g.gid = st.dbxref_id " +
 		"LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
 		"LEFT JOIN nd_experimentprop plot_no ON plot_no.nd_experiment_id = nde.nd_experiment_id AND plot_no.type_id = " +
 		TermId.PLOT_NO.getId() + " " +
-		"WHERE p.study_id = :studyId  GROUP BY s.sample_id ";
+		"WHERE p.study_id = :studyId ";
 
 	public GenotypeDao(final Session session) {
 		super(session);
 	}
 
-	public List<GenotypeDTO> searchGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO, final List<String> variableNames, final Pageable pageable) {
+	public List<GenotypeDTO> searchGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO, final List<String> variableNames,
+		final Pageable pageable) {
 		final StringBuilder sql = new StringBuilder(GENOTYPE_SEARCH_QUERY);
 
 		if (!CollectionUtils.isEmpty(variableNames)) {
@@ -64,16 +66,17 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		}
 		sql.append(GENOTYPE_SEARCH_FROM_QUERY);
 		addSearchQueryFilters(new SqlQueryParamBuilder(sql), searchRequestDTO.getFilter());
+		sql.append(" GROUP BY s.sample_id ");
 		addPageRequestOrderBy(sql, pageable, SampleGenotypeSearchRequestDTO.GenotypeFilter.SORTABLE_FIELDS);
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 		addSearchQueryFilters(new SqlQueryParamBuilder(query), searchRequestDTO.getFilter());
 
 		query.addScalar("gid", new IntegerType());
-		query.addScalar("designation");
+		query.addScalar("designation", new StringType());
 		query.addScalar("plotNumber", new IntegerType());
 		query.addScalar("sampleNo", new IntegerType());
-		query.addScalar("sampleName");
+		query.addScalar("sampleName", new StringType());
 		if (!CollectionUtils.isEmpty(variableNames)) {
 			for (final String varName : variableNames) {
 				query.addScalar(varName); // Value
@@ -99,7 +102,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 				genotypeDTO.setPlotNumber((Integer) row.get("plotNumber"));
 				genotypeDTO.setSampleNo((Integer) row.get("sampleNo"));
 				genotypeDTO.setSampleName((String) row.get("sampleName"));
-				genotypeDTO.setGenotypeDataList(new ArrayList<>());
+				genotypeDTO.setGenotypeDataMap(new HashMap<>());
 				if (!CollectionUtils.isEmpty(variableNames)) {
 					for (final String varName : variableNames) {
 						final GenotypeData data = new GenotypeData();
@@ -107,7 +110,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 						data.setGenotypeId((Integer) row.get(varName + "_genotypeId"));
 						data.setVariableId((Integer) row.get(varName + "_variableId"));
 						data.setVariableName((String) row.get(varName + "_variableName"));
-						genotypeDTO.getGenotypeDataList().add(data);
+						genotypeDTO.getGenotypeDataMap().put(varName, data);
 					}
 				}
 				genotypeDTOList.add(genotypeDTO);
@@ -122,6 +125,16 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		final SampleGenotypeSearchRequestDTO.GenotypeFilter filter) {
 
 		if (filter != null) {
+			final Integer datasetId = filter.getDatasetId();
+			if (datasetId != null) {
+				paramBuilder.append(" and p.project_id = :datasetId");
+				paramBuilder.setParameter("datasetId", datasetId);
+			}
+			final List<Integer> instanceIds = filter.getInstanceIds();
+			if (!CollectionUtils.isEmpty(instanceIds)) {
+				paramBuilder.append(" and nde.nd_geolocation_id IN (:instanceIds)");
+				paramBuilder.setParameterList("instanceIds", instanceIds);
+			}
 			final List<Integer> gidList = filter.getGidList();
 			if (!CollectionUtils.isEmpty(gidList)) {
 				paramBuilder.append(" and g.gid IN (:gidList)");

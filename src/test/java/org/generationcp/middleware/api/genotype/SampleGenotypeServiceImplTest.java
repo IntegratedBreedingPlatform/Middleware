@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
@@ -28,6 +29,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 	public static final String DEFAULT_MARKER_1 = "PZE-101093951";
 	public static final String DEFAULT_MARKER_2 = "PZE-0186065237";
 	public static final String DEFAULT_MARKER_3 = "PZE-0186365075";
+
 	@Resource
 	private SampleGenotypeService sampleGenotypeService;
 
@@ -35,8 +37,10 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 	private DaoFactory daoFactory;
 	private WorkbenchUser user;
 	private DmsProject study;
-	private DmsProject plot;
-	private Geolocation geolocation;
+	private DmsProject plotDataset;
+	private DmsProject subObservationDataset;
+	private Geolocation trialInstance1;
+	private Geolocation trialInstance2;
 
 	@Before
 	public void setUp() {
@@ -45,20 +49,25 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		this.study =
 			this.testDataInitializer.createDmsProject(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), null,
 				this.daoFactory.getDmsProjectDAO().getById(1), null);
-		this.plot = this.testDataInitializer
+		this.plotDataset = this.testDataInitializer
 			.createDmsProject(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), this.study, this.study,
 				DatasetTypeEnum.PLOT_DATA);
+		this.subObservationDataset = this.testDataInitializer
+			.createDmsProject(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), this.study, this.plotDataset,
+				DatasetTypeEnum.PLANT_SUBOBSERVATIONS);
 
 		this.user = this.testDataInitializer.createUserForTesting();
 
-		this.geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		this.trialInstance1 = this.testDataInitializer.createTestGeolocation("1", 101);
+		this.trialInstance2 = this.testDataInitializer.createTestGeolocation("2", 101);
 	}
 
 	@Test
 	public void testImportSampleGenotypes() {
 
 		final List<ExperimentModel>
-			experimentModels = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, this.geolocation, 1);
+			experimentModels =
+			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plotDataset, null, this.trialInstance1, 1);
 
 		final SampleList sampleList =
 			this.testDataInitializer.createTestSampleList(RandomStringUtils.randomAlphabetic(10), this.user.getUserid());
@@ -84,18 +93,113 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		final List<GenotypeDTO> genotypeDTOList = this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null);
 
 		Assert.assertEquals(1, genotypeDTOList.size());
-		Assert.assertEquals(1, this.sampleGenotypeService.countSampleGenotypes(sampleGenotypeSearchRequestDTO));
+		Assert.assertEquals(3, this.sampleGenotypeService.countSampleGenotypes(sampleGenotypeSearchRequestDTO));
 		Assert.assertEquals(3, this.sampleGenotypeService.countSampleGenotypesBySampleList(sampleList.getId()));
 		final GenotypeDTO genotypeDTO = genotypeDTOList.get(0);
-		Assert.assertEquals("C",
-			genotypeDTO.getGenotypeDataList().stream().filter(g -> g.getVariableName().equals(DEFAULT_MARKER_1)).findAny().get()
-				.getValue());
-		Assert.assertEquals("G",
-			genotypeDTO.getGenotypeDataList().stream().filter(g -> g.getVariableName().equals(DEFAULT_MARKER_2)).findAny().get()
-				.getValue());
-		Assert.assertEquals("T",
-			genotypeDTO.getGenotypeDataList().stream().filter(g -> g.getVariableName().equals(DEFAULT_MARKER_3)).findAny().get()
-				.getValue());
+		Assert.assertEquals("C", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
+		Assert.assertEquals("G", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_2).getValue());
+		Assert.assertEquals("T", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_3).getValue());
+	}
+
+	@Test
+	public void testSearchSampleGenotypes_FilterByDatasetId() {
+
+		// Create 2 Datasets that will contain samples associated to their observation units
+		final List<ExperimentModel>
+			plotExperimentModels =
+			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plotDataset, null, this.trialInstance1, 1);
+		final List<ExperimentModel>
+			subObservationExperimentModels =
+			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.subObservationDataset, plotExperimentModels.get(0),
+				this.trialInstance1, 1);
+
+		final SampleList sampleList =
+			this.testDataInitializer.createTestSampleList(RandomStringUtils.randomAlphabetic(10), this.user.getUserid());
+
+		// Add samples in the list
+		final List<Sample> plotObservationSamples =
+			this.testDataInitializer.addSamples(plotExperimentModels, sampleList, this.user.getUserid());
+		final List<Sample> subObservationSamples =
+			this.testDataInitializer.addSamples(subObservationExperimentModels, sampleList, this.user.getUserid());
+
+		final Sample observationSample = plotObservationSamples.get(0);
+		final Sample subObservationSample = subObservationSamples.get(0);
+
+		// Create Sample Genotype records
+		final List<SampleGenotypeImportRequestDto> genotypes = new ArrayList<>();
+		genotypes.add(this.createSampleGenotypeImportRequestDto(observationSample, DEFAULT_MARKER_1, "C"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(observationSample, DEFAULT_MARKER_2, "G"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(observationSample, DEFAULT_MARKER_3, "T"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(subObservationSample, DEFAULT_MARKER_1, "T"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(subObservationSample, DEFAULT_MARKER_2, "C"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(subObservationSample, DEFAULT_MARKER_3, "G"));
+		this.sampleGenotypeService.importSampleGenotypes(genotypes);
+
+		// Retrieve the imported Sample Genotype Records
+		final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
+		sampleGenotypeSearchRequestDTO.setStudyId(this.study.getProjectId());
+		sampleGenotypeSearchRequestDTO.setFilter(new SampleGenotypeSearchRequestDTO.GenotypeFilter());
+		sampleGenotypeSearchRequestDTO.getFilter().setDatasetId(this.plotDataset.getProjectId());
+		final List<GenotypeDTO> genotypeDTOList = this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null);
+
+		Assert.assertEquals(1, genotypeDTOList.size());
+		Assert.assertEquals(3, this.sampleGenotypeService.countFilteredSampleGenotypes(sampleGenotypeSearchRequestDTO));
+		Assert.assertEquals(6, this.sampleGenotypeService.countSampleGenotypes(sampleGenotypeSearchRequestDTO));
+		Assert.assertEquals(6, this.sampleGenotypeService.countSampleGenotypesBySampleList(sampleList.getId()));
+		final GenotypeDTO genotypeDTO = genotypeDTOList.get(0);
+		Assert.assertEquals("C", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
+		Assert.assertEquals("G", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_2).getValue());
+		Assert.assertEquals("T", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_3).getValue());
+	}
+
+	@Test
+	public void testSearchSampleGenotypes_FilterByGeolocationId() {
+
+		// Create 2 trial instances in a dataset that will contain samples associated to their observation units
+		final List<ExperimentModel>
+			firstInstanceExperimentModels =
+			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plotDataset, null, this.trialInstance1, 1);
+		final List<ExperimentModel>
+			secondInstanceExperimentModels =
+			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plotDataset, null, this.trialInstance2, 1);
+
+		final SampleList sampleList =
+			this.testDataInitializer.createTestSampleList(RandomStringUtils.randomAlphabetic(10), this.user.getUserid());
+
+		// Add samples in the list
+		final List<Sample> firstInstanceSamples =
+			this.testDataInitializer.addSamples(firstInstanceExperimentModels, sampleList, this.user.getUserid());
+		final List<Sample> secondInstanceSamples =
+			this.testDataInitializer.addSamples(secondInstanceExperimentModels, sampleList, this.user.getUserid());
+
+		final Sample firstInstanceSample = firstInstanceSamples.get(0);
+		final Sample secondInstanceSample = secondInstanceSamples.get(0);
+
+		// Create Sample Genotype records
+		final List<SampleGenotypeImportRequestDto> genotypes = new ArrayList<>();
+		genotypes.add(this.createSampleGenotypeImportRequestDto(firstInstanceSample, DEFAULT_MARKER_1, "C"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(firstInstanceSample, DEFAULT_MARKER_2, "G"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(firstInstanceSample, DEFAULT_MARKER_3, "T"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(secondInstanceSample, DEFAULT_MARKER_1, "T"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(secondInstanceSample, DEFAULT_MARKER_2, "C"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(secondInstanceSample, DEFAULT_MARKER_3, "G"));
+		this.sampleGenotypeService.importSampleGenotypes(genotypes);
+
+		// Retrieve the imported Sample Genotype Records
+		final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
+		sampleGenotypeSearchRequestDTO.setStudyId(this.study.getProjectId());
+		sampleGenotypeSearchRequestDTO.setFilter(new SampleGenotypeSearchRequestDTO.GenotypeFilter());
+		sampleGenotypeSearchRequestDTO.getFilter().setInstanceIds(Arrays.asList(this.trialInstance1.getLocationId()));
+		final List<GenotypeDTO> genotypeDTOList = this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null);
+
+		Assert.assertEquals(1, genotypeDTOList.size());
+		Assert.assertEquals(3, this.sampleGenotypeService.countFilteredSampleGenotypes(sampleGenotypeSearchRequestDTO));
+		Assert.assertEquals(6, this.sampleGenotypeService.countSampleGenotypes(sampleGenotypeSearchRequestDTO));
+		Assert.assertEquals(6, this.sampleGenotypeService.countSampleGenotypesBySampleList(sampleList.getId()));
+		final GenotypeDTO genotypeDTO = genotypeDTOList.get(0);
+		Assert.assertEquals("C", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
+		Assert.assertEquals("G", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_2).getValue());
+		Assert.assertEquals("T", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_3).getValue());
 	}
 
 	private SampleGenotypeImportRequestDto createSampleGenotypeImportRequestDto(final Sample sample, final String markerVariableName,
