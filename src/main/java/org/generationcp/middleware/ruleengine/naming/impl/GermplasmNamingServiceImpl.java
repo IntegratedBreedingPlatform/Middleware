@@ -29,7 +29,8 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		return nextSequence;
 	}
 
-	private int getNextSequenceUsingNativeSQL(final String keyPrefix) {
+	@Override
+	public int getNextSequenceUsingNativeSQL(final String keyPrefix) {
 		if (!StringUtils.isEmpty(keyPrefix)) {
 			final int nextSequenceNumber = this.keySequenceRegisterService.getNextSequenceUsingNativeSQL(keyPrefix.trim());
 			if (nextSequenceNumber > 1) {

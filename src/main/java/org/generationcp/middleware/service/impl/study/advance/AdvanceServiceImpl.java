@@ -198,9 +198,13 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final List<ObservationUnitRow> observations =
 			this.getObservations(studyId, dataset.getDatasetId(), request.getInstanceIds(), request.getSelectedReplications(),
 				observationVisibleColumns);
+		// TODO filter observations of deselected entries
+
 		if (CollectionUtils.isEmpty(observations)) {
 			return new ArrayList<>();
 		}
+
+		final long numberOfPlots = observations.size();
 
 		final List<MeasurementVariable> studyVariables =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(studyId, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
@@ -304,6 +308,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 				new AdvancingSource(originGermplasm, namesByGids.get(row.getGid()), row, trialInstanceObservation,
 					breedingMethod, breedingMethodsById.get(originGermplasm.getMethodId()),
 					seasonStudyLevel, selectionTraitStudyLevel, plantsSelected, sampleNumbers);
+			advancingSource.setPreview(isPreview);
 
 			// Resolves data related to season, selection trait and location for environment and plot
 			this.resolveEnvironmentAndPlotAndSubObservationLevelData(environmentDataset.getDatasetId(), dataset.getDatasetId(),
@@ -344,7 +349,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 			final Integer repNumberVariableId = this.getVariableId(REP_NUMBER_VARIABLE_NAME);
 			final Integer trialInstanceVariableId = this.getVariableId(TRIAL_INSTANCE_VARIABLE_NAME);
 			final Integer plantNumberVariableId = this.getVariableId(PLANT_NUMBER_VARIABLE_NAME);
-			final AtomicInteger previewRowNumber = new AtomicInteger(1);
 
 			advancingSources.forEach(advancingSource -> {
 				final AtomicInteger selectionNumber = new AtomicInteger(1);
@@ -352,6 +356,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 				final ObservationUnitRow observation = advancingSource.getObservation();
 				final Integer trialInstance = observation.getTrialInstance();
 				final String plotNumber = observation.getVariableValueByVariableId(TermId.PLOT_NO.getId());
+				final String plantNumber = observation.getVariableValueByVariableId(TermId.PLANT_NO.getId());
 				final String entryNumber = observation.getVariableValueByVariableId(TermId.ENTRY_NO.getId());
 				final List<BasicNameDTO> originGermplasmNames = advancingSource.getNames();
 				final String originGermplasmName = originGermplasmNames.isEmpty() ? "" : originGermplasmNames.get(0).getNval();
@@ -383,13 +388,11 @@ public class AdvanceServiceImpl implements AdvanceService {
 						final List<Name> currentGermplasmNames = germplasm.getNames();
 
 						advancedGermplasms.add(
-							new AdvancedGermplasm(previewRowNumber.get(), trialInstance == null ? "" : trialInstance.toString(),
+							new AdvancedGermplasm(observation.getObservationUnitId(), trialInstance == null ? "" : trialInstance.toString(),
 								locationsByLocationId.get(germplasm.getLocationId()).getLname(),
-								entryNumber, plotNumber, sampleNumber, pedigreeString,
+								entryNumber, plotNumber, plantNumber, pedigreeString,
 								originGermplasmName, germplasm.getMethod().getMcode(),
 								currentGermplasmNames.isEmpty() ? "" : currentGermplasmNames.get(0).getNval()));
-
-						previewRowNumber.incrementAndGet();
 					} else {
 						// Adding attributes to the advanced germplasm
 						this.createGermplasmAttributes(study.getName(), advancingSource,
@@ -406,9 +409,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 								advancingSource.getObservation().getObservationUnitId(),
 								GermplasmStudySourceType.ADVANCE);
 						this.germplasmStudySourceService.saveGermplasmStudySources(Arrays.asList(germplasmStudySourceInput));
-
-						selectionNumber.incrementAndGet();
 					}
+					selectionNumber.incrementAndGet();
 				});
 			});
 		}
@@ -730,7 +732,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 			final Attribute plantNumberAttribute =
 				this.createGermplasmAttribute(advancedGermplasmGid, plantNumber, plantNumberVariableId, locationId, date);
 			this.daoFactory.getAttributeDAO().save(plantNumberAttribute);
-			return;
 		}
 	}
 

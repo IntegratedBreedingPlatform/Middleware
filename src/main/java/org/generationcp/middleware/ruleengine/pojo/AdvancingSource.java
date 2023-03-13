@@ -9,20 +9,22 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @AutoProperty
 public class AdvancingSource {
 
 	private BasicGermplasmDTO originGermplasm;
-	private List<BasicNameDTO> names;
-	private ObservationUnitRow observation;
+	private final List<BasicNameDTO> names;
+	private final ObservationUnitRow observation;
 
 	//This will be used if we have trial
-	private ObservationUnitRow trialInstanceObservation;
+	private final ObservationUnitRow trialInstanceObservation;
 
-	private Method breedingMethod;
-	private Method sourceMethod;
+	private final Method breedingMethod;
+	private final Method sourceMethod;
 
 	// These properties values are being set by data resolvers
 	private String season;
@@ -30,13 +32,13 @@ public class AdvancingSource {
 	private String locationAbbreviation;
 	private Integer harvestLocationId;
 
-	private Integer plantsSelected;
-	private List<Integer> sampleNumbers;
+	private final Integer plantsSelected;
+	private final List<Integer> sampleNumbers;
 
 	private String rootName;
 	private Integer rootNameType;
 
-	private List<Germplasm> advancedGermplasm = new ArrayList<>();
+	private final List<Germplasm> advancedGermplasm = new ArrayList<>();
 
 	// These are only used by crosses generation process. Remove them once cross process will be redo it
 	private int maleGid;
@@ -44,6 +46,10 @@ public class AdvancingSource {
 	private boolean isForceUniqueNameGeneration;
 	private int currentMaxSequence;
 	private AdvanceGermplasmChangeDetail changeDetail;
+
+	// These are used to track sequences on preview mode if needed
+	private boolean isPreview = false;
+	private Map<String, Integer> keySequenceMap = new HashMap<>();
 
 	public AdvancingSource(final BasicGermplasmDTO originGermplasm, final List<BasicNameDTO> names,
 		final ObservationUnitRow observation,
@@ -71,31 +77,31 @@ public class AdvancingSource {
 	}
 
 	public BasicGermplasmDTO getOriginGermplasm() {
-		return originGermplasm;
+		return this.originGermplasm;
 	}
 
 	public List<BasicNameDTO> getNames() {
-		return names;
+		return this.names;
 	}
 
 	public ObservationUnitRow getObservation() {
-		return observation;
+		return this.observation;
 	}
 
 	public ObservationUnitRow getTrialInstanceObservation() {
-		return trialInstanceObservation;
+		return this.trialInstanceObservation;
 	}
 
 	public Method getBreedingMethod() {
-		return breedingMethod;
+		return this.breedingMethod;
 	}
 
 	public Method getSourceMethod() {
-		return sourceMethod;
+		return this.sourceMethod;
 	}
 
 	public String getSeason() {
-		return season;
+		return this.season;
 	}
 
 	public void setSeason(final String season) {
@@ -103,7 +109,7 @@ public class AdvancingSource {
 	}
 
 	public String getSelectionTraitValue() {
-		return selectionTraitValue;
+		return this.selectionTraitValue;
 	}
 
 	public void setSelectionTraitValue(final String selectionTraitValue) {
@@ -111,7 +117,7 @@ public class AdvancingSource {
 	}
 
 	public String getLocationAbbreviation() {
-		return locationAbbreviation;
+		return this.locationAbbreviation;
 	}
 
 	public void setLocationAbbreviation(final String locationAbbreviation) {
@@ -119,7 +125,7 @@ public class AdvancingSource {
 	}
 
 	public Integer getHarvestLocationId() {
-		return harvestLocationId;
+		return this.harvestLocationId;
 	}
 
 	public void setHarvestLocationId(final Integer harvestLocationId) {
@@ -127,15 +133,15 @@ public class AdvancingSource {
 	}
 
 	public Integer getPlantsSelected() {
-		return plantsSelected;
+		return this.plantsSelected;
 	}
 
 	public List<Integer> getSampleNumbers() {
-		return sampleNumbers;
+		return this.sampleNumbers;
 	}
 
 	public String getRootName() {
-		return rootName;
+		return this.rootName;
 	}
 
 	public void setRootName(final String rootName) {
@@ -143,7 +149,7 @@ public class AdvancingSource {
 	}
 
 	public Integer getRootNameType() {
-		return rootNameType;
+		return this.rootNameType;
 	}
 
 	public void setRootNameType(final Integer rootNameType) {
@@ -151,11 +157,11 @@ public class AdvancingSource {
 	}
 
 	public List<Germplasm> getAdvancedGermplasm() {
-		return advancedGermplasm;
+		return this.advancedGermplasm;
 	}
 
 	public int getMaleGid() {
-		return maleGid;
+		return this.maleGid;
 	}
 
 	public void setOriginGermplasm(final BasicGermplasmDTO originGermplasm) {
@@ -167,7 +173,7 @@ public class AdvancingSource {
 	}
 
 	public int getFemaleGid() {
-		return femaleGid;
+		return this.femaleGid;
 	}
 
 	public void setFemaleGid(final int femaleGid) {
@@ -175,15 +181,15 @@ public class AdvancingSource {
 	}
 
 	public boolean isForceUniqueNameGeneration() {
-		return isForceUniqueNameGeneration;
+		return this.isForceUniqueNameGeneration;
 	}
 
 	public void setForceUniqueNameGeneration(final boolean forceUniqueNameGeneration) {
-		isForceUniqueNameGeneration = forceUniqueNameGeneration;
+		this.isForceUniqueNameGeneration = forceUniqueNameGeneration;
 	}
 
 	public int getCurrentMaxSequence() {
-		return currentMaxSequence;
+		return this.currentMaxSequence;
 	}
 
 	public void setCurrentMaxSequence(final int currentMaxSequence) {
@@ -191,7 +197,7 @@ public class AdvancingSource {
 	}
 
 	public AdvanceGermplasmChangeDetail getChangeDetail() {
-		return changeDetail;
+		return this.changeDetail;
 	}
 
 	public void setChangeDetail(final AdvanceGermplasmChangeDetail changeDetail) {
@@ -204,6 +210,22 @@ public class AdvancingSource {
 
 	public void addAdvancedGermplasm(final Germplasm advancedGermplasm) {
 		this.advancedGermplasm.add(advancedGermplasm);
+	}
+
+	public boolean isPreview() {
+		return this.isPreview;
+	}
+
+	public void setPreview(final boolean preview) {
+		this.isPreview = preview;
+	}
+
+	public Map<String, Integer> getKeySequenceMap() {
+		return this.keySequenceMap;
+	}
+
+	public void setKeySequenceMap(final Map<String, Integer> keySequenceMap) {
+		this.keySequenceMap = keySequenceMap;
 	}
 
 	@Override
