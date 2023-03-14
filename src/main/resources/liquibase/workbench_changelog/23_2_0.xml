@@ -86,16 +86,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-5">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'GERMPLASM_AND_CHECKS';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_GERMPLASM_AND_CHECKS';
              </sqlCheck>
  		</preConditions>
 		<comment>Germplasm and Checks permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('GERMPLASM_AND_CHECKS', 'Germplasm and Checks', @mg_studies_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_GERMPLASM_AND_CHECKS', 'Germplasm and Checks', @mg_studies_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_GERMPLASM_AND_CHECKS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -106,16 +106,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-6">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'VIEW_GERMPLASM_AND_CHECKS';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_GERMPLASM_AND_CHECKS';
              </sqlCheck>
  		</preConditions>
 		<comment>View Germplasm and Checks permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
+			SET @ms_germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_GERMPLASM_AND_CHECKS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('VIEW_GERMPLASM_AND_CHECKS', 'View Germplasm and Checks', @germplasm_and_checks_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_GERMPLASM_AND_CHECKS', 'View Germplasm and Checks', @ms_germplasm_and_checks_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'VIEW_GERMPLASM_AND_CHECKS');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_GERMPLASM_AND_CHECKS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -126,16 +126,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-7">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'ADD_ENTRY_DETAILS_VARIABLES';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADD_ENTRY_DETAILS_VARIABLES';
              </sqlCheck>
  		</preConditions>
 		<comment>Add Entry Details Variables permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
+			SET @ms_germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_GERMPLASM_AND_CHECKS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('ADD_ENTRY_DETAILS_VARIABLES', 'Add Entry Details Variables', @germplasm_and_checks_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ADD_ENTRY_DETAILS_VARIABLES', 'Add Entry Details Variables', @ms_germplasm_and_checks_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'ADD_ENTRY_DETAILS_VARIABLES');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ADD_ENTRY_DETAILS_VARIABLES');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -146,16 +146,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-8">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MODIFY_ENTRY_DETAILS_VALUES';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MODIFY_ENTRY_DETAILS_VALUES';
              </sqlCheck>
  		</preConditions>
 		<comment>Modify Entry Details Values permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
+			SET @ms_germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_GERMPLASM_AND_CHECKS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MODIFY_ENTRY_DETAILS_VALUES', 'Modify Entry Details Values', @germplasm_and_checks_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_MODIFY_ENTRY_DETAILS_VALUES', 'Modify Entry Details Values', @ms_germplasm_and_checks_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MODIFY_ENTRY_DETAILS_VALUES');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MODIFY_ENTRY_DETAILS_VALUES');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -166,16 +166,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-9">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MODIFY_COLUMNS';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MODIFY_COLUMNS';
              </sqlCheck>
  		</preConditions>
         <comment>Modify Columns permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
+			SET @ms_germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_GERMPLASM_AND_CHECKS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MODIFY_COLUMNS', 'Modify Columns', @germplasm_and_checks_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_MODIFY_COLUMNS', 'Modify Columns', @ms_germplasm_and_checks_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MODIFY_COLUMNS');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MODIFY_COLUMNS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -186,16 +186,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-10">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'REPLACE_GERMPLASM';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_REPLACE_GERMPLASM';
              </sqlCheck>
  		</preConditions>
 		<comment>Replace Germplasm permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
+			SET @ms_germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_GERMPLASM_AND_CHECKS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('REPLACE_GERMPLASM', 'Replace Germplasm', @germplasm_and_checks_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_REPLACE_GERMPLASM', 'Replace Germplasm', @ms_germplasm_and_checks_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'REPLACE_GERMPLASM');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_REPLACE_GERMPLASM');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -206,16 +206,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-11">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'ADD_NEW_ENTRIES';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADD_NEW_ENTRIES';
              </sqlCheck>
  		</preConditions>
 		<comment>Add New Entries permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
+			SET @ms_germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_GERMPLASM_AND_CHECKS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('ADD_NEW_ENTRIES', 'Add New Entries', @germplasm_and_checks_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ADD_NEW_ENTRIES', 'Add New Entries', @ms_germplasm_and_checks_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'ADD_NEW_ENTRIES');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ADD_NEW_ENTRIES');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -226,16 +226,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-12">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'IMPORT_ENTRY_DETAILS';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_IMPORT_ENTRY_DETAILS';
              </sqlCheck>
  		</preConditions>
         <comment>Add New Entries permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
+			SET @ms_germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_GERMPLASM_AND_CHECKS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('IMPORT_ENTRY_DETAILS', 'Import Entry Details', @germplasm_and_checks_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_IMPORT_ENTRY_DETAILS', 'Import Entry Details', @ms_germplasm_and_checks_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'IMPORT_ENTRY_DETAILS');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_IMPORT_ENTRY_DETAILS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -246,16 +246,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-13">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'TREATMENT_FACTORS';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_TREATMENT_FACTORS';
              </sqlCheck>
  		</preConditions>
         <comment>Add Treatment Factors permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('TREATMENT_FACTORS', 'Treatment Factors', @mg_studies_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_TREATMENT_FACTORS', 'Treatment Factors', @mg_studies_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'TREATMENT_FACTORS');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_TREATMENT_FACTORS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -266,16 +266,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-14">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'VIEW_TREATMENT_FACTORS';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_TREATMENT_FACTORS';
              </sqlCheck>
  		</preConditions>
 		<comment>View Treatment Factors permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @treatment_factors_id = (SELECT permission_id FROM permission WHERE name = 'TREATMENT_FACTORS');
+			SET @ms_treatment_factors_id = (SELECT permission_id FROM permission WHERE name = 'MS_TREATMENT_FACTORS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('VIEW_TREATMENT_FACTORS', 'View Treatment Factors', @treatment_factors_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_TREATMENT_FACTORS', 'View Treatment Factors', @ms_treatment_factors_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'VIEW_TREATMENT_FACTORS');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_TREATMENT_FACTORS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -286,16 +286,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-15">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'ADD_TREATMENT_FACTORS_VARIABLES';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADD_TREATMENT_FACTORS_VARIABLES';
              </sqlCheck>
  		</preConditions>
 		<comment>Add Treatment Factors Variables permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @treatment_factors_id = (SELECT permission_id FROM permission WHERE name = 'TREATMENT_FACTORS');
+			SET @ms_treatment_factors_id = (SELECT permission_id FROM permission WHERE name = 'MS_TREATMENT_FACTORS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('ADD_TREATMENT_FACTORS_VARIABLES', 'Add Treatment Factors Variables', @treatment_factors_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ADD_TREATMENT_FACTORS_VARIABLES', 'Add Treatment Factors Variables', @ms_treatment_factors_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'ADD_TREATMENT_FACTORS_VARIABLES');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ADD_TREATMENT_FACTORS_VARIABLES');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -306,16 +306,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-16">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'EXPERIMENTAL_DESIGN';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPERIMENTAL_DESIGN';
              </sqlCheck>
  		</preConditions>
         <comment>Add Experimental Design permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('EXPERIMENTAL_DESIGN', 'Experimental Design', @mg_studies_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXPERIMENTAL_DESIGN', 'Experimental Design', @mg_studies_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'EXPERIMENTAL_DESIGN');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPERIMENTAL_DESIGN');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -326,16 +326,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-17">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'VIEW_EXPERIMENTAL_DESIGN';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_EXPERIMENTAL_DESIGN';
              </sqlCheck>
  		</preConditions>
 		<comment>View Experimental Design permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @experimental_design_id = (SELECT permission_id FROM permission WHERE name = 'EXPERIMENTAL_DESIGN');
+			SET @ms_experimental_design_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPERIMENTAL_DESIGN');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('VIEW_EXPERIMENTAL_DESIGN', 'View Experimental Design', @experimental_design_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_EXPERIMENTAL_DESIGN', 'View Experimental Design', @ms_experimental_design_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'VIEW_EXPERIMENTAL_DESIGN');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_EXPERIMENTAL_DESIGN');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -346,16 +346,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-18">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'GENERATE_EXPERIMENTAL_DESIGN';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_GENERATE_EXPERIMENTAL_DESIGN';
              </sqlCheck>
  		</preConditions>
 		<comment>Generate Experimental Design permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @experimental_design_id = (SELECT permission_id FROM permission WHERE name = 'EXPERIMENTAL_DESIGN');
+			SET @ms_experimental_design_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPERIMENTAL_DESIGN');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('GENERATE_EXPERIMENTAL_DESIGN', 'Generate Experimental Design', @experimental_design_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_GENERATE_EXPERIMENTAL_DESIGN', 'Generate Experimental Design', @ms_experimental_design_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'GENERATE_EXPERIMENTAL_DESIGN');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_GENERATE_EXPERIMENTAL_DESIGN');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -366,16 +366,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-19">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'DELETE_EXPERIMENTAL_DESIGN';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_DELETE_EXPERIMENTAL_DESIGN';
              </sqlCheck>
  		</preConditions>
 		<comment>Delete Experimental Design permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @experimental_design_id = (SELECT permission_id FROM permission WHERE name = 'EXPERIMENTAL_DESIGN');
+			SET @ms_experimental_design_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPERIMENTAL_DESIGN');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('DELETE_EXPERIMENTAL_DESIGN', 'Delete Experimental Design', @experimental_design_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DELETE_EXPERIMENTAL_DESIGN', 'Delete Experimental Design', @ms_experimental_design_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'DELETE_EXPERIMENTAL_DESIGN');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DELETE_EXPERIMENTAL_DESIGN');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -386,16 +386,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-20">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'ENVIRONMENT';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ENVIRONMENT';
              </sqlCheck>
  		</preConditions>
         <comment>Add Environment permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('ENVIRONMENT', 'Environments', @mg_studies_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ENVIRONMENT', 'Environments', @mg_studies_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'ENVIRONMENT');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ENVIRONMENT');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -406,16 +406,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-21">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'VIEW_ENVIRONMENT';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_ENVIRONMENT';
              </sqlCheck>
  		</preConditions>
 		<comment>View Environment permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'ENVIRONMENT');
+			SET @ms_environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_ENVIRONMENT');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('VIEW_ENVIRONMENT', 'View Environment', @environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_ENVIRONMENT', 'View Environment', @ms_environment_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'VIEW_ENVIRONMENT');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_ENVIRONMENT');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -426,16 +426,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-22">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'ADD_ENVIRONMENTAL_CONDITIONS_VARIABLES';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADD_ENVIRONMENTAL_CONDITIONS_VARIABLES';
              </sqlCheck>
  		</preConditions>
 		<comment>Add Environmental Conditions Variables permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'ENVIRONMENT');
+			SET @ms_environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_ENVIRONMENT');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('ADD_ENVIRONMENTAL_CONDITIONS_VARIABLES', 'Add Environmental Conditions Variables', @environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ADD_ENVIRONMENTAL_CONDITIONS_VARIABLES', 'Add Environmental Conditions Variables', @ms_environment_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'ADD_ENVIRONMENT_CONDITIONS_VARIABLES');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ADD_ENVIRONMENTAL_CONDITIONS_VARIABLES');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -446,16 +446,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-23">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'ADD_ENVIRONMENT_DETAILS_VARIABLES';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADD_ENVIRONMENT_DETAILS_VARIABLES';
              </sqlCheck>
  		</preConditions>
 		<comment>Add Environment Details Variables permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'ENVIRONMENT');
+			SET @ms_environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_ENVIRONMENT');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('ADD_ENVIRONMENT_DETAILS_VARIABLES', 'Add Environment Details Variables', @environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ADD_ENVIRONMENT_DETAILS_VARIABLES', 'Add Environment Details Variables', @ms_environment_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'ADD_ENVIRONMENT_DETAILS_VARIABLES');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ADD_ENVIRONMENT_DETAILS_VARIABLES');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -466,16 +466,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-24">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MODIFY_ENVIRONMENT_VALUES';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MODIFY_ENVIRONMENT_VALUES';
              </sqlCheck>
  		</preConditions>
 		<comment>modify Environment Values permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'ENVIRONMENT');
+			SET @ms_environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_ENVIRONMENT');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MODIFY_ENVIRONMENT_VALUES', 'Modify Environment Values', @environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_MODIFY_ENVIRONMENT_VALUES', 'Modify Environment Values', @ms_environment_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MODIFY_ENVIRONMENT_VALUES');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MODIFY_ENVIRONMENT_VALUES');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -486,16 +486,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-25">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MODIFY_NUMBER_OF_ENVIRONMENT';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MODIFY_NUMBER_OF_ENVIRONMENT';
              </sqlCheck>
  		</preConditions>
 		<comment>Modify Number of Environment permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'ENVIRONMENT');
+			SET @ms_environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_ENVIRONMENT');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MODIFY_NUMBER_OF_ENVIRONMENT', 'Modify Number of Environment', @environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_MODIFY_NUMBER_OF_ENVIRONMENT', 'Modify Number of Environment', @ms_environment_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MODIFY_NUMBER_OF_ENVIRONMENT');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MODIFY_NUMBER_OF_ENVIRONMENT');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -506,16 +506,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-26">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MANAGE_FILES_ENVIRONMENT';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MANAGE_FILES_ENVIRONMENT';
              </sqlCheck>
  		</preConditions>
 		<comment>Manage Files Environment permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'ENVIRONMENT');
+			SET @ms_environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_ENVIRONMENT');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MANAGE_FILES_ENVIRONMENT', 'Manage Files Environment', @environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_MANAGE_FILES_ENVIRONMENT', 'Manage Files Environment', @ms_environment_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_FILES_ENVIRONMENT');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MANAGE_FILES_ENVIRONMENT');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -526,16 +526,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-27">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'STUDY_SETTINGS';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_STUDY_SETTINGS';
              </sqlCheck>
  		</preConditions>
-        <comment>Add Study Settings permission</comment>
+        <comment>Study Settings permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('STUDY_SETTINGS', 'Study Settings', @mg_studies_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_STUDY_SETTINGS', 'Study Settings', @mg_studies_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'STUDY_SETTINGS');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_SETTINGS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -546,16 +546,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-28">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'VIEW_STUDY_SETTINGS';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_STUDY_SETTINGS';
              </sqlCheck>
  		</preConditions>
-		<comment>View Study Settings permission</comment>
+		<comment>View Settings permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'STUDY_SETTINGS');
+			SET @ms_study_settings = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_SETTINGS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('VIEW_STUDY_SETTINGS', 'View Study Settings', @environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_STUDY_SETTINGS', 'View Study Settings', @ms_study_settings);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'VIEW_STUDY_SETTINGS');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_STUDY_SETTINGS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -566,16 +566,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-29">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'ADD_STUDY_SETTINGS_VARIABLES';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADD_STUDY_SETTINGS_VARIABLES';
              </sqlCheck>
  		</preConditions>
-		<comment>Add Study Settings Variables permission</comment>
+		<comment>Add Settings Variables permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'STUDY_SETTINGS');
+			SET @ms_study_settings = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_SETTINGS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('ADD_STUDY_SETTINGS_VARIABLES', 'Add Study Settings Variables', @environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ADD_STUDY_SETTINGS_VARIABLES', 'Add Study Settings Variables', @ms_study_settings);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'ADD_STUDY_SETTINGS_VARIABLES');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ADD_STUDY_SETTINGS_VARIABLES');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -586,16 +586,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-30">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'CROSSES_AND_SELECTIONS';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CROSSES_AND_SELECTIONS';
              </sqlCheck>
  		</preConditions>
         <comment>Add Crosses and Selections permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('CROSSES_AND_SELECTIONS', 'Crosses and Selections', @mg_studies_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_CROSSES_AND_SELECTIONS', 'Crosses and Selections', @mg_studies_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'CROSSES_AND_SELECTIONS');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSES_AND_SELECTIONS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -606,16 +606,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-31">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'VIEW_CROSSES_AND_SELECTIONS';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_CROSSES_AND_SELECTIONS';
              </sqlCheck>
  		</preConditions>
 		<comment>View Crosses and Selections permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'CROSSES_AND_SELECTIONS');
+			SET @mg_crosses_and_selections_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSES_AND_SELECTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('VIEW_CROSSES_AND_SELECTIONS', 'View Crosses and Selections', @environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_CROSSES_AND_SELECTIONS', 'View Crosses and Selections', @mg_crosses_and_selections_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'VIEW_CROSSES_AND_SELECTIONS');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_CROSSES_AND_SELECTIONS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -624,26 +624,6 @@
  	</changeSet>
 
 	<changeSet author="cuenyad" id="v23.2.0-32">
-         <preConditions onFail="MARK_RAN">
- 			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'CREATE_LOTS_CROSSES_AND_SELECTIONS';
-             </sqlCheck>
- 		</preConditions>
-		<comment>Create lots Crosses and Selections permission</comment>
- 		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'CROSSES_AND_SELECTIONS');
-
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('CREATE_LOTS_CROSSES_AND_SELECTIONS', 'Create Lots', @environment_id);
-
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'CREATE_LOTS_CROSSES_AND_SELECTIONS');
-
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
- 		</sql>
- 	</changeSet>
-
-	<changeSet author="cuenyad" id="v23.2.0-33">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_INVENTORY';
@@ -663,7 +643,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.2.0-34">
+	<changeSet author="cuenyad" id="v23.2.0-33">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_INVENTORY';
@@ -671,9 +651,9 @@
  		</preConditions>
 		<comment>View Study Inventory permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_INVENTORY');
+			SET @mg_inventory_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_INVENTORY');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_INVENTORY', 'View Inventory', @environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_INVENTORY', 'View Inventory', @mg_inventory_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_INVENTORY');
 
@@ -683,13 +663,13 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.2.0-35">
+	<changeSet author="cuenyad" id="v23.2.0-34">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SAMPLE_LIST';
              </sqlCheck>
  		</preConditions>
-        <comment>Add Study Sample List permission</comment>
+        <comment>Study Sample List permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
@@ -703,7 +683,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.2.0-36">
+	<changeSet author="cuenyad" id="v23.2.0-35">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_SAMPLE_LIST';
@@ -711,11 +691,31 @@
  		</preConditions>
 		<comment>View Sample List permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
+			SET @mg_sample_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_SAMPLE_LIST', 'View Sample List', @environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_SAMPLE_LIST', 'View Sample List', @mg_sample_list_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_SAMPLE_LIST');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-36">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPORT_SAMPLE_LIST';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>Export Sample List permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @mg_sample_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXPORT_SAMPLE_LIST', 'Export Sample List', @mg_sample_list_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPORT_SAMPLE_LIST');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -726,34 +726,14 @@
 	<changeSet author="cuenyad" id="v23.2.0-37">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPORT_SAMPLE_LIST';
-             </sqlCheck>
- 		</preConditions>
-		<comment>Export Sample List permission</comment>
- 		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
-
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_SAMPLE_LIST', 'Export Sample List', @environment_id);
-
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPORT_SAMPLE_LIST');
-
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
- 		</sql>
- 	</changeSet>
-
-	<changeSet author="cuenyad" id="v23.2.0-38">
-         <preConditions onFail="MARK_RAN">
- 			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_DELETE_SAMPLES';
              </sqlCheck>
  		</preConditions>
 		<comment>Delete Samples permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
+			SET @mg_sample_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DELETE_SAMPLES', 'Delete Samples', @environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DELETE_SAMPLES', 'Delete Samples', @mg_sample_list_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DELETE_SAMPLES');
 
@@ -763,13 +743,13 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.2.0-39">
+	<changeSet author="cuenyad" id="v23.2.0-38">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SSA_RESULTS';
              </sqlCheck>
  		</preConditions>
-        <comment>Add SSA Results permission</comment>
+        <comment>SSA Results permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
@@ -783,19 +763,39 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.2.0-40">
+	<changeSet author="cuenyad" id="v23.2.0-39">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_SSA_RESULTS';
              </sqlCheck>
  		</preConditions>
-        <comment>Add View SSA Results permission</comment>
+        <comment>View SSA Results permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SSA_RESULTS');
+			SET @ssa_results_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SSA_RESULTS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_SSA_RESULTS', 'View SSA Results', @mg_studies_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_SSA_RESULTS', 'View SSA Results', @ssa_results_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_SSA_RESULTS');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-40">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SSA_SUMMARY_STATISTICS';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Summary Statistics permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ssa_results_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SSA_RESULTS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_SSA_SUMMARY_STATISTICS', 'Summary Statistics', @ssa_results_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SSA_SUMMARY_STATISTICS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -806,34 +806,14 @@
 	<changeSet author="cuenyad" id="v23.2.0-41">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SSA_SUMMARY_STATISTICS';
-             </sqlCheck>
- 		</preConditions>
-        <comment>Add Summary Statistics permission</comment>
- 		<sql dbms="mysql" splitStatements="true">
-			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SSA_RESULTS');
-
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_SSA_SUMMARY_STATISTICS', 'Summary Statistics', @mg_studies_permission_id);
-
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SSA_SUMMARY_STATISTICS');
-
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
-			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
- 		</sql>
- 	</changeSet>
-
-	<changeSet author="cuenyad" id="v23.2.0-42">
-		<preConditions onFail="MARK_RAN">
- 			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SSA_MEANS_BLUE';
              </sqlCheck>
  		</preConditions>
-        <comment>Add Means (BLUES) permission</comment>
+        <comment>Means (BLUES) permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SSA_RESULTS');
+			SET @ssa_results_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SSA_RESULTS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_SSA_MEANS_BLUE', 'Means (BLUES)', @mg_studies_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_SSA_MEANS_BLUE', 'Means (BLUES)', @ssa_results_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SSA_MEANS_BLUE');
 
