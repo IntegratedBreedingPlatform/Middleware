@@ -1056,6 +1056,65 @@
  	</changeSet>
 
 	<changeSet author="cuenyad" id="v23.2.0-54">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_DESIGN_AND_PLANNING_OPTIONS';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Design and planning options permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DESIGN_AND_PLANNING_OPTIONS', 'Design and planning options', @ms_study_Actions_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DESIGN_AND_PLANNING_OPTIONS');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-55">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPORT_DESIGN_TEMPLATE';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Export design template permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_design_and_planning_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DESIGN_AND_PLANNING_OPTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXPORT_DESIGN_TEMPLATE', 'Export design template', @ms_design_and_planning_options_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPORT_DESIGN_TEMPLATE');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-56">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CREATE_PLANTING_LABELS';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Create planting labels permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_design_and_planning_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DESIGN_AND_PLANNING_OPTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_CREATE_PLANTING_LABELS', 'Create planting labels', @ms_design_and_planning_options_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CREATE_PLANTING_LABELS');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+	<changeSet author="cuenyad" id="v23.2.0-57">
          <preConditions onFail="MARK_RAN">
 			<and>
             	<sqlCheck expectedResult="0">
