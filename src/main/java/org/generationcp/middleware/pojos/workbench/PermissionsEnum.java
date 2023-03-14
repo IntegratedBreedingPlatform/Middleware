@@ -49,12 +49,12 @@ public enum PermissionsEnum {
 
 	public static final String HAS_CREATE_LOTS_BATCH = " or hasAnyAuthority('ADMIN'"
 		+ ", 'STUDIES'"
-		+ ", 'MG_MANAGE_INVENTORY'"
-		+ ", 'MG_CREATE_LOTS'"
 		+ ", 'MANAGE_STUDIES'"
 		+ ", 'MS_CREATE_LOTS'"
 		+ ", 'GERMPLASM'"
 		+ ", 'MANAGE_GERMPLASM'"
+		+ ", 'MG_MANAGE_INVENTORY'"
+		+ ", 'MG_CREATE_LOTS'"
 		+ ", 'CREATE_LOTS')";
 
 	public static final String HAS_IMPORT_GERMPLASM = " or hasAnyAuthority('ADMIN'"
