@@ -78,25 +78,19 @@ public class SampleDaoTest extends IntegrationTestBase {
 		this.sampleListDao = this.daoFactory.getSampleListDao();
 		this.sampleDao = this.daoFactory.getSampleDao();
 
-		this.experimentDao = new ExperimentDao();
-		this.experimentDao.setSession(this.sessionProvder.getSession());
+		this.experimentDao = new ExperimentDao(this.sessionProvder.getSession());
 
-		this.geolocationDao = new GeolocationDao();
-		this.geolocationDao.setSession(this.sessionProvder.getSession());
+		this.geolocationDao = new GeolocationDao(this.sessionProvder.getSession());
 
-		this.stockDao = new StockDao();
-		this.stockDao.setSession(this.sessionProvder.getSession());
+		this.stockDao = new StockDao(this.sessionProvder.getSession());
 
-		this.personDAO = new PersonDAO();
-		this.personDAO.setSession(this.sessionProvder.getSession());
+		this.personDAO = new PersonDAO(this.sessionProvder.getSession());
 
-		this.dmsProjectDao = new DmsProjectDao();
-		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+		this.dmsProjectDao = new DmsProjectDao(this.sessionProvder.getSession());
 
 		this.germplasmDao = new GermplasmDAO(this.sessionProvder.getSession());
 
-		this.projectPropertyDao = new ProjectPropertyDao();
-		this.projectPropertyDao.setSession(this.sessionProvder.getSession());
+		this.projectPropertyDao = new ProjectPropertyDao(this.sessionProvder.getSession());
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 

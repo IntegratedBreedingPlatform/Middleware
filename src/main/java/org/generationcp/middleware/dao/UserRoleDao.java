@@ -8,6 +8,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -51,6 +52,10 @@ public class UserRoleDao extends GenericDAO<UserRole, Long> {
 		+ "', '" + PermissionsEnum.MANAGE_PROGRAMS.toString() //
 		+ "','" + PermissionsEnum.ADD_PROGRAM.toString() + "'))" //
 		+ " and ur.userid = :userId and r.active = 1 "; //
+
+	public UserRoleDao(final Session session) {
+		super(session);
+	}
 
 	public List<UserRole> getByProgramId(final Long programId) {
 		final List<UserRole> toReturn;

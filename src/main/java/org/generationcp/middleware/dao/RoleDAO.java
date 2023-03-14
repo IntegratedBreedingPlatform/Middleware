@@ -7,6 +7,7 @@ import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,10 @@ import java.util.List;
 public class RoleDAO extends GenericDAO<Role, Integer> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RoleDAO.class);
+
+	public RoleDAO(final Session session) {
+		super(session);
+	}
 
 	public List<Role> searchRoles(final RoleSearchDto roleSearchDto, Pageable pageable) {
 		final List<Role> toReturn;

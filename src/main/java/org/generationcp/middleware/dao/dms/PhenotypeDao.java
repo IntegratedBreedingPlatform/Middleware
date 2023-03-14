@@ -141,6 +141,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public static final String ENTRY_NO = "ENTRY_NO";
 	public static final String DATASET_ID = "datasetId";
 
+	public PhenotypeDao(final Session session) {
+		super(session);
+	}
+
 	public List<NumericTraitInfo> getNumericTraitInfoList(final List<Integer> environmentIds, final List<Integer> numericVariableIds) {
 		final List<NumericTraitInfo> numericTraitInfoList = new ArrayList<>();
 		try {

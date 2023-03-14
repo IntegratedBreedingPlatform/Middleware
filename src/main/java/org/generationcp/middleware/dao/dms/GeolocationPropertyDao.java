@@ -22,6 +22,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
@@ -57,6 +58,10 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 
 	private static final String DELETE_GEOLOCATIONPROP_BY_ID_TYPE = "Delete ngp.* "
 		+ GEOLOCATIONPROP_ID_TYPE_CONDITION;
+
+	public GeolocationPropertyDao(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getGeolocationIdsByPropertyTypeAndValue(final Integer typeId, final String value) {

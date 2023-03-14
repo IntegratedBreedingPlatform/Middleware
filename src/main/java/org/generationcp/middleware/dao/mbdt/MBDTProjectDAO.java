@@ -16,6 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MBDTProjectDAO extends GenericDAO<MBDTProjectData, Integer> {
 
+	public MBDTProjectDAO(final Session session) {
+		super(session);
+	}
+
 	@Override
 	public MBDTProjectData getById(Integer integer) throws MiddlewareQueryException {
 		return super.getById(integer);

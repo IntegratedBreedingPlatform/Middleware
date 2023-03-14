@@ -18,6 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MBDTGenerationDAO extends GenericDAO<MBDTGeneration, Integer> {
 
+	public MBDTGenerationDAO(final Session session) {
+		super(session);
+	}
+
 	public MBDTGeneration getByProjectAndDatasetID(Integer datasetID, Integer projectID) throws MiddlewareQueryException {
 
 		MBDTGeneration generation = null;

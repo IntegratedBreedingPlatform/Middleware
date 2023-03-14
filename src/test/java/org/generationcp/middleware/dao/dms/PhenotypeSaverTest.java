@@ -34,13 +34,11 @@ public class PhenotypeSaverTest extends IntegrationTestBase {
 		}
 
 		if (this.phenotypeDao == null) {
-			this.phenotypeDao = new PhenotypeDao();
-			this.phenotypeDao.setSession(this.sessionProvder.getSession());
+			this.phenotypeDao = new PhenotypeDao(this.sessionProvder.getSession());
 		}
 
 		if (this.experimentDao == null) {
-			this.experimentDao = new ExperimentDao();
-			this.experimentDao.setSession(this.sessionProvder.getSession());
+			this.experimentDao = new ExperimentDao(this.sessionProvder.getSession());
 		}
 
 		if(this.experimentModelSaver == null) {

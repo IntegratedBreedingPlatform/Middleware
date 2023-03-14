@@ -20,6 +20,7 @@ import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -34,6 +35,10 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 
 	public static final String MODEL_STOCK_ID = "stockModel.stockId";
 	public static final String TYPE_ID = "typeId";
+
+	public StockPropertyDao(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getStockIdsByPropertyTypeAndValue(final Integer typeId, final String value) {

@@ -28,6 +28,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
@@ -62,6 +63,10 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			+ " 	SELECT e.nd_experiment_id FROM nd_experiment e "
 			+ " 	WHERE e.nd_geolocation_id IN (:locationIds) )"
 			+ " AND type_id IN (:termIds)";
+
+	public ExperimentPropertyDao(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByPropertyTypeAndValue(final Integer typeId, final String value) {

@@ -115,39 +115,27 @@ public class DaoFactory {
 	}
 
 	public FormulaDAO getFormulaDAO() {
-		final FormulaDAO formulaDAO = new FormulaDAO();
-		formulaDAO.setSession(this.sessionProvider.getSession());
-		return formulaDAO;
+		return new FormulaDAO(this.sessionProvider.getSession());
 	}
 
 	public SampleListDao getSampleListDao() {
-		final SampleListDao sampleListDao = new SampleListDao();
-		sampleListDao.setSession(this.sessionProvider.getSession());
-		return sampleListDao;
+		return new SampleListDao(this.sessionProvider.getSession());
 	}
 
 	public SampleDao getSampleDao() {
-		final SampleDao sampleDao = new SampleDao();
-		sampleDao.setSession(this.sessionProvider.getSession());
-		return sampleDao;
+		return new SampleDao(this.sessionProvider.getSession());
 	}
 
 	public CVTermDao getCvTermDao() {
-		final CVTermDao cvTermDao = new CVTermDao();
-		cvTermDao.setSession(this.sessionProvider.getSession());
-		return cvTermDao;
+		return new CVTermDao(this.sessionProvider.getSession());
 	}
 
 	public CvTermPropertyDao getCvTermPropertyDao() {
-		final CvTermPropertyDao cvTermPropertyDao = new CvTermPropertyDao();
-		cvTermPropertyDao.setSession(this.sessionProvider.getSession());
-		return cvTermPropertyDao;
+		return new CvTermPropertyDao(this.sessionProvider.getSession());
 	}
 
 	public CVTermRelationshipDao getCvTermRelationshipDao() {
-		final CVTermRelationshipDao cvTermRelationshipDao = new CVTermRelationshipDao();
-		cvTermRelationshipDao.setSession(this.sessionProvider.getSession());
-		return cvTermRelationshipDao;
+		return new CVTermRelationshipDao(this.sessionProvider.getSession());
 	}
 
 	public CopMatrixDao getCopMatrixDao() {
@@ -155,27 +143,19 @@ public class DaoFactory {
 	}
 
 	public LotDAO getLotDao() {
-		final LotDAO lotDao = new LotDAO();
-		lotDao.setSession(this.sessionProvider.getSession());
-		return lotDao;
+		return new LotDAO(this.sessionProvider.getSession());
 	}
 
 	public TransactionDAO getTransactionDAO() {
-		final TransactionDAO transactionDao = new TransactionDAO();
-		transactionDao.setSession(this.sessionProvider.getSession());
-		return transactionDao;
+		return new TransactionDAO(this.sessionProvider.getSession());
 	}
 
 	public StockDao getStockDao() {
-		final StockDao stockDao = new StockDao();
-		stockDao.setSession(this.sessionProvider.getSession());
-		return stockDao;
+		return new StockDao(this.sessionProvider.getSession());
 	}
 
 	public StockPropertyDao getStockPropertyDao() {
-		final StockPropertyDao stockPropertyDao = new StockPropertyDao();
-		stockPropertyDao.setSession(this.sessionProvider.getSession());
-		return stockPropertyDao;
+		return new StockPropertyDao(this.sessionProvider.getSession());
 	}
 
 	public GermplasmDAO getGermplasmDao() {
@@ -187,27 +167,19 @@ public class DaoFactory {
 	}
 
 	public GermplasmListDAO getGermplasmListDAO() {
-		final GermplasmListDAO germplasmListDao = new GermplasmListDAO();
-		germplasmListDao.setSession(this.sessionProvider.getSession());
-		return germplasmListDao;
+		return new GermplasmListDAO(this.sessionProvider.getSession());
 	}
 
 	public GermplasmListDataDAO getGermplasmListDataDAO() {
-		final GermplasmListDataDAO germplasmListDataDao = new GermplasmListDataDAO();
-		germplasmListDataDao.setSession(this.sessionProvider.getSession());
-		return germplasmListDataDao;
+		return new GermplasmListDataDAO(this.sessionProvider.getSession());
 	}
 
 	public AttributeDAO getAttributeDAO() {
-		final AttributeDAO attributeDAO = new AttributeDAO();
-		attributeDAO.setSession(this.sessionProvider.getSession());
-		return attributeDAO;
+		return new AttributeDAO(this.sessionProvider.getSession());
 	}
 
 	public LotAttributeDAO getLotAttributeDAO() {
-		final LotAttributeDAO attributeDAO = new LotAttributeDAO();
-		attributeDAO.setSession(this.sessionProvider.getSession());
-		return attributeDAO;
+		return new LotAttributeDAO(this.sessionProvider.getSession());
 	}
 
 	public LocationDAO getLocationDAO() {
@@ -219,55 +191,39 @@ public class DaoFactory {
 	}
 
 	public PhenotypeDao getPhenotypeDAO() {
-		final PhenotypeDao phenotypeDao = new PhenotypeDao();
-		phenotypeDao.setSession(this.sessionProvider.getSession());
-		return phenotypeDao;
+		return new PhenotypeDao(this.sessionProvider.getSession());
 
 	}
 
 	public DmsProjectDao getDmsProjectDAO() {
-		final DmsProjectDao dmsProjectDao = new DmsProjectDao();
-		dmsProjectDao.setSession(this.sessionProvider.getSession());
-		return dmsProjectDao;
+		return new DmsProjectDao(this.sessionProvider.getSession());
 
 	}
 
 	public KeySequenceRegisterDAO getKeySequenceRegisterDAO() {
-		final KeySequenceRegisterDAO keySequenceRegisterDAO = new KeySequenceRegisterDAO();
-		keySequenceRegisterDAO.setSession(this.sessionProvider.getSession());
-		return keySequenceRegisterDAO;
+		return new KeySequenceRegisterDAO(this.sessionProvider.getSession());
 
 	}
 
 	public ProjectPropertyDao getProjectPropertyDAO() {
-		final ProjectPropertyDao projectPropDao = new ProjectPropertyDao();
-		projectPropDao.setSession(this.sessionProvider.getSession());
-		return projectPropDao;
+		return new ProjectPropertyDao(this.sessionProvider.getSession());
 	}
 
 	public ExperimentDao getExperimentDao() {
-		final ExperimentDao experimentDao = new ExperimentDao();
-		experimentDao.setSession(this.sessionProvider.getSession());
-		return experimentDao;
+		return new ExperimentDao(this.sessionProvider.getSession());
 
 	}
 
 	public GeolocationDao getGeolocationDao() {
-		final GeolocationDao geolocationDao = new GeolocationDao();
-		geolocationDao.setSession(this.sessionProvider.getSession());
-		return geolocationDao;
+		return new GeolocationDao(this.sessionProvider.getSession());
 	}
 
 	public GeolocationPropertyDao getGeolocationPropertyDao() {
-		final GeolocationPropertyDao geolocationPropertyDao = new GeolocationPropertyDao();
-		geolocationPropertyDao.setSession(this.sessionProvider.getSession());
-		return geolocationPropertyDao;
+		return new GeolocationPropertyDao(this.sessionProvider.getSession());
 	}
 
 	public ProgramPresetDAO getProgramPresetDAO() {
-		final ProgramPresetDAO programPresetDAO = new ProgramPresetDAO();
-		programPresetDAO.setSession(this.sessionProvider.getSession());
-		return programPresetDAO;
+		return new ProgramPresetDAO(this.sessionProvider.getSession());
 	}
 
 	public NameDAO getNameDao() {
@@ -275,45 +231,31 @@ public class DaoFactory {
 	}
 
 	public ProgenitorDAO getProgenitorDao() {
-		final ProgenitorDAO progenitorDao = new ProgenitorDAO();
-		progenitorDao.setSession(this.sessionProvider.getSession());
-		return progenitorDao;
+		return new ProgenitorDAO(this.sessionProvider.getSession());
 	}
 
 	public DatasetTypeDAO getDatasetTypeDao() {
-		final DatasetTypeDAO datasetTypeDao = new DatasetTypeDAO();
-		datasetTypeDao.setSession(this.sessionProvider.getSession());
-		return datasetTypeDao;
+		return new DatasetTypeDAO(this.sessionProvider.getSession());
 	}
 
 	public SearchRequestDAO getSearchRequestDAO() {
-		final SearchRequestDAO brapiSearchDAO = new SearchRequestDAO();
-		brapiSearchDAO.setSession(this.sessionProvider.getSession());
-		return brapiSearchDAO;
+		return new SearchRequestDAO(this.sessionProvider.getSession());
 	}
 
 	public ObservationUnitsSearchDao getObservationUnitsSearchDAO() {
-		final ObservationUnitsSearchDao obsUnitsSearchDao = new ObservationUnitsSearchDao();
-		obsUnitsSearchDao.setSession(this.sessionProvider.getSession());
-		return obsUnitsSearchDao;
+		return new ObservationUnitsSearchDao(this.sessionProvider.getSession());
 	}
 
 	public StudySearchDao getStudySearchDao() {
-		final StudySearchDao studySearchDao = new StudySearchDao();
-		studySearchDao.setSession(this.sessionProvider.getSession());
-		return studySearchDao;
+		return new StudySearchDao(this.sessionProvider.getSession());
 	}
 
 	public LocationSearchDao getLocationSearchDao() {
-		final LocationSearchDao locationSearchDao = new LocationSearchDao();
-		locationSearchDao.setSession(this.sessionProvider.getSession());
-		return locationSearchDao;
+		return new LocationSearchDao(this.sessionProvider.getSession());
 	}
 
 	public CountryDAO getCountryDao() {
-		final CountryDAO countryDAO = new CountryDAO();
-		countryDAO.setSession(this.sessionProvider.getSession());
-		return countryDAO;
+		return new CountryDAO(this.sessionProvider.getSession());
 	}
 
 	public UserDefinedFieldDAO getUserDefinedFieldDAO() {
@@ -321,69 +263,47 @@ public class DaoFactory {
 	}
 
 	public ProgramFavoriteDAO getProgramFavoriteDao() {
-		final ProgramFavoriteDAO programFavoriteDao = new ProgramFavoriteDAO();
-		programFavoriteDao.setSession(this.sessionProvider.getSession());
-		return programFavoriteDao;
+		return new ProgramFavoriteDAO(this.sessionProvider.getSession());
 	}
 
 	public ExperimentTransactionDAO getExperimentTransactionDao() {
-		final ExperimentTransactionDAO experimentTransactionDAO = new ExperimentTransactionDAO();
-		experimentTransactionDAO.setSession(this.sessionProvider.getSession());
-		return experimentTransactionDAO;
+		return new ExperimentTransactionDAO(this.sessionProvider.getSession());
 	}
 
 	public ExperimentPropertyDao getExperimentPropertyDao() {
-		final ExperimentPropertyDao experimentPropertyDao = new ExperimentPropertyDao();
-		experimentPropertyDao.setSession(this.sessionProvider.getSession());
-		return experimentPropertyDao;
+		return new ExperimentPropertyDao(this.sessionProvider.getSession());
 	}
 
 	public GermplasmStudySourceDAO getGermplasmStudySourceDAO() {
-		final GermplasmStudySourceDAO germplasmStudySourceDAO = new GermplasmStudySourceDAO();
-		germplasmStudySourceDAO.setSession(this.sessionProvider.getSession());
-		return germplasmStudySourceDAO;
+		return new GermplasmStudySourceDAO(this.sessionProvider.getSession());
 	}
 
 	public BibrefDAO getBibrefDAO() {
-		final BibrefDAO bibrefDAO = new BibrefDAO();
-		bibrefDAO.setSession(this.sessionProvider.getSession());
-		return bibrefDAO;
+		return new BibrefDAO(this.sessionProvider.getSession());
 	}
 
 	public StudyTypeDAO getStudyTypeDao() {
-		final StudyTypeDAO studyTypeDAO = new StudyTypeDAO();
-		studyTypeDAO.setSession(this.sessionProvider.getSession());
-		return studyTypeDAO;
+		return new StudyTypeDAO(this.sessionProvider.getSession());
 	}
 
 	public LocdesDAO getLocDesDao() {
-		final LocdesDAO locdesDao = new LocdesDAO();
-		locdesDao.setSession(this.sessionProvider.getSession());
-		return locdesDao;
+		return new LocdesDAO(this.sessionProvider.getSession());
 	}
 
 	public NamingConfigurationDAO getNamingConfigurationDAO() {
-		final NamingConfigurationDAO namingConfigurationDAO = new NamingConfigurationDAO();
-		namingConfigurationDAO.setSession(this.sessionProvider.getSession());
-		return namingConfigurationDAO;
+		return new NamingConfigurationDAO(this.sessionProvider.getSession());
 	}
 
 	public UserProgramTreeStateDAO getUserProgramTreeStateDAO() {
-		final UserProgramTreeStateDAO userProgramTreeStateDAO = new UserProgramTreeStateDAO();
-		userProgramTreeStateDAO.setSession(this.sessionProvider.getSession());
-		return userProgramTreeStateDAO;
+		return new UserProgramTreeStateDAO(this.sessionProvider.getSession());
 	}
 
 	public CropTypeDAO getCropTypeDAO() {
-		final CropTypeDAO cropTypeDAO = new CropTypeDAO();
-		cropTypeDAO.setSession(this.sessionProvider.getSession());
-		return cropTypeDAO;
+		return new CropTypeDAO(this.sessionProvider.getSession());
 	}
 
 	public VariableOverridesDao getVariableProgramOverridesDao() {
-		final VariableOverridesDao variableOverridesDao = new VariableOverridesDao();
-		variableOverridesDao.setSession(this.sessionProvider.getSession());
-		return variableOverridesDao;
+		return new VariableOverridesDao(this.sessionProvider.getSession());
 	}
 
 	public StandardVariableDao getStandardVariableDao() {
@@ -391,225 +311,151 @@ public class DaoFactory {
 	}
 
 	public CVDao getCvDao() {
-		final CVDao cvDao = new CVDao();
-		cvDao.setSession(this.sessionProvider.getSession());
-		return cvDao;
+		return new CVDao(this.sessionProvider.getSession());
 	}
 
 	public TrackMarkerDAO getTrackMarkerDao() {
-		final TrackMarkerDAO trackMarkerDao = new TrackMarkerDAO();
-		trackMarkerDao.setSession(this.sessionProvider.getSession());
-		return trackMarkerDao;
+		return new TrackMarkerDAO(this.sessionProvider.getSession());
 	}
 
 	public MapDAO getMapDao() {
-		final MapDAO mapDao = new MapDAO();
-		mapDao.setSession(this.sessionProvider.getSession());
-		return mapDao;
+		return new MapDAO(this.sessionProvider.getSession());
 	}
 
 	public MappingDataDAO getMappingDataDao() {
-		final MappingDataDAO mappingDataDao = new MappingDataDAO();
-		mappingDataDao.setSession(this.sessionProvider.getSession());
-		return mappingDataDao;
+		return new MappingDataDAO(this.sessionProvider.getSession());
 	}
 
 	public MappingPopDAO getMappingPopDao() {
-		final MappingPopDAO mappingPopDao = new MappingPopDAO();
-		mappingPopDao.setSession(this.sessionProvider.getSession());
-		return mappingPopDao;
+		return new MappingPopDAO(this.sessionProvider.getSession());
 	}
 
 	public MappingPopValuesDAO getMappingPopValuesDao() {
-		final MappingPopValuesDAO mappingPopValuesDao = new MappingPopValuesDAO();
-		mappingPopValuesDao.setSession(this.sessionProvider.getSession());
-		return mappingPopValuesDao;
+		return new MappingPopValuesDAO(this.sessionProvider.getSession());
 	}
 
 	public MarkerAliasDAO getMarkerAliasDao() {
-		final MarkerAliasDAO markerAliasDao = new MarkerAliasDAO();
-		markerAliasDao.setSession(this.sessionProvider.getSession());
-		return markerAliasDao;
+		return new MarkerAliasDAO(this.sessionProvider.getSession());
 	}
 
 	public MarkerDAO getMarkerDao() {
-		final MarkerDAO markerDao = new MarkerDAO();
-		markerDao.setSession(this.sessionProvider.getSession());
-		return markerDao;
+		return new MarkerDAO(this.sessionProvider.getSession());
 	}
 
 	public MarkerDetailsDAO getMarkerDetailsDao() {
-		final MarkerDetailsDAO markerDetailsDao = new MarkerDetailsDAO();
-		markerDetailsDao.setSession(this.sessionProvider.getSession());
-		return markerDetailsDao;
+		return new MarkerDetailsDAO(this.sessionProvider.getSession());
 	}
 
 	public MarkerInfoDAO getMarkerInfoDao() {
-		final MarkerInfoDAO markerInfoDao = new MarkerInfoDAO();
-		markerInfoDao.setSession(this.sessionProvider.getSession());
-		return markerInfoDao;
+		return new MarkerInfoDAO(this.sessionProvider.getSession());
 	}
 
 	public ExtendedMarkerInfoDAO getExtendedMarkerInfoDao() {
-		final ExtendedMarkerInfoDAO extendedMarkerInfoDAO = new ExtendedMarkerInfoDAO();
-		extendedMarkerInfoDAO.setSession(this.sessionProvider.getSession());
-		return extendedMarkerInfoDAO;
+		return new ExtendedMarkerInfoDAO(this.sessionProvider.getSession());
 	}
 
 	public MarkerMetadataSetDAO getMarkerMetadataSetDao() {
-		final MarkerMetadataSetDAO markerMetadataSetDao = new MarkerMetadataSetDAO();
-		markerMetadataSetDao.setSession(this.sessionProvider.getSession());
-		return markerMetadataSetDao;
+		return new MarkerMetadataSetDAO(this.sessionProvider.getSession());
 	}
 
 	public MarkerOnMapDAO getMarkerOnMapDao() {
-		final MarkerOnMapDAO markerOnMapDao = new MarkerOnMapDAO();
-		markerOnMapDao.setSession(this.sessionProvider.getSession());
-		return markerOnMapDao;
+		return new MarkerOnMapDAO(this.sessionProvider.getSession());
 	}
 
 	public MarkerUserInfoDAO getMarkerUserInfoDao() {
-		final MarkerUserInfoDAO markerUserInfoDao = new MarkerUserInfoDAO();
-		markerUserInfoDao.setSession(this.sessionProvider.getSession());
-		return markerUserInfoDao;
+		return new MarkerUserInfoDAO(this.sessionProvider.getSession());
 	}
 
 	public QtlDAO getQtlDao() {
-		final QtlDAO qtlDao = new QtlDAO();
-		qtlDao.setSession(this.sessionProvider.getSession());
-		return qtlDao;
+		return new QtlDAO(this.sessionProvider.getSession());
 	}
 
 	public QtlDetailsDAO getQtlDetailsDao() {
-		final QtlDetailsDAO qtlDetailsDao = new QtlDetailsDAO();
-		qtlDetailsDao.setSession(this.sessionProvider.getSession());
-		return qtlDetailsDao;
+		return new QtlDetailsDAO(this.sessionProvider.getSession());
 	}
 
 	public MtaDAO getMtaDao() {
-		final MtaDAO mtaDao = new MtaDAO();
-		mtaDao.setSession(this.sessionProvider.getSession());
-		return mtaDao;
+		return new MtaDAO(this.sessionProvider.getSession());
 	}
 
 	public MtaMetadataDAO getMtaMetadataDao() {
-		final MtaMetadataDAO mtaMetadataDao = new MtaMetadataDAO();
-		mtaMetadataDao.setSession(this.sessionProvider.getSession());
-		return mtaMetadataDao;
+		return new MtaMetadataDAO(this.sessionProvider.getSession());
 	}
 
 	public TrackDataDAO getTrackDataDao() {
-		final TrackDataDAO trackDataDao = new TrackDataDAO();
-		trackDataDao.setSession(this.sessionProvider.getSession());
-		return trackDataDao;
+		return new TrackDataDAO(this.sessionProvider.getSession());
 	}
 
 	public AccMetadataSetDAO getAccMetadataSetDao() {
-		final AccMetadataSetDAO accMetadataSetDao = new AccMetadataSetDAO();
-		accMetadataSetDao.setSession(this.sessionProvider.getSession());
-		return accMetadataSetDao;
+		return new AccMetadataSetDAO(this.sessionProvider.getSession());
 	}
 
 	public AlleleValuesDAO getAlleleValuesDao() {
-		final AlleleValuesDAO alleleValuesDao = new AlleleValuesDAO();
-		alleleValuesDao.setSession(this.sessionProvider.getSession());
-		return alleleValuesDao;
+		return new AlleleValuesDAO(this.sessionProvider.getSession());
 	}
 
 	public CharValuesDAO getCharValuesDao() {
-		final CharValuesDAO charValuesDao = new CharValuesDAO();
-		charValuesDao.setSession(this.sessionProvider.getSession());
-		return charValuesDao;
+		return new CharValuesDAO(this.sessionProvider.getSession());
 	}
 
 	public DartValuesDAO getDartValuesDao() {
-		final DartValuesDAO dartValuesDao = new DartValuesDAO();
-		dartValuesDao.setSession(this.sessionProvider.getSession());
-		return dartValuesDao;
+		return new DartValuesDAO(this.sessionProvider.getSession());
 	}
 
 	public DatasetDAO getDatasetDao() {
-		final DatasetDAO datasetDao = new DatasetDAO();
-		datasetDao.setSession(this.sessionProvider.getSession());
-		return datasetDao;
+		return new DatasetDAO(this.sessionProvider.getSession());
 	}
 
 	public DatasetUsersDAO getDatasetUsersDao() {
-		final DatasetUsersDAO datasetUsersDao = new DatasetUsersDAO();
-		datasetUsersDao.setSession(this.sessionProvider.getSession());
-		return datasetUsersDao;
+		return new DatasetUsersDAO(this.sessionProvider.getSession());
 	}
 
 	public CvTermSynonymDao getCvTermSynonymDao() {
-		final CvTermSynonymDao cvTermSynonymDao = new CvTermSynonymDao();
-		cvTermSynonymDao.setSession(this.sessionProvider.getSession());
-		return cvTermSynonymDao;
+		return new CvTermSynonymDao(this.sessionProvider.getSession());
 	}
 
 	public PhenotypeOutlierDao getPhenotypeOutlierDao() {
-		final PhenotypeOutlierDao phenotypeOutlierDao = new PhenotypeOutlierDao();
-		phenotypeOutlierDao.setSession(this.sessionProvider.getSession());
-		return phenotypeOutlierDao;
+		return new PhenotypeOutlierDao(this.sessionProvider.getSession());
 	}
 
 	public GermplasmExternalReferenceDAO getGermplasmExternalReferenceDAO() {
-		final GermplasmExternalReferenceDAO germplasmExternalReferenceDAO = new GermplasmExternalReferenceDAO();
-		germplasmExternalReferenceDAO.setSession(this.sessionProvider.getSession());
-		return germplasmExternalReferenceDAO;
+		return new GermplasmExternalReferenceDAO(this.sessionProvider.getSession());
 	}
 
 	public GermplasmListExternalReferenceDAO getGermplasmListExternalReferenceDAO() {
-		final GermplasmListExternalReferenceDAO germplasmListExternalReferenceDAO = new GermplasmListExternalReferenceDAO();
-		germplasmListExternalReferenceDAO.setSession(this.sessionProvider.getSession());
-		return germplasmListExternalReferenceDAO;
+		return new GermplasmListExternalReferenceDAO(this.sessionProvider.getSession());
 	}
 
 	public StudyExternalReferenceDao getStudyExternalReferenceDAO() {
-		final StudyExternalReferenceDao studyExternalReferenceDAO = new StudyExternalReferenceDao();
-		studyExternalReferenceDAO.setSession(this.sessionProvider.getSession());
-		return studyExternalReferenceDAO;
+		return new StudyExternalReferenceDao(this.sessionProvider.getSession());
 	}
 
 	public CvTermExternalReferenceDAO getCvTermExternalReferenceDAO() {
-		final CvTermExternalReferenceDAO cvTermExternalReferenceDAO = new CvTermExternalReferenceDAO();
-		cvTermExternalReferenceDAO.setSession(this.sessionProvider.getSession());
-		return cvTermExternalReferenceDAO;
+		return new CvTermExternalReferenceDAO(this.sessionProvider.getSession());
 	}
 
 	public PhenotypeExternalReferenceDAO getPhenotypeExternalReferenceDAO() {
-		final PhenotypeExternalReferenceDAO phenotypeExternalReferenceDAO = new PhenotypeExternalReferenceDAO();
-		phenotypeExternalReferenceDAO.setSession(this.sessionProvider.getSession());
-		return phenotypeExternalReferenceDAO;
+		return new PhenotypeExternalReferenceDAO(this.sessionProvider.getSession());
 	}
 
 	public StudyInstanceExternalReferenceDao getStudyInstanceExternalReferenceDao() {
-		final StudyInstanceExternalReferenceDao studyInstanceExternalReferenceDao = new StudyInstanceExternalReferenceDao();
-		studyInstanceExternalReferenceDao.setSession(this.sessionProvider.getSession());
-		return studyInstanceExternalReferenceDao;
+		return new StudyInstanceExternalReferenceDao(this.sessionProvider.getSession());
 	}
 
 	public SampleExternalReferenceDAO getSampleExternalReferenceDAO() {
-		final SampleExternalReferenceDAO sampleExternalReferenceDAO = new SampleExternalReferenceDAO();
-		sampleExternalReferenceDAO.setSession(this.sessionProvider.getSession());
-		return sampleExternalReferenceDAO;
+		return new SampleExternalReferenceDAO(this.sessionProvider.getSession());
 	}
 
 	public ExperimentExternalReferenceDao getExperimentExternalReferenceDao() {
-		final ExperimentExternalReferenceDao experimentExternalReferenceDao = new ExperimentExternalReferenceDao();
-		experimentExternalReferenceDao.setSession(this.sessionProvider.getSession());
-		return experimentExternalReferenceDao;
+		return new ExperimentExternalReferenceDao(this.sessionProvider.getSession());
 	}
 
 	public AttributeExternalReferenceDAO getAttributeExternalReferenceDao() {
-		final AttributeExternalReferenceDAO attributeExternalReferenceDao = new AttributeExternalReferenceDAO();
-		attributeExternalReferenceDao.setSession(this.sessionProvider.getSession());
-		return attributeExternalReferenceDao;
+		return new AttributeExternalReferenceDAO(this.sessionProvider.getSession());
 	}
 
 	public FileMetadataExternalReferenceDAO getFileMetadataExternalReferenceDAO() {
-		final FileMetadataExternalReferenceDAO fileMetadataExternalReferenceDAO = new FileMetadataExternalReferenceDAO();
-		fileMetadataExternalReferenceDAO.setSession(this.sessionProvider.getSession());
-		return fileMetadataExternalReferenceDAO;
+		return new FileMetadataExternalReferenceDAO(this.sessionProvider.getSession());
 	}
 
 	public GermplasmAuditDAO getGermplasmAuditDAO() {
@@ -645,10 +491,7 @@ public class DaoFactory {
 	}
 
 	public PhenotypeAuditDao getPhenotypeAuditDao() {
-		final PhenotypeAuditDao phenotypeAuditDao = new PhenotypeAuditDao();
-		phenotypeAuditDao.setSession(this.sessionProvider.getSession());
-
-		return phenotypeAuditDao;
+		return new PhenotypeAuditDao(this.sessionProvider.getSession());
 	}
 
 	public GenotypeDao getGenotypeDao() {

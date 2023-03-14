@@ -5,11 +5,16 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.UserProgramTreeState;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.List;
 
 public class UserProgramTreeStateDAO extends GenericDAO<UserProgramTreeState,Integer> {
+
+	public UserProgramTreeStateDAO(final Session session) {
+		super(session);
+	}
 
 	public UserProgramTreeState getUserProgramTreeState(final int userId, final String programUuid, final String type) throws MiddlewareQueryException {
 		try {

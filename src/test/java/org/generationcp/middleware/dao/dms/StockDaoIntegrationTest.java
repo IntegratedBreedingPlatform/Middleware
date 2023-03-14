@@ -67,29 +67,14 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		this.dmsProjectDao = new DmsProjectDao();
-		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
-
+		this.dmsProjectDao = new DmsProjectDao(this.sessionProvder.getSession());
 		this.germplasmDao = new GermplasmDAO(this.sessionProvder.getSession());
-
-		this.experimentDao = new ExperimentDao();
-		this.experimentDao.setSession(this.sessionProvder.getSession());
-
-		this.geolocationDao = new GeolocationDao();
-		this.geolocationDao.setSession(this.sessionProvder.getSession());
-
-		this.stockDao = new StockDao();
-		this.stockDao.setSession(this.sessionProvder.getSession());
-
-		this.cvtermDao = new CVTermDao();
-		this.cvtermDao.setSession(this.sessionProvder.getSession());
-
-		this.phenotypeDao = new PhenotypeDao();
-		this.phenotypeDao.setSession(this.sessionProvder.getSession());
-
-		this.studyTypeDAO = new StudyTypeDAO();
-		this.studyTypeDAO.setSession(this.sessionProvder.getSession());
-
+		this.experimentDao = new ExperimentDao(this.sessionProvder.getSession());
+		this.geolocationDao = new GeolocationDao(this.sessionProvder.getSession());
+		this.stockDao = new StockDao(this.sessionProvder.getSession());
+		this.cvtermDao = new CVTermDao(this.sessionProvder.getSession());
+		this.phenotypeDao = new PhenotypeDao(this.sessionProvder.getSession());
+		this.studyTypeDAO = new StudyTypeDAO(this.sessionProvder.getSession());
 		this.project = this.createProject(null);
 
 		this.testStocks= new ArrayList<>();

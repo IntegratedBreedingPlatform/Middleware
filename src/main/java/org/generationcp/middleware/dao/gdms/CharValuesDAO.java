@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
@@ -99,6 +100,10 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 					+ "  WHERE charvalues.dataset_id = :datasetId "; //
 
 	private static final Logger LOG = LoggerFactory.getLogger(CharValuesDAO.class);
+
+	public CharValuesDAO(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getGIDsByMarkerId(final Integer markerId, final int start, final int numOfRows) {

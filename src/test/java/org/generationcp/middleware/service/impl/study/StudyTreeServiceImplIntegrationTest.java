@@ -31,8 +31,7 @@ public class StudyTreeServiceImplIntegrationTest extends IntegrationTestBase {
 	@Before
 	public void setUp() {
 		if (this.dmsProjectDao == null) {
-			this.dmsProjectDao = new DmsProjectDao();
-			this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+			this.dmsProjectDao = new DmsProjectDao(this.sessionProvder.getSession());
 		}
 
 		ContextHolder.setLoggedInUserId(this.findAdminUser());

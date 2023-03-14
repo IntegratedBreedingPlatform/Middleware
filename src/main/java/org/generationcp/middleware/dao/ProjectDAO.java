@@ -21,6 +21,7 @@ import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
@@ -83,6 +84,10 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		+ " INNER JOIN workbench_project_user_info r ON w.project_id = r.project_id "
 		+ " WHERE r.user_id = :userId "
 		+ " AND r.last_open_date IS NOT NULL ORDER BY r.last_open_date DESC LIMIT 1) ";
+
+	public ProjectDAO(final Session session) {
+		super(session);
+	}
 
 	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
 

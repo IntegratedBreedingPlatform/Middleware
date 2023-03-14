@@ -23,6 +23,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
@@ -86,6 +87,10 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 		+ " ORDER BY n.nval";
 
 	private static final Logger LOG = LoggerFactory.getLogger(DatasetDAO.class);
+
+	public DatasetDAO(final Session session) {
+		super(session);
+	}
 
 	public long countByName() throws MiddlewareQueryException {
 		Query query = this.getSession().createSQLQuery(DatasetDAO.COUNT_BY_NAME);

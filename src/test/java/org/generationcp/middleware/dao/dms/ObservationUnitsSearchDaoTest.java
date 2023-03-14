@@ -121,10 +121,8 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 	public void setUp() {
 
 		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.obsUnitSearchDao = new ObservationUnitsSearchDao();
-		this.obsUnitSearchDao.setSession(this.sessionProvder.getSession());
-		final DmsProjectDao dmsProjectDao = new DmsProjectDao();
-		dmsProjectDao.setSession(this.sessionProvder.getSession());
+		this.obsUnitSearchDao = new ObservationUnitsSearchDao(this.sessionProvder.getSession());
+		final DmsProjectDao dmsProjectDao = new DmsProjectDao(this.sessionProvder.getSession());
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, dmsProjectDao.getById(1), null);

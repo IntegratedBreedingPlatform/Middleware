@@ -14,8 +14,7 @@ public class MapDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		this.mapDAO = new MapDAO();
-		this.mapDAO.setSession(this.sessionProvder.getSession());
+		this.mapDAO = new MapDAO(this.sessionProvder.getSession());
 	}
 
 	@Test

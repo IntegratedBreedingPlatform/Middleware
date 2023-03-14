@@ -46,11 +46,8 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() {
-		this.germplasmListDataDAO = new GermplasmListDataDAO();
-		this.germplasmListDAO = new GermplasmListDAO();
-
-		this.germplasmListDataDAO.setSession(this.sessionProvder.getSession());
-		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
+		this.germplasmListDataDAO = new GermplasmListDataDAO(this.sessionProvder.getSession());
+		this.germplasmListDAO = new GermplasmListDAO(this.sessionProvder.getSession());
 
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 

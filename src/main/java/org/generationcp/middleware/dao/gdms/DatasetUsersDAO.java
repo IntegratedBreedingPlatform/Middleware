@@ -16,6 +16,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.DatasetUsers;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 
 /**
  * DAO class for {@link DatasetUsers}.
@@ -25,6 +26,10 @@ import org.hibernate.SQLQuery;
  */
 
 public class DatasetUsersDAO extends GenericDAO<DatasetUsers, Integer> {
+
+	public DatasetUsersDAO(final Session session) {
+		super(session);
+	}
 
 	public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
 		try {

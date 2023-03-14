@@ -45,12 +45,9 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 	@Before
 	public void setUp() {
 
-		this.experimentDao = new ExperimentDao();
-		this.experimentDao.setSession(this.sessionProvder.getSession());
-		this.dmsProjectDao = new DmsProjectDao();
-		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
-		this.stockDao = new StockDao();
-		this.stockDao.setSession(this.sessionProvder.getSession());
+		this.experimentDao = new ExperimentDao(this.sessionProvder.getSession());
+		this.dmsProjectDao = new DmsProjectDao(this.sessionProvder.getSession());
+		this.stockDao = new StockDao(this.sessionProvder.getSession());
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.study = this.testDataInitializer.createDmsProject("Study1", "Study-Description", null, this.dmsProjectDao.getById(1), null);

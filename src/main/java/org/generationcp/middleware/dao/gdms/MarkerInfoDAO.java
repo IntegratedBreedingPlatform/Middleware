@@ -20,6 +20,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 
 /**
  * DAO class for {@link MarkerInfo}.
@@ -66,6 +67,10 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer> {
 	/* Used by MarkerInfoDAO.countByDbAccessionId() */
 	public static final String COUNT_BY_DB_ACCESSION_ID = "SELECT COUNT(*) " + "FROM gdms_marker_retrieval_info "
 			+ "WHERE LOWER(db_accession_id) LIKE LOWER(:dbAccessionId)";
+
+	public MarkerInfoDAO(final Session session) {
+		super(session);
+	}
 
 	/**
 	 * Gets the list of marker info objects corresponding to the given marker name.

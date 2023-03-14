@@ -29,6 +29,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -88,6 +89,10 @@ public class QtlDAO extends GenericDAO<Qtl, Integer> {
 	public static final String COUNT_QTL_BY_TRAIT = "SELECT COUNT(qtl_id) " + "FROM gdms_qtl_details " + "WHERE tid = :qtlTrait ";
 
 	public static final String GET_QTL_IDS_BY_DATASET_IDS = "SELECT qtl_id " + "FROM gdms_qtl " + "WHERE dataset_id in (:datasetIds) ";
+
+	public QtlDAO(final Session session) {
+		super(session);
+	}
 
 	public long countQtlIdByName(String name) throws MiddlewareQueryException {
 		try {

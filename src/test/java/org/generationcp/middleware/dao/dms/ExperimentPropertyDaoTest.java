@@ -39,8 +39,7 @@ public class ExperimentPropertyDaoTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 
-		this.dao = new ExperimentPropertyDao();
-		this.dao.setSession(this.mockSession);
+		this.dao = new ExperimentPropertyDao(this.mockSession);
 		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockQuery);
 		Mockito.when(this.mockQuery.addScalar(Matchers.anyString())).thenReturn(this.mockQuery);
 	}

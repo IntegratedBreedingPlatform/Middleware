@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.pojos.Bibref;
+import org.hibernate.Session;
 
 /**
  * DAO class for {@link Bibref}.
@@ -19,4 +20,7 @@ import org.generationcp.middleware.pojos.Bibref;
  */
 public class BibrefDAO extends GenericDAO<Bibref, Integer> {
 
+	public BibrefDAO(final Session session) {
+		super(session);
+	}
 }

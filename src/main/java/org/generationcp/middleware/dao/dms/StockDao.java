@@ -25,6 +25,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -51,6 +52,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StockDao.class);
 	private static final String IN_STOCK_DAO = " in StockDao: ";
+
+	public StockDao(final Session session) {
+		super(session);
+	}
 
 	public long countStudiesByGids(final List<Integer> gids) {
 
