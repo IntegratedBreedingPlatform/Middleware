@@ -823,15 +823,156 @@
  		</sql>
  	</changeSet>
 
+	<changeSet author="cuenyad" id="v23.2.0-42">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_OBSERVATIONS';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Observations permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_OBSERVATIONS', 'Observations', @mg_studies_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_OBSERVATIONS');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
 	<changeSet author="cuenyad" id="v23.2.0-43">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_OBSERVATIONS';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>View Observations permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @observation_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_OBSERVATIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_OBSERVATIONS', 'View Observations', @observation_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_OBSERVATIONS');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-44">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADD_OBSERVATION_TRAIT_VARIABLES';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Add trait variables permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @observation_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_OBSERVATIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ADD_OBSERVATION_TRAIT_VARIABLES', 'Add trait variables', @observation_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ADD_OBSERVATION_TRAIT_VARIABLES');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-45">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADD_OBSERVATION_SELECTION_VARIABLES';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Add Selection variables permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @observation_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_OBSERVATIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ADD_OBSERVATION_SELECTION_VARIABLES', 'Add Selection variables', @observation_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ADD_OBSERVATION_SELECTION_VARIABLES');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+
+	<changeSet author="cuenyad" id="v23.2.0-46">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MANAGE_PENDING_OBSERVATIONS';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>Manage pending observations permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @observation_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_OBSERVATIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_MANAGE_PENDING_OBSERVATIONS', 'Manage pending observations', @observation_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MANAGE_PENDING_OBSERVATIONS');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-47">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MANAGE_CONFIRMED_OBSERVATIONS';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>Manage confirmed observations permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @observation_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_OBSERVATIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_MANAGE_CONFIRMED_OBSERVATIONS', 'Manage confirmed observations', @observation_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MANAGE_CONFIRMED_OBSERVATIONS');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-48">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ACCEPT_PENDING_OBSERVATION';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>Accept pending observations permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @observation_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_OBSERVATIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ACCEPT_PENDING_OBSERVATION', 'Accept pending observations', @observation_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ACCEPT_PENDING_OBSERVATION');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-49">
          <preConditions onFail="MARK_RAN">
 			<and>
             	<sqlCheck expectedResult="0">
                 	SELECT count(*) > 1 FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
-					WHERE p.name IN ('CREATE_STUDIES', 'CLOSE_STUDY', 'DELETE_STUDY', 'LOCK_STUDY', 'GERMPLASM_AND_CHECKS',
-									 'TREATMENT_FACTORS', 'EXPERIMENTAL_DESIGN', 'ENVIRONMENT', 'STUDY_SETTINGS',
-									 'CROSSES_AND_SELECTIONS', 'CROSSES_AND_SELECTIONS', 'MS_INVENTORY', 'MS_SAMPLE_LIST'
-									 'MS_SSA_RESULTS');
+					WHERE p.name IN ('CREATE_STUDIES', 'CLOSE_STUDY', 'DELETE_STUDY', 'LOCK_STUDY', 'MS_GERMPLASM_AND_CHECKS',
+									 'MS_TREATMENT_FACTORS', 'MS_EXPERIMENTAL_DESIGN', 'MS_ENVIRONMENT', 'MS_STUDY_SETTINGS',
+									 'MS_CROSSES_AND_SELECTIONS', 'MS_INVENTORY', 'MS_SAMPLE_LIST'
+									 'MS_SSA_RESULTS' ,'MS_OBSERVATIONS');
             	</sqlCheck>
 				<not>
 					<tableExists tableName="roles_affected_temporary"></tableExists>
@@ -844,15 +985,16 @@
 			SET @close_study_permission_id = (SELECT permission_id FROM permission WHERE name = 'CLOSE_STUDY');
 			SET @delete_study_permission_id = (SELECT permission_id FROM permission WHERE name = 'DELETE_STUDY');
 			SET @lock_study_permission_id = (SELECT permission_id FROM permission WHERE name = 'LOCK_STUDY');
-			SET @germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_AND_CHECKS');
-			SET @treatment_factors_permission_id = (SELECT permission_id FROM permission WHERE name = 'TREATMENT_FACTORS');
-			SET @experimental_design_permission_id = (SELECT permission_id FROM permission WHERE name = 'EXPERIMENTAL_DESIGN');
-			SET @environment_permission_id = (SELECT permission_id FROM permission WHERE name = 'ENVIRONMENT');
-			SET @study_settings_permission_id = (SELECT permission_id FROM permission WHERE name = 'STUDY_SETTINGS');
-			SET @crosses_and_selections_permission_id = (SELECT permission_id FROM permission WHERE name = 'CROSSES_AND_SELECTIONS');
+			SET @ms_germplasm_and_checks_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_GERMPLASM_AND_CHECKS');
+			SET @treatment_factors_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_TREATMENT_FACTORS');
+			SET @experimental_design_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPERIMENTAL_DESIGN');
+			SET @environment_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ENVIRONMENT');
+			SET @study_settings_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_SETTINGS');
+			SET @crosses_and_selections_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSES_AND_SELECTIONS');
 			SET @study_inventory_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_INVENTORY');
 			SET @study_sample_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
 			SET @single_site_results_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SSA_RESULTS');
+			SET @observation_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_OBSERVATIONS');
 
 
 			#Create roles_affected_temporary Table
@@ -882,7 +1024,7 @@
 			SELECT rp.role_id, @lock_study_permission_id FROM roles_affected_temporary rp;
 
 			INSERT INTO role_permission(role_id, permission_id)
-			SELECT rp.role_id, @germplasm_and_checks_permission_id FROM roles_affected_temporary rp;
+			SELECT rp.role_id, @ms_germplasm_and_checks_permission_id FROM roles_affected_temporary rp;
 
 			INSERT INTO role_permission(role_id, permission_id)
 			SELECT rp.role_id, @treatment_factors_permission_id FROM roles_affected_temporary rp;
@@ -907,6 +1049,9 @@
 
 			INSERT INTO role_permission(role_id, permission_id)
 			SELECT rp.role_id, @single_site_results_permission_id FROM roles_affected_temporary rp;
+
+			INSERT INTO role_permission(role_id, permission_id)
+			SELECT rp.role_id, @observation_permission_id FROM roles_affected_temporary rp;
 
 			#Delete roles_affected_temporary Table
 			DROP TABLE roles_affected_temporary;
