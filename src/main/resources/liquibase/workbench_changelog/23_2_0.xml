@@ -965,6 +965,97 @@
  	</changeSet>
 
 	<changeSet author="cuenyad" id="v23.2.0-49">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_STUDY_ACTIONS';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Study Actions permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_STUDY_ACTIONS', 'Study Actions', @mg_studies_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-50">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="1">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CREATE_LOTS' AND
+                                                         P.PARENT_ID = ( SELECT PERMISSION_ID FROM PERMISSION WHERE NAME = 'MANAGE_STUDIES');
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Update the parent id of MS_CREATE_LOTS by MS_STUDY_ACTIONS permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+			SET @mg_create_lots_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CREATE_LOTS');
+			update permission set parent_id = @ms_study_Actions_permission_id where permission_id = @mg_create_lots_permission_id
+ 		</sql>
+ 	</changeSet>
+
+
+	<changeSet author="cuenyad" id="v23.2.0-51">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="1">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MANAGE_OBSERVATION_UNITS' AND
+						 P.PARENT_ID = ( SELECT PERMISSION_ID FROM PERMISSION WHERE NAME = 'MANAGE_STUDIES');
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Update the parent id of MS_MANAGE_OBSERVATION_UNITS by MS_STUDY_ACTIONS permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+			SET @mg_observation_units_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MANAGE_OBSERVATION_UNITS');
+			update permission set parent_id = @ms_study_Actions_permission_id where permission_id = @mg_observation_units_permission_id
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-52">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CREATE_GENOTYPING_SAMPLES';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Create Genotyping Samples permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_CREATE_GENOTYPING_SAMPLES', 'Create Genotyping Samples', @ms_study_Actions_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CREATE_GENOTYPING_SAMPLES');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-53">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXECUTE_CALCULATED_VARIABLES';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Exectute calculated variables permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXECUTE_CALCULATED_VARIABLES', 'Exectute calculated variables', @ms_study_Actions_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXECUTE_CALCULATED_VARIABLES');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-54">
          <preConditions onFail="MARK_RAN">
 			<and>
             	<sqlCheck expectedResult="0">
