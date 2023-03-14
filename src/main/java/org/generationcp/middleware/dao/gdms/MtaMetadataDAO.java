@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.gdms;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.pojos.gdms.MtaMetadata;
+import org.hibernate.Session;
 
 /**
  * DAO class for {@link MtaMetadata}.
@@ -22,4 +23,7 @@ import org.generationcp.middleware.pojos.gdms.MtaMetadata;
 
 public class MtaMetadataDAO extends GenericDAO<MtaMetadata, Integer> {
 
+	public MtaMetadataDAO(final Session session) {
+		super(session);
+	}
 }

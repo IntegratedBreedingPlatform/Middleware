@@ -22,6 +22,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,6 +131,10 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 			+ ", marker.amplification "
 			+ "FROM (gdms_marker marker INNER JOIN gdms_markers_onmap onmap on onmap.marker_id = marker.marker_id)"
 			+ " WHERE onmap.map_id = :map_id";
+
+	public MarkerDAO(final Session session) {
+		super(session);
+	}
 
 	/**
 	 * Gets the ids by names.

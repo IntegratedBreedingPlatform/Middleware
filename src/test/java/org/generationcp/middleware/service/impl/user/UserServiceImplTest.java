@@ -70,8 +70,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		}
 
 		if (this.userRoleDao == null) {
-			this.userRoleDao = new UserRoleDao();
-			this.userRoleDao.setSession(this.workbenchSessionProvider.getSession());
+			this.userRoleDao = new UserRoleDao(this.workbenchSessionProvider.getSession());
 		}
 
 		this.integrationTestDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);

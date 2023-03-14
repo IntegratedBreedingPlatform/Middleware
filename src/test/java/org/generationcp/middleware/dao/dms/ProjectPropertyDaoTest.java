@@ -83,11 +83,10 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.cvTermDao = this.daoFactory.getCvTermDao();
 
-		this.projectPropDao = new ProjectPropertyDao();
-		this.projectPropDao.setSession(this.sessionProvder.getSession());
+		this.projectPropDao = new ProjectPropertyDao(this.sessionProvder.getSession());
 
-		this.projectDao = new DmsProjectDao();
-		this.projectDao.setSession(this.sessionProvder.getSession());
+		this.projectDao = new DmsProjectDao(this.sessionProvder.getSession());
+
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, daoFactory);
 		}
@@ -103,8 +102,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 			this.projectDao.save(this.study);
 		}
 
-		this.cvTermRelationshipDao = new CVTermRelationshipDao();
-		this.cvTermRelationshipDao.setSession(this.sessionProvder.getSession());
+		this.cvTermRelationshipDao = new CVTermRelationshipDao(this.sessionProvder.getSession());
 	}
 
 	@Test

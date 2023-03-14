@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
 
@@ -73,6 +74,10 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 			+ " order by gid, nid,acc_sample_id asc";
 
 	private static final String GET_NIDS_BY_DATASET_IDS = "SELECT nid FROM gdms_acc_metadataset WHERE dataset_id IN (:datasetIds)";
+
+	public AccMetadataSetDAO(final Session session) {
+		super(session);
+	}
 
 	//FIXME
 	@SuppressWarnings("unchecked")

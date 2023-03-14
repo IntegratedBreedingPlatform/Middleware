@@ -85,12 +85,9 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 		this.studyDataManager = new StudyDataManagerImpl(this.sessionProvder);
 		this.standardVariableSaver = new StandardVariableSaver(this.sessionProvder);
 		this.projectPropertySaver = new ProjectPropertySaver(this.sessionProvder);
-		this.projectPropertyDao = new ProjectPropertyDao();
-		this.projectPropertyDao.setSession(this.sessionProvder.getSession());
-		this.dmsProjectDao = new DmsProjectDao();
-		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
-		this.cvTermDao = new CVTermDao();
-		this.cvTermDao.setSession(this.sessionProvder.getSession());
+		this.projectPropertyDao = new ProjectPropertyDao(this.sessionProvder.getSession());
+		this.dmsProjectDao = new DmsProjectDao(this.sessionProvder.getSession());
+		this.cvTermDao = new CVTermDao(this.sessionProvder.getSession());
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();

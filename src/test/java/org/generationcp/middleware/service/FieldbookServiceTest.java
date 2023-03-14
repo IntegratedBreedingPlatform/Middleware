@@ -76,8 +76,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 			this.crop = this.programService.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
 		}
 
-		this.germplasmListDAO = new GermplasmListDAO();
-		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
+		this.germplasmListDAO = new GermplasmListDAO(this.sessionProvder.getSession());
 
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject,
 			this.sessionProvder);

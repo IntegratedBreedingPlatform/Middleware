@@ -26,6 +26,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
@@ -44,6 +45,10 @@ import java.util.Map;
 public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 	private static final String TYPE_ID = "typeId";
+
+	public ProjectPropertyDao(final Session session) {
+		super(session);
+	}
 
 	/**
 	 * @param variableNames

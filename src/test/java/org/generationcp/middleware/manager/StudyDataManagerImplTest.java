@@ -147,8 +147,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		this.manager.setUserService(this.userService);
 
-		this.cvTermDao = new CVTermDao();
-		this.cvTermDao.setSession(this.sessionProvder.getSessionFactory().getCurrentSession());
+		this.cvTermDao = new CVTermDao(this.sessionProvder.getSessionFactory().getCurrentSession());
 
 		this.variableDataManager = Mockito.mock(OntologyVariableDataManagerImpl.class);
 		final Optional<DataType> dataTypeOptional = Optional.of(DataType.CATEGORICAL_VARIABLE);

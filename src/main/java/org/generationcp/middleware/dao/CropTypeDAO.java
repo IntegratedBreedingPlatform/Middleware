@@ -16,6 +16,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.List;
@@ -26,6 +27,10 @@ import java.util.List;
  * @author Joyce Avestro
  */
 public class CropTypeDAO extends GenericDAO<CropType, Long> {
+
+	public CropTypeDAO(final Session session) {
+		super(session);
+	}
 
 	public CropType getByName(final String cropName) {
 		CropType toReturn = null;

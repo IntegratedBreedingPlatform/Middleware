@@ -17,6 +17,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,10 @@ import org.slf4j.LoggerFactory;
 public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(DataSetDao.class);
+
+	public DataSetDao(final Session session) {
+		super(session);
+	}
 
 	public void deleteExperimentsByLocation(final int datasetId, final int locationId) {
 		try {

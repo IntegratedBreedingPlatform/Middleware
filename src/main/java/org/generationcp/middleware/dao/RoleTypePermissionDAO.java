@@ -5,6 +5,7 @@ import org.generationcp.middleware.pojos.workbench.RoleTypePermission;
 import org.generationcp.middleware.pojos.workbench.RoleTypePermissionId;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -15,6 +16,10 @@ import java.util.List;
 public class RoleTypePermissionDAO extends GenericDAO<RoleTypePermission, RoleTypePermissionId> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RoleTypePermission.class);
+
+	public RoleTypePermissionDAO(final Session session) {
+		super(session);
+	}
 
 	public List<RoleTypePermission> getPermissionsByRoleTypeAndParent(final Integer roleTypeId, final Integer parentId) {
 		final List<RoleTypePermission> toReturn;

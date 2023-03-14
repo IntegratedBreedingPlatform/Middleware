@@ -2,11 +2,16 @@ package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 
 import java.util.List;
 
 public abstract class GenericExternalReferenceDAO<T> extends GenericDAO<T, Integer> {
+
+	public GenericExternalReferenceDAO(final Session session) {
+		super(session);
+	}
 
 	public List<ExternalReferenceDTO> getExternalReferences(final List<Integer> ids) {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(

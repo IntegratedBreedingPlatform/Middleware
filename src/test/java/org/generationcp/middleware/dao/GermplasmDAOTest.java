@@ -515,8 +515,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetNextSequenceNumber() {
 		final Session mockSession = Mockito.mock(Session.class);
-		this.daoFactory.getGermplasmDao().setSession(mockSession);
-		this.daoFactory.getGermplasmDao().getNextSequenceNumber("");
+		final GermplasmDAO germplasmDAO = new GermplasmDAO(mockSession);
+		germplasmDAO.getNextSequenceNumber("");
 		// Verify that no query was made if the prefix is empty
 		Mockito.verify(mockSession, Mockito.never()).createSQLQuery(ArgumentMatchers.anyString());
 	}
@@ -789,16 +789,16 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testCountGermplasmDTOs_FilterByAccessionNumbers() {
 		final Germplasm germplasm1 =
-				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		this.germplasmTestDataGenerator.addGermplasm(germplasm1, germplasm1.getPreferredName(), this.cropType);
 
 		final Germplasm germplasm2 =
-				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 0, 1, "LocationName");
 		this.germplasmTestDataGenerator.addGermplasm(germplasm2, germplasm2.getPreferredName(), this.cropType);
 
 		this.sessionProvder.getSession().flush();
 
-		final List<String> names =  Arrays.asList(germplasm1.getNames().get(0).getNval(), germplasm2.getNames().get(0).getNval());
+		final List<String> names = Arrays.asList(germplasm1.getNames().get(0).getNval(), germplasm2.getNames().get(0).getNval());
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();
 		request.setAccessionNumbers(names);
 		final Long count = this.daoFactory.getGermplasmDao().countGermplasmDTOs(request);
@@ -1823,7 +1823,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			this.daoFactory.getUserDefinedFieldDAO().saveOrUpdate(attributeField);
 		}
 
-		final Name name = GermplasmTestDataInitializer.createGermplasmName(germplasmGID, RandomStringUtils.randomAlphanumeric(50), attributeField.getFldno());
+		final Name name = GermplasmTestDataInitializer.createGermplasmName(germplasmGID, RandomStringUtils.randomAlphanumeric(50),
+			attributeField.getFldno());
 		name.setNstat(0); // TODO Review
 		this.daoFactory.getNameDao().save(name);
 

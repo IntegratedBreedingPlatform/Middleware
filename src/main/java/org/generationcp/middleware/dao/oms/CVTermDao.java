@@ -54,6 +54,7 @@ import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
@@ -136,6 +137,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	private static final String PROGRAMUUID = "programUUID";
 	private static final String QUERY_PARAMETER = "query";
+
+	public CVTermDao(final Session session) {
+		super(session);
+	}
 
 	public List<Integer> getTermsByNameOrSynonym(final String nameOrSynonym, final int cvId) {
 		final List<Integer> termIds = new ArrayList<>();

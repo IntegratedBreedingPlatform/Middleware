@@ -36,10 +36,8 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
-		this.experimentDao = new ExperimentDao();
-		this.experimentDao.setSession(this.sessionProvder.getSession());
-		this.phenotypeDao = new PhenotypeDao();
-		this.phenotypeDao.setSession(this.sessionProvder.getSession());
+		this.experimentDao = new ExperimentDao(this.sessionProvder.getSession());
+		this.phenotypeDao = new PhenotypeDao(this.sessionProvder.getSession());
 	}
 
 	@Test

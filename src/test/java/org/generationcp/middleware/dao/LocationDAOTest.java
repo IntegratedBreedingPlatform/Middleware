@@ -29,8 +29,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		this.locationDAO = new LocationDAO(this.sessionProvder.getSession());
-		this.countryDAO = new CountryDAO();
-		this.countryDAO.setSession(this.sessionProvder.getSession());
+		this.countryDAO = new CountryDAO(this.sessionProvder.getSession());
 	}
 
 	@Test

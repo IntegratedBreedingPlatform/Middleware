@@ -27,6 +27,7 @@ import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
@@ -64,6 +65,10 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 
 	public static final String ADDTL_INFO_LOCATION = "locationDbId";
 	public static final String PROGRAM_UUID = "programUUID";
+
+	public AttributeDAO(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Attribute> getByGID(final Integer gid) {

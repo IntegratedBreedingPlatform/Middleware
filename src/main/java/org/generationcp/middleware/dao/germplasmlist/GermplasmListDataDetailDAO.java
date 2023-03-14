@@ -34,9 +34,6 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 		+ "          AND ld.listid = :srcListid "
 		+ "          AND destld.listid = :destListid ";
 
-	public GermplasmListDataDetailDAO() {
-	}
-
 	public GermplasmListDataDetailDAO(final Session session) {
 		super(session);
 	}

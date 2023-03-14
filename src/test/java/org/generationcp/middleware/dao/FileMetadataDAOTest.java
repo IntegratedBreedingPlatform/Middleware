@@ -51,8 +51,7 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 			this.fileMetadataDAO = new FileMetadataDAO(session);
 		}
 		if (this.cvTermDao == null) {
-			this.cvTermDao = new CVTermDao();
-			this.cvTermDao.setSession(session);
+			this.cvTermDao = new CVTermDao(session);
 		}
 		if (this.germplasmDao == null) {
 			this.germplasmDao = new GermplasmDAO(session);

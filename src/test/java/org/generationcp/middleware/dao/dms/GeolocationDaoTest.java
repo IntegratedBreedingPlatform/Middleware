@@ -71,8 +71,7 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		if (this.geolocationDao == null) {
-			this.geolocationDao = new GeolocationDao();
-			this.geolocationDao.setSession(this.sessionProvder.getSession());
+			this.geolocationDao = new GeolocationDao(this.sessionProvder.getSession());
 		}
 
 		if (this.germplasmDao == null) {
@@ -80,33 +79,27 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 		}
 
 		if (this.experimentDao == null) {
-			this.experimentDao = new ExperimentDao();
-			this.experimentDao.setSession(this.sessionProvder.getSession());
+			this.experimentDao = new ExperimentDao(this.sessionProvder.getSession());
 		}
 
 		if (this.stockDao == null) {
-			this.stockDao = new StockDao();
-			this.stockDao.setSession(this.sessionProvder.getSession());
+			this.stockDao = new StockDao(this.sessionProvder.getSession());
 		}
 
 		if (this.dmsProjectDao == null) {
-			this.dmsProjectDao = new DmsProjectDao();
-			this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+			this.dmsProjectDao = new DmsProjectDao(this.sessionProvder.getSession());
 		}
 
 		if (this.cvTermDao == null) {
-			this.cvTermDao = new CVTermDao();
-			this.cvTermDao.setSession(this.sessionProvder.getSession());
+			this.cvTermDao = new CVTermDao(this.sessionProvder.getSession());
 		}
 
 		if (this.phenotypeDao == null) {
-			this.phenotypeDao = new PhenotypeDao();
-			this.phenotypeDao.setSession(this.sessionProvder.getSession());
+			this.phenotypeDao = new PhenotypeDao(this.sessionProvder.getSession());
 		}
 
 		if (this.geolocationPropertyDao == null) {
-			this.geolocationPropertyDao = new GeolocationPropertyDao();
-			this.geolocationPropertyDao.setSession(this.sessionProvder.getSession());
+			this.geolocationPropertyDao = new GeolocationPropertyDao(this.sessionProvder.getSession());
 		}
 
 		if (this.study == null) {

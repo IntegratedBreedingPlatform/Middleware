@@ -54,8 +54,7 @@ public class ExperimentDaoTest {
 	public void beforeEachTest() {
 		this.mockSession = Mockito.mock(Session.class);
 
-		this.experimentDao = new ExperimentDao();
-		this.experimentDao.setSession(this.mockSession);
+		this.experimentDao = new ExperimentDao(this.mockSession);
 
 		this.mockQuery = Mockito.mock(SQLQuery.class);
 		Mockito.when(this.mockSession.createSQLQuery(ArgumentMatchers.anyString())).thenReturn(this.mockQuery);

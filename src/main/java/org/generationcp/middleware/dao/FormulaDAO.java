@@ -5,6 +5,7 @@ import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,10 @@ import java.util.Set;
 public class FormulaDAO extends GenericDAO<Formula, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FormulaDAO.class);
+
+	public FormulaDAO(final Session session) {
+		super(session);
+	}
 
 	public Formula getByTargetVariableId(final Integer variableId) {
 

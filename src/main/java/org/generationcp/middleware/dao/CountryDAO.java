@@ -19,6 +19,7 @@ import org.generationcp.middleware.pojos.Country;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -26,6 +27,10 @@ import org.hibernate.criterion.Restrictions;
  *
  */
 public class CountryDAO extends GenericDAO<Country, Integer> {
+
+	public CountryDAO(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Country> getAllCountry() throws MiddlewareQueryException {
