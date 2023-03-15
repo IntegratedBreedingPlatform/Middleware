@@ -1041,11 +1041,11 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXECUTE_CALCULATED_VARIABLES';
              </sqlCheck>
  		</preConditions>
-        <comment>Exectute calculated variables permission</comment>
+        <comment>Execute calculated variables permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXECUTE_CALCULATED_VARIABLES', 'Exectute calculated variables', @ms_study_Actions_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXECUTE_CALCULATED_VARIABLES', 'Execute calculated variables', @ms_study_Actions_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXECUTE_CALCULATED_VARIABLES');
 
