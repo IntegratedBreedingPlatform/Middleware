@@ -50,7 +50,7 @@ public class SequenceExpression extends BaseExpression implements Expression {
 							final String keyPrefix = upperCaseValue.substring(0, matcher.start());
 							int nextNumberInSequence = 0;
 
-							// check if action is preview, do not increment DB value if true
+							// check if action is preview, do not increment sequence value in the database if true
 							if (advancingSource.isPreview()) {
 								final Map<String, Integer> keySequenceMap = advancingSource.getKeySequenceMap();
 

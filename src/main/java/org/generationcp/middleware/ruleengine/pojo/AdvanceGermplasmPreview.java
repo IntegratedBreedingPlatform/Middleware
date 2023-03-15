@@ -4,9 +4,9 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class AdvancedGermplasm {
+public class AdvanceGermplasmPreview {
 
-	private Integer previewRowNum;
+	private Integer observationUnitId;
 	private String trialInstance;
 	private String locationName;
 	private String entryNumber;
@@ -17,11 +17,11 @@ public class AdvancedGermplasm {
 	private String breedingMethodAbbr;
 	private String designation;
 
-	public AdvancedGermplasm(final Integer previewRowNum, final String trialInstance, final String locationName, final String entryNumber,
+	public AdvanceGermplasmPreview(final Integer observationUnitId, final String trialInstance, final String locationName, final String entryNumber,
 		final String plotNumber,
 		final String plantNumber, final String cross, final String immediateSource, final String breedingMethodAbbr,
 		final String designation) {
-		this.previewRowNum = previewRowNum;
+		this.observationUnitId = observationUnitId;
 		this.trialInstance = trialInstance;
 		this.locationName = locationName;
 		this.entryNumber = entryNumber;
@@ -33,12 +33,12 @@ public class AdvancedGermplasm {
 		this.designation = designation;
 	}
 
-	public Integer getPreviewRowNum() {
-		return this.previewRowNum;
+	public Integer getObservationUnitId() {
+		return this.observationUnitId;
 	}
 
-	public void setPreviewRowNum(final Integer previewRowNum) {
-		this.previewRowNum = previewRowNum;
+	public void setObservationUnitId(final Integer observationUnitId) {
+		this.observationUnitId = observationUnitId;
 	}
 
 	public String getEntryNumber() {

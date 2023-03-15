@@ -2,7 +2,7 @@ package org.generationcp.middleware.service.api.study.advance;
 
 import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
-import org.generationcp.middleware.ruleengine.pojo.AdvancedGermplasm;
+import org.generationcp.middleware.ruleengine.pojo.AdvanceGermplasmPreview;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public interface AdvanceService {
 	 * @param request
 	 * @return a {@link List} of the advanced gids
 	 */
-	List<AdvancedGermplasm> advanceStudyPreview(Integer studyId, AdvanceStudyRequest request);
+	List<AdvanceGermplasmPreview> advanceStudyPreview(Integer studyId, AdvanceStudyRequest request);
 
 	/**
 	 * @param studyId

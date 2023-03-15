@@ -12,11 +12,13 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 	private List<Integer> instanceIds;
 	private List<Integer> selectedReplications;
 
+	private List<Integer> excludedObservations;
+
 	private SelectionTraitRequest selectionTraitRequest;
 
 	@Override
 	public List<Integer> getInstanceIds() {
-		return instanceIds;
+		return this.instanceIds;
 	}
 
 	public void setInstanceIds(final List<Integer> instanceIds) {
@@ -25,7 +27,7 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 
 	@Override
 	public List<Integer> getSelectedReplications() {
-		return selectedReplications;
+		return this.selectedReplications;
 	}
 
 	public void setSelectedReplications(final List<Integer> selectedReplications) {
@@ -33,8 +35,17 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 	}
 
 	@Override
+	public List<Integer> getExcludedObservations() {
+		return this.excludedObservations;
+	}
+
+	public void setExcludedObservations(final List<Integer> excludedObservations) {
+		this.excludedObservations = excludedObservations;
+	}
+
+	@Override
 	public SelectionTraitRequest getSelectionTraitRequest() {
-		return selectionTraitRequest;
+		return this.selectionTraitRequest;
 	}
 
 	public void setSelectionTraitRequest(final SelectionTraitRequest selectionTraitRequest) {
@@ -63,7 +74,7 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 		private Integer variableId;
 
 		public Integer getDatasetId() {
-			return datasetId;
+			return this.datasetId;
 		}
 
 		public void setDatasetId(final Integer datasetId) {
@@ -71,7 +82,7 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 		}
 
 		public Integer getVariableId() {
-			return variableId;
+			return this.variableId;
 		}
 
 		public void setVariableId(final Integer variableId) {

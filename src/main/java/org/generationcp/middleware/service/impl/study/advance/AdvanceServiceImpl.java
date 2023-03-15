@@ -25,7 +25,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
@@ -41,7 +40,7 @@ import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.generator.SeedSourceGenerator;
 import org.generationcp.middleware.ruleengine.naming.context.AdvanceContext;
 import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
-import org.generationcp.middleware.ruleengine.pojo.AdvancedGermplasm;
+import org.generationcp.middleware.ruleengine.pojo.AdvanceGermplasmPreview;
 import org.generationcp.middleware.ruleengine.pojo.AdvancingSource;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.PedigreeService;
@@ -66,7 +65,6 @@ import org.generationcp.middleware.service.impl.study.advance.visitor.GetExperim
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetObservationsVisibleColumnsVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetPlantSelectedVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetSampleNumbersVisitor;
-import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -82,6 +80,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -162,8 +161,6 @@ public class AdvanceServiceImpl implements AdvanceService {
 		this.selectionTraitDataResolver = new SelectionTraitDataResolver();
 		this.locationDataResolver = new LocationDataResolver();
 		this.trialInstanceObservationsResolver = new TrialInstanceObservationsResolver();
-
-		this.pedigreeService = this.getPedigreeService();
 	}
 
 	@Override
@@ -172,11 +169,12 @@ public class AdvanceServiceImpl implements AdvanceService {
 	}
 
 	@Override
-	public List<AdvancedGermplasm> advanceStudyPreview(final Integer studyId, final AdvanceStudyRequest request) {
-		final List<AdvancedGermplasm> advancedGermplasms = new ArrayList<>();
-		this.advance(studyId, request, true, advancedGermplasms);
+	public List<AdvanceGermplasmPreview> advanceStudyPreview(final Integer studyId, final AdvanceStudyRequest request) {
+		final List<AdvanceGermplasmPreview> advanceGermplasmPreviewList = new ArrayList<>();
+		this.advance(studyId, request, true, advanceGermplasmPreviewList);
+		Collections.sort(advanceGermplasmPreviewList, Comparator.comparing(AdvanceGermplasmPreview::getEntryNumber));
 
-		return advancedGermplasms;
+		return advanceGermplasmPreviewList;
 	}
 
 	@Override
@@ -185,7 +183,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 	}
 
 	private List<Integer> advance(final Integer studyId, final AdvanceRequest request,
-		final boolean isPreview, final List<AdvancedGermplasm> advancedGermplasms) {
+		final boolean isPreview, final List<AdvanceGermplasmPreview> advanceGermplasmPreviewList) {
 
 		final DatasetDTO dataset = request.accept(new GetDatasetVisitor(studyId, this.datasetService));
 		final DatasetDTO environmentDataset =
@@ -198,13 +196,21 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final List<ObservationUnitRow> observations =
 			this.getObservations(studyId, dataset.getDatasetId(), request.getInstanceIds(), request.getSelectedReplications(),
 				observationVisibleColumns);
-		// TODO filter observations of deselected entries
 
-		if (CollectionUtils.isEmpty(observations)) {
+		final List<ObservationUnitRow> filteredObservations;
+		if (request.getExcludedObservations() != null && !request.getExcludedObservations().isEmpty()) {
+			filteredObservations = observations.stream()
+				.filter(observationUnitRow -> !request.getExcludedObservations().contains(observationUnitRow.getObservationUnitId()))
+				.collect(Collectors.toList());
+		} else {
+			filteredObservations = observations;
+		}
+
+		if (CollectionUtils.isEmpty(filteredObservations)) {
 			return new ArrayList<>();
 		}
 
-		final long numberOfPlots = observations.size();
+		final long numberOfPlots = filteredObservations.size();
 
 		final List<MeasurementVariable> studyVariables =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(studyId, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
@@ -250,7 +256,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Map<Integer, Location> locationsByLocationId =
 			locations.stream().collect(Collectors.toMap(Location::getLocid, location -> location));
 
-		final Set<Integer> gids = observations.stream()
+		final Set<Integer> gids = filteredObservations.stream()
 			.map(ObservationUnitRow::getGid)
 			.collect(Collectors.toSet());
 
@@ -271,7 +277,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Map<Integer, List<SampleDTO>> samplesByExperimentId =
 			request.accept(new GetExperimentSamplesVisitor(studyId, this.studyDataManager));
 
-		observations.forEach(row -> {
+		filteredObservations.forEach(row -> {
 			final BasicGermplasmDTO originGermplasm = originGermplasmsByGid.get(row.getGid());
 
 			// Get the selected breeding method
@@ -387,8 +393,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 					if (isPreview) {
 						final List<Name> currentGermplasmNames = germplasm.getNames();
 
-						advancedGermplasms.add(
-							new AdvancedGermplasm(observation.getObservationUnitId(), trialInstance == null ? "" : trialInstance.toString(),
+						advanceGermplasmPreviewList.add(
+							new AdvanceGermplasmPreview(observation.getObservationUnitId(), trialInstance == null ? "" : trialInstance.toString(),
 								locationsByLocationId.get(germplasm.getLocationId()).getLname(),
 								entryNumber, plotNumber, plantNumber, pedigreeString,
 								originGermplasmName, germplasm.getMethod().getMcode(),
@@ -748,13 +754,5 @@ public class AdvanceServiceImpl implements AdvanceService {
 				.orElse(null);
 		}
 		return null;
-	}
-
-	private PedigreeService getPedigreeService() {
-		if (ManagerFactory.getCurrentManagerFactoryThreadLocal().get() != null) {
-			return ManagerFactory.getCurrentManagerFactoryThreadLocal().get().getPedigreeService();
-		}
-		// we will just return default pedigree service
-		return PedigreeFactory.getPedigreeService(this.sessionProvider, null, null);
 	}
 }
