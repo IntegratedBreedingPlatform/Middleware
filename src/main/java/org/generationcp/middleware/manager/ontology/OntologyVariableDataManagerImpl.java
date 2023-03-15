@@ -95,6 +95,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		"Analysis and/or Analysis Summary variable type(s) should not be assigned together with any other variable type";
 	private static final String OBSERVATION_UNIT_VARIABLES_CANNOT_BE_TRAITS =
 		"Variables cannot be classified as both Observation Unit and Trait. Please check the variable types assigned and try again.";
+	private static final String VARIABLE_TYPE_GENOTYPE_MARKER_SHOULD_BE_USED_SINGLE =
+		"Genotype Marker variable type should not be assigned together with any other variable type";
 
 	@Autowired
 	private OntologyMethodDataManager methodManager;
@@ -836,6 +838,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		} else if (variableInfo.getVariableTypes().contains(VariableType.OBSERVATION_UNIT)
 			&& variableInfo.getVariableTypes().contains(VariableType.TRAIT)) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.OBSERVATION_UNIT_VARIABLES_CANNOT_BE_TRAITS);
+		} else if (!Collections.disjoint(variableInfo.getVariableTypes(), Arrays.asList(VariableType.GENOTYPE_MARKER))
+			&& variableInfo.getVariableTypes().size() > 1) {
+			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_GENOTYPE_MARKER_SHOULD_BE_USED_SINGLE);
 		}
 	}
 
