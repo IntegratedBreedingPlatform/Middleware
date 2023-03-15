@@ -502,6 +502,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Override
 	public void deleteSamples(final Integer sampleListId, final List<Integer> sampleIds) {
+		this.daoFactory.getGenotypeDao().deleteSampleGenotypes(sampleIds);
 		this.daoFactory.getSampleDao().deleteBySampleIds(sampleListId, sampleIds);
 		this.daoFactory.getSampleDao().reOrderEntries(sampleListId);
 	}

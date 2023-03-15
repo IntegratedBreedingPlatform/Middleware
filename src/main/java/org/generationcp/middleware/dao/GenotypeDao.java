@@ -1,12 +1,16 @@
 package org.generationcp.middleware.dao;
 
+import com.google.common.base.Preconditions;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.genotype.GenotypeDTO;
 import org.generationcp.middleware.domain.genotype.GenotypeData;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Genotype;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
+import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
@@ -15,7 +19,6 @@ import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -194,5 +197,21 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 		query.setParameter("studyId", sampleGenotypeSearchRequestDTO.getStudyId());
 		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
+	public void deleteSampleGenotypes(final List<Integer> sampleIds) {
+		Preconditions.checkArgument(CollectionUtils.isNotEmpty(sampleIds),
+			"sampleIds passed cannot be empty.");
+
+		try {
+			final String query = "DELETE g FROM genotype g  WHERE g.sample_id IN (:sampleIds) ";
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
+			sqlQuery.setParameterList("sampleIds", sampleIds);
+			sqlQuery.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error with deleteSampleGenotypes(sampleIds=" + sampleIds + "): " + e.getMessage();
+			GenotypeDao.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 }
