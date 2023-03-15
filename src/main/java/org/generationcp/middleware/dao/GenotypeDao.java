@@ -163,8 +163,13 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 			}
 			final String sampleName = filter.getSampleName();
 			if (!StringUtils.isEmpty(sampleName)) {
-				paramBuilder.append(" and s.sample_name like :sampleName"); //
+				paramBuilder.append(" and s.sample_name like :sampleName");
 				paramBuilder.setParameter("sampleName", '%' + sampleName + '%');
+			}
+			final List<Integer> sampleIds = filter.getSampleIds();
+			if (!CollectionUtils.isEmpty(sampleIds)) {
+				paramBuilder.append(" and s.sample_id in (:sampleIds)");
+				paramBuilder.setParameterList("sampleIds", sampleIds);
 			}
             /*final List<Integer> variableIdsList = filter.getVariableIdsList();
             if (!CollectionUtils.isEmpty(variableIdsList)) {

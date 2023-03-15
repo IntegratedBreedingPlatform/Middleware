@@ -75,6 +75,8 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 
 		private Map<Integer, String> variableMap;
 
+		private List<Integer> sampleIds;
+
 		public List<Integer> getGidList() {
 			return this.gidList;
 		}
@@ -137,6 +139,14 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 
 		public void setInstanceIds(final List<Integer> instanceIds) {
 			this.instanceIds = instanceIds;
+		}
+
+		public List<Integer> getSampleIds() {
+			return this.sampleIds;
+		}
+
+		public void setSampleIds(final List<Integer> sampleIds) {
+			this.sampleIds = sampleIds;
 		}
 
 		@Override
