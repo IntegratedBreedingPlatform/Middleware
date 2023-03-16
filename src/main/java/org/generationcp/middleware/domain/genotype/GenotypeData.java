@@ -14,6 +14,17 @@ public class GenotypeData {
 
     private String value;
 
+    private Integer datasetId;
+
+    public GenotypeData() {
+
+    }
+
+    public GenotypeData(final Integer variableId, final String variableName, final String value) {
+        this.variableId = variableId;
+        this.variableName = variableName;
+        this.value = value;
+    }
     public Integer getGenotypeId() {
         return genotypeId;
     }
@@ -44,6 +55,14 @@ public class GenotypeData {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public Integer getDatasetId() {
+        return datasetId;
+    }
+
+    public void setDatasetId(Integer datasetId) {
+        this.datasetId = datasetId;
     }
 
     @Override

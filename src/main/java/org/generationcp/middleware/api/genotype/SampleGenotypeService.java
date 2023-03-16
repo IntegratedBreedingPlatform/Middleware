@@ -23,4 +23,5 @@ public interface SampleGenotypeService {
 
 	Map<Integer, MeasurementVariable> getSampleGenotypeVariables(Integer studyId, Integer datasetId);
 
+    List<MeasurementVariable> getSampleGenotypeColumns(Integer studyId);
 }

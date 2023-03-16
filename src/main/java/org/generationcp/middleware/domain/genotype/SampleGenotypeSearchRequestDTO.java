@@ -1,16 +1,32 @@
 package org.generationcp.middleware.domain.genotype;
 
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.pojomatic.Pojomatic;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 
 	private int studyId;
+
+	private List<MeasurementVariableDto> sampleGenotypeVariableDTOs;
+
+	private List<MeasurementVariableDto> entryDetails;
+
+	/**
+	 * List of columns that will be included and retrieved in the query.
+	 * If no columns are specified, the query will retrieve all columns by default.
+	 */
+	private Set<String> visibleColumns = new HashSet<>();
+
+	/**
+	 * This is used by DataTables to ensure that the Ajax returns from server-side processing requests are drawn in sequence
+	 */
+	private String draw;
 
 	private GenotypeFilter filter;
 
@@ -22,12 +38,44 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 		this.studyId = studyId;
 	}
 
+	public String getDraw() {
+		return this.draw;
+	}
+
+	public void setDraw(final String draw) {
+		this.draw = draw;
+	}
+
 	public GenotypeFilter getFilter() {
 		return this.filter;
 	}
 
 	public void setFilter(final GenotypeFilter filter) {
 		this.filter = filter;
+	}
+
+	public List<MeasurementVariableDto> getSampleGenotypeVariableDTOs() {
+		return sampleGenotypeVariableDTOs;
+	}
+
+	public void setSampleGenotypeVariableDTOs(List<MeasurementVariableDto> sampleGenotypeVariableDTOs) {
+		this.sampleGenotypeVariableDTOs = sampleGenotypeVariableDTOs;
+	}
+
+	public List<MeasurementVariableDto> getEntryDetails() {
+		return entryDetails;
+	}
+
+	public void setEntryDetails(List<MeasurementVariableDto> entryDetails) {
+		this.entryDetails = entryDetails;
+	}
+
+	public Set<String> getVisibleColumns() {
+		return visibleColumns;
+	}
+
+	public void setVisibleColumns(Set<String> visibleColumns) {
+		this.visibleColumns = visibleColumns;
 	}
 
 	@Override
@@ -47,84 +95,14 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 
 	public static class GenotypeFilter {
 
-		public static final String GID = "gid";
-		public static final String DESIGNATION = "designation";
-		public static final String PLOT_NO = "plotNumber";
-		public static final String SAMPLE_NO = "sampleNumber";
-		public static final String SAMPLE_NAME = "sampleName";
-		public static final String VARIABLE_ID = "variableId";
-		public static final String VARIABLE_NAME = "variableName";
-		public static final String VALUE = "value";
-
-		public static final List<String> SORTABLE_FIELDS = Collections.unmodifiableList(Arrays
-			.asList(GID, DESIGNATION, PLOT_NO, SAMPLE_NO, SAMPLE_NAME, VARIABLE_NAME, VALUE));
-
 		private Integer datasetId;
-
 		private List<Integer> instanceIds;
-
-		private List<Integer> gidList;
-
-		private String designation;
-
-		private List<Integer> plotNumberList;
-
-		private List<Integer> sampleNumberList;
-
-		private String sampleName;
-
-		private Map<Integer, String> variableMap;
 
 		private List<Integer> sampleIds;
 
-		public List<Integer> getGidList() {
-			return this.gidList;
-		}
-
-		public void setGidList(final List<Integer> gidList) {
-			this.gidList = gidList;
-		}
-
-		public String getDesignation() {
-			return this.designation;
-		}
-
-		public void setDesignation(final String designation) {
-			this.designation = designation;
-		}
-
-		public List<Integer> getPlotNumberList() {
-			return this.plotNumberList;
-		}
-
-		public void setPlotNumberList(final List<Integer> plotNumberList) {
-			this.plotNumberList = plotNumberList;
-		}
-
-		public List<Integer> getSampleNumberList() {
-			return this.sampleNumberList;
-		}
-
-		public void setSampleNumberList(final List<Integer> sampleNumberList) {
-			this.sampleNumberList = sampleNumberList;
-		}
-
-		public String getSampleName() {
-			return this.sampleName;
-		}
-
-		public void setSampleName(final String sampleName) {
-			this.sampleName = sampleName;
-		}
-
-		public Map<Integer, String> getVariableMap() {
-			return this.variableMap;
-		}
-
-		public void setVariableMap(final Map<Integer, String> variableMap) {
-			this.variableMap = variableMap;
-		}
-
+		private Map<String, List<String>> filteredValues;
+		private Map<String, String> filteredTextValues;
+		private Map<String, String> variableTypeMap;
 		public Integer getDatasetId() {
 			return this.datasetId;
 		}
@@ -134,11 +112,35 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 		}
 
 		public List<Integer> getInstanceIds() {
-			return this.instanceIds;
+			return instanceIds;
 		}
 
-		public void setInstanceIds(final List<Integer> instanceIds) {
+		public void setInstanceIds(List<Integer> instanceIds) {
 			this.instanceIds = instanceIds;
+		}
+
+		public Map<String, List<String>> getFilteredValues() {
+			return filteredValues;
+		}
+
+		public void setFilteredValues(Map<String, List<String>> filteredValues) {
+			this.filteredValues = filteredValues;
+		}
+
+		public Map<String, String> getFilteredTextValues() {
+			return filteredTextValues;
+		}
+
+		public void setFilteredTextValues(Map<String, String> filteredTextValues) {
+			this.filteredTextValues = filteredTextValues;
+		}
+
+		public Map<String, String> getVariableTypeMap() {
+			return variableTypeMap;
+		}
+
+		public void setVariableTypeMap(Map<String, String> variableTypeMap) {
+			this.variableTypeMap = variableTypeMap;
 		}
 
 		public List<Integer> getSampleIds() {

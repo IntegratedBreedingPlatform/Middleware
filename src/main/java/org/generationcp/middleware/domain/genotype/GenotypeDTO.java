@@ -14,12 +14,6 @@ public class GenotypeDTO {
 
 	private String designation;
 
-	private Integer plotNumber;
-
-	private Integer sampleNo;
-
-	private String sampleName;
-
 	private Map<String, GenotypeData> genotypeDataMap;
 
 	public Integer getObservationUnitId() {
@@ -44,30 +38,6 @@ public class GenotypeDTO {
 
 	public void setDesignation(final String designation) {
 		this.designation = designation;
-	}
-
-	public Integer getPlotNumber() {
-		return this.plotNumber;
-	}
-
-	public void setPlotNumber(final Integer plotNumber) {
-		this.plotNumber = plotNumber;
-	}
-
-	public Integer getSampleNo() {
-		return this.sampleNo;
-	}
-
-	public void setSampleNo(final Integer sampleNo) {
-		this.sampleNo = sampleNo;
-	}
-
-	public String getSampleName() {
-		return this.sampleName;
-	}
-
-	public void setSampleName(final String sampleName) {
-		this.sampleName = sampleName;
 	}
 
 	public Map<String, GenotypeData> getGenotypeDataMap() {
