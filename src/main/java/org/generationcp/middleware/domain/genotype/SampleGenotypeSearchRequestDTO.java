@@ -1,21 +1,22 @@
 package org.generationcp.middleware.domain.genotype;
 
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@AutoProperty
 public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 
 	private int studyId;
 
-	private List<MeasurementVariableDto> sampleGenotypeVariableDTOs;
-
-	private List<MeasurementVariableDto> entryDetails;
+	private List<MeasurementVariable> sampleGenotypeVariables;
 
 	/**
 	 * List of columns that will be included and retrieved in the query.
@@ -28,7 +29,7 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 	 */
 	private String draw;
 
-	private GenotypeFilter filter;
+	private GenotypeFilter filter = new GenotypeFilter();
 
 	public int getStudyId() {
 		return this.studyId;
@@ -54,27 +55,19 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 		this.filter = filter;
 	}
 
-	public List<MeasurementVariableDto> getSampleGenotypeVariableDTOs() {
-		return sampleGenotypeVariableDTOs;
+	public List<MeasurementVariable> getSampleGenotypeVariables() {
+		return this.sampleGenotypeVariables;
 	}
 
-	public void setSampleGenotypeVariableDTOs(List<MeasurementVariableDto> sampleGenotypeVariableDTOs) {
-		this.sampleGenotypeVariableDTOs = sampleGenotypeVariableDTOs;
-	}
-
-	public List<MeasurementVariableDto> getEntryDetails() {
-		return entryDetails;
-	}
-
-	public void setEntryDetails(List<MeasurementVariableDto> entryDetails) {
-		this.entryDetails = entryDetails;
+	public void setSampleGenotypeVariables(final List<MeasurementVariable> sampleGenotypeVariables) {
+		this.sampleGenotypeVariables = sampleGenotypeVariables;
 	}
 
 	public Set<String> getVisibleColumns() {
-		return visibleColumns;
+		return this.visibleColumns;
 	}
 
-	public void setVisibleColumns(Set<String> visibleColumns) {
+	public void setVisibleColumns(final Set<String> visibleColumns) {
 		this.visibleColumns = visibleColumns;
 	}
 
@@ -93,6 +86,7 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 		return Pojomatic.equals(this, o);
 	}
 
+	@AutoProperty
 	public static class GenotypeFilter {
 
 		private Integer datasetId;
@@ -103,6 +97,7 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 		private Map<String, List<String>> filteredValues;
 		private Map<String, String> filteredTextValues;
 		private Map<String, String> variableTypeMap;
+
 		public Integer getDatasetId() {
 			return this.datasetId;
 		}
@@ -112,34 +107,34 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 		}
 
 		public List<Integer> getInstanceIds() {
-			return instanceIds;
+			return this.instanceIds;
 		}
 
-		public void setInstanceIds(List<Integer> instanceIds) {
+		public void setInstanceIds(final List<Integer> instanceIds) {
 			this.instanceIds = instanceIds;
 		}
 
 		public Map<String, List<String>> getFilteredValues() {
-			return filteredValues;
+			return this.filteredValues;
 		}
 
-		public void setFilteredValues(Map<String, List<String>> filteredValues) {
+		public void setFilteredValues(final Map<String, List<String>> filteredValues) {
 			this.filteredValues = filteredValues;
 		}
 
 		public Map<String, String> getFilteredTextValues() {
-			return filteredTextValues;
+			return this.filteredTextValues;
 		}
 
-		public void setFilteredTextValues(Map<String, String> filteredTextValues) {
+		public void setFilteredTextValues(final Map<String, String> filteredTextValues) {
 			this.filteredTextValues = filteredTextValues;
 		}
 
 		public Map<String, String> getVariableTypeMap() {
-			return variableTypeMap;
+			return this.variableTypeMap;
 		}
 
-		public void setVariableTypeMap(Map<String, String> variableTypeMap) {
+		public void setVariableTypeMap(final Map<String, String> variableTypeMap) {
 			this.variableTypeMap = variableTypeMap;
 		}
 

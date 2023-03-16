@@ -6,7 +6,7 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.Map;
 
 @AutoProperty
-public class GenotypeDTO {
+public class SampleGenotypeDTO {
 
 	private Integer observationUnitId;
 
@@ -14,7 +14,7 @@ public class GenotypeDTO {
 
 	private String designation;
 
-	private Map<String, GenotypeData> genotypeDataMap;
+	private Map<String, SampleGenotypeData> genotypeDataMap;
 
 	public Integer getObservationUnitId() {
 		return this.observationUnitId;
@@ -40,11 +40,11 @@ public class GenotypeDTO {
 		this.designation = designation;
 	}
 
-	public Map<String, GenotypeData> getGenotypeDataMap() {
+	public Map<String, SampleGenotypeData> getGenotypeDataMap() {
 		return this.genotypeDataMap;
 	}
 
-	public void setGenotypeDataMap(final Map<String, GenotypeData> genotypeDataMap) {
+	public void setGenotypeDataMap(final Map<String, SampleGenotypeData> genotypeDataMap) {
 		this.genotypeDataMap = genotypeDataMap;
 	}
 

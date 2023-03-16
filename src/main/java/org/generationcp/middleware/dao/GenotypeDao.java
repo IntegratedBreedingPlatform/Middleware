@@ -5,13 +5,13 @@ import com.google.common.base.Preconditions;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.domain.genotype.GenotypeDTO;
-import org.generationcp.middleware.domain.genotype.GenotypeData;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeData;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Genotype;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -37,14 +37,13 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GenotypeDao.class);
 
-	private static final List<Integer> STANDARD_SAMPLE_GENOTYPE_VARIABLE_IDS =
-			Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.GID.getId(), TermId.DESIG.getId(),
-					TermId.ENTRY_TYPE.getId(), TermId.ENTRY_NO.getId(), TermId.REP_NO.getId(), TermId.PLOT_NO.getId(),
-					TermId.OBS_UNIT_ID.getId());
+	private static final List<Integer> STANDARD_SAMPLE_GENOTYPE_TABLE_VARIABLE_IDS =
+		Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.GID.getId(), TermId.DESIG.getId(),
+			TermId.ENTRY_TYPE.getId(), TermId.ENTRY_NO.getId(), TermId.REP_NO.getId(), TermId.PLOT_NO.getId(),
+			TermId.OBS_UNIT_ID.getId());
 
 	private static final String OBSERVATION_UNIT_ID = "observationUnitId";
 	private static final String DATASET_ID = "datasetId";
-
 
 	private static final String GENOTYPE_SEARCH_FROM_QUERY = "FROM sample s " +
 		"LEFT JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id " +
@@ -65,15 +64,18 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 	static {
 		// NOTE: Column names will be replaced by queried standard variable names (not hardcoded)
-		mainVariablesMap.put(DATASET_ID, "    nde.nd_experiment_id as datasetId");
-		mainVariablesMap.put(OBSERVATION_UNIT_ID, "    nde.nd_experiment_id as observationUnitId");
-		mainVariablesMap.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), "    gl.description AS '%s'");
-		mainVariablesMap.put(String.valueOf(TermId.GID.getId()), "    st.dbxref_id AS '%s'");
-		mainVariablesMap.put(String.valueOf(TermId.DESIG.getId()), "    n.nval AS '%s'");
+		mainVariablesMap.put(DATASET_ID, "    nde.nd_experiment_id as `datasetId`");
+		mainVariablesMap.put(OBSERVATION_UNIT_ID, "    nde.nd_experiment_id as `observationUnitId`");
+		mainVariablesMap.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), "    gl.description AS `%s`");
+		mainVariablesMap.put(String.valueOf(TermId.GID.getId()), "    st.dbxref_id AS `%s`");
+		mainVariablesMap.put(String.valueOf(TermId.DESIG.getId()), "    n.nval AS `%s`");
+		mainVariablesMap.put(String.valueOf(TermId.ENTRY_NO.getId()), " st.uniquename AS `%s`");
+		mainVariablesMap.put(String.valueOf(TermId.ENTRY_TYPE.getId()),
+			" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.value, NULL)) AS `%1$s`");
 		mainVariablesMap.put(String.valueOf(TermId.REP_NO.getId()),
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ndep.type_id = 8210) AS '%s'");
+			"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ndep.type_id = 8210) AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.PLOT_NO.getId()),
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ndep.type_id = 8200) AS '%s'");
+			"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ndep.type_id = 8200) AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.OBS_UNIT_ID.getId()), "    nde.obs_unit_id AS '%s'");
 	}
 
@@ -81,7 +83,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		super(session);
 	}
 
-	public List<GenotypeDTO> searchGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO, final Pageable pageable) {
+	public List<SampleGenotypeDTO> searchGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO, final Pageable pageable) {
 		final Map<String, String> finalColumnsQueryMap = new HashMap<>();
 		final Map<Integer, String> standardSampleGenotypeVariables = this.getStandardSampleGenotypeVariables(finalColumnsQueryMap);
 		final List<String> columns = new ArrayList<>();
@@ -93,35 +95,18 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 			}
 		});
 
-		searchRequestDTO.getEntryDetails().forEach(measurementVariable -> {
-			final StringBuilder entryDetailsClauseFormat = new StringBuilder();
+		if (!CollectionUtils.isEmpty(searchRequestDTO.getSampleGenotypeVariables())) {
 
-			if (this.isColumnVisible(measurementVariable.getName(), searchRequestDTO.getVisibleColumns())) {
-				if (TermId.ENTRY_NO.name().equals(measurementVariable.getName())) {
-					entryDetailsClauseFormat.append(" st.uniquename AS `%1$s`");
-				} else {
-					entryDetailsClauseFormat.append(" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.value, NULL)) AS `%1$s`");
-				}
-			} else {
-				entryDetailsClauseFormat.append(" NULL AS `%1$s`");
-			}
-
-			columns.add(String.format(entryDetailsClauseFormat.toString(), measurementVariable.getName()));
-		});
-
-		if (!CollectionUtils.isEmpty(searchRequestDTO.getSampleGenotypeVariableDTOs())) {
-
-			final StringBuilder sampleGenotypeVariableClauseFormat = new StringBuilder(" MAX(IF(cvterm_variable.name = '%1$s', geno.value, NULL)) AS `%1$s`,")
-					.append(" MAX(IF(cvterm_variable.name = '%1$s', geno.id, NULL)) AS `%1$s_genotypeId`,")
+			final StringBuilder sampleGenotypeVariableClauseFormat =
+				new StringBuilder(" MAX(IF(cvterm_variable.name = '%1$s', geno.value, NULL)) AS `%1$s`,")
 					.append(" MAX(IF(cvterm_variable.name = '%1$s', geno.variabe_id, NULL)) AS `%1$s_variableId`,")
 					.append(" MAX(IF(cvterm_variable.name = '%1$s', cvterm_variable.name, NULL)) AS `%1$s_variableName` ");
 
 			final StringBuilder sampleGenotypeVariableClauseFormatNullValues = new StringBuilder(" NULL AS `%1$s`,")
-					.append(" NULL AS `%1$s_genotypeId`,")
-					.append(" NULL AS `%1$s_variableId`,")
-					.append(" NULL AS `%1$s_variableName` ");
+				.append(" NULL AS `%1$s_variableId`,")
+				.append(" NULL AS `%1$s_variableName` ");
 
-			searchRequestDTO.getSampleGenotypeVariableDTOs().forEach(measurementVariable -> {
+			searchRequestDTO.getSampleGenotypeVariables().forEach(measurementVariable -> {
 				if (this.isColumnVisible(measurementVariable.getName(), searchRequestDTO.getVisibleColumns())) {
 					columns.add(String.format(sampleGenotypeVariableClauseFormat.toString(), measurementVariable.getName()));
 				} else {
@@ -139,20 +124,15 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 		this.addScalar(query, standardSampleGenotypeVariables);
-		if (!CollectionUtils.isEmpty(searchRequestDTO.getSampleGenotypeVariableDTOs())) {
-			for (final MeasurementVariableDto variableDto : searchRequestDTO.getSampleGenotypeVariableDTOs()) {
-				final String varName = variableDto.getName();
-				query.addScalar(varName); // Value
-				query.addScalar(varName + "_genotypeId", new IntegerType()); // genotypeId
-				query.addScalar(varName + "_variableId", new IntegerType()); // Variable Id
-				query.addScalar(varName + "_variableName", new StringType()); // Variable Name
+		if (!CollectionUtils.isEmpty(searchRequestDTO.getSampleGenotypeVariables())) {
+			for (final MeasurementVariable sampleGenotypeVariable : searchRequestDTO.getSampleGenotypeVariables()) {
+				final String variableName = sampleGenotypeVariable.getName();
+				query.addScalar(variableName); // Value
+				query.addScalar(variableName + "_variableId", new IntegerType()); // Variable Id
+				query.addScalar(variableName + "_variableName", new StringType()); // Variable Name
 			}
 		}
-		if (!CollectionUtils.isEmpty(searchRequestDTO.getEntryDetails())) {
-			for (final MeasurementVariableDto measurementVariable : searchRequestDTO.getEntryDetails()) {
-				query.addScalar(measurementVariable.getName()); // Value
-			}
-		}
+
 		query.setParameter("studyId", searchRequestDTO.getStudyId());
 		addPaginationToSQLQuery(query, pageable);
 		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
@@ -160,80 +140,91 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		return this.mapGenotypeResults(query.list(), searchRequestDTO, standardSampleGenotypeVariables);
 	}
 
-	private List<GenotypeDTO> mapGenotypeResults(final List<Map<String, Object>> results, final SampleGenotypeSearchRequestDTO searchRequestDTO,
+	private List<SampleGenotypeDTO> mapGenotypeResults(final List<Map<String, Object>> results,
+		final SampleGenotypeSearchRequestDTO searchRequestDTO,
 		final Map<Integer, String> standardSampleGenotypeVariables) {
-		final List<GenotypeDTO> genotypeDTOList = new ArrayList<>();
+		final List<SampleGenotypeDTO> sampleGenotypeDTOList = new ArrayList<>();
 		if (results != null && !results.isEmpty()) {
 			for (final Map<String, Object> row : results) {
-				final GenotypeDTO genotypeDTO = new GenotypeDTO();
-				genotypeDTO.setObservationUnitId((Integer) row.get(OBSERVATION_UNIT_ID));
-				genotypeDTO.setGenotypeDataMap(new HashMap<>());
+				final SampleGenotypeDTO sampleGenotypeDTO = new SampleGenotypeDTO();
+				sampleGenotypeDTO.setObservationUnitId((Integer) row.get(OBSERVATION_UNIT_ID));
+				sampleGenotypeDTO.setGenotypeDataMap(new HashMap<>());
 
 				final String gidColumnName = standardSampleGenotypeVariables.get(TermId.GID.getId());
 				final Integer gid = (Integer) row.get(gidColumnName);
 				if (gid != null) {
-					genotypeDTO.setGid(gid);
-					genotypeDTO.getGenotypeDataMap().put(gidColumnName, new GenotypeData(TermId.GID.getId(), gidColumnName, gid.toString()));
+					sampleGenotypeDTO.setGid(gid);
+					sampleGenotypeDTO.getGenotypeDataMap()
+						.put(gidColumnName, new SampleGenotypeData(TermId.GID.getId(), gidColumnName, gid.toString()));
 				}
 
 				final String designationColumnName = standardSampleGenotypeVariables.get(TermId.DESIG.getId());
 				final String designation = (String) row.get(designationColumnName);
 				if (designation != null) {
-					genotypeDTO.setDesignation(designation);
-					genotypeDTO.getGenotypeDataMap().put(designationColumnName, new GenotypeData(TermId.DESIG.getId(),designationColumnName, designation));
+					sampleGenotypeDTO.setDesignation(designation);
+					sampleGenotypeDTO.getGenotypeDataMap()
+						.put(designationColumnName, new SampleGenotypeData(TermId.DESIG.getId(), designationColumnName, designation));
+				}
+
+				final String entryNoColumnName = standardSampleGenotypeVariables.get(TermId.ENTRY_NO.getId());
+				final String entryNo = (String) row.get(entryNoColumnName);
+				if (entryNo != null) {
+					sampleGenotypeDTO.getGenotypeDataMap()
+						.put(entryNoColumnName, new SampleGenotypeData(TermId.ENTRY_NO.getId(), entryNoColumnName, entryNo));
+				}
+
+				final String entryTypeColumnName = standardSampleGenotypeVariables.get(TermId.ENTRY_TYPE.getId());
+				final String entryType = (String) row.get(entryTypeColumnName);
+				if (entryType != null) {
+					sampleGenotypeDTO.getGenotypeDataMap()
+						.put(entryTypeColumnName, new SampleGenotypeData(TermId.ENTRY_TYPE.getId(), entryTypeColumnName, entryType));
 				}
 
 				final String trialInstanceColumnName = standardSampleGenotypeVariables.get(TermId.TRIAL_INSTANCE_FACTOR.getId());
 				final String trialInstance = (String) row.get(trialInstanceColumnName);
 				if (NumberUtils.isDigits(trialInstance)) {
-					genotypeDTO.setDesignation(designation);
-					genotypeDTO.getGenotypeDataMap().put(trialInstanceColumnName, new GenotypeData(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstanceColumnName, trialInstance));
+					sampleGenotypeDTO.setDesignation(designation);
+					sampleGenotypeDTO.getGenotypeDataMap().put(trialInstanceColumnName,
+						new SampleGenotypeData(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstanceColumnName, trialInstance));
 				}
 
 				final String repNoColumnName = standardSampleGenotypeVariables.get(TermId.REP_NO.getId());
 				final String repNo = (String) row.get(repNoColumnName);
 				if (repNo != null) {
-					genotypeDTO.getGenotypeDataMap().put(repNoColumnName, new GenotypeData(TermId.REP_NO.getId(), repNoColumnName, repNo));
+					sampleGenotypeDTO.getGenotypeDataMap()
+						.put(repNoColumnName, new SampleGenotypeData(TermId.REP_NO.getId(), repNoColumnName, repNo));
 				}
 
 				final String plotNoColumnName = standardSampleGenotypeVariables.get(TermId.PLOT_NO.getId());
 				final String plotNo = (String) row.get(plotNoColumnName);
 				if (plotNoColumnName != null) {
-					genotypeDTO.getGenotypeDataMap().put(plotNoColumnName, new GenotypeData(TermId.PLOT_NO.getId(), plotNoColumnName, plotNo));
+					sampleGenotypeDTO.getGenotypeDataMap()
+						.put(plotNoColumnName, new SampleGenotypeData(TermId.PLOT_NO.getId(), plotNoColumnName, plotNo));
 				}
 
 				final String obsUnitIdColumnName = standardSampleGenotypeVariables.get(TermId.OBS_UNIT_ID.getId());
 				final String obsUnitId = (String) row.get(obsUnitIdColumnName);
 				if (obsUnitId != null) {
-					final GenotypeData genotypeData = new GenotypeData(TermId.OBS_UNIT_ID.getId(), obsUnitIdColumnName, obsUnitId);
-					genotypeData.setDatasetId((Integer) row.get(DATASET_ID));
-					genotypeDTO.getGenotypeDataMap().put(obsUnitIdColumnName, genotypeData);
+					final SampleGenotypeData
+						sampleGenotypeData = new SampleGenotypeData(TermId.OBS_UNIT_ID.getId(), obsUnitIdColumnName, obsUnitId);
+					sampleGenotypeData.setDatasetId((Integer) row.get(DATASET_ID));
+					sampleGenotypeDTO.getGenotypeDataMap().put(obsUnitIdColumnName, sampleGenotypeData);
 				}
 
-				if (!CollectionUtils.isEmpty(searchRequestDTO.getSampleGenotypeVariableDTOs())) {
-					for (final MeasurementVariableDto variableDto : searchRequestDTO.getSampleGenotypeVariableDTOs()) {
-						final String varName = variableDto.getName();
-						final GenotypeData data = new GenotypeData();
+				if (!CollectionUtils.isEmpty(searchRequestDTO.getSampleGenotypeVariables())) {
+					for (final MeasurementVariable sampleGenotypeVariable : searchRequestDTO.getSampleGenotypeVariables()) {
+						final String varName = sampleGenotypeVariable.getName();
+						final SampleGenotypeData data = new SampleGenotypeData();
 						data.setValue((String) row.get(varName));
-						data.setGenotypeId((Integer) row.get(varName + "_genotypeId"));
 						data.setVariableId((Integer) row.get(varName + "_variableId"));
 						data.setVariableName((String) row.get(varName + "_variableName"));
-						genotypeDTO.getGenotypeDataMap().put(varName, data);
+						sampleGenotypeDTO.getGenotypeDataMap().put(varName, data);
 					}
 				}
-				for (final MeasurementVariableDto variable : searchRequestDTO.getEntryDetails()) {
-					final String varName = variable.getName();
-					final GenotypeData data = new GenotypeData();
-					data.setValue((String) row.get(varName));
-					data.setGenotypeId(null);
-					data.setVariableId(variable.getId());
-					data.setVariableName(variable.getName());
-					genotypeDTO.getGenotypeDataMap().put(varName, data);
-				}
-				genotypeDTOList.add(genotypeDTO);
+				sampleGenotypeDTOList.add(sampleGenotypeDTO);
 			}
 		}
-		return genotypeDTOList;
+		return sampleGenotypeDTOList;
 
 	}
 
@@ -303,7 +294,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		final SQLQuery query = this.getSession().createSQLQuery("SELECT cvterm_id, name from cvterm where cvterm_id in (:cvtermIds)");
 		query.addScalar("cvterm_id", new IntegerType());
 		query.addScalar("name", new StringType());
-		query.setParameterList("cvtermIds", GenotypeDao.STANDARD_SAMPLE_GENOTYPE_VARIABLE_IDS);
+		query.setParameterList("cvtermIds", GenotypeDao.STANDARD_SAMPLE_GENOTYPE_TABLE_VARIABLE_IDS);
 		final List<Object[]> result = query.list();
 		final Map<Integer, String> variableMap = new HashMap<>();
 		for (final Object[] variableRow : result) {
@@ -323,22 +314,22 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 	}
 
 	private void addOrder(final StringBuilder sql, final SampleGenotypeSearchRequestDTO searchDto, final String plotNoName,
-						  final Pageable pageable) {
+		final Pageable pageable) {
 
 		if (pageable != null && pageable.getSort() != null) {
 			final String orderClause = StreamSupport.stream(pageable.getSort().spliterator(), false)
-					.filter(order -> StringUtils.isNotBlank(order.getProperty()))
-					.map(order -> {
-						final String property = order.getProperty();
-						final String sortDirection = order.getDirection().name();
-						return "(1 * `" + property + "`) " + sortDirection + ", `" + property + "` " + sortDirection;
-					})
-					.collect(Collectors.joining(","));
+				.filter(order -> StringUtils.isNotBlank(order.getProperty()))
+				.map(order -> {
+					final String property = order.getProperty();
+					final String sortDirection = order.getDirection().name();
+					return "(1 * `" + property + "`) " + sortDirection + ", `" + property + "` " + sortDirection;
+				})
+				.collect(Collectors.joining(","));
 			sql.append(" ) T ORDER BY ").append(orderClause);
 		} else {
 			final String direction = "asc";
 			sql.append(" ) T ORDER BY " + "(1 * `" + plotNoName + "`) " + direction
-					+ ", `" + plotNoName + "` " + direction);
+				+ ", `" + plotNoName + "` " + direction);
 		}
 	}
 
@@ -347,6 +338,8 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.TRIAL_INSTANCE_FACTOR.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.GID.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.DESIG.getId()));
+		createSQLQuery.addScalar(standardVariableNames.get(TermId.ENTRY_NO.getId()));
+		createSQLQuery.addScalar(standardVariableNames.get(TermId.ENTRY_TYPE.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.REP_NO.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.PLOT_NO.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.OBS_UNIT_ID.getId()), new StringType());

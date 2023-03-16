@@ -3,7 +3,7 @@ package org.generationcp.middleware.api.genotype;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.genotype.GenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDto;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -92,15 +92,16 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
 		sampleGenotypeSearchRequestDTO.setStudyId(this.study.getProjectId());
 		sampleGenotypeSearchRequestDTO.setFilter(new SampleGenotypeSearchRequestDTO.GenotypeFilter());
-		final List<GenotypeDTO> genotypeDTOList = this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null);
+		final List<SampleGenotypeDTO>
+			sampleGenotypeDTOList = this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null);
 
-		Assert.assertEquals(1, genotypeDTOList.size());
+		Assert.assertEquals(1, sampleGenotypeDTOList.size());
 		Assert.assertEquals(3, this.sampleGenotypeService.countSampleGenotypes(sampleGenotypeSearchRequestDTO));
 		Assert.assertEquals(3, this.sampleGenotypeService.countSampleGenotypesBySampleList(sampleList.getId()));
-		final GenotypeDTO genotypeDTO = genotypeDTOList.get(0);
-		Assert.assertEquals("C", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
-		Assert.assertEquals("G", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_2).getValue());
-		Assert.assertEquals("T", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_3).getValue());
+		final SampleGenotypeDTO sampleGenotypeDTO = sampleGenotypeDTOList.get(0);
+		Assert.assertEquals("C", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
+		Assert.assertEquals("G", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_2).getValue());
+		Assert.assertEquals("T", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_3).getValue());
 	}
 
 	@Test
@@ -142,16 +143,17 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		sampleGenotypeSearchRequestDTO.setStudyId(this.study.getProjectId());
 		sampleGenotypeSearchRequestDTO.setFilter(new SampleGenotypeSearchRequestDTO.GenotypeFilter());
 		sampleGenotypeSearchRequestDTO.getFilter().setDatasetId(this.plotDataset.getProjectId());
-		final List<GenotypeDTO> genotypeDTOList = this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null);
+		final List<SampleGenotypeDTO>
+			sampleGenotypeDTOList = this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null);
 
-		Assert.assertEquals(1, genotypeDTOList.size());
+		Assert.assertEquals(1, sampleGenotypeDTOList.size());
 		Assert.assertEquals(3, this.sampleGenotypeService.countFilteredSampleGenotypes(sampleGenotypeSearchRequestDTO));
 		Assert.assertEquals(6, this.sampleGenotypeService.countSampleGenotypes(sampleGenotypeSearchRequestDTO));
 		Assert.assertEquals(6, this.sampleGenotypeService.countSampleGenotypesBySampleList(sampleList.getId()));
-		final GenotypeDTO genotypeDTO = genotypeDTOList.get(0);
-		Assert.assertEquals("C", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
-		Assert.assertEquals("G", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_2).getValue());
-		Assert.assertEquals("T", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_3).getValue());
+		final SampleGenotypeDTO sampleGenotypeDTO = sampleGenotypeDTOList.get(0);
+		Assert.assertEquals("C", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
+		Assert.assertEquals("G", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_2).getValue());
+		Assert.assertEquals("T", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_3).getValue());
 	}
 
 	@Test
@@ -192,16 +194,17 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		sampleGenotypeSearchRequestDTO.setStudyId(this.study.getProjectId());
 		sampleGenotypeSearchRequestDTO.setFilter(new SampleGenotypeSearchRequestDTO.GenotypeFilter());
 		sampleGenotypeSearchRequestDTO.getFilter().setInstanceIds(Arrays.asList(this.trialInstance1.getLocationId()));
-		final List<GenotypeDTO> genotypeDTOList = this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null);
+		final List<SampleGenotypeDTO>
+			sampleGenotypeDTOList = this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null);
 
-		Assert.assertEquals(1, genotypeDTOList.size());
+		Assert.assertEquals(1, sampleGenotypeDTOList.size());
 		Assert.assertEquals(3, this.sampleGenotypeService.countFilteredSampleGenotypes(sampleGenotypeSearchRequestDTO));
 		Assert.assertEquals(6, this.sampleGenotypeService.countSampleGenotypes(sampleGenotypeSearchRequestDTO));
 		Assert.assertEquals(6, this.sampleGenotypeService.countSampleGenotypesBySampleList(sampleList.getId()));
-		final GenotypeDTO genotypeDTO = genotypeDTOList.get(0);
-		Assert.assertEquals("C", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
-		Assert.assertEquals("G", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_2).getValue());
-		Assert.assertEquals("T", genotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_3).getValue());
+		final SampleGenotypeDTO sampleGenotypeDTO = sampleGenotypeDTOList.get(0);
+		Assert.assertEquals("C", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
+		Assert.assertEquals("G", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_2).getValue());
+		Assert.assertEquals("T", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_3).getValue());
 	}
 
 	@Test
