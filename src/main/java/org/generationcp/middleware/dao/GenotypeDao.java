@@ -51,7 +51,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 			TermId.OBS_UNIT_ID.getId());
 
 	protected static final Set<String> SAMPLE_GENOTYPES_TABLE_SYSTEM_COLUMNS =
-			Sets.newHashSet(TRIAL_INSTANCE, GID, DESIGNATION, ENTRY_NO, OBS_UNIT_ID, OBSERVATION_UNIT_ID, DATASET_ID);
+		Sets.newHashSet(TRIAL_INSTANCE, GID, DESIGNATION, ENTRY_NO, OBS_UNIT_ID, OBSERVATION_UNIT_ID, DATASET_ID);
 
 	private static final String GENOTYPE_SEARCH_FROM_QUERY = "FROM sample s " +
 		"LEFT JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id " +
@@ -127,6 +127,9 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT ");
 		sql.append(Joiner.on(", ").join(columns));
 		sql.append(GENOTYPE_SEARCH_FROM_QUERY);
+
+		addSearchQueryFilters(new SqlQueryParamBuilder(sql), searchRequestDTO.getFilter());
+
 		sql.append(" GROUP BY s.sample_id ");
 		this.addOrder(sql, searchRequestDTO, standardSampleGenotypeVariables.get(TermId.PLOT_NO.getId()), pageable);
 
@@ -142,6 +145,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		}
 
 		query.setParameter("studyId", searchRequestDTO.getStudyId());
+		addSearchQueryFilters(new SqlQueryParamBuilder(query), searchRequestDTO.getFilter());
 		addPaginationToSQLQuery(query, pageable);
 		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 		LOG.error(query.getQueryString());
@@ -313,7 +317,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		// If the visible columns list is not empty, we should only include the columns specified.
 		// Exempted are the columns required by the system (e.g. OBSERVATION_UNIT_ID)
 		if (!CollectionUtils.isEmpty(visibleColumns) && SAMPLE_GENOTYPES_TABLE_SYSTEM_COLUMNS.stream()
-				.noneMatch(s -> s.equalsIgnoreCase(columnName))) {
+			.noneMatch(s -> s.equalsIgnoreCase(columnName))) {
 			return visibleColumns.stream().anyMatch(s -> s.equalsIgnoreCase(columnName));
 		}
 		// If the visible columns list is not specified, process and retrieve the column by default.
