@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -35,6 +36,13 @@ import java.util.stream.StreamSupport;
 
 public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
+	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
+	public static final String GID = "GID";
+	public static final String DESIGNATION = "DESIGNATION";
+	public static final String ENTRY_NO = "ENTRY_NO";
+	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
+	private static final String OBSERVATION_UNIT_ID = "observationUnitId";
+	private static final String DATASET_ID = "datasetId";
 	private static final Logger LOG = LoggerFactory.getLogger(GenotypeDao.class);
 
 	private static final List<Integer> STANDARD_SAMPLE_GENOTYPE_TABLE_VARIABLE_IDS =
@@ -42,8 +50,8 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 			TermId.ENTRY_TYPE.getId(), TermId.ENTRY_NO.getId(), TermId.REP_NO.getId(), TermId.PLOT_NO.getId(),
 			TermId.OBS_UNIT_ID.getId());
 
-	private static final String OBSERVATION_UNIT_ID = "observationUnitId";
-	private static final String DATASET_ID = "datasetId";
+	protected static final Set<String> SAMPLE_GENOTYPES_TABLE_SYSTEM_COLUMNS =
+			Sets.newHashSet(TRIAL_INSTANCE, GID, DESIGNATION, ENTRY_NO, OBS_UNIT_ID, OBSERVATION_UNIT_ID, DATASET_ID);
 
 	private static final String GENOTYPE_SEARCH_FROM_QUERY = "FROM sample s " +
 		"LEFT JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id " +
@@ -64,7 +72,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 	static {
 		// NOTE: Column names will be replaced by queried standard variable names (not hardcoded)
-		mainVariablesMap.put(DATASET_ID, "    nde.nd_experiment_id as `datasetId`");
+		mainVariablesMap.put(DATASET_ID, "    nde.project_id as datasetId");
 		mainVariablesMap.put(OBSERVATION_UNIT_ID, "    nde.nd_experiment_id as `observationUnitId`");
 		mainVariablesMap.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), "    gl.description AS `%s`");
 		mainVariablesMap.put(String.valueOf(TermId.GID.getId()), "    st.dbxref_id AS `%s`");
@@ -303,7 +311,9 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 	protected boolean isColumnVisible(final String columnName, final Set<String> visibleColumns) {
 
 		// If the visible columns list is not empty, we should only include the columns specified.
-		if (!CollectionUtils.isEmpty(visibleColumns)) {
+		// Exempted are the columns required by the system (e.g. OBSERVATION_UNIT_ID)
+		if (!CollectionUtils.isEmpty(visibleColumns) && SAMPLE_GENOTYPES_TABLE_SYSTEM_COLUMNS.stream()
+				.noneMatch(s -> s.equalsIgnoreCase(columnName))) {
 			return visibleColumns.stream().anyMatch(s -> s.equalsIgnoreCase(columnName));
 		}
 		// If the visible columns list is not specified, process and retrieve the column by default.
@@ -340,6 +350,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.REP_NO.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.PLOT_NO.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.OBS_UNIT_ID.getId()), new StringType());
+		createSQLQuery.addScalar(GenotypeDao.DATASET_ID);
 	}
 
 	public void deleteSampleGenotypes(final List<Integer> sampleIds) {
