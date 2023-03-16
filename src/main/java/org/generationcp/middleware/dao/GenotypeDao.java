@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,17 +43,23 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 	public static final String DESIGNATION = "DESIGNATION";
 	public static final String ENTRY_NO = "ENTRY_NO";
 	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
+	public static final String SAMPLE_NAME = "SAMPLE_NAME";
+	public static final String SAMPLE_UUID = "SAMPLE_UUID";
+	public static final String TAKEN_BY = "TAKEN_BY";
+	public static final String SAMPLING_DATE = "SAMPLING_DATE";
+
 	private static final String OBSERVATION_UNIT_ID = "observationUnitId";
 	private static final String DATASET_ID = "datasetId";
 	private static final Logger LOG = LoggerFactory.getLogger(GenotypeDao.class);
 
-	private static final List<Integer> STANDARD_SAMPLE_GENOTYPE_TABLE_VARIABLE_IDS =
+	public static final List<Integer> STANDARD_SAMPLE_GENOTYPE_TABLE_VARIABLE_IDS =
 		Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.GID.getId(), TermId.DESIG.getId(),
 			TermId.ENTRY_TYPE.getId(), TermId.ENTRY_NO.getId(), TermId.REP_NO.getId(), TermId.PLOT_NO.getId(),
 			TermId.OBS_UNIT_ID.getId());
 
 	protected static final Set<String> SAMPLE_GENOTYPES_TABLE_SYSTEM_COLUMNS =
-		Sets.newHashSet(TRIAL_INSTANCE, GID, DESIGNATION, ENTRY_NO, OBS_UNIT_ID, OBSERVATION_UNIT_ID, DATASET_ID);
+		Sets.newHashSet(TRIAL_INSTANCE, GID, DESIGNATION, ENTRY_NO, OBS_UNIT_ID, OBSERVATION_UNIT_ID, DATASET_ID,
+				SAMPLE_NAME, SAMPLE_UUID, TAKEN_BY, SAMPLING_DATE);
 
 	private static final String GENOTYPE_SEARCH_FROM_QUERY = "FROM sample s " +
 		"LEFT JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id " +
@@ -87,6 +94,10 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		mainVariablesMap.put(String.valueOf(TermId.PLOT_NO.getId()),
 			"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ndep.type_id = 8200) AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.OBS_UNIT_ID.getId()), "    nde.obs_unit_id AS '%s'");
+		mainVariablesMap.put(SAMPLE_NAME, "    s.sample_name AS SAMPLE_NAME");
+		mainVariablesMap.put(SAMPLE_UUID, "    s.sample_bk AS SAMPLE_UUID");
+		mainVariablesMap.put(SAMPLING_DATE, "    s.sampling_date AS SAMPLING_DATE");
+		mainVariablesMap.put(TAKEN_BY, "    s.taken_by AS TAKEN_BY");
 	}
 
 	static {
@@ -169,6 +180,10 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 			for (final Map<String, Object> row : results) {
 				final SampleGenotypeDTO sampleGenotypeDTO = new SampleGenotypeDTO();
 				sampleGenotypeDTO.setObservationUnitId((Integer) row.get(OBSERVATION_UNIT_ID));
+				sampleGenotypeDTO.setSampleName((String) row.get(SAMPLE_NAME));
+				sampleGenotypeDTO.setSampleUUID((String) row.get(SAMPLE_UUID));
+				sampleGenotypeDTO.setSamplingDate((Date) row.get(SAMPLING_DATE));
+				sampleGenotypeDTO.setTakenById((Integer) row.get(TAKEN_BY));
 				sampleGenotypeDTO.setGenotypeDataMap(new HashMap<>());
 
 				final String gidColumnName = standardSampleGenotypeVariables.get(TermId.GID.getId());
@@ -470,6 +485,10 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.PLOT_NO.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.OBS_UNIT_ID.getId()), new StringType());
 		createSQLQuery.addScalar(GenotypeDao.DATASET_ID);
+		createSQLQuery.addScalar(GenotypeDao.SAMPLE_NAME);
+		createSQLQuery.addScalar(GenotypeDao.SAMPLE_UUID);
+		createSQLQuery.addScalar(GenotypeDao.SAMPLING_DATE);
+		createSQLQuery.addScalar(GenotypeDao.TAKEN_BY);
 	}
 
 	public void deleteSampleGenotypes(final List<Integer> sampleIds) {

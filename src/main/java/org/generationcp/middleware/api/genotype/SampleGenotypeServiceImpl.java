@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDto;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -17,6 +18,8 @@ import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.user.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -41,6 +45,9 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 
 	@Resource
 	private OntologyVariableService ontologyVariableService;
+
+	@Autowired
+	private UserService userService;
 
 	private final DaoFactory daoFactory;
 
@@ -69,7 +76,9 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	public List<SampleGenotypeDTO> searchSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO, final Pageable pageable) {
 		this.updateSearchDTO(searchRequestDTO);
 		if (!CollectionUtils.isEmpty(searchRequestDTO.getSampleGenotypeVariables())) {
-			return this.daoFactory.getGenotypeDao().searchGenotypes(searchRequestDTO, pageable);
+			final List<SampleGenotypeDTO> sampleGenotypeDTOS = this.daoFactory.getGenotypeDao().searchGenotypes(searchRequestDTO, pageable);
+			this.populateTakenBy(sampleGenotypeDTOS);
+			return sampleGenotypeDTOS;
 		}
 		return new ArrayList<>();
 	}
@@ -116,20 +125,46 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 		return result;
 	}
 
+	@Override
+	public List<MeasurementVariable> getSampleGenotypeColumns(final Integer studyId) {
+		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);
+		final List<MeasurementVariable> variables = this.datasetService.getObservationSetVariables(plotDatasetId,
+				Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.ENTRY_DETAIL.getId(),
+				VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId()))
+				.stream().filter(var -> GenotypeDao.STANDARD_SAMPLE_GENOTYPE_TABLE_VARIABLE_IDS.contains(var.getTermId())).collect(Collectors.toList());
+		this.addSampleColumns(variables);
+		variables.addAll(this.getSampleGenotypeVariables(studyId, null).values());
+		return variables;
+	}
+
+	public void addSampleColumns(final List<MeasurementVariable> variables) {
+		variables.add(this.addTermIdColumn(TermId.SAMPLE_NAME, null, TermId.SAMPLE_NAME.name(), true));
+		variables.add(this.addTermIdColumn(TermId.SAMPLE_UUID, null, TermId.SAMPLE_UUID.name(), true));
+		variables.add(this.addTermIdColumn(TermId.SAMPLING_DATE, null, TermId.SAMPLING_DATE.name(), true));
+		variables.add(this.addTermIdColumn(TermId.TAKEN_BY, null, TermId.TAKEN_BY.name(), true));
+	}
+
 	private void updateSearchDTO(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
 		// Add the list of Marker variables available in study
 		searchRequestDTO.setSampleGenotypeVariables(new ArrayList<>(
 			this.getSampleGenotypeVariables(searchRequestDTO.getStudyId(), searchRequestDTO.getFilter().getDatasetId()).values()));
 	}
 
-	public List<MeasurementVariable> getSampleGenotypeColumns(final Integer studyId) {
-		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);
+	void populateTakenBy(final List<SampleGenotypeDTO> sampleGenotypeDTOS) {
+		// Populate takenBy with full name of user from workbench database.
+		final List<Integer> userIds = sampleGenotypeDTOS.stream().map(SampleGenotypeDTO::getTakenById).collect(Collectors.toList());
+		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
+		sampleGenotypeDTOS.forEach(sampleGenotypeDTO -> sampleGenotypeDTO.setTakenBy(userIDFullNameMap.get(sampleGenotypeDTO.getTakenById())));
+	}
 
-		final List<MeasurementVariable> variables =
-			this.datasetService.getObservationSetVariables(plotDatasetId,
-				Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.ENTRY_DETAIL.getId(),
-					VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId()));
-		variables.addAll(this.getSampleGenotypeVariables(studyId, null).values());
-		return variables;
+	private MeasurementVariable addTermIdColumn(final TermId termId, final VariableType variableType, final String name,
+												final boolean factor) {
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName(org.apache.commons.lang3.StringUtils.isBlank(name) ? termId.name() : name);
+		measurementVariable.setAlias(termId.name());
+		measurementVariable.setTermId(termId.getId());
+		measurementVariable.setVariableType(variableType);
+		measurementVariable.setFactor(factor);
+		return measurementVariable;
 	}
 }
