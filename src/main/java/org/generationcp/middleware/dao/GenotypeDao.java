@@ -153,7 +153,6 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 				final String gidColumnName = standardSampleGenotypeVariables.get(TermId.GID.getId());
 				final Integer gid = (Integer) row.get(gidColumnName);
 				if (gid != null) {
-					sampleGenotypeDTO.setGid(gid);
 					sampleGenotypeDTO.getGenotypeDataMap()
 						.put(gidColumnName, new SampleGenotypeData(TermId.GID.getId(), gidColumnName, gid.toString()));
 				}
@@ -161,7 +160,6 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 				final String designationColumnName = standardSampleGenotypeVariables.get(TermId.DESIG.getId());
 				final String designation = (String) row.get(designationColumnName);
 				if (designation != null) {
-					sampleGenotypeDTO.setDesignation(designation);
 					sampleGenotypeDTO.getGenotypeDataMap()
 						.put(designationColumnName, new SampleGenotypeData(TermId.DESIG.getId(), designationColumnName, designation));
 				}
@@ -183,7 +181,6 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 				final String trialInstanceColumnName = standardSampleGenotypeVariables.get(TermId.TRIAL_INSTANCE_FACTOR.getId());
 				final String trialInstance = (String) row.get(trialInstanceColumnName);
 				if (NumberUtils.isDigits(trialInstance)) {
-					sampleGenotypeDTO.setDesignation(designation);
 					sampleGenotypeDTO.getGenotypeDataMap().put(trialInstanceColumnName,
 						new SampleGenotypeData(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstanceColumnName, trialInstance));
 				}

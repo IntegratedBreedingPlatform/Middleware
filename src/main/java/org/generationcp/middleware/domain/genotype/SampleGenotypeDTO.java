@@ -10,10 +10,6 @@ public class SampleGenotypeDTO {
 
 	private Integer observationUnitId;
 
-	private Integer gid;
-
-	private String designation;
-
 	private Map<String, SampleGenotypeData> genotypeDataMap;
 
 	public Integer getObservationUnitId() {
@@ -22,22 +18,6 @@ public class SampleGenotypeDTO {
 
 	public void setObservationUnitId(final Integer observationUnitId) {
 		this.observationUnitId = observationUnitId;
-	}
-
-	public Integer getGid() {
-		return this.gid;
-	}
-
-	public void setGid(final Integer gid) {
-		this.gid = gid;
-	}
-
-	public String getDesignation() {
-		return this.designation;
-	}
-
-	public void setDesignation(final String designation) {
-		this.designation = designation;
 	}
 
 	public Map<String, SampleGenotypeData> getGenotypeDataMap() {
