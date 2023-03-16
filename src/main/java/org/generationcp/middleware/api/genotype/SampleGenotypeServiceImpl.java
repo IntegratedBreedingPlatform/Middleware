@@ -100,6 +100,7 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 		sampleGenotypeVariables.forEach(variableFilter::addVariableId);
 		this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().forEach(v -> {
 			final MeasurementVariable measurementVariable = new MeasurementVariable();
+			measurementVariable.setTermId(v.getId());
 			measurementVariable.setName(v.getName());
 			measurementVariable.setAlias(StringUtils.isEmpty(v.getAlias()) ? v.getName() : v.getAlias());
 			measurementVariable.setDescription(v.getDefinition());

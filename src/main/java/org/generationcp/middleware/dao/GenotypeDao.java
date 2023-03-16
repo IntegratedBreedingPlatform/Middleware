@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -11,9 +12,9 @@ import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeData;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Genotype;
-import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -69,6 +70,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		"WHERE p.study_id = :studyId ";
 
 	private static final Map<String, String> mainVariablesMap = new HashMap<>();
+	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 
 	static {
 		// NOTE: Column names will be replaced by queried standard variable names (not hardcoded)
@@ -85,6 +87,15 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		mainVariablesMap.put(String.valueOf(TermId.PLOT_NO.getId()),
 			"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ndep.type_id = 8200) AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.OBS_UNIT_ID.getId()), "    nde.obs_unit_id AS '%s'");
+	}
+
+	static {
+		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "st.dbxref_id");
+		factorsFilterMap.put(String.valueOf(TermId.DESIG.getId()), "n.nval");
+		factorsFilterMap.put(String.valueOf(TermId.ENTRY_NO.getId()), "st.uniquename");
+		factorsFilterMap.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), "gl.description");
+		factorsFilterMap.put(String.valueOf(TermId.OBS_UNIT_ID.getId()), "nde.obs_unit_id");
+
 	}
 
 	public GenotypeDao(final Session session) {
@@ -127,13 +138,12 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT ");
 		sql.append(Joiner.on(", ").join(columns));
 		sql.append(GENOTYPE_SEARCH_FROM_QUERY);
-
-		addSearchQueryFilters(new SqlQueryParamBuilder(sql), searchRequestDTO.getFilter());
-
+		addSearchQueryFilters(sql, searchRequestDTO.getFilter());
 		sql.append(" GROUP BY s.sample_id ");
 		this.addOrder(sql, searchRequestDTO, standardSampleGenotypeVariables.get(TermId.PLOT_NO.getId()), pageable);
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+		addQueryParams(query, searchRequestDTO.getFilter());
 		this.addScalar(query, standardSampleGenotypeVariables);
 		if (!CollectionUtils.isEmpty(searchRequestDTO.getSampleGenotypeVariables())) {
 			for (final MeasurementVariable sampleGenotypeVariable : searchRequestDTO.getSampleGenotypeVariables()) {
@@ -145,7 +155,6 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		}
 
 		query.setParameter("studyId", searchRequestDTO.getStudyId());
-		addSearchQueryFilters(new SqlQueryParamBuilder(query), searchRequestDTO.getFilter());
 		addPaginationToSQLQuery(query, pageable);
 		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 		LOG.error(query.getQueryString());
@@ -237,37 +246,142 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 	}
 
-	private static void addSearchQueryFilters(
-		final SqlQueryParamBuilder paramBuilder,
+	private void addSearchQueryFilters(
+		final StringBuilder sql,
 		final SampleGenotypeSearchRequestDTO.GenotypeFilter filter) {
 
 		if (filter != null) {
 			final Integer datasetId = filter.getDatasetId();
 			if (datasetId != null) {
-				paramBuilder.append(" and p.project_id = :datasetId");
-				paramBuilder.setParameter("datasetId", datasetId);
+				sql.append(" and p.project_id = :datasetId");
 			}
 			final List<Integer> instanceIds = filter.getInstanceIds();
 			if (!CollectionUtils.isEmpty(instanceIds)) {
-				paramBuilder.append(" and nde.nd_geolocation_id IN (:instanceIds)");
-				paramBuilder.setParameterList("instanceIds", instanceIds);
+				sql.append(" and nde.nd_geolocation_id IN (:instanceIds)");
 			}
 			final List<Integer> sampleIds = filter.getSampleIds();
 			if (!CollectionUtils.isEmpty(sampleIds)) {
-				paramBuilder.append(" and s.sample_id in (:sampleIds)");
-				paramBuilder.setParameterList("sampleIds", sampleIds);
+				sql.append(" and s.sample_id in (:sampleIds)");
+			}
+
+			if (!MapUtils.isEmpty(filter.getFilteredValues())) {
+				// Perform IN operation on variable values
+				this.appendVariableIdAndOperationToFilterQuery(sql, filter, filter.getFilteredValues().keySet(),
+						false);
+			}
+
+			if (filter.getFilteredTextValues() != null && !filter.getFilteredTextValues().isEmpty()) {
+				// Perform LIKE operation on variable value
+				this.appendVariableIdAndOperationToFilterQuery(sql, filter,	filter.getFilteredTextValues().keySet(), true);
 			}
 		}
 	}
 
+	private void addQueryParams(final SQLQuery sql,
+								final SampleGenotypeSearchRequestDTO.GenotypeFilter filter)  {
+		if (filter != null) {
+			final Integer datasetId = filter.getDatasetId();
+			if (datasetId != null) {
+				sql.setParameter("datasetId", datasetId);
+			}
+			final List<Integer> instanceIds = filter.getInstanceIds();
+			if (!CollectionUtils.isEmpty(instanceIds)) {
+				sql.setParameterList("instanceIds", instanceIds);
+			}
+			final List<Integer> sampleIds = filter.getSampleIds();
+			if (!CollectionUtils.isEmpty(sampleIds)) {
+				sql.setParameterList("sampleIds", sampleIds);
+			}
+
+			final List<String> filterVariableIds = new ArrayList<>();
+			if (!MapUtils.isEmpty(filter.getFilteredTextValues())) {
+				filterVariableIds.addAll(filter.getFilteredTextValues().keySet());
+				for (final String variableId: filter.getFilteredTextValues().keySet()) {
+					sql.setParameter(variableId + "_text", "%" + filter.getFilteredTextValues().get(variableId) + "%");
+				}
+			}
+
+			if (!MapUtils.isEmpty(filter.getFilteredValues())) {
+				filterVariableIds.addAll(filter.getFilteredValues().keySet());
+				for (final String variableId: filter.getFilteredValues().keySet()) {
+					sql.setParameterList(variableId + "_values", filter.getFilteredValues().get(variableId));
+				}
+			}
+
+			for(final String variableId: filterVariableIds) {
+				final String variableTypeString = filter.getVariableTypeMap().get(variableId);
+				if (!VariableType.GENOTYPE_MARKER.name().equals(variableTypeString)
+					&& !factorsFilterMap.containsKey(variableId)) {
+					sql.setParameter(variableId + "_Id", variableId);
+				}
+			}
+		}
+
+	}
+
+	private void appendVariableIdAndOperationToFilterQuery(final StringBuilder sql, final SampleGenotypeSearchRequestDTO.GenotypeFilter filter,
+			final Set<String> variableIds, final boolean performLikeOperation) {
+		for (final String variableId : variableIds) {
+			final String variableTypeString = filter.getVariableTypeMap().get(variableId);
+			if (VariableType.GENOTYPE_MARKER.name().equals(variableTypeString)) {
+				this.appendGenotypeMarkerFilteringToQuery(sql, variableId, performLikeOperation, filter);
+			} else {
+				this.applyFactorsFilter(sql, variableId, variableTypeString, performLikeOperation, filter);
+			}
+		}
+	}
+
+	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType,
+									final boolean performLikeOperation, final SampleGenotypeSearchRequestDTO.GenotypeFilter filter) {
+		// Check if the variable to be filtered is in one of the columns in stock, nd_experiment, geolocation or sum of samples
+		final String observationUnitClause = VariableType.OBSERVATION_UNIT.name().equals(variableType) ? "nde.observation_unit_no" : null;
+		final String filterClause = factorsFilterMap.get(variableId);
+		final String matchClause = performLikeOperation ? " LIKE :" + variableId + "_text " : " IN (:" + variableId + "_values) ";
+		if (filterClause != null || observationUnitClause != null) {
+			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(matchClause);
+			return;
+		}
+
+		// Otherwise, look in "props" tables
+		// If doing text searching, perform LIKE operation. Otherwise perform value "IN" operation
+		if (VariableType.EXPERIMENTAL_DESIGN.name().equals(variableType)) {
+			sql.append(" AND EXISTS ( SELECT 1 FROM nd_experimentprop xp ")
+					.append("WHERE xp.nd_experiment_id = nde.nd_experiment_id AND xp.type_id = :" + variableId)
+					.append("_Id AND value ").append(matchClause).append(" )");
+
+		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType) || VariableType.ENTRY_DETAIL.name().equals(variableType)) {
+			// IF searching by list of values, search for the values in:
+			// 1)cvterm.name (for categorical variables) or
+			// 2)perform IN operation on stockprop.value
+			// Otherwise, search the value like a text by LIKE operation
+			final String stockMatchClause = performLikeOperation ? "sp.value LIKE :" + variableId + "_text " :
+					" (cvt.name IN (:" + variableId + "_values) OR sp.value IN (:" + variableId + "_values ))";
+			sql.append(" AND EXISTS ( SELECT 1 FROM stockprop sp ")
+					.append("LEFT JOIN cvterm cvt ON cvt.cvterm_id = sp.value ")
+					.append("WHERE sp.stock_id = st.stock_id AND sp.type_id = :" + variableId)
+					.append("_Id AND ").append(stockMatchClause).append(" )");
+		}
+	}
+
+	private void appendGenotypeMarkerFilteringToQuery(final StringBuilder sql, final String variableId, final boolean performLikeOperation,
+		final SampleGenotypeSearchRequestDTO.GenotypeFilter filter) {
+		final String matchClause = performLikeOperation ? " LIKE :" + variableId + "_text " : " IN (:" + variableId + "_values) ";
+		sql.append(" and EXISTS ( ")
+				.append("    SELECT 1 ")
+				.append("    FROM genotype geno2 ")
+				.append("    WHERE geno2.sample_id = s.sample_id")
+				.append("    AND geno2.variabe_id = " + variableId)
+				.append("    and geno2.value").append(matchClause).append(") ");
+	}
+
 	public long countFilteredGenotypes(final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO) {
-		final StringBuilder sql = new StringBuilder("SELECT COUNT(1) ");
+		final StringBuilder sql = new StringBuilder("SELECT COUNT(1) FROM ( SELECT s.sample_id ");
 		sql.append(GENOTYPE_SEARCH_FROM_QUERY);
-		addSearchQueryFilters(new SqlQueryParamBuilder(sql), sampleGenotypeSearchRequestDTO.getFilter());
+		addSearchQueryFilters(sql, sampleGenotypeSearchRequestDTO.getFilter());
+		sql.append(" GROUP BY s.sample_id ) a ");
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-		addSearchQueryFilters(new SqlQueryParamBuilder(query), sampleGenotypeSearchRequestDTO.getFilter());
-
+		addQueryParams(query, sampleGenotypeSearchRequestDTO.getFilter());
 		query.setParameter("studyId", sampleGenotypeSearchRequestDTO.getStudyId());
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
@@ -275,6 +389,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 	public long countGenotypes(final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO) {
 		final StringBuilder subQuery = new StringBuilder("SELECT s.sample_id ");
 		subQuery.append(GENOTYPE_SEARCH_FROM_QUERY);
+		subQuery.append(" GROUP BY s.sample_id ");
 		final StringBuilder mainSql = new StringBuilder("SELECT COUNT(*) FROM ( \n");
 		mainSql.append(subQuery);
 		mainSql.append(") a \n");
