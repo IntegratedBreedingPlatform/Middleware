@@ -312,6 +312,26 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		return null;
 	}
 
+	public List<SampleListDTO> getSampleListsByStudy(final Integer studyId, final boolean withGenotypesOnly) {
+
+		final StringBuilder sql =
+			new StringBuilder("SELECT DISTINCT sl.list_id as listId, sl.list_name as listName, sl.description as description FROM "
+				+ "sample_list sl "
+				+ "INNER JOIN sample s ON s.sample_list = sl.list_id "
+				+ "LEFT JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id "
+				+ "LEFT JOIN project p ON p.project_id = nde.project_id "
+				+ "WHERE sl.type = 'SAMPLE_LIST' AND p.study_id = :studyId ");
+
+		if (withGenotypesOnly) {
+			sql.append(" AND EXISTS(SELECT 1 FROM genotype WHERE sample_id = s.sample_id) ");
+		}
+
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql.toString());
+		sqlQuery.setParameter("studyId", studyId);
+		sqlQuery.setResultTransformer(Transformers.aliasToBean(SampleListDTO.class));
+		return sqlQuery.list();
+	}
+
 	private void addCriteriaForProgramUUIDInLists(final String programUUID, final Criteria criteria) {
 		final Criterion sameProgramUUID = Restrictions.eq(SampleListDao.PROGRAMUUID, programUUID);
 		final Criterion nullProgramUUID = Restrictions.isNull(SampleListDao.PROGRAMUUID);

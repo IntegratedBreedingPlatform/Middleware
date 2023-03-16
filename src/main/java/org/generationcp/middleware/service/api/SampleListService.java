@@ -66,6 +66,8 @@ public interface SampleListService {
 
 	List<SampleListDTO> getSampleLists(final List<Integer> datasetIds);
 
+	List<SampleListDTO> getSampleListsByStudy(Integer studyId, boolean withGenotypesOnly);
+
 	SampleList getSampleList(final Integer sampleListId);
 
 	List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId);

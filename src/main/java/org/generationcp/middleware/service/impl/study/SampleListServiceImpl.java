@@ -382,6 +382,7 @@ public class SampleListServiceImpl implements SampleListService {
 			throw new MiddlewareQueryException("Error in moveSampleList in SampleListServiceImpl: " + e.getMessage(), e);
 		}
 	}
+
 	@Override
 	public SampleList getLastSavedSampleListByUserId(final Integer userId, final String programUuid) {
 		return this.daoFactory.getSampleListDao().getLastCreatedByUserID(userId, programUuid);
@@ -424,6 +425,11 @@ public class SampleListServiceImpl implements SampleListService {
 	@Override
 	public List<SampleListDTO> getSampleLists(final List<Integer> datasetIds) {
 		return this.daoFactory.getSampleListDao().getSampleLists(datasetIds);
+	}
+
+	@Override
+	public List<SampleListDTO> getSampleListsByStudy(final Integer studyId, final boolean withGenotypesOnly) {
+		return this.daoFactory.getSampleListDao().getSampleListsByStudy(studyId, withGenotypesOnly);
 	}
 
 	@Override
