@@ -97,7 +97,7 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 
 	@Override
 	public long countSampleGenotypesBySampleList(final Integer listId) {
-		return this.daoFactory.getSampleListDao().countSampleGenotypesBySampleList(listId);
+		return this.daoFactory.getGenotypeDao().countSampleGenotypesBySampleList(listId);
 	}
 
 	@Override

@@ -269,21 +269,6 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		});
 	}
 
-	public long countSampleGenotypesBySampleList(final Integer listId) {
-		try {
-			final String sql = "SELECT COUNT(1) FROM sample s "
-				+ " INNER JOIN sample_list list ON s.sample_list = list.list_id "
-				+ " INNER JOIN genotype g ON g.sample_id = s.sample_id "
-				+ " WHERE list.list_id = :listId ";
-			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			query.setParameter("listId", listId);
-			return ((BigInteger) query.uniqueResult()).longValue();
-		} catch (final HibernateException e) {
-			final String message = "Error with countSampleGenotypesBySampleList(listId=" + listId + "): " + e.getMessage();
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	@Nullable
 	public SampleList getLastCreatedByUserID(final Integer userID, final String programUUID) {
 		try {

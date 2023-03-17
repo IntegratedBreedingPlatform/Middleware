@@ -60,7 +60,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 	protected static final Set<String> SAMPLE_GENOTYPES_TABLE_SYSTEM_COLUMNS =
 		Sets.newHashSet(TRIAL_INSTANCE, GID, DESIGNATION, ENTRY_NO, OBS_UNIT_ID, OBSERVATION_UNIT_ID, DATASET_ID,
-				SAMPLE_NAME, SAMPLE_UUID, TAKEN_BY, SAMPLING_DATE);
+			SAMPLE_NAME, SAMPLE_UUID, TAKEN_BY, SAMPLING_DATE);
 
 	private static final String GENOTYPE_SEARCH_FROM_QUERY = "FROM sample s " +
 		"LEFT JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id " +
@@ -551,6 +551,21 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
 				"Error at getSampleGenotypeVariableIds(filter=" + filter + ") query on GenotypeDao", e);
+		}
+	}
+
+	public long countSampleGenotypesBySampleList(final Integer listId) {
+		try {
+			final String sql = "SELECT COUNT(DISTINCT s.sample_id) FROM sample s "
+				+ " INNER JOIN sample_list list ON s.sample_list = list.list_id "
+				+ " INNER JOIN genotype g ON g.sample_id = s.sample_id "
+				+ " WHERE list.list_id = :listId ";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("listId", listId);
+			return ((BigInteger) query.uniqueResult()).longValue();
+		} catch (final HibernateException e) {
+			final String message = "Error with countSampleGenotypesBySampleList(listId=" + listId + "): " + e.getMessage();
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 }
