@@ -19,6 +19,7 @@ import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -56,6 +57,9 @@ public class Person implements Comparable<Person>, Serializable {
 
 	@Column(name = "lname")
 	private String lastName;
+
+	@Formula(value = " concat(fname, ' ', lname) ")
+	private String fullName;
 
 	@Column(name = "ioname")
 	private String middleName;
@@ -152,6 +156,14 @@ public class Person implements Comparable<Person>, Serializable {
 
 	public void setLastName(final String lastName) {
 		this.lastName = lastName;
+	}
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullname) {
+		this.fullName = fullname;
 	}
 
 	public String getMiddleName() {

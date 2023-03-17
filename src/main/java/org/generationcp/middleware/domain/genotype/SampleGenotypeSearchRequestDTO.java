@@ -17,6 +17,8 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 
 	private List<MeasurementVariable> sampleGenotypeVariables;
 
+	private List<Integer> takenByIds;
+
 	/**
 	 * List of columns that will be included and retrieved in the query.
 	 * If no columns are specified, the query will retrieve all columns by default.
@@ -60,6 +62,14 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 
 	public void setSampleGenotypeVariables(final List<MeasurementVariable> sampleGenotypeVariables) {
 		this.sampleGenotypeVariables = sampleGenotypeVariables;
+	}
+
+	public List<Integer> getTakenByIds() {
+		return takenByIds;
+	}
+
+	public void setTakenByIds(List<Integer> takenByIds) {
+		this.takenByIds = takenByIds;
 	}
 
 	public Set<String> getVisibleColumns() {

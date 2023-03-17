@@ -16,6 +16,8 @@ public class UserSearchRequest {
 
 	public String lastName;
 
+	public String fullName;
+
 	public String email;
 
 	public List<String> crops;
@@ -60,6 +62,14 @@ public class UserSearchRequest {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 
 	public String getEmail() {

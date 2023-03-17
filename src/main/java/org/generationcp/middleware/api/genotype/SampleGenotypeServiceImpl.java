@@ -2,7 +2,9 @@ package org.generationcp.middleware.api.genotype;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.MapUtils;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
+import org.generationcp.middleware.api.user.UserSearchRequest;
 import org.generationcp.middleware.dao.GenotypeDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
@@ -10,6 +12,7 @@ import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDt
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeVariablesSearchFilter;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -19,6 +22,7 @@ import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -78,6 +82,7 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	public List<SampleGenotypeDTO> searchSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO, final Pageable pageable) {
 		this.updateSearchDTO(searchRequestDTO);
 		if (!CollectionUtils.isEmpty(searchRequestDTO.getSampleGenotypeVariables())) {
+			this.updateTakenByIds(searchRequestDTO);
 			final List<SampleGenotypeDTO> sampleGenotypeDTOS = this.daoFactory.getGenotypeDao().searchGenotypes(searchRequestDTO, pageable);
 			this.populateTakenBy(sampleGenotypeDTOS);
 			return sampleGenotypeDTOS;
@@ -92,6 +97,7 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 
 	@Override
 	public long countFilteredSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
+		this.updateTakenByIds(searchRequestDTO);
 		return this.daoFactory.getGenotypeDao().countFilteredGenotypes(searchRequestDTO);
 	}
 
@@ -145,10 +151,23 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 		return variables;
 	}
 
+	private void updateTakenByIds(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
+		final UserSearchRequest userSearchRequest = new UserSearchRequest();
+		if (searchRequestDTO.getFilter() !=null && MapUtils.isNotEmpty(searchRequestDTO.getFilter().getFilteredTextValues())
+			&& searchRequestDTO.getFilter().getFilteredTextValues().containsKey(String.valueOf(TermId.TAKEN_BY.getId()))) {
+			userSearchRequest.setFullName(searchRequestDTO.getFilter().getFilteredTextValues().get(String.valueOf(TermId.TAKEN_BY.getId())));
+			final List<UserDto> userDtos = this.userService.searchUsers(userSearchRequest, null);
+			searchRequestDTO.setTakenByIds(userDtos.stream().map(UserDto::getId).collect(Collectors.toList()));
+		}
+	}
+
 	public void addSampleColumns(final List<MeasurementVariable> variables) {
 		variables.add(this.addTermIdColumn(TermId.SAMPLE_NAME, null, TermId.SAMPLE_NAME.name(), true));
 		variables.add(this.addTermIdColumn(TermId.SAMPLE_UUID, null, TermId.SAMPLE_UUID.name(), true));
-		variables.add(this.addTermIdColumn(TermId.SAMPLING_DATE, null, TermId.SAMPLING_DATE.name(), true));
+		final MeasurementVariable samplingDateVariable = this.addTermIdColumn(TermId.SAMPLING_DATE, null, TermId.SAMPLING_DATE.name(), true);
+		samplingDateVariable.setDataTypeId(DataType.DATE_TIME_VARIABLE.getId());
+		samplingDateVariable.setDataType(DataType.DATE_TIME_VARIABLE.getName());
+		variables.add(samplingDateVariable);
 		variables.add(this.addTermIdColumn(TermId.TAKEN_BY, null, TermId.TAKEN_BY.name(), true));
 	}
 
