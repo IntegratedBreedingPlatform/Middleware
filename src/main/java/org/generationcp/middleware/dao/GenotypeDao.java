@@ -64,6 +64,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 	private static final String GENOTYPE_SEARCH_FROM_QUERY = "FROM sample s " +
 		"LEFT JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id " +
+		"LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) " +
 		"LEFT JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " +
 		"LEFT JOIN project p ON p.project_id = nde.project_id " +
 		"INNER JOIN genotype geno ON s.sample_id = geno.sample_id " +
@@ -91,9 +92,9 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		mainVariablesMap.put(String.valueOf(TermId.ENTRY_TYPE.getId()),
 			" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.value, NULL)) AS `%1$s`");
 		mainVariablesMap.put(String.valueOf(TermId.REP_NO.getId()),
-			"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ndep.type_id = 8210) AS '%s'");
+			"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ndep.type_id = 8210) AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.PLOT_NO.getId()),
-			"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ndep.type_id = 8200) AS '%s'");
+			"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ndep.type_id = 8200) AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.OBS_UNIT_ID.getId()), "    nde.obs_unit_id AS '%s'");
 		mainVariablesMap.put(SAMPLE_NAME, "    s.sample_name AS SAMPLE_NAME");
 		mainVariablesMap.put(SAMPLE_UUID, "    s.sample_bk AS SAMPLE_UUID");
