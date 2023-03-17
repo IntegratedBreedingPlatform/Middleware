@@ -98,7 +98,7 @@ public class Sample implements Serializable {
 	}
 
 	public Integer getCreatedBy() {
-		return createdBy;
+		return this.createdBy;
 	}
 
 	public void setCreatedBy(final Integer createdBy) {
@@ -170,18 +170,18 @@ public class Sample implements Serializable {
 	}
 
 	public String getPlateId() {
-		return plateId;
+		return this.plateId;
 	}
 
-	public void setPlateId(String plateId) {
+	public void setPlateId(final String plateId) {
 		this.plateId = plateId;
 	}
 
 	public String getWell() {
-		return well;
+		return this.well;
 	}
 
-	public void setWell(String well) {
+	public void setWell(final String well) {
 		this.well = well;
 	}
 
@@ -194,7 +194,7 @@ public class Sample implements Serializable {
 	}
 
 	public Integer getSampleNumber() {
-		return sampleNumber;
+		return this.sampleNumber;
 	}
 
 	public void setSampleNumber(final Integer sampleNumber) {
@@ -231,7 +231,7 @@ public class Sample implements Serializable {
 	}
 
 	public List<AccMetadataSet> getAccMetadataSets() {
-		return accMetadataSets;
+		return this.accMetadataSets;
 	}
 
 	public void setAccMetadataSets(final List<AccMetadataSet> accMetadataSets) {

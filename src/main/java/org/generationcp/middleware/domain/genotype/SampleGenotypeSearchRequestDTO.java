@@ -65,10 +65,10 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 	}
 
 	public List<Integer> getTakenByIds() {
-		return takenByIds;
+		return this.takenByIds;
 	}
 
-	public void setTakenByIds(List<Integer> takenByIds) {
+	public void setTakenByIds(final List<Integer> takenByIds) {
 		this.takenByIds = takenByIds;
 	}
 

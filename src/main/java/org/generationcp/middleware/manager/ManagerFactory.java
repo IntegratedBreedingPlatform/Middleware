@@ -375,10 +375,6 @@ public class ManagerFactory implements Serializable {
 		return new GermplasmServiceImpl(this.sessionProvider);
 	}
 
-	public SampleGenotypeService getGenotypeService() {
-		return new SampleGenotypeServiceImpl(this.sessionProvider);
-	}
-
 	public GermplasmNameTypeService getGermplasmNameTypeService() {
 		return new GermplasmNameTypeServiceImpl(this.sessionProvider);
 	}

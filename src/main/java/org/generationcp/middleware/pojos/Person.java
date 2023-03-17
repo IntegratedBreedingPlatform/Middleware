@@ -159,10 +159,10 @@ public class Person implements Comparable<Person>, Serializable {
 	}
 
 	public String getFullName() {
-		return fullName;
+		return this.fullName;
 	}
 
-	public void setFullName(String fullname) {
+	public void setFullName(final String fullname) {
 		this.fullName = fullname;
 	}
 
@@ -348,7 +348,7 @@ public class Person implements Comparable<Person>, Serializable {
 	}
 
 	public Set<CropType> getCrops() {
-		return crops;
+		return this.crops;
 	}
 
 	public void setCrops(final Set<CropType> crops) {
