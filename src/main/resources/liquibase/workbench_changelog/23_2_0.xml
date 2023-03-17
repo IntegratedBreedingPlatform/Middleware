@@ -1296,6 +1296,35 @@
  	</changeSet>
 
 	<changeSet author="cuenyad" id="v23.2.0-66">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="1">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MANAGE_FILES';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>Update the parent id of MS_MANAGE_FILES by MS_OBSERVATIONS permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_manage_file_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MANAGE_FILES');
+			SET @observation_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_OBSERVATIONS');
+
+			update permission set parent_id = @observation_permission_id  where permission_id = @ms_manage_file_permission_id
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-67">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="1">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MANAGE_FILES';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>Renaming MS_MANAGE_FILES permission as MS_MANAGE_FILES_OBSERVATIONS</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_manage_file_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MANAGE_FILES');
+
+			update permission set name = 'MS_MANAGE_FILES_OBSERVATIONS ', description='Manage Files Observations'  where permission_id = @ms_manage_file_permission_id
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-68">
          <preConditions onFail="MARK_RAN">
 			<and>
             	<sqlCheck expectedResult="0">
