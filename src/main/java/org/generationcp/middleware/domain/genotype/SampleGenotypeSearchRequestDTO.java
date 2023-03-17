@@ -2,7 +2,6 @@ package org.generationcp.middleware.domain.genotype;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -91,8 +90,8 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 
 		private Integer datasetId;
 		private List<Integer> instanceIds;
-
 		private List<Integer> sampleIds;
+		private List<Integer> sampleListIds;
 
 		private Map<String, List<String>> filteredValues;
 		private Map<String, String> filteredTextValues;
@@ -144,6 +143,14 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 
 		public void setSampleIds(final List<Integer> sampleIds) {
 			this.sampleIds = sampleIds;
+		}
+
+		public List<Integer> getSampleListIds() {
+			return this.sampleListIds;
+		}
+
+		public void setSampleListIds(final List<Integer> sampleListIds) {
+			this.sampleListIds = sampleListIds;
 		}
 
 		@Override

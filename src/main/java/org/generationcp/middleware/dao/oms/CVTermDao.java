@@ -213,34 +213,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return stdVarMap;
 	}
 
-	public List<Integer> getSampleGenotypeVariableIds(final Integer studyId, final Integer datasetId) {
-		try {
-			final StringBuilder queryString = new StringBuilder("SELECT DISTINCT(var.cvterm_id) as variableId " +
-				"FROM genotype geno " +
-				"INNER JOIN sample s ON s.sample_id = geno.sample_id " +
-				"INNER JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id " +
-				"INNER JOIN project p ON p.project_id = nde.project_id " +
-				"INNER JOIN cvterm var ON var.cvterm_id = geno.variabe_id " +
-				"WHERE p.study_id = :studyId ");
-
-			if (datasetId != null) {
-				queryString.append("AND p.project_id = :datasetId");
-			}
-			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.setParameter("studyId", studyId);
-			if (datasetId != null) {
-				query.setParameter("datasetId", datasetId);
-			}
-			query.addScalar("variableId", new IntegerType());
-
-			return query.list();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error at getSampleGenotypeVariableIds(studyId=" + studyId + ",datasetId=" + datasetId + ") query on CVTermDao", e);
-		}
-	}
-
 	public Map<Integer, MeasurementVariable> getVariablesByIdsAndVariableTypes(final List<String> ids, final List<String> variableTypes) {
 		final Map<Integer, MeasurementVariable> stdVarMap = new HashMap<>();
 

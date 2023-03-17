@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDto;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeVariablesSearchFilter;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -28,6 +29,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,9 +101,10 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	}
 
 	@Override
-	public Map<Integer, MeasurementVariable> getSampleGenotypeVariables(final Integer studyId, final Integer datasetId) {
-		Preconditions.checkNotNull(studyId);
-		final List<Integer> sampleGenotypeVariables = this.daoFactory.getCvTermDao().getSampleGenotypeVariableIds(studyId, datasetId);
+	public Map<Integer, MeasurementVariable> getSampleGenotypeVariables(final SampleGenotypeVariablesSearchFilter filter) {
+
+		Preconditions.checkNotNull(filter.getStudyId());
+		final List<Integer> sampleGenotypeVariables = this.daoFactory.getGenotypeDao().getSampleGenotypeVariableIds(filter);
 
 		final Map<Integer, MeasurementVariable> result = new HashMap<>();
 
@@ -126,14 +129,19 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getSampleGenotypeColumns(final Integer studyId) {
+	public List<MeasurementVariable> getSampleGenotypeColumns(final Integer studyId, final List<Integer> sampleListIds) {
 		final Integer plotDatasetId = this.studyService.getPlotDatasetId(studyId);
 		final List<MeasurementVariable> variables = this.datasetService.getObservationSetVariables(plotDatasetId,
 				Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.ENTRY_DETAIL.getId(),
-				VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId()))
-				.stream().filter(var -> GenotypeDao.STANDARD_SAMPLE_GENOTYPE_TABLE_VARIABLE_IDS.contains(var.getTermId())).collect(Collectors.toList());
+					VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId()))
+			.stream().filter(var -> GenotypeDao.STANDARD_SAMPLE_GENOTYPE_TABLE_VARIABLE_IDS.contains(var.getTermId()))
+			.collect(Collectors.toList());
 		this.addSampleColumns(variables);
-		variables.addAll(this.getSampleGenotypeVariables(studyId, null).values());
+
+		final SampleGenotypeVariablesSearchFilter sampleGenotypeVariablesSearchFilter = new SampleGenotypeVariablesSearchFilter();
+		sampleGenotypeVariablesSearchFilter.setSampleListIds(sampleListIds);
+		sampleGenotypeVariablesSearchFilter.setStudyId(studyId);
+		variables.addAll(this.getSampleGenotypeVariables(sampleGenotypeVariablesSearchFilter).values());
 		return variables;
 	}
 
@@ -145,20 +153,29 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	}
 
 	private void updateSearchDTO(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
+
+		final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
+		filter.setStudyId(searchRequestDTO.getStudyId());
+		if (searchRequestDTO.getFilter().getDatasetId() != null) {
+			filter.setDatasetIds(Arrays.asList());
+		}
+		filter.setSampleListIds(searchRequestDTO.getFilter().getSampleListIds());
+
 		// Add the list of Marker variables available in study
 		searchRequestDTO.setSampleGenotypeVariables(new ArrayList<>(
-			this.getSampleGenotypeVariables(searchRequestDTO.getStudyId(), searchRequestDTO.getFilter().getDatasetId()).values()));
+			this.getSampleGenotypeVariables(filter).values()));
 	}
 
 	void populateTakenBy(final List<SampleGenotypeDTO> sampleGenotypeDTOS) {
 		// Populate takenBy with full name of user from workbench database.
 		final List<Integer> userIds = sampleGenotypeDTOS.stream().map(SampleGenotypeDTO::getTakenById).collect(Collectors.toList());
 		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
-		sampleGenotypeDTOS.forEach(sampleGenotypeDTO -> sampleGenotypeDTO.setTakenBy(userIDFullNameMap.get(sampleGenotypeDTO.getTakenById())));
+		sampleGenotypeDTOS.forEach(
+			sampleGenotypeDTO -> sampleGenotypeDTO.setTakenBy(userIDFullNameMap.get(sampleGenotypeDTO.getTakenById())));
 	}
 
 	private MeasurementVariable addTermIdColumn(final TermId termId, final VariableType variableType, final String name,
-												final boolean factor) {
+		final boolean factor) {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		measurementVariable.setName(org.apache.commons.lang3.StringUtils.isBlank(name) ? termId.name() : name);
 		measurementVariable.setAlias(termId.name());

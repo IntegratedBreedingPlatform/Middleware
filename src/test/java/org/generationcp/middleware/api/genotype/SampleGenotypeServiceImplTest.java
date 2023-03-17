@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDto;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeVariablesSearchFilter;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Sample;
@@ -232,8 +233,11 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		this.sampleGenotypeService.importSampleGenotypes(genotypes);
 
 		// Get the marker genotype variables available in the study.
+		final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
+		filter.setStudyId(this.study.getProjectId());
+		filter.setDatasetIds(Arrays.asList(this.plotDataset.getProjectId()));
 		final Map<Integer, MeasurementVariable> variableMap =
-			this.sampleGenotypeService.getSampleGenotypeVariables(this.study.getProjectId(), this.plotDataset.getProjectId());
+			this.sampleGenotypeService.getSampleGenotypeVariables(filter);
 		Assert.assertEquals(3, variableMap.size());
 		Assert.assertTrue(
 			variableMap.values().stream().filter(measurementVariable -> measurementVariable.getName().equalsIgnoreCase(DEFAULT_MARKER_1))
