@@ -37,34 +37,34 @@ public class Genotype extends AbstractEntity implements Serializable {
     }
 
     public Integer getId() {
-        return id;
+        return this.id;
     }
 
-    public void setId(Integer id) {
+    public void setId(final Integer id) {
         this.id = id;
     }
 
     public Sample getSample() {
-        return sample;
+        return this.sample;
     }
 
-    public void setSample(Sample sample) {
+    public void setSample(final Sample sample) {
         this.sample = sample;
     }
 
     public CVTerm getVariable() {
-        return variable;
+        return this.variable;
     }
 
-    public void setVariable(CVTerm variable) {
+    public void setVariable(final CVTerm variable) {
         this.variable = variable;
     }
 
     public String getValue() {
-        return value;
+        return this.value;
     }
 
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 

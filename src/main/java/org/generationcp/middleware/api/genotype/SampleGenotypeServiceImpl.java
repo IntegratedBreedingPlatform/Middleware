@@ -162,13 +162,13 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	}
 
 	public void addSampleColumns(final List<MeasurementVariable> variables) {
-		variables.add(this.addTermIdColumn(TermId.SAMPLE_NAME, null, TermId.SAMPLE_NAME.name(), true));
-		variables.add(this.addTermIdColumn(TermId.SAMPLE_UUID, null, TermId.SAMPLE_UUID.name(), true));
-		final MeasurementVariable samplingDateVariable = this.addTermIdColumn(TermId.SAMPLING_DATE, null, TermId.SAMPLING_DATE.name(), true);
+		variables.add(this.addTermIdColumn(TermId.SAMPLE_NAME));
+		variables.add(this.addTermIdColumn(TermId.SAMPLE_UUID));
+		final MeasurementVariable samplingDateVariable = this.addTermIdColumn(TermId.SAMPLING_DATE);
 		samplingDateVariable.setDataTypeId(DataType.DATE_TIME_VARIABLE.getId());
 		samplingDateVariable.setDataType(DataType.DATE_TIME_VARIABLE.getName());
 		variables.add(samplingDateVariable);
-		variables.add(this.addTermIdColumn(TermId.TAKEN_BY, null, TermId.TAKEN_BY.name(), true));
+		variables.add(this.addTermIdColumn(TermId.TAKEN_BY));
 	}
 
 	private void updateSearchDTO(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
@@ -193,14 +193,13 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 			sampleGenotypeDTO -> sampleGenotypeDTO.setTakenBy(userIDFullNameMap.get(sampleGenotypeDTO.getTakenById())));
 	}
 
-	private MeasurementVariable addTermIdColumn(final TermId termId, final VariableType variableType, final String name,
-		final boolean factor) {
+	private MeasurementVariable addTermIdColumn(final TermId termId) {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName(org.apache.commons.lang3.StringUtils.isBlank(name) ? termId.name() : name);
+		measurementVariable.setName(termId.name());
 		measurementVariable.setAlias(termId.name());
 		measurementVariable.setTermId(termId.getId());
-		measurementVariable.setVariableType(variableType);
-		measurementVariable.setFactor(factor);
+		measurementVariable.setVariableType(null);
+		measurementVariable.setFactor(true);
 		return measurementVariable;
 	}
 }

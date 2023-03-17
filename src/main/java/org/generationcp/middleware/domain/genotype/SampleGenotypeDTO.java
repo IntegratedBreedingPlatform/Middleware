@@ -32,42 +32,42 @@ public class SampleGenotypeDTO {
 	}
 
 	public String getSampleName() {
-		return sampleName;
+		return this.sampleName;
 	}
 
-	public void setSampleName(String sampleName) {
+	public void setSampleName(final String sampleName) {
 		this.sampleName = sampleName;
 	}
 
 	public String getSampleUUID() {
-		return sampleUUID;
+		return this.sampleUUID;
 	}
 
-	public void setSampleUUID(String sampleUUID) {
+	public void setSampleUUID(final String sampleUUID) {
 		this.sampleUUID = sampleUUID;
 	}
 
 	public Date getSamplingDate() {
-		return samplingDate;
+		return this.samplingDate;
 	}
 
-	public void setSamplingDate(Date samplingDate) {
+	public void setSamplingDate(final Date samplingDate) {
 		this.samplingDate = samplingDate;
 	}
 
 	public Integer getTakenById() {
-		return takenById;
+		return this.takenById;
 	}
 
-	public void setTakenById(Integer takenById) {
+	public void setTakenById(final Integer takenById) {
 		this.takenById = takenById;
 	}
 
 	public String getTakenBy() {
-		return takenBy;
+		return this.takenBy;
 	}
 
-	public void setTakenBy(String takenBy) {
+	public void setTakenBy(final String takenBy) {
 		this.takenBy = takenBy;
 	}
 

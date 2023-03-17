@@ -156,12 +156,12 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT ");
 		sql.append(Joiner.on(", ").join(columns));
 		sql.append(GENOTYPE_SEARCH_FROM_QUERY);
-		addSearchQueryFilters(sql, searchRequestDTO);
+		this.addSearchQueryFilters(sql, searchRequestDTO);
 		sql.append(" GROUP BY s.sample_id ");
 		this.addOrder(sql, searchRequestDTO, standardSampleGenotypeVariables.get(TermId.PLOT_NO.getId()), pageable);
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-		addQueryParams(query, searchRequestDTO);
+		this.addQueryParams(query, searchRequestDTO);
 		this.addScalar(query, standardSampleGenotypeVariables);
 		if (!CollectionUtils.isEmpty(searchRequestDTO.getSampleGenotypeVariables())) {
 			for (final MeasurementVariable sampleGenotypeVariable : searchRequestDTO.getSampleGenotypeVariables()) {
@@ -445,11 +445,11 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 	public long countFilteredGenotypes(final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO) {
 		final StringBuilder sql = new StringBuilder("SELECT COUNT(1) FROM ( SELECT s.sample_id ");
 		sql.append(GENOTYPE_SEARCH_FROM_QUERY);
-		addSearchQueryFilters(sql, sampleGenotypeSearchRequestDTO);
+		this.addSearchQueryFilters(sql, sampleGenotypeSearchRequestDTO);
 		sql.append(" GROUP BY s.sample_id ) a ");
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-		addQueryParams(query, sampleGenotypeSearchRequestDTO);
+		this.addQueryParams(query, sampleGenotypeSearchRequestDTO);
 		query.setParameter("studyId", sampleGenotypeSearchRequestDTO.getStudyId());
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
