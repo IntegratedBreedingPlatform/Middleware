@@ -1216,6 +1216,86 @@
  	</changeSet>
 
 	<changeSet author="cuenyad" id="v23.2.0-62">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CREATE_SUB_OBSERVATION_UNITS';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Create Sub-observation Units permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_manage_observation_units_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MANAGE_OBSERVATION_UNITS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_CREATE_SUB_OBSERVATION_UNITS', 'Create Sub-observation Units', @ms_manage_observation_units_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CREATE_SUB_OBSERVATION_UNITS');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-63">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CHANGE_PLOT_ENTRY';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Change Plot Entry permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_manage_observation_units_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MANAGE_OBSERVATION_UNITS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_CHANGE_PLOT_ENTRY', 'Change Plot Entry', @ms_manage_observation_units_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CHANGE_PLOT_ENTRY');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-64">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPORT_STUDY_BOOK';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Export Study Book permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_manage_observation_units_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MANAGE_OBSERVATION_UNITS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXPORT_STUDY_BOOK', 'Export Study Book', @ms_manage_observation_units_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPORT_STUDY_BOOK');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-65">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'EXPORT_STUDY_ENTRIES';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Export Study Entries permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_manage_observation_units_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MANAGE_OBSERVATION_UNITS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('EXPORT_STUDY_ENTRIES', 'Export Study Entries', @ms_manage_observation_units_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'EXPORT_STUDY_ENTRIES');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-66">
          <preConditions onFail="MARK_RAN">
 			<and>
             	<sqlCheck expectedResult="0">
