@@ -26,7 +26,7 @@ public class Genotype extends AbstractEntity implements Serializable {
     private Sample sample;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "variabe_id")
+    @JoinColumn(name = "variable_id")
     private CVTerm variable;
 
     @Basic(optional = false)

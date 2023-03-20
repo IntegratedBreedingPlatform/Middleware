@@ -71,7 +71,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		"LEFT JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " +
 		"LEFT JOIN project p ON p.project_id = nde.project_id " +
 		"INNER JOIN genotype geno ON s.sample_id = geno.sample_id " +
-		"LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = geno.variabe_id " +
+		"LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = geno.variable_id " +
 		"LEFT JOIN stock st ON st.stock_id = nde.stock_id " +
 		"LEFT JOIN stockprop sp ON sp.stock_id = st.stock_id " +
 		"LEFT JOIN cvterm cvterm_entry_variable ON (cvterm_entry_variable.cvterm_id = sp.type_id) " +
@@ -136,7 +136,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 			final StringBuilder sampleGenotypeVariableClauseFormat =
 				new StringBuilder(" MAX(IF(cvterm_variable.name = '%1$s', geno.value, NULL)) AS `%1$s`,")
-					.append(" MAX(IF(cvterm_variable.name = '%1$s', geno.variabe_id, NULL)) AS `%1$s_variableId`,")
+					.append(" MAX(IF(cvterm_variable.name = '%1$s', geno.variable_id, NULL)) AS `%1$s_variableId`,")
 					.append(" MAX(IF(cvterm_variable.name = '%1$s', cvterm_variable.name, NULL)) AS `%1$s_variableName` ");
 
 			final StringBuilder sampleGenotypeVariableClauseFormatNullValues = new StringBuilder(" NULL AS `%1$s`,")
@@ -389,7 +389,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 			.append("    SELECT 1 ")
 			.append("    FROM genotype geno2 ")
 			.append("    WHERE geno2.sample_id = s.sample_id")
-			.append("    AND geno2.variabe_id = " + variableId)
+			.append("    AND geno2.variable_id = " + variableId)
 			.append("    and geno2.value").append(matchClause).append(") ");
 	}
 
@@ -517,7 +517,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 				"INNER JOIN sample s ON s.sample_id = geno.sample_id " +
 				"INNER JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id " +
 				"INNER JOIN project p ON p.project_id = nde.project_id " +
-				"INNER JOIN cvterm var ON var.cvterm_id = geno.variabe_id " +
+				"INNER JOIN cvterm var ON var.cvterm_id = geno.variable_id " +
 				"WHERE p.study_id = :studyId ");
 
 			if (!CollectionUtils.isEmpty(filter.getDatasetIds())) {
