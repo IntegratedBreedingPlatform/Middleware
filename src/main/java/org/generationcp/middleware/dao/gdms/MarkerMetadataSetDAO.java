@@ -22,6 +22,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -52,6 +53,10 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 
 	public static final String COUNT_MARKER_BY_DATASET_IDS = "SELECT COUNT(DISTINCT marker_id) " + "FROM gdms_marker_metadataset "
 			+ "WHERE dataset_id IN (:datasetIds)";
+
+	public MarkerMetadataSetDAO(final Session session) {
+		super(session);
+	}
 
 	/**
 	 * Gets the marker id by dataset id.

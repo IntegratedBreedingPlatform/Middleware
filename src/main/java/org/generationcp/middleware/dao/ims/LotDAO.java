@@ -29,6 +29,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -56,6 +57,10 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(LotDAO.class);
 
 	private static final String AT_LOT_DAO = " at LotDAO: ";
+
+	public LotDAO(final Session session) {
+		super(session);
+	}
 
 	public List<Lot> getByGids(final List<Integer> gids) {
 		if (CollectionUtils.isNotEmpty(gids)) {

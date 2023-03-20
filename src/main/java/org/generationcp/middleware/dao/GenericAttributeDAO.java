@@ -24,6 +24,7 @@ import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.util.VariableValueUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
 
@@ -87,6 +88,10 @@ public abstract class GenericAttributeDAO<T extends GenericAttribute> extends Ge
 		+ " left join variable_overrides vpo ON vpo.cvterm_id = v.cvterm_id AND vpo.program_uuid = :" + PROGRAM_UUID;
 
 	private static final String GET_ATTRIBUTE_VARIABLES_GROUP_BY = " group by v.cvterm_id";
+
+	public GenericAttributeDAO(final Session session) {
+		super(session);
+	}
 
 	public Integer createAttribute(final Integer mainRecordId, final AttributeRequestDto dto, final Variable variable) {
 		final GenericAttribute newAttribute = this.getNewAttributeInstance(mainRecordId);

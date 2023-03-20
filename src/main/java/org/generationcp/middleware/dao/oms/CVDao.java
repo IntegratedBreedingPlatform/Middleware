@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -25,6 +26,10 @@ import org.hibernate.criterion.Restrictions;
  *
  */
 public class CVDao extends GenericDAO<CV, Integer> {
+
+	public CVDao(final Session session) {
+		super(session);
+	}
 
 	public Integer getIdByName(String name) throws MiddlewareQueryException {
 		try {

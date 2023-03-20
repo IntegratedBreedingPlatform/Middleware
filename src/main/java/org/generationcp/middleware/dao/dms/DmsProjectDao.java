@@ -53,6 +53,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
@@ -260,6 +261,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private static final List<String> BRAPI_STUDIES_SORTABLE_FIELDS = Arrays
 		.asList("programDbId", "programName", "trialDbId", "trialName", "startDate", "endDate", "locationDbId");
+
+	public DmsProjectDao(final Session session) {
+		super(session);
+	}
 
 	private List<Reference> getChildrenNodesList(final List<Object[]> list) {
 		final List<Reference> childrenNodes = new ArrayList<>();

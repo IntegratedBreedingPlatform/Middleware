@@ -53,10 +53,8 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 	@Before
 	public void setUp() {
 
-		this.experimentPropertyDao = new ExperimentPropertyDao();
-		this.experimentPropertyDao.setSession(this.sessionProvder.getSession());
-		this.dmsProjectDao = new DmsProjectDao();
-		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+		this.experimentPropertyDao = new ExperimentPropertyDao(this.sessionProvder.getSession());
+		this.dmsProjectDao = new DmsProjectDao(this.sessionProvder.getSession());
 		this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);

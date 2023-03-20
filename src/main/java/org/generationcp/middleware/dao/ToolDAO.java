@@ -19,6 +19,7 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class ToolDAO extends GenericDAO<Tool, Long> {
+
+	public ToolDAO(final Session session) {
+		super(session);
+	}
 
 	public Tool getByToolName(final String toolName) throws MiddlewareQueryException {
 		try {

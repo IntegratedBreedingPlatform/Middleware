@@ -17,6 +17,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.api.dataset.ObservationAuditDTO;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
 import org.springframework.data.domain.Pageable;
@@ -52,6 +53,10 @@ public class PhenotypeAuditDao extends GenericDAO<ObservationAuditDTO, Integer> 
 			+ " 	ORDER BY inn.aud_id DESC LIMIT 1) "
 			+ "WHERE p.observable_id = :observableId "
 			+ "ORDER BY p.aud_id DESC ";
+
+	public PhenotypeAuditDao(final Session session) {
+		super(session);
+	}
 
 	public long countObservationAudit(final String observationUnitId, final int observableId) {
 		final SQLQuery query = this.getSession().createSQLQuery(COUNT_PHENOTYPE_AUD_QUERY);

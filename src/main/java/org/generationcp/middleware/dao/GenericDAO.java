@@ -40,23 +40,10 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 	private static final Logger LOG = LoggerFactory.getLogger(GenericDAO.class);
 
 	private final Class<T> persistentClass;
-	private Session session;
-
-	/**
-	 * @deprecated please, instead use {@link #GenericDAO(Session)}}
-	 */
-	@Deprecated
-	@SuppressWarnings("unchecked")
-	public GenericDAO() {
-		this.persistentClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-	}
+	private final Session session;
 
 	public GenericDAO(final Session session) {
 		this.persistentClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-		this.session = session;
-	}
-
-	public void setSession(Session session) {
 		this.session = session;
 	}
 

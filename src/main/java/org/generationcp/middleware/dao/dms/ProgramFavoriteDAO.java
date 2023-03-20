@@ -19,6 +19,7 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,10 @@ import java.util.Set;
 public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ProgramFavoriteDAO.class);
+
+	public ProgramFavoriteDAO(final Session session) {
+		super(session);
+	}
 
 	public Optional<ProgramFavorite> getProgramFavorite(
 		final String programUUID, final ProgramFavorite.FavoriteType type, final Integer entityId)

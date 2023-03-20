@@ -24,8 +24,7 @@ public class DatasetDAOTest {
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		
-		this.dao = new DatasetDAO();
-		this.dao.setSession(this.mockSession);
+		this.dao = new DatasetDAO(this.mockSession);
 	}
 	
 	@Test

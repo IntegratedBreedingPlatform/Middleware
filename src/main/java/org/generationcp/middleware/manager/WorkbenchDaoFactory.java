@@ -39,119 +39,79 @@ public class WorkbenchDaoFactory {
 	}
 
 	public WorkbenchUserDAO getWorkbenchUserDAO() {
-		final WorkbenchUserDAO workbenchUserDAO = new WorkbenchUserDAO();
-		workbenchUserDAO.setSession(this.sessionProvider.getSession());
-		return workbenchUserDAO;
+		return new WorkbenchUserDAO(this.sessionProvider.getSession());
 	}
 
 	public PersonDAO getPersonDAO() {
-		final PersonDAO personDAO = new PersonDAO();
-		personDAO.setSession(this.sessionProvider.getSession());
-		return personDAO;
+		return new PersonDAO(this.sessionProvider.getSession());
 	}
 
 	public CropPersonDAO getCropPersonDAO() {
-		final CropPersonDAO cropPersonDAO = new CropPersonDAO();
-		cropPersonDAO.setSession(this.sessionProvider.getSession());
-		return cropPersonDAO;
+		return new CropPersonDAO(this.sessionProvider.getSession());
 	}
 
 	public UserInfoDAO getUserInfoDAO() {
-		final UserInfoDAO userInfoDAO = new UserInfoDAO();
-		userInfoDAO.setSession(this.sessionProvider.getSession());
-		return userInfoDAO;
+		return new UserInfoDAO(this.sessionProvider.getSession());
 	}
 
 	public ProjectUserInfoDAO getProjectUserInfoDAO() {
-		final ProjectUserInfoDAO projectUserInfoDAO = new ProjectUserInfoDAO();
-		projectUserInfoDAO.setSession(this.sessionProvider.getSession());
-		return projectUserInfoDAO;
+		return new ProjectUserInfoDAO(this.sessionProvider.getSession());
 	}
 
 	public RoleDAO getRoleDAO() {
-		final RoleDAO roleDAO = new RoleDAO();
-		roleDAO.setSession(this.sessionProvider.getSession());
-		return roleDAO;
+		return new RoleDAO(this.sessionProvider.getSession());
 	}
 
 	public CropTypeDAO getCropTypeDAO() {
-		final CropTypeDAO cropTypeDAO = new CropTypeDAO();
-		cropTypeDAO.setSession(this.sessionProvider.getSession());
-		return cropTypeDAO;
+		return new CropTypeDAO(this.sessionProvider.getSession());
 	}
 
 	public ProjectActivityDAO getProjectActivityDAO() {
-		final ProjectActivityDAO projectActivityDAO = new ProjectActivityDAO();
-		projectActivityDAO.setSession(this.sessionProvider.getSession());
-		return projectActivityDAO;
+		return new ProjectActivityDAO(this.sessionProvider.getSession());
 	}
 
 	public ProjectDAO getProjectDAO() {
-		final ProjectDAO projectDAO = new ProjectDAO();
-		projectDAO.setSession(this.sessionProvider.getSession());
-		return projectDAO;
+		return new ProjectDAO(this.sessionProvider.getSession());
 	}
 
 	public ToolDAO getToolDAO() {
-		final ToolDAO toolDAO = new ToolDAO();
-		toolDAO.setSession(this.sessionProvider.getSession());
-		return toolDAO;
+		return new ToolDAO(this.sessionProvider.getSession());
 	}
 
 	public RoleTypeDAO getRoleTypeDAO() {
-		final RoleTypeDAO roleTypeDAO = new RoleTypeDAO();
-		roleTypeDAO.setSession(this.sessionProvider.getSession());
-		return roleTypeDAO;
+		return new RoleTypeDAO(this.sessionProvider.getSession());
 	}
 
 	public PermissionDAO getPermissionDAO() {
-		final PermissionDAO permissionDAO = new PermissionDAO();
-		permissionDAO.setSession(this.sessionProvider.getSession());
-		return permissionDAO;
+		return new PermissionDAO(this.sessionProvider.getSession());
 	}
 
 	public RoleTypePermissionDAO getRoleTypePermissionDAO() {
-		final RoleTypePermissionDAO roleTypePermissionDAO = new RoleTypePermissionDAO();
-		roleTypePermissionDAO.setSession(this.sessionProvider.getSession());
-		return roleTypePermissionDAO;
+		return new RoleTypePermissionDAO(this.sessionProvider.getSession());
 	}
 
 	public WorkbenchSidebarCategoryLinkDAO getWorkbenchSidebarCategoryLinkDao() {
-
-		final WorkbenchSidebarCategoryLinkDAO workbenchSidebarCategoryLinkDAO = new WorkbenchSidebarCategoryLinkDAO();
-
-		workbenchSidebarCategoryLinkDAO.setSession(this.sessionProvider.getSession());
-		return workbenchSidebarCategoryLinkDAO;
+		return new WorkbenchSidebarCategoryLinkDAO(this.sessionProvider.getSession());
 	}
 
 	public UserRoleDao getUserRoleDao() {
-		final UserRoleDao userRoleDao = new UserRoleDao();
-		userRoleDao.setSession(this.sessionProvider.getSession());
-		return userRoleDao;
+		return new UserRoleDao(this.sessionProvider.getSession());
 	}
 
 	public RoleDAO getRoleDao() {
-		final RoleDAO roleDao = new RoleDAO();
-		roleDao.setSession(this.sessionProvider.getSession());
-		return roleDao;
+		return new RoleDAO(this.sessionProvider.getSession());
 	}
 
 	public RPackageDAO getRPackageDao() {
-		final RPackageDAO rPackageDAO = new RPackageDAO();
-		rPackageDAO.setSession(this.sessionProvider.getSession());
-		return rPackageDAO;
+		return new RPackageDAO(this.sessionProvider.getSession());
 	}
 
 	public RCallDAO getRCallDao() {
-		final RCallDAO rCallDAO = new RCallDAO();
-		rCallDAO.setSession(this.sessionProvider.getSession());
-		return rCallDAO;
+		return new RCallDAO(this.sessionProvider.getSession());
 	}
 
 	public RCallParameterDAO getRCallParameterDao() {
-		final RCallParameterDAO rCallParameterDAO = new RCallParameterDAO();
-		rCallParameterDAO.setSession(this.sessionProvider.getSession());
-		return rCallParameterDAO;
+		return new RCallParameterDAO(this.sessionProvider.getSession());
 	}
 
 	public ReleaseNoteDAO getReleaseNoteDAO() {

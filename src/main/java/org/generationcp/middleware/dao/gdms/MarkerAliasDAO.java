@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.gdms;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.pojos.gdms.MarkerAlias;
+import org.hibernate.Session;
 
 /**
  * DAO class for {@link MarkerAlias}.
@@ -23,4 +24,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerAlias;
 
 public class MarkerAliasDAO extends GenericDAO<MarkerAlias, Integer> {
 
+	public MarkerAliasDAO(final Session session) {
+		super(session);
+	}
 }

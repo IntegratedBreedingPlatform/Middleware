@@ -76,8 +76,7 @@ public class OntologyScaleDataManagerImplIntegrationTest extends IntegrationTest
 
 	@Test
 	public void testGetScaleById_DontFilterObsolete() throws Exception {
-		CVTermDao cvtermDao = new CVTermDao();
-		cvtermDao.setSession(this.sessionProvder.getSession());
+		CVTermDao cvtermDao = new CVTermDao(this.sessionProvder.getSession());
 
 		// set testScale to obsolete
 		int id = this.testScale.getId();

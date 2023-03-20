@@ -8,6 +8,7 @@ import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
@@ -106,6 +107,10 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 		+ "p.workbench_sidebar_category_link_id as workbenchCategoryLinkId " //
 		+ "from workbench.permission p " //
 		+ "where  p.parent_id = :parentId ";
+
+	public PermissionDAO(final Session session) {
+		super(session);
+	}
 
 	public List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId) {
 		//FIXME. Try an user with ADMIN and MANAGE_PROGRAM_SETTINGS, Only ADMIN should be retrieved and given that MANAGE_PROGRAMS is not a row in the result, both permissions are returned

@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -35,6 +36,10 @@ import java.util.List;
 public class ProjectActivityDAO extends GenericDAO<ProjectActivity, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ProjectActivityDAO.class);
+
+	public ProjectActivityDAO(final Session session) {
+		super(session);
+	}
 
 	public void deleteAllProjectActivities(final String programUUID) {
 		try {

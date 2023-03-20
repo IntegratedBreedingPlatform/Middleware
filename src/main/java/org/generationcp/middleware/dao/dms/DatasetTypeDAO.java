@@ -7,6 +7,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Projections;
@@ -16,6 +17,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class DatasetTypeDAO extends GenericDAO<DatasetType, Integer> {
+
+	public DatasetTypeDAO(final Session session) {
+		super(session);
+	}
 
 	public List<Integer> getObservationDatasetTypeIds() {
 		return this.getSession().createCriteria(DatasetType.class, "datasetType")

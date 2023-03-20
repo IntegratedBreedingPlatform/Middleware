@@ -19,9 +19,7 @@ public class KeySequenceRegisterDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setup() {
-		final Session session = this.sessionProvder.getSession();
-		this.keySequenceRegisterDao = new KeySequenceRegisterDAO();
-		this.keySequenceRegisterDao.setSession(session);
+		this.keySequenceRegisterDao = new KeySequenceRegisterDAO(this.sessionProvder.getSession());
 	}
 
 	@Test

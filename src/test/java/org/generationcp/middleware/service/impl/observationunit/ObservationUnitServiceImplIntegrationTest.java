@@ -98,10 +98,6 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		this.studySummary = this.trialServiceBrapi
 			.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid()).get(0);
 
-		// Create means dataset
-		this.createDataset(this.daoFactory.getDmsProjectDAO().getById(this.studySummary.getTrialDbId()), DatasetTypeEnum.MEANS_DATA,
-			"-MEANS");
-
 		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
 		dto.setTrialDbId(String.valueOf(this.studySummary.getTrialDbId()));
 		this.studyInstanceDto = this.studyServiceBrapi

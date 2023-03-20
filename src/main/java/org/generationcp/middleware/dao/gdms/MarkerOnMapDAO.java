@@ -16,6 +16,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.type.DoubleType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -35,6 +36,10 @@ import java.util.Map;
 public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 
 	private static final String FROM_GDMS_MARKERS_ONMAP = "FROM gdms_markers_onmap ";
+
+	public MarkerOnMapDAO(final Session session) {
+		super(session);
+	}
 
 	public void deleteByMapId(int mapId) {
 		try {

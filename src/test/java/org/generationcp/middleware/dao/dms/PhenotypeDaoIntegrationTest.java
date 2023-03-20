@@ -123,13 +123,11 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	public void setUp() throws Exception {
 
 		if (this.phenotypeDao == null) {
-			this.phenotypeDao = new PhenotypeDao();
-			this.phenotypeDao.setSession(this.sessionProvder.getSession());
+			this.phenotypeDao = new PhenotypeDao(this.sessionProvder.getSession());
 		}
 
 		if (this.geolocationDao == null) {
-			this.geolocationDao = new GeolocationDao();
-			this.geolocationDao.setSession(this.sessionProvder.getSession());
+			this.geolocationDao = new GeolocationDao(this.sessionProvder.getSession());
 		}
 
 		if (this.locationDAO == null) {
@@ -137,8 +135,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		}
 
 		if (this.geolocPropDao == null) {
-			this.geolocPropDao = new GeolocationPropertyDao();
-			this.geolocPropDao.setSession(this.sessionProvder.getSession());
+			this.geolocPropDao = new GeolocationPropertyDao(this.sessionProvder.getSession());
 		}
 
 		if (this.germplasmDao == null) {
@@ -150,33 +147,27 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		}
 
 		if (this.experimentDao == null) {
-			this.experimentDao = new ExperimentDao();
-			this.experimentDao.setSession(this.sessionProvder.getSession());
+			this.experimentDao = new ExperimentDao(this.sessionProvder.getSession());
 		}
 
 		if (this.stockDao == null) {
-			this.stockDao = new StockDao();
-			this.stockDao.setSession(this.sessionProvder.getSession());
+			this.stockDao = new StockDao(this.sessionProvder.getSession());
 		}
 
 		if (this.dmsProjectDao == null) {
-			this.dmsProjectDao = new DmsProjectDao();
-			this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+			this.dmsProjectDao = new DmsProjectDao(this.sessionProvder.getSession());
 		}
 
 		if (this.cvTermDao == null) {
-			this.cvTermDao = new CVTermDao();
-			this.cvTermDao.setSession(this.sessionProvder.getSession());
+			this.cvTermDao = new CVTermDao(this.sessionProvder.getSession());
 		}
 
 		if (this.cvTermPropertyDao == null) {
-			this.cvTermPropertyDao = new CvTermPropertyDao();
-			this.cvTermPropertyDao.setSession(this.sessionProvder.getSession());
+			this.cvTermPropertyDao = new CvTermPropertyDao(this.sessionProvder.getSession());
 		}
 
 		if (this.projectPropertyDao == null) {
-			this.projectPropertyDao = new ProjectPropertyDao();
-			this.projectPropertyDao.setSession(this.sessionProvder.getSession());
+			this.projectPropertyDao = new ProjectPropertyDao(this.sessionProvder.getSession());
 		}
 
 		if (this.commonTestProject == null) {

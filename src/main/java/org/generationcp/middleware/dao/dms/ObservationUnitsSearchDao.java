@@ -23,6 +23,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -178,6 +179,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ " inner join file_metadata_cvterm fcvt on fm.file_id = fcvt.file_metadata_id"
 			+ " where fm.nd_experiment_id = nde.nd_experiment_id) as '" + FILE_TERM_IDS + "'");
 		mainVariablesMap.put(String.valueOf(TermId.CROSS.getId()), "    s.cross_value AS '%s'");
+	}
+
+	public ObservationUnitsSearchDao(final Session session) {
+		super(session);
 	}
 
 	public Integer countObservationUnitsForDataset(final Integer datasetId, final List<Integer> instanceIds, final Boolean draftMode,

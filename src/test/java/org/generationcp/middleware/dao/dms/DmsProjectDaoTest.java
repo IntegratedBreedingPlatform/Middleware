@@ -37,8 +37,7 @@ public class DmsProjectDaoTest {
 	public void beforeEachTest() {
 		this.mockSession = Mockito.mock(Session.class);
 
-		this.dao = new DmsProjectDao();
-		this.dao.setSession(this.mockSession);
+		this.dao = new DmsProjectDao(this.mockSession);
 
 		this.mockQuery = Mockito.mock(SQLQuery.class);
 		Mockito.when(this.mockSession.createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER)).thenReturn(this.mockQuery);

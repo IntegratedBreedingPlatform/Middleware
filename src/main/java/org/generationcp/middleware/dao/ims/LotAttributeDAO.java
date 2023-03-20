@@ -11,6 +11,7 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotAttribute;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 
 import java.util.ArrayList;
@@ -59,6 +60,10 @@ public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 		+ "    ims_lot lot ON a.lotId = lot.lotId "
 		+ " WHERE"
 		+ "    lot.lotId IN (:lotIds) ";
+
+	public LotAttributeDAO(final Session session) {
+		super(session);
+	}
 
 	public List<AttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
 		try {

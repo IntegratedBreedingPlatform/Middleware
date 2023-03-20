@@ -40,28 +40,23 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 	@Before
 	public void test() {
 		if (this.geolocationDao == null) {
-			this.geolocationDao = new GeolocationDao();
-			this.geolocationDao.setSession(this.sessionProvder.getSession());
+			this.geolocationDao = new GeolocationDao(this.sessionProvder.getSession());
 		}
 
 		if (this.geolocationPropDao == null) {
-			this.geolocationPropDao = new GeolocationPropertyDao();
-			this.geolocationPropDao.setSession(this.sessionProvder.getSession());
+			this.geolocationPropDao = new GeolocationPropertyDao(this.sessionProvder.getSession());
 		}
 
 		if (this.dmsProjectDao == null) {
-			this.dmsProjectDao = new DmsProjectDao();
-			this.dmsProjectDao.setSession(this.sessionProvder.getSession());
+			this.dmsProjectDao = new DmsProjectDao(this.sessionProvder.getSession());
 		}
 
 		if (this.experimentDao == null) {
-			this.experimentDao = new ExperimentDao();
-			this.experimentDao.setSession(this.sessionProvder.getSession());
+			this.experimentDao = new ExperimentDao(this.sessionProvder.getSession());
 		}
 
 		if (this.cvTermDao == null) {
-			this.cvTermDao = new CVTermDao();
-			this.cvTermDao.setSession(this.sessionProvder.getSession());
+			this.cvTermDao = new CVTermDao(this.sessionProvder.getSession());
 		}
 
 		if (this.study == null) {

@@ -40,6 +40,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -134,6 +135,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_PHENOTYPE = "SELECT count(e.nd_experiment_id) "
 		+ "FROM nd_experiment e  INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id "
 		+ "AND p.observable_id = :variableId AND (p.value IS NOT NULL  OR p.cvalue_id IS NOT NULL)";
+
+	public ExperimentDao(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByGeolocationIds(final Collection<Integer> geolocationIds) {

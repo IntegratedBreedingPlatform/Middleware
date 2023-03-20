@@ -76,11 +76,9 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 
 		this.methodDAO = new MethodDAO(this.sessionProvder.getSession());
 
-		this.cvTermDao = new CVTermDao();
-		this.cvTermDao.setSession(this.sessionProvder.getSession());
+		this.cvTermDao = new CVTermDao(this.sessionProvder.getSession());
 
-		this.cvTermPropertyDao = new CvTermPropertyDao();
-		this.cvTermPropertyDao.setSession(this.sessionProvder.getSession());
+		this.cvTermPropertyDao = new CvTermPropertyDao(this.sessionProvder.getSession());
 	}
 
 	@Test
