@@ -1325,6 +1325,86 @@
  	</changeSet>
 
 	<changeSet author="cuenyad" id="v23.2.0-68">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CROSSING_OPTIONS_PERMISSION';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Crossing Options permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_CROSSING_OPTIONS_PERMISSION', 'Crossing Options', @ms_study_Actions_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSING_OPTIONS_PERMISSION');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-69">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPORT_CROSSING_TEMPLATE_PERMISSION';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Export crossing template permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_crossing_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSING_OPTIONS_PERMISSION');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXPORT_CROSSING_TEMPLATE_PERMISSION', 'Export crossing template', @ms_crossing_options_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPORT_CROSSING_TEMPLATE_PERMISSION');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-70">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_IMPORT_CROSSES_PERMISSION';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Import Crosses permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_crossing_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSING_OPTIONS_PERMISSION');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_IMPORT_CROSSES_PERMISSION', 'Import Crosses', @ms_crossing_options_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_IMPORT_CROSSES_PERMISSION');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-71">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_DESIGN_NEW_CROSSES_PERMISSION';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Design New Crosses permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_crossing_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSING_OPTIONS_PERMISSION');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DESIGN_NEW_CROSSES_PERMISSION', 'Design New Crosses', @ms_crossing_options_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DESIGN_NEW_CROSSES_PERMISSION');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-72">
          <preConditions onFail="MARK_RAN">
 			<and>
             	<sqlCheck expectedResult="0">
