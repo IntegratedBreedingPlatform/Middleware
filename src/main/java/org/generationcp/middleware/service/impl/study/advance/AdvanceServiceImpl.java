@@ -165,13 +165,13 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	@Override
 	public List<Integer> advanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
-		return this.advance(studyId, request, false, null);
+		return this.advance(studyId, request, false, null, false);
 	}
 
 	@Override
 	public List<AdvanceGermplasmPreview> advanceStudyPreview(final Integer studyId, final AdvanceStudyRequest request) {
 		final List<AdvanceGermplasmPreview> advanceGermplasmPreviewList = new ArrayList<>();
-		this.advance(studyId, request, true, advanceGermplasmPreviewList);
+		this.advance(studyId, request, true, advanceGermplasmPreviewList, false);
 		Collections.sort(advanceGermplasmPreviewList, Comparator.comparing(AdvanceGermplasmPreview::getEntryNumber));
 
 		return advanceGermplasmPreviewList;
@@ -179,11 +179,20 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	@Override
 	public List<Integer> advanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
-		return this.advance(studyId, request, false, null);
+		return this.advance(studyId, request, false, null, true);
+	}
+
+	@Override
+	public List<AdvanceGermplasmPreview> advanceSamplesPreview(final Integer studyId, final AdvanceSamplesRequest request) {
+		final List<AdvanceGermplasmPreview> advanceGermplasmPreviewList = new ArrayList<>();
+		this.advance(studyId, request, true, advanceGermplasmPreviewList, true);
+		Collections.sort(advanceGermplasmPreviewList, Comparator.comparing(AdvanceGermplasmPreview::getEntryNumber));
+
+		return advanceGermplasmPreviewList;
 	}
 
 	private List<Integer> advance(final Integer studyId, final AdvanceRequest request,
-		final boolean isPreview, final List<AdvanceGermplasmPreview> advanceGermplasmPreviewList) {
+		final boolean isPreview, final List<AdvanceGermplasmPreview> advanceGermplasmPreviewList, final boolean isSample) {
 
 		final DatasetDTO dataset = request.accept(new GetDatasetVisitor(studyId, this.datasetService));
 		final DatasetDTO environmentDataset =
@@ -198,9 +207,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 				observationVisibleColumns);
 
 		final List<ObservationUnitRow> filteredObservations;
-		if (request.getExcludedObservations() != null && !request.getExcludedObservations().isEmpty()) {
+		if (!isSample && request.getExcludedAdvancedRows() != null && !request.getExcludedAdvancedRows().isEmpty()) {
 			filteredObservations = observations.stream()
-				.filter(observationUnitRow -> !request.getExcludedObservations().contains(observationUnitRow.getObservationUnitId()))
+				.filter(observationUnitRow -> !request.getExcludedAdvancedRows().contains(observationUnitRow.getObservationUnitId()))
 				.collect(Collectors.toList());
 		} else {
 			filteredObservations = observations;
@@ -288,8 +297,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 			}
 
 			// Get the sample numbers
-			final List<Integer> sampleNumbers =
+			final List<SampleDTO> sampleDTOS =
 				request.accept(new GetSampleNumbersVisitor(row.getObservationUnitId(), samplesByExperimentId));
+			final List<Integer> sampleNumbers =
+				sampleDTOS.stream().map(SampleDTO::getSampleNumber).collect(Collectors.toList());
 
 			// Get the number of selected plants
 			final Integer plantsSelected =
@@ -313,7 +324,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 			final AdvancingSource advancingSource =
 				new AdvancingSource(originGermplasm, namesByGids.get(row.getGid()), row, trialInstanceObservation,
 					breedingMethod, breedingMethodsById.get(originGermplasm.getMethodId()),
-					seasonStudyLevel, selectionTraitStudyLevel, plantsSelected, sampleNumbers);
+					seasonStudyLevel, selectionTraitStudyLevel, plantsSelected, sampleDTOS);
 			advancingSource.setPreview(isPreview);
 
 			// Resolves data related to season, selection trait and location for environment and plot
@@ -368,7 +379,16 @@ public class AdvanceServiceImpl implements AdvanceService {
 				final String originGermplasmName = originGermplasmNames.isEmpty() ? "" : originGermplasmNames.get(0).getNval();
 				final String pedigreeString = pedigreeStringMap.get(observation.getGid());
 
+				final Iterator<SampleDTO> sampleDTOIterator = advancingSource.getSampleDTOS().iterator();
 				advancingSource.getAdvancedGermplasm().forEach(germplasm -> {
+					final SampleDTO sampleDTO = (sampleDTOIterator.hasNext()) ? sampleDTOIterator.next() : null;
+					final String sampleNumber = sampleDTO != null ? String.valueOf(sampleDTO.getSampleNumber()) : null;
+
+					if (isSample && request.getExcludedAdvancedRows() != null
+						&& !request.getExcludedAdvancedRows().isEmpty()
+						&& request.getExcludedAdvancedRows().contains(sampleDTO.getSampleId())) {
+						return;
+					}
 
 					// inherit 'selection history at fixation' and code names of parent if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
@@ -384,22 +404,20 @@ public class AdvanceServiceImpl implements AdvanceService {
 						advancedGermplasmGids.add(germplasm.getGid());
 					}
 
-					final Iterator<Integer> sampleNumberIterator = advancingSource.getSampleNumbers().iterator();
-					final String sampleNumber = (sampleNumberIterator.hasNext()) ? String.valueOf(sampleNumberIterator.next()) : null;
-
-					// Get all plots selection
-					final Boolean allPlotsSelected = request.accept(new GetAllPlotsSelectedVisitor());
-
 					if (isPreview) {
 						final List<Name> currentGermplasmNames = germplasm.getNames();
 
 						advanceGermplasmPreviewList.add(
-							new AdvanceGermplasmPreview(observation.getObservationUnitId(), trialInstance == null ? "" : trialInstance.toString(),
+							new AdvanceGermplasmPreview(isSample ? sampleDTO.getSampleId() : observation.getObservationUnitId(),
+								trialInstance == null ? "" : trialInstance.toString(),
 								locationsByLocationId.get(germplasm.getLocationId()).getLname(),
 								entryNumber, plotNumber, plantNumber, pedigreeString,
 								originGermplasmName, germplasm.getMethod().getMcode(),
 								currentGermplasmNames.isEmpty() ? "" : currentGermplasmNames.get(0).getNval()));
 					} else {
+						// Get all plots selection
+						final Boolean allPlotsSelected = request.accept(new GetAllPlotsSelectedVisitor());
+
 						// Adding attributes to the advanced germplasm
 						this.createGermplasmAttributes(study.getName(), advancingSource,
 							allPlotsSelected, germplasm.getGid(),
@@ -416,6 +434,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 								GermplasmStudySourceType.ADVANCE);
 						this.germplasmStudySourceService.saveGermplasmStudySources(Arrays.asList(germplasmStudySourceInput));
 					}
+
 					selectionNumber.incrementAndGet();
 				});
 			});

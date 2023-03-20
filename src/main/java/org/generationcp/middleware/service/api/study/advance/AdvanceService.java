@@ -29,4 +29,10 @@ public interface AdvanceService {
 	 */
 	List<Integer> advanceSamples(Integer studyId, AdvanceSamplesRequest request);
 
+	/**
+	 * @param studyId
+	 * @param request
+	 * @return a {@link List} of the advanced gids
+	 */
+	List<AdvanceGermplasmPreview> advanceSamplesPreview(Integer studyId, AdvanceSamplesRequest request);
 }
