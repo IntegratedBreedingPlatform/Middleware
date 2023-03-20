@@ -12,8 +12,6 @@ public class SampleGenotypeData {
 
 	private String value;
 
-	private Integer datasetId;
-
 	public SampleGenotypeData() {
 
 	}
@@ -46,14 +44,6 @@ public class SampleGenotypeData {
 
 	public void setValue(final String value) {
 		this.value = value;
-	}
-
-	public Integer getDatasetId() {
-		return this.datasetId;
-	}
-
-	public void setDatasetId(final Integer datasetId) {
-		this.datasetId = datasetId;
 	}
 
 	@Override

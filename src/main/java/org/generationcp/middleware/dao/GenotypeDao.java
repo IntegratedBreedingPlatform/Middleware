@@ -6,7 +6,6 @@ import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeData;
@@ -59,7 +58,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 			TermId.OBS_UNIT_ID.getId());
 
 	public static final List<Integer> SAMPLE_COLUMN_TERM_IDS =
-			Arrays.asList(TermId.SAMPLE_NAME.getId(), TermId.SAMPLE_UUID.getId(), TermId.SAMPLING_DATE.getId());
+		Arrays.asList(TermId.SAMPLE_NAME.getId(), TermId.SAMPLE_UUID.getId(), TermId.SAMPLING_DATE.getId());
 
 	protected static final Set<String> SAMPLE_GENOTYPES_TABLE_SYSTEM_COLUMNS =
 		Sets.newHashSet(TRIAL_INSTANCE, GID, DESIGNATION, ENTRY_NO, OBS_UNIT_ID, OBSERVATION_UNIT_ID, DATASET_ID,
@@ -67,7 +66,8 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 	private static final String GENOTYPE_SEARCH_FROM_QUERY = "FROM sample s " +
 		"LEFT JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id " +
-		"LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) " +
+		"LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) "
+		+
 		"LEFT JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " +
 		"LEFT JOIN project p ON p.project_id = nde.project_id " +
 		"INNER JOIN genotype geno ON s.sample_id = geno.sample_id " +
@@ -158,7 +158,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		sql.append(GENOTYPE_SEARCH_FROM_QUERY);
 		this.addSearchQueryFilters(sql, searchRequestDTO);
 		sql.append(" GROUP BY s.sample_id ");
-		this.addOrder(sql, searchRequestDTO, standardSampleGenotypeVariables.get(TermId.PLOT_NO.getId()), pageable);
+		this.addOrder(sql, standardSampleGenotypeVariables.get(TermId.PLOT_NO.getId()), pageable);
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 		this.addQueryParams(query, searchRequestDTO);
@@ -192,63 +192,12 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 				sampleGenotypeDTO.setTakenById((Integer) row.get(TAKEN_BY));
 				sampleGenotypeDTO.setGenotypeDataMap(new HashMap<>());
 
-				final String gidColumnName = standardSampleGenotypeVariables.get(TermId.GID.getId());
-				final Integer gid = (Integer) row.get(gidColumnName);
-				if (gid != null) {
+				standardSampleGenotypeVariables.forEach((variableId, columnName) -> {
+					final Object columnValue = row.get(columnName);
 					sampleGenotypeDTO.getGenotypeDataMap()
-						.put(gidColumnName, new SampleGenotypeData(TermId.GID.getId(), gidColumnName, gid.toString()));
-				}
-
-				final String designationColumnName = standardSampleGenotypeVariables.get(TermId.DESIG.getId());
-				final String designation = (String) row.get(designationColumnName);
-				if (designation != null) {
-					sampleGenotypeDTO.getGenotypeDataMap()
-						.put(designationColumnName, new SampleGenotypeData(TermId.DESIG.getId(), designationColumnName, designation));
-				}
-
-				final String entryNoColumnName = standardSampleGenotypeVariables.get(TermId.ENTRY_NO.getId());
-				final String entryNo = (String) row.get(entryNoColumnName);
-				if (entryNo != null) {
-					sampleGenotypeDTO.getGenotypeDataMap()
-						.put(entryNoColumnName, new SampleGenotypeData(TermId.ENTRY_NO.getId(), entryNoColumnName, entryNo));
-				}
-
-				final String entryTypeColumnName = standardSampleGenotypeVariables.get(TermId.ENTRY_TYPE.getId());
-				final String entryType = (String) row.get(entryTypeColumnName);
-				if (entryType != null) {
-					sampleGenotypeDTO.getGenotypeDataMap()
-						.put(entryTypeColumnName, new SampleGenotypeData(TermId.ENTRY_TYPE.getId(), entryTypeColumnName, entryType));
-				}
-
-				final String trialInstanceColumnName = standardSampleGenotypeVariables.get(TermId.TRIAL_INSTANCE_FACTOR.getId());
-				final String trialInstance = (String) row.get(trialInstanceColumnName);
-				if (NumberUtils.isDigits(trialInstance)) {
-					sampleGenotypeDTO.getGenotypeDataMap().put(trialInstanceColumnName,
-						new SampleGenotypeData(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialInstanceColumnName, trialInstance));
-				}
-
-				final String repNoColumnName = standardSampleGenotypeVariables.get(TermId.REP_NO.getId());
-				final String repNo = (String) row.get(repNoColumnName);
-				if (repNo != null) {
-					sampleGenotypeDTO.getGenotypeDataMap()
-						.put(repNoColumnName, new SampleGenotypeData(TermId.REP_NO.getId(), repNoColumnName, repNo));
-				}
-
-				final String plotNoColumnName = standardSampleGenotypeVariables.get(TermId.PLOT_NO.getId());
-				final String plotNo = (String) row.get(plotNoColumnName);
-				if (plotNoColumnName != null) {
-					sampleGenotypeDTO.getGenotypeDataMap()
-						.put(plotNoColumnName, new SampleGenotypeData(TermId.PLOT_NO.getId(), plotNoColumnName, plotNo));
-				}
-
-				final String obsUnitIdColumnName = standardSampleGenotypeVariables.get(TermId.OBS_UNIT_ID.getId());
-				final String obsUnitId = (String) row.get(obsUnitIdColumnName);
-				if (obsUnitId != null) {
-					final SampleGenotypeData
-						sampleGenotypeData = new SampleGenotypeData(TermId.OBS_UNIT_ID.getId(), obsUnitIdColumnName, obsUnitId);
-					sampleGenotypeData.setDatasetId((Integer) row.get(DATASET_ID));
-					sampleGenotypeDTO.getGenotypeDataMap().put(obsUnitIdColumnName, sampleGenotypeData);
-				}
+						.put(columnName, new SampleGenotypeData(variableId, columnName,
+							columnValue == null ? StringUtils.EMPTY : String.valueOf(columnValue)));
+				});
 
 				if (!CollectionUtils.isEmpty(searchRequestDTO.getSampleGenotypeVariables())) {
 					for (final MeasurementVariable sampleGenotypeVariable : searchRequestDTO.getSampleGenotypeVariables()) {
@@ -267,7 +216,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 	}
 
-	private void addSearchQueryFilters(final StringBuilder sql,	final SampleGenotypeSearchRequestDTO requestDTO) {
+	private void addSearchQueryFilters(final StringBuilder sql, final SampleGenotypeSearchRequestDTO requestDTO) {
 		if (!CollectionUtils.isEmpty(requestDTO.getTakenByIds())) {
 			sql.append(" and s.taken_by IN (:takenByIds)");
 		}
@@ -330,15 +279,17 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 			final List<String> filterVariableIds = new ArrayList<>();
 			if (!MapUtils.isEmpty(filter.getFilteredTextValues())) {
 				filterVariableIds.addAll(filter.getFilteredTextValues().keySet());
-				for (final String variableId: filter.getFilteredTextValues().keySet()) {
+				for (final String variableId : filter.getFilteredTextValues().keySet()) {
 					final Integer variableIdInt = Integer.valueOf(variableId);
 					if (!SAMPLE_COLUMN_TERM_IDS.contains(variableIdInt) && TermId.TAKEN_BY.getId() != variableIdInt) {
 						sql.setParameter(variableId + "_text", "%" + filter.getFilteredTextValues().get(variableId) + "%");
 					} else if (SAMPLE_COLUMN_TERM_IDS.contains(variableIdInt)) {
 						if (TermId.SAMPLING_DATE.getId() != variableIdInt) {
-							sql.setParameter(TermId.getById(variableIdInt).name() + "_text", "%" + filter.getFilteredTextValues().get(variableId) + "%");
+							sql.setParameter(TermId.getById(variableIdInt).name() + "_text",
+								"%" + filter.getFilteredTextValues().get(variableId) + "%");
 						} else if (TermId.SAMPLING_DATE.getId() == variableIdInt) {
-							sql.setParameter(TermId.getById(variableIdInt).name() + "_text", filter.getFilteredTextValues().get(variableId));
+							sql.setParameter(TermId.getById(variableIdInt).name() + "_text",
+								filter.getFilteredTextValues().get(variableId));
 						}
 					}
 				}
@@ -346,7 +297,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 
 			if (!MapUtils.isEmpty(filter.getFilteredValues())) {
 				filterVariableIds.addAll(filter.getFilteredValues().keySet());
-				for (final String variableId: filter.getFilteredValues().keySet()) {
+				for (final String variableId : filter.getFilteredValues().keySet()) {
 					final Integer variableIdInt = Integer.valueOf(variableId);
 					if (!SAMPLE_COLUMN_TERM_IDS.contains(variableIdInt) && TermId.TAKEN_BY.getId() != variableIdInt) {
 						sql.setParameterList(variableId + "_values", filter.getFilteredValues().get(variableId));
@@ -374,7 +325,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		for (final String variableId : variableIds) {
 			final String variableTypeString = filter.getVariableTypeMap().get(variableId);
 			if (VariableType.GENOTYPE_MARKER.name().equals(variableTypeString)) {
-				this.appendGenotypeMarkerFilteringToQuery(sql, variableId, performLikeOperation, filter);
+				this.appendGenotypeMarkerFilteringToQuery(sql, variableId, performLikeOperation);
 			} else {
 				this.applyFactorsFilter(sql, variableId, variableTypeString, performLikeOperation);
 			}
@@ -382,7 +333,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 	}
 
 	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType,
-									final boolean performLikeOperation) {
+		final boolean performLikeOperation) {
 		// Check if the variable to be filtered is in one of the columns in stock, nd_experiment, geolocation or sum of samples
 		final String observationUnitClause = VariableType.OBSERVATION_UNIT.name().equals(variableType) ? "nde.observation_unit_no" : null;
 		final String filterClause = factorsFilterMap.get(variableId);
@@ -420,19 +371,19 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 	private void applySampleColumnsFilter(final StringBuilder sql, final Integer variableId) {
 		if (TermId.SAMPLING_DATE.getId() == variableId) {
 			sql.append(" AND ")
-					.append(factorsFilterMap.get(variableId.toString()))
-					.append(" = :")
-					.append(TermId.SAMPLING_DATE.name() + "_text");
+				.append(factorsFilterMap.get(variableId.toString()))
+				.append(" = :")
+				.append(TermId.SAMPLING_DATE.name() + "_text");
 		} else {
 			sql.append(" AND ")
-					.append(factorsFilterMap.get(variableId.toString()))
-					.append(" LIKE :")
-					.append(TermId.getById(variableId).name() + "_text");
+				.append(factorsFilterMap.get(variableId.toString()))
+				.append(" LIKE :")
+				.append(TermId.getById(variableId).name() + "_text");
 		}
 	}
 
-	private void appendGenotypeMarkerFilteringToQuery(final StringBuilder sql, final String variableId, final boolean performLikeOperation,
-		final SampleGenotypeSearchRequestDTO.GenotypeFilter filter) {
+	private void appendGenotypeMarkerFilteringToQuery(final StringBuilder sql, final String variableId,
+		final boolean performLikeOperation) {
 		final String matchClause = performLikeOperation ? " LIKE :" + variableId + "_text " : " IN (:" + variableId + "_values) ";
 		sql.append(" and EXISTS ( ")
 			.append("    SELECT 1 ")
@@ -507,8 +458,7 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		return true;
 	}
 
-	private void addOrder(final StringBuilder sql, final SampleGenotypeSearchRequestDTO searchDto, final String plotNoName,
-		final Pageable pageable) {
+	private void addOrder(final StringBuilder sql, final String plotNoName, final Pageable pageable) {
 
 		if (pageable != null && pageable.getSort() != null) {
 			final String orderClause = StreamSupport.stream(pageable.getSort().spliterator(), false)
