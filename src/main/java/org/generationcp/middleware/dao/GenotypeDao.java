@@ -65,11 +65,10 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 			SAMPLE_NAME, SAMPLE_UUID, TAKEN_BY, SAMPLING_DATE);
 
 	private static final String GENOTYPE_SEARCH_FROM_QUERY = "FROM sample s " +
-		"LEFT JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id " +
-		"LEFT JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) "
-		+
-		"LEFT JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " +
-		"LEFT JOIN project p ON p.project_id = nde.project_id " +
+		"INNER JOIN nd_experiment nde ON nde.nd_experiment_id = s.nd_experiment_id " +
+		"INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) "	+
+		"INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " +
+		"INNER JOIN project p ON p.project_id = nde.project_id " +
 		"INNER JOIN genotype geno ON s.sample_id = geno.sample_id " +
 		"LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = geno.variable_id " +
 		"LEFT JOIN stock st ON st.stock_id = nde.stock_id " +
@@ -77,8 +76,6 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		"LEFT JOIN cvterm cvterm_entry_variable ON (cvterm_entry_variable.cvterm_id = sp.type_id) " +
 		"LEFT JOIN germplsm g ON g.gid = st.dbxref_id " +
 		"LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
-		"LEFT JOIN nd_experimentprop plot_no ON plot_no.nd_experiment_id = nde.nd_experiment_id AND plot_no.type_id = " +
-		TermId.PLOT_NO.getId() + " " +
 		"WHERE p.study_id = :studyId ";
 
 	private static final Map<String, String> mainVariablesMap = new HashMap<>();
