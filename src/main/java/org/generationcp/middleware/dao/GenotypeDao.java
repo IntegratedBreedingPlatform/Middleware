@@ -69,12 +69,12 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		"INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) "	+
 		"INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " +
 		"INNER JOIN project p ON p.project_id = nde.project_id " +
+		"INNER JOIN stock st ON st.stock_id = nde.stock_id " +
+		"INNER JOIN germplsm g ON g.gid = st.dbxref_id " +
 		"INNER JOIN genotype geno ON s.sample_id = geno.sample_id " +
 		"LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = geno.variable_id " +
-		"LEFT JOIN stock st ON st.stock_id = nde.stock_id " +
 		"LEFT JOIN stockprop sp ON sp.stock_id = st.stock_id " +
 		"LEFT JOIN cvterm cvterm_entry_variable ON (cvterm_entry_variable.cvterm_id = sp.type_id) " +
-		"LEFT JOIN germplsm g ON g.gid = st.dbxref_id " +
 		"LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
 		"WHERE p.study_id = :studyId ";
 
