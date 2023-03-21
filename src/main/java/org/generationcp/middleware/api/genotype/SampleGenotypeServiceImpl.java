@@ -114,22 +114,25 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 
 		final Map<Integer, MeasurementVariable> result = new HashMap<>();
 
-		final VariableFilter variableFilter = new VariableFilter();
-		sampleGenotypeVariables.forEach(variableFilter::addVariableId);
-		this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().forEach(v -> {
-			final MeasurementVariable measurementVariable = new MeasurementVariable();
-			measurementVariable.setTermId(v.getId());
-			measurementVariable.setName(v.getName());
-			measurementVariable.setAlias(StringUtils.isEmpty(v.getAlias()) ? v.getName() : v.getAlias());
-			measurementVariable.setDescription(v.getDefinition());
-			measurementVariable.setVariableType(VariableType.GENOTYPE_MARKER);
-			measurementVariable.setProperty(v.getProperty().getName());
-			measurementVariable.setScale(v.getScale().getName());
-			measurementVariable.setMethod(v.getMethod().getName());
-			measurementVariable.setDataType(v.getScale().getDataType().getName());
-			measurementVariable.setDataTypeId(v.getScale().getDataType().getId());
-			result.put(v.getId(), measurementVariable);
-		});
+		if (!CollectionUtils.isEmpty(sampleGenotypeVariables)) {
+
+			final VariableFilter variableFilter = new VariableFilter();
+			sampleGenotypeVariables.forEach(variableFilter::addVariableId);
+			this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().forEach(v -> {
+				final MeasurementVariable measurementVariable = new MeasurementVariable();
+				measurementVariable.setTermId(v.getId());
+				measurementVariable.setName(v.getName());
+				measurementVariable.setAlias(StringUtils.isEmpty(v.getAlias()) ? v.getName() : v.getAlias());
+				measurementVariable.setDescription(v.getDefinition());
+				measurementVariable.setVariableType(VariableType.GENOTYPE_MARKER);
+				measurementVariable.setProperty(v.getProperty().getName());
+				measurementVariable.setScale(v.getScale().getName());
+				measurementVariable.setMethod(v.getMethod().getName());
+				measurementVariable.setDataType(v.getScale().getDataType().getName());
+				measurementVariable.setDataTypeId(v.getScale().getDataType().getId());
+				result.put(v.getId(), measurementVariable);
+			});
+		}
 
 		return result;
 	}
