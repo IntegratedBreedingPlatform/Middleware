@@ -1405,6 +1405,126 @@
  	</changeSet>
 
 	<changeSet author="cuenyad" id="v23.2.0-72">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_FIELD_MAP_OPTIONS';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Field Map options permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_study_actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_FIELD_MAP_OPTIONS', 'Field Map Options', @ms_study_actions_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_FIELD_MAP_OPTIONS');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-73">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MAKE_FIELD_MAP';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Make Field Map permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_field_map_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_FIELD_MAP_OPTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_MAKE_FIELD_MAP', 'Make Field Map', @ms_field_map_options_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MAKE_FIELD_MAP');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-74">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_FIELD_MAP';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>View Field Map permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_field_map_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_FIELD_MAP_OPTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_FIELD_MAP', 'View Field Map', @ms_field_map_options_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_FIELD_MAP');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-75">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_DELETE_FIELD_MAP';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Delete Field Map permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_field_map_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_FIELD_MAP_OPTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DELETE_FIELD_MAP', 'Delete Field Map', @ms_field_map_options_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DELETE_FIELD_MAP');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-76">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CREATE_GEOREFERENCE';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Create Georeference permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_field_map_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_FIELD_MAP_OPTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_CREATE_GEOREFERENCE', 'Create Georeference', @ms_field_map_options_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CREATE_GEOREFERENCE');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-77">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EDIT_GEOREFERENCE';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Edit Georeference permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @ms_field_map_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_FIELD_MAP_OPTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EDIT_GEOREFERENCE', 'Edit Georeference', @ms_field_map_options_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EDIT_GEOREFERENCE');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-79">
          <preConditions onFail="MARK_RAN">
 			<and>
             	<sqlCheck expectedResult="0">
