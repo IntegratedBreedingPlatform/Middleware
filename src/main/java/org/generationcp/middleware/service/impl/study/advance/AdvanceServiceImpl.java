@@ -62,9 +62,11 @@ import org.generationcp.middleware.service.impl.study.advance.visitor.GetAllPlot
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetBreedingMethodVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetDatasetVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetExperimentSamplesVisitor;
+import org.generationcp.middleware.service.impl.study.advance.visitor.GetFilteredObservationsVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetObservationsVisibleColumnsVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetPlantSelectedVisitor;
-import org.generationcp.middleware.service.impl.study.advance.visitor.GetSampleNumbersVisitor;
+import org.generationcp.middleware.service.impl.study.advance.visitor.GetPreviewUniqueIdVisitor;
+import org.generationcp.middleware.service.impl.study.advance.visitor.GetSampleDTOsVisitor;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -165,34 +167,34 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	@Override
 	public List<Integer> advanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
-		return this.advance(studyId, request, false, null, false);
+		return this.advance(studyId, request, false, null);
 	}
 
 	@Override
 	public List<AdvanceGermplasmPreview> advanceStudyPreview(final Integer studyId, final AdvanceStudyRequest request) {
 		final List<AdvanceGermplasmPreview> advanceGermplasmPreviewList = new ArrayList<>();
-		this.advance(studyId, request, true, advanceGermplasmPreviewList, false);
-		Collections.sort(advanceGermplasmPreviewList, Comparator.comparing(AdvanceGermplasmPreview::getEntryNumber));
+		this.advance(studyId, request, true, advanceGermplasmPreviewList);
+		Collections.sort(advanceGermplasmPreviewList, Comparator.comparing(AdvanceGermplasmPreview::getEntryNumberValue));
 
 		return advanceGermplasmPreviewList;
 	}
 
 	@Override
 	public List<Integer> advanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
-		return this.advance(studyId, request, false, null, true);
+		return this.advance(studyId, request, false, null);
 	}
 
 	@Override
 	public List<AdvanceGermplasmPreview> advanceSamplesPreview(final Integer studyId, final AdvanceSamplesRequest request) {
 		final List<AdvanceGermplasmPreview> advanceGermplasmPreviewList = new ArrayList<>();
-		this.advance(studyId, request, true, advanceGermplasmPreviewList, true);
-		Collections.sort(advanceGermplasmPreviewList, Comparator.comparing(AdvanceGermplasmPreview::getEntryNumber));
+		this.advance(studyId, request, true, advanceGermplasmPreviewList);
+		Collections.sort(advanceGermplasmPreviewList, Comparator.comparing(AdvanceGermplasmPreview::getEntryNumberValue));
 
 		return advanceGermplasmPreviewList;
 	}
 
 	private List<Integer> advance(final Integer studyId, final AdvanceRequest request,
-		final boolean isPreview, final List<AdvanceGermplasmPreview> advanceGermplasmPreviewList, final boolean isSample) {
+		final boolean isPreview, final List<AdvanceGermplasmPreview> advanceGermplasmPreviewList) {
 
 		final DatasetDTO dataset = request.accept(new GetDatasetVisitor(studyId, this.datasetService));
 		final DatasetDTO environmentDataset =
@@ -206,14 +208,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 			this.getObservations(studyId, dataset.getDatasetId(), request.getInstanceIds(), request.getSelectedReplications(),
 				observationVisibleColumns);
 
-		final List<ObservationUnitRow> filteredObservations;
-		if (!isSample && request.getExcludedAdvancedRows() != null && !request.getExcludedAdvancedRows().isEmpty()) {
-			filteredObservations = observations.stream()
-				.filter(observationUnitRow -> !request.getExcludedAdvancedRows().contains(observationUnitRow.getObservationUnitId()))
-				.collect(Collectors.toList());
-		} else {
-			filteredObservations = observations;
-		}
+		final List<ObservationUnitRow> filteredObservations =
+			request.accept(new GetFilteredObservationsVisitor(observations));
 
 		if (CollectionUtils.isEmpty(filteredObservations)) {
 			return new ArrayList<>();
@@ -298,7 +294,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 			// Get the sample numbers
 			final List<SampleDTO> sampleDTOS =
-				request.accept(new GetSampleNumbersVisitor(row.getObservationUnitId(), samplesByExperimentId));
+				request.accept(new GetSampleDTOsVisitor(row.getObservationUnitId(), samplesByExperimentId));
 			final List<Integer> sampleNumbers =
 				sampleDTOS.stream().map(SampleDTO::getSampleNumber).collect(Collectors.toList());
 
@@ -384,11 +380,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 					final SampleDTO sampleDTO = (sampleDTOIterator.hasNext()) ? sampleDTOIterator.next() : null;
 					final String sampleNumber = sampleDTO != null ? String.valueOf(sampleDTO.getSampleNumber()) : null;
 
-					if (isSample && request.getExcludedAdvancedRows() != null
-						&& !request.getExcludedAdvancedRows().isEmpty()
-						&& request.getExcludedAdvancedRows().contains(sampleDTO.getSampleId())) {
-						return;
-					}
+					// Get uniqueId for preview
+					final Integer uniqueId =
+						request.accept(new GetPreviewUniqueIdVisitor(observation, sampleDTO));
 
 					// inherit 'selection history at fixation' and code names of parent if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
@@ -408,7 +402,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 						final List<Name> currentGermplasmNames = germplasm.getNames();
 
 						advanceGermplasmPreviewList.add(
-							new AdvanceGermplasmPreview(isSample ? sampleDTO.getSampleId() : observation.getObservationUnitId(),
+							new AdvanceGermplasmPreview(uniqueId,
 								trialInstance == null ? "" : trialInstance.toString(),
 								locationsByLocationId.get(germplasm.getLocationId()).getLname(),
 								entryNumber, plotNumber, plantNumber, pedigreeString,

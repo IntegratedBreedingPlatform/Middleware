@@ -1,5 +1,6 @@
 package org.generationcp.middleware.ruleengine.pojo;
 
+import org.apache.commons.lang3.StringUtils;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -41,6 +42,10 @@ public class AdvanceGermplasmPreview {
 
 	public void setUniqueId(final Integer uniqueId) {
 		this.uniqueId = uniqueId;
+	}
+
+	public Integer getEntryNumberValue() {
+		return StringUtils.isEmpty(this.entryNumber) ? 0 : Integer.parseInt(this.entryNumber);
 	}
 
 	public String getEntryNumber() {

@@ -9,13 +9,14 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public class GetSampleNumbersVisitor implements AdvanceRequestVisitor<List<SampleDTO>> {
+public class GetSampleDTOsVisitor implements AdvanceRequestVisitor<List<SampleDTO>> {
 
 	private final Integer experimentId;
 	private final Map<Integer, List<SampleDTO>> samplesByExperimentId;
 
-	public GetSampleNumbersVisitor(final Integer experimentId,
+	public GetSampleDTOsVisitor(final Integer experimentId,
 		final Map<Integer, List<SampleDTO>> samplesByExperimentId) {
 		this.experimentId = experimentId;
 		this.samplesByExperimentId = samplesByExperimentId;
@@ -29,9 +30,16 @@ public class GetSampleNumbersVisitor implements AdvanceRequestVisitor<List<Sampl
 	@Override
 	public List<SampleDTO> visit(final AdvanceSamplesRequest request) {
 		final List<SampleDTO> sampleDTOS = this.samplesByExperimentId.get(this.experimentId);
+
 		if (CollectionUtils.isEmpty(sampleDTOS)) {
 			return new ArrayList<>();
 		}
+
+		if (!CollectionUtils.isEmpty(request.getExcludedAdvancedRows())) {
+			return sampleDTOS.stream().filter(sample -> !request.getExcludedAdvancedRows().contains(
+				sample.getSampleId())).collect(Collectors.toList());
+		}
+
 		return sampleDTOS;
 	}
 
