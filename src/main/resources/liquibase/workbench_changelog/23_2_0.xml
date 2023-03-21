@@ -1278,16 +1278,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-65">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'EXPORT_STUDY_ENTRIES';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPORT_STUDY_ENTRIES';
              </sqlCheck>
  		</preConditions>
         <comment>Export Study Entries permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @ms_manage_observation_units_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MANAGE_OBSERVATION_UNITS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('EXPORT_STUDY_ENTRIES', 'Export Study Entries', @ms_manage_observation_units_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXPORT_STUDY_ENTRIES', 'Export Study Entries', @ms_manage_observation_units_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'EXPORT_STUDY_ENTRIES');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPORT_STUDY_ENTRIES');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
