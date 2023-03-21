@@ -993,9 +993,9 @@
  		</preConditions>
         <comment>Update the parent id of MS_CREATE_LOTS by MS_STUDY_ACTIONS permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+			SET @ms_study_actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
 			SET @mg_create_lots_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CREATE_LOTS');
-			update permission set parent_id = @ms_study_Actions_permission_id where permission_id = @mg_create_lots_permission_id
+			update permission set parent_id = @ms_study_actions_permission_id where permission_id = @mg_create_lots_permission_id
  		</sql>
  	</changeSet>
 
@@ -1009,9 +1009,9 @@
  		</preConditions>
         <comment>Update the parent id of MS_MANAGE_OBSERVATION_UNITS by MS_STUDY_ACTIONS permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+			SET @ms_study_actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
 			SET @mg_observation_units_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MANAGE_OBSERVATION_UNITS');
-			update permission set parent_id = @ms_study_Actions_permission_id where permission_id = @mg_observation_units_permission_id
+			update permission set parent_id = @ms_study_actions_permission_id where permission_id = @mg_observation_units_permission_id
  		</sql>
  	</changeSet>
 
@@ -1023,9 +1023,9 @@
  		</preConditions>
         <comment>Create Genotyping Samples permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+			SET @ms_study_actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_CREATE_GENOTYPING_SAMPLES', 'Create Genotyping Samples', @ms_study_Actions_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_CREATE_GENOTYPING_SAMPLES', 'Create Genotyping Samples', @ms_study_actions_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CREATE_GENOTYPING_SAMPLES');
 
@@ -1043,9 +1043,9 @@
  		</preConditions>
         <comment>Execute calculated variables permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+			SET @ms_study_actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXECUTE_CALCULATED_VARIABLES', 'Execute calculated variables', @ms_study_Actions_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXECUTE_CALCULATED_VARIABLES', 'Execute calculated variables', @ms_study_actions_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXECUTE_CALCULATED_VARIABLES');
 
@@ -1063,9 +1063,9 @@
  		</preConditions>
         <comment>Design and planning options permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+			SET @ms_study_actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DESIGN_AND_PLANNING_OPTIONS', 'Design and planning options', @ms_study_Actions_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DESIGN_AND_PLANNING_OPTIONS', 'Design and planning options', @ms_study_actions_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DESIGN_AND_PLANNING_OPTIONS');
 
@@ -1123,9 +1123,9 @@
  		</preConditions>
         <comment>Advances permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+			SET @ms_study_actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ADVANCES', 'Advances', @ms_study_Actions_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ADVANCES', 'Advances', @ms_study_actions_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ADVANCES');
 
@@ -1183,9 +1183,9 @@
  		</preConditions>
         <comment>Analyze with STA BrAPP permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+			SET @ms_study_actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ANALYZE_WITH_STA_BRAPP', 'Analyze with STA BrAPP', @ms_study_Actions_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ANALYZE_WITH_STA_BRAPP', 'Analyze with STA BrAPP', @ms_study_actions_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ANALYZE_WITH_STA_BRAPP');
 
@@ -1203,9 +1203,9 @@
  		</preConditions>
         <comment>Analyze with Decision Support permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+			SET @ms_study_actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ANALYZE_WITH_DECISION_SUPPORT', 'Analyze with Decision Support', @ms_study_Actions_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ANALYZE_WITH_DECISION_SUPPORT', 'Analyze with Decision Support', @ms_study_actions_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ANALYZE_WITH_DECISION_SUPPORT');
 
@@ -1327,16 +1327,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-68">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CROSSING_OPTIONS_PERMISSION';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CROSSING_OPTIONS';
              </sqlCheck>
  		</preConditions>
         <comment>Crossing Options permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @ms_study_Actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
+			SET @ms_study_actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_CROSSING_OPTIONS_PERMISSION', 'Crossing Options', @ms_study_Actions_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_CROSSING_OPTIONS', 'Crossing Options', @ms_study_actions_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSING_OPTIONS_PERMISSION');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSING_OPTIONS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -1347,16 +1347,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-69">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPORT_CROSSING_TEMPLATE_PERMISSION';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPORT_CROSSING_TEMPLATE';
              </sqlCheck>
  		</preConditions>
-        <comment>Export crossing template permission</comment>
+        <comment>Export Crossing Template permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @ms_crossing_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSING_OPTIONS_PERMISSION');
+			SET @ms_crossing_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSING_OPTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXPORT_CROSSING_TEMPLATE_PERMISSION', 'Export crossing template', @ms_crossing_options_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXPORT_CROSSING_TEMPLATE', 'Export Crossing Template', @ms_crossing_options_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPORT_CROSSING_TEMPLATE_PERMISSION');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPORT_CROSSING_TEMPLATE');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -1367,16 +1367,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-70">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_IMPORT_CROSSES_PERMISSION';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_IMPORT_CROSSES';
              </sqlCheck>
  		</preConditions>
         <comment>Import Crosses permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @ms_crossing_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSING_OPTIONS_PERMISSION');
+			SET @ms_crossing_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSING_OPTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_IMPORT_CROSSES_PERMISSION', 'Import Crosses', @ms_crossing_options_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_IMPORT_CROSSES', 'Import Crosses', @ms_crossing_options_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_IMPORT_CROSSES_PERMISSION');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_IMPORT_CROSSES');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -1387,16 +1387,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-71">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_DESIGN_NEW_CROSSES_PERMISSION';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_DESIGN_NEW_CROSSES';
              </sqlCheck>
  		</preConditions>
         <comment>Design New Crosses permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @ms_crossing_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSING_OPTIONS_PERMISSION');
+			SET @ms_crossing_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSING_OPTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DESIGN_NEW_CROSSES_PERMISSION', 'Design New Crosses', @ms_crossing_options_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DESIGN_NEW_CROSSES', 'Design New Crosses', @ms_crossing_options_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DESIGN_NEW_CROSSES_PERMISSION');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DESIGN_NEW_CROSSES');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
