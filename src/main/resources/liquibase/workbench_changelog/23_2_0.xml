@@ -486,16 +486,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-25">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MODIFY_NUMBER_OF_ENVIRONMENT';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MODIFY_NUMBER_OF_ENVIRONMENTS';
              </sqlCheck>
  		</preConditions>
 		<comment>Modify Number of Environment permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @ms_environment_id = (SELECT permission_id FROM permission WHERE name = 'MS_ENVIRONMENT');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_MODIFY_NUMBER_OF_ENVIRONMENT', 'Modify Number of Environment', @ms_environment_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_MODIFY_NUMBER_OF_ENVIRONMENTS', 'Modify Number of Environments', @ms_environment_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MODIFY_NUMBER_OF_ENVIRONMENT');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MODIFY_NUMBER_OF_ENVIRONMENTS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -666,16 +666,16 @@
 	<changeSet author="cuenyad" id="v23.2.0-34">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SAMPLE_LIST';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SAMPLE_LISTS';
              </sqlCheck>
  		</preConditions>
         <comment>Study Sample List permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_SAMPLE_LIST', 'Sample List', @mg_studies_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_SAMPLE_LISTS', 'Sample Lists', @mg_studies_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LISTS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -691,11 +691,11 @@
  		</preConditions>
 		<comment>View Sample List permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @mg_sample_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
+			SET @mg_sample_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LISTS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_SAMPLE_LIST', 'View Sample List', @mg_sample_list_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_SAMPLE_LISTS', 'View Sample Lists', @mg_sample_list_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_SAMPLE_LIST');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_SAMPLE_LISTS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -711,7 +711,7 @@
  		</preConditions>
 		<comment>Export Sample List permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @mg_sample_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
+			SET @mg_sample_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LISTS');
 
 			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXPORT_SAMPLE_LIST', 'Export Sample List', @mg_sample_list_permission_id);
 
@@ -731,7 +731,7 @@
  		</preConditions>
 		<comment>Delete Samples permission</comment>
  		<sql dbms="mysql" splitStatements="true">
-			SET @mg_sample_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
+			SET @mg_sample_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LISTS');
 
 			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DELETE_SAMPLES', 'Delete Samples', @mg_sample_list_permission_id);
 
@@ -1045,7 +1045,7 @@
  		<sql dbms="mysql" splitStatements="true">
 			SET @ms_study_actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXECUTE_CALCULATED_VARIABLES', 'Execute calculated variables', @ms_study_actions_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXECUTE_CALCULATED_VARIABLES', 'Execute Calculated Variables', @ms_study_actions_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXECUTE_CALCULATED_VARIABLES');
 
@@ -1065,7 +1065,7 @@
  		<sql dbms="mysql" splitStatements="true">
 			SET @ms_study_actions_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DESIGN_AND_PLANNING_OPTIONS', 'Design and planning options', @ms_study_actions_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_DESIGN_AND_PLANNING_OPTIONS', 'Design and Planning Options', @ms_study_actions_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DESIGN_AND_PLANNING_OPTIONS');
 
@@ -1085,7 +1085,7 @@
  		<sql dbms="mysql" splitStatements="true">
 			SET @ms_design_and_planning_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DESIGN_AND_PLANNING_OPTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXPORT_DESIGN_TEMPLATE', 'Export design template', @ms_design_and_planning_options_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_EXPORT_DESIGN_TEMPLATE', 'Export Design Template', @ms_design_and_planning_options_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_EXPORT_DESIGN_TEMPLATE');
 
@@ -1105,7 +1105,7 @@
  		<sql dbms="mysql" splitStatements="true">
 			SET @ms_design_and_planning_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_DESIGN_AND_PLANNING_OPTIONS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_CREATE_PLANTING_LABELS', 'Create planting labels', @ms_design_and_planning_options_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_CREATE_PLANTING_LABELS', 'Create Planting Labels', @ms_design_and_planning_options_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CREATE_PLANTING_LABELS');
 
@@ -1165,7 +1165,7 @@
  		<sql dbms="mysql" splitStatements="true">
 			SET @ms_advances_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ADVANCES');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ADVANCE_STUDY_FOR_PLANTS', 'Advance study From Plants', @ms_advances_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_ADVANCE_STUDY_FOR_PLANTS', 'Advance Study From Plants', @ms_advances_permission_id);
 
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_ADVANCE_STUDY_FOR_PLANTS');
 
