@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class DoubleHaploidSourceExpression extends BaseExpression {
@@ -23,8 +24,9 @@ public class DoubleHaploidSourceExpression extends BaseExpression {
 
 	/**
 	 * Method to append '@' + [lastUsedSequence] in designation column ex. @1, @2 etc.
-	 * @param values       Designation column value
-	 * @param advancingSource       Advancing Source object contains information about source
+	 *
+	 * @param values          Designation column value
+	 * @param advancingSource Advancing Source object contains information about source
 	 * @param capturedText
 	 */
 	@Override
@@ -34,10 +36,28 @@ public class DoubleHaploidSourceExpression extends BaseExpression {
 			if (checkIndex != -1) {
 				synchronized (DoubleHaploidSourceExpression.class) {
 					final String keyPrefix = value.substring(0, checkIndex + 1);
-					// Get last sequence number for KeyPrefix with synchronization at class level
-					final int lastUsedSequence = this.keySequenceRegisterService.incrementAndGetNextSequenceUsingNativeSQL(keyPrefix);
+					int nextNumberInSequence = 0;
+
+					// check if action is preview, do not increment DB value if true
+					if (advancingSource.isPreview()) {
+						final Map<String, Integer> keySequenceMap = advancingSource.getKeySequenceMap();
+
+						// check if keyPrefix is previously used in the same preview action
+						if (keySequenceMap.containsKey(keyPrefix)) {
+							nextNumberInSequence = keySequenceMap.get(keyPrefix) + 1;
+						}
+						// otherwise, retrieve next sequence from DB
+						else {
+							nextNumberInSequence = this.keySequenceRegisterService.getNextSequenceUsingNativeSQL(keyPrefix);
+						}
+
+						keySequenceMap.put(keyPrefix, nextNumberInSequence);
+					} else {
+						// Get last sequence number for KeyPrefix with synchronization at class level
+						nextNumberInSequence = this.keySequenceRegisterService.incrementAndGetNextSequenceUsingNativeSQL(keyPrefix);
+					}
 					this.replaceExistingSuffixValue(value, checkIndex + 1);
-					this.replaceExpressionWithValue(value, String.valueOf(lastUsedSequence));
+					this.replaceExpressionWithValue(value, String.valueOf(nextNumberInSequence));
 				}
 
 			} else {
