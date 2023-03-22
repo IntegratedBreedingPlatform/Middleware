@@ -1524,14 +1524,14 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.2.0-79">
+	<changeSet author="cuenyad" id="v23.2.0-78">
          <preConditions onFail="MARK_RAN">
 			<and>
             	<sqlCheck expectedResult="0">
                 	SELECT count(*) > 1 FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
 					WHERE p.name IN ('CREATE_STUDIES', 'CLOSE_STUDY', 'DELETE_STUDY', 'LOCK_STUDY', 'MS_GERMPLASM_AND_CHECKS',
 									 'MS_TREATMENT_FACTORS', 'MS_EXPERIMENTAL_DESIGN', 'MS_ENVIRONMENT', 'MS_STUDY_SETTINGS',
-									 'MS_CROSSES_AND_SELECTIONS', 'MS_INVENTORY', 'MS_SAMPLE_LIST'
+									 'MS_CROSSES_AND_SELECTIONS', 'MS_INVENTORY', 'MS_SAMPLE_LISTS'
 									 'MS_SSA_RESULTS' ,'MS_OBSERVATIONS');
             	</sqlCheck>
 				<not>
@@ -1552,7 +1552,7 @@
 			SET @study_settings_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_SETTINGS');
 			SET @crosses_and_selections_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_CROSSES_AND_SELECTIONS');
 			SET @study_inventory_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_INVENTORY');
-			SET @study_sample_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LIST');
+			SET @study_sample_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LISTS');
 			SET @single_site_results_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SSA_RESULTS');
 			SET @observation_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_OBSERVATIONS');
 
