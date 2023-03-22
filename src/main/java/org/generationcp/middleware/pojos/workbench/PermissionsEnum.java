@@ -71,8 +71,6 @@ public enum PermissionsEnum {
 
 	public static final List<String> SITE_ADMIN_PERMISSIONS = Arrays.asList(SITE_ADMIN.name(), ADMINISTRATION.name(), ADMIN.name());
 
-	public static final List<String> MANAGE_STUDIES_PERMISSIONS = Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name());
-
 	// Sample List Export List
 	public static final List<String> EXPORT_FILE_SAMPLE_LIST_PERMISSIONS =
 		Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name(), MS_SAMPLE_LISTS.name(), MS_EXPORT_SAMPLE_LIST.name());
