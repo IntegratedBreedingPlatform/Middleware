@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,8 +48,27 @@ public class SequenceExpression extends BaseExpression implements Expression {
 						final Matcher matcher = pattern.matcher(upperCaseValue);
 						if (matcher.find()) {
 							final String keyPrefix = upperCaseValue.substring(0, matcher.start());
-							final int nextNumberInSequence =
-								this.germplasmNamingService.getNextNumberAndIncrementSequenceUsingNativeSQL(keyPrefix);
+							int nextNumberInSequence = 0;
+
+							// check if action is preview, do not increment sequence value in the database if true
+							if (advancingSource.isPreview()) {
+								final Map<String, Integer> keySequenceMap = advancingSource.getKeySequenceMap();
+
+								// check if keyPrefix is previously used in the same preview action
+								if (keySequenceMap.containsKey(keyPrefix)) {
+									nextNumberInSequence = keySequenceMap.get(keyPrefix) + 1;
+								}
+								// otherwise, retrieve next sequence from DB
+								else {
+									nextNumberInSequence = this.germplasmNamingService.getNextSequenceUsingNativeSQL(keyPrefix);
+								}
+
+								keySequenceMap.put(keyPrefix, nextNumberInSequence);
+							} else {
+								nextNumberInSequence =
+									this.germplasmNamingService.getNextNumberAndIncrementSequenceUsingNativeSQL(keyPrefix);
+							}
+
 							final String numberString = this.germplasmNamingService
 								.getNumberWithLeadingZeroesAsString(nextNumberInSequence, this.getNumberOfDigits(value));
 
