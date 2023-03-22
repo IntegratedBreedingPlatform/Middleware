@@ -43,7 +43,7 @@ public enum PermissionsEnum {
 	GERMPLASM_LIST_LABEL_PRINTING,
 	DELETE_GERMPLASM_LIST,
 	LOCK_UNLOCK_GERMPLASM_LIST,
-	MS_SAMPLE_LIST,
+	MS_SAMPLE_LISTS,
 	MS_EXPORT_SAMPLE_LIST,
 	MS_DELETE_SAMPLES,
 	MS_STUDY_ACTIONS,
@@ -71,7 +71,7 @@ public enum PermissionsEnum {
 
 	// Sample List Export List
 	public static final List<String> EXPORT_FILE_SAMPLE_LIST_PERMISSIONS =
-		Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name(), MS_SAMPLE_LIST.name(), MS_EXPORT_SAMPLE_LIST.name());
+		Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name(), MS_SAMPLE_LISTS.name(), MS_EXPORT_SAMPLE_LIST.name());
 	public static final List<String> DELETE_SAMPLES_PERMISSIONS =
-		Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name(), MS_SAMPLE_LIST.name(), MS_DELETE_SAMPLES.name());
+		Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name(), MS_SAMPLE_LISTS.name(), MS_DELETE_SAMPLES.name());
 }
