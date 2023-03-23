@@ -21,6 +21,10 @@ public class SelectedMarkerDAO extends GenericDAO<SelectedMarker, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SelectedMarkerDAO.class);
 
+	public SelectedMarkerDAO(final Session session) {
+		super(session);
+	}
+
 	public List<SelectedMarker> getMarkersByProjectAndDatasetID(Integer projectID, Integer datasetID) throws MiddlewareQueryException {
 		Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 

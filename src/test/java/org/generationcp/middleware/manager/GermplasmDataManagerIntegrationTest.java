@@ -128,13 +128,11 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		}
 
 		if (this.lotDAO == null) {
-			this.lotDAO = new LotDAO();
-			this.lotDAO.setSession(this.sessionProvder.getSession());
+			this.lotDAO = new LotDAO(this.sessionProvder.getSession());
 		}
 
 		if (this.transactionDAO == null) {
-			this.transactionDAO = new TransactionDAO();
-			this.transactionDAO.setSession(this.sessionProvder.getSession());
+			this.transactionDAO = new TransactionDAO(this.sessionProvder.getSession());
 		}
 
 		if (this.userDefinedFieldDAO == null) {
@@ -142,18 +140,15 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		}
 
 		if (this.progenitorDAO == null) {
-			this.progenitorDAO = new ProgenitorDAO();
-			this.progenitorDAO.setSession(this.sessionProvder.getSession());
+			this.progenitorDAO = new ProgenitorDAO(this.sessionProvder.getSession());
 		}
 
 		if (this.keySequenceRegisterDAO == null) {
-			this.keySequenceRegisterDAO = new KeySequenceRegisterDAO();
-			this.keySequenceRegisterDAO.setSession(this.sessionProvder.getSession());
+			this.keySequenceRegisterDAO = new KeySequenceRegisterDAO(this.sessionProvder.getSession());
 		}
 
 		if (this.cvTermDao == null) {
-			this.cvTermDao = new CVTermDao();
-			this.cvTermDao.setSession(this.sessionProvder.getSession());
+			this.cvTermDao = new CVTermDao(this.sessionProvder.getSession());
 		}
 
 

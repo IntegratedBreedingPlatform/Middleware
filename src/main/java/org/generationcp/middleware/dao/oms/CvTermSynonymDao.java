@@ -19,6 +19,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -26,6 +27,10 @@ import org.hibernate.criterion.Restrictions;
  *
  */
 public class CvTermSynonymDao extends GenericDAO<CVTermSynonym, Integer> {
+
+	public CvTermSynonymDao(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<CVTermSynonym> getByCvTermId(int cvTermId) throws MiddlewareQueryException {

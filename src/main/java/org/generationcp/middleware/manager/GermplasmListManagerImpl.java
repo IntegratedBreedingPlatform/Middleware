@@ -256,9 +256,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 		final List<Integer> idGermplasmListDataSaved = new ArrayList<>();
 		try {
-			final GermplasmListDataDAO dao = new GermplasmListDataDAO();
-			dao.setSession(this.getActiveSession());
-
 			final List<Integer> deletedListEntryIds = new ArrayList<>();
 
 			for (final GermplasmListData germplasmListData : germplasmListDatas) {

@@ -22,6 +22,7 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
@@ -44,6 +45,10 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 
 	private static final Logger LOG = LoggerFactory.getLogger(CVTermRelationshipDao.class);
 	private static final StringType STRING = new StringType();
+
+	public CVTermRelationshipDao(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getObjectIdByTypeAndSubject(final Integer typeId, final Integer subjectId) {

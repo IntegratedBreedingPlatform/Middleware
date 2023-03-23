@@ -22,6 +22,7 @@ import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.FloatType;
 import org.hibernate.type.IntegerType;
@@ -96,6 +97,10 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 					+ "         gdms_marker.marker_id = gdms_markers_onmap.marker_id" + " WHERE"
 					+ "     gdms_markers_onmap.marker_id IN (:markerIdList)" + "     AND gdms_markers_onmap.map_id = :mapId" + " ORDER BY"
 					+ "     gdms_map.map_name" + "     ,gdms_markers_onmap.linkage_group" + "     ,gdms_markers_onmap.start_position ASC";
+
+	public MapDAO(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("rawtypes")
 	public List<MapDetailElement> getMapDetailsByName(final String nameLike, final int start, final int numOfRows) {

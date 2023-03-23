@@ -15,6 +15,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
@@ -26,6 +27,10 @@ import java.util.List;
  *
  */
 public class ProgenitorDAO extends GenericDAO<Progenitor, Integer> {
+
+	public ProgenitorDAO(final Session session) {
+		super(session);
+	}
 
 	public Progenitor getByGIDAndPID(final Integer gid, final Integer pid) {
 		try {

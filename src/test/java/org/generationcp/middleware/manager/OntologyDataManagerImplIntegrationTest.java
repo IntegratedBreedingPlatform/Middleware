@@ -59,8 +59,7 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 	@Before
 	public void init() {
 		this.ontologyDataManager = new OntologyDataManagerImpl(this.sessionProvder);
-		this.cvTermDao = new CVTermDao();
-		this.cvTermDao.setSession(this.sessionProvder.getSession());
+		this.cvTermDao = new CVTermDao(this.sessionProvder.getSession());
 	}
 
 	@Test

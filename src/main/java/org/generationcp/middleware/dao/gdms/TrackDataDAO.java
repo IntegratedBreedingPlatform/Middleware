@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.gdms;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.pojos.gdms.TrackData;
+import org.hibernate.Session;
 
 /**
  * DAO class for {@link TrackData}.
@@ -22,4 +23,7 @@ import org.generationcp.middleware.pojos.gdms.TrackData;
 
 public class TrackDataDAO extends GenericDAO<TrackData, Integer> {
 
+	public TrackDataDAO(final Session session) {
+		super(session);
+	}
 }

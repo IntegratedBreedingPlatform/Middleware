@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.gdms;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfoDetails;
+import org.hibernate.Session;
 
 /**
  * DAO class for {@link MarkerUserInfo}.
@@ -23,4 +24,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerUserInfoDetails;
  */
 public class MarkerUserInfoDetailsDAO extends GenericDAO<MarkerUserInfoDetails, Integer> {
 
+	public MarkerUserInfoDetailsDAO(final Session session) {
+		super(session);
+	}
 }

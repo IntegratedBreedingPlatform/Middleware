@@ -12,6 +12,7 @@ import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmS
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
@@ -106,6 +107,10 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "       LEFT JOIN nd_experimentprop fieldMapCol ON fieldMapCol.nd_experiment_id = ne.nd_experiment_id AND fieldMapCol.type_id = "
 		+ TermId.FIELDMAP_COLUMN.getId() //
 		+ " where source.gid = :gid AND g.deleted = 0 AND g.grplce = 0 and study.deleted = 0";
+
+	public GermplasmStudySourceDAO(final Session session) {
+		super(session);
+	}
 
 	public List<GermplasmStudySource> getByGids(final Set<Integer> gids) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());

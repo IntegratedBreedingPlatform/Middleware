@@ -21,6 +21,7 @@ import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +44,10 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(StudySearchDao.class);
 	private static final String NOT_IN_DELETED_STUDIES_QUERY = " AND p.deleted = 0 ";
 	private static final String HAS_STUDY_TYPE = " and p.study_type_id is not null ";
+
+	public StudySearchDao(final Session session) {
+		super(session);
+	}
 
 	public List<StudyReference> searchStudies(final BrowseStudyQueryFilter filter, final List<Integer> locationIds) {
 

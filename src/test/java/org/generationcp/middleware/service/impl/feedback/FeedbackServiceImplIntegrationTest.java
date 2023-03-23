@@ -30,11 +30,8 @@ public class FeedbackServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		this.personDAO = new PersonDAO();
-		this.personDAO.setSession(this.workbenchSessionProvider.getSession());
-
-		this.workbenchUserDAO = new WorkbenchUserDAO();
-		this.workbenchUserDAO.setSession(this.workbenchSessionProvider.getSession());
+		this.personDAO = new PersonDAO(this.workbenchSessionProvider.getSession());
+		this.workbenchUserDAO = new WorkbenchUserDAO(this.workbenchSessionProvider.getSession());
 
 		final WorkbenchUser user = this.createUser();
 		ContextHolder.setLoggedInUserId(user.getUserid());

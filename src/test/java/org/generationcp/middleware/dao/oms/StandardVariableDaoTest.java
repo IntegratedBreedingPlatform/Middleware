@@ -35,8 +35,7 @@ public class StandardVariableDaoTest extends IntegrationTestBase {
 	public void init() {
 		this.standardVariableDao = new StandardVariableDao(this.sessionProvder.getSession());
 		this.standardVariableSaver = new StandardVariableSaver(this.sessionProvder);
-		this.cvTermDao = new CVTermDao();
-		this.cvTermDao.setSession(this.sessionProvder.getSession());
+		this.cvTermDao = new CVTermDao(this.sessionProvder.getSession());
 	}
 
 	@Test

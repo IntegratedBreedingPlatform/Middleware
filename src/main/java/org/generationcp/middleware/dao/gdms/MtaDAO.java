@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.gdms.Mta;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -33,6 +34,10 @@ public class MtaDAO extends GenericDAO<Mta, Integer> {
 	public static final String GET_MTAS_BY_TRAIT = "SELECT mta_id " + "     ,marker_id " + "     ,dataset_id " + "     ,map_id "
 			+ "     ,linkage_group " + "     ,position " + "     ,tid " + "     ,effect " + "     ,CONCAT(hv_allele, '') "
 			+ "     ,CONCAT(experiment, '') " + "     ,score_value " + "     ,r_square " + "FROM gdms_mta " + "WHERE tid = :traitId ";
+
+	public MtaDAO(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Mta> getMtasByTrait(Integer traitId) throws MiddlewareQueryException {

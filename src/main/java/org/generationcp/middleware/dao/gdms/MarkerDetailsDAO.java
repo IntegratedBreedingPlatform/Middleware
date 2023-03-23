@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.gdms;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.pojos.gdms.MarkerDetails;
+import org.hibernate.Session;
 
 /**
  * DAO class for {@link MarkerDetails}.
@@ -22,4 +23,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerDetails;
  */
 public class MarkerDetailsDAO extends GenericDAO<MarkerDetails, Integer> {
 
+	public MarkerDetailsDAO(final Session session) {
+		super(session);
+	}
 }

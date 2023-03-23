@@ -11,6 +11,7 @@ import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -21,6 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 public class VariableOverridesDao extends GenericDAO<VariableOverrides, Integer> {
+
+	public VariableOverridesDao(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<VariableOverrides> getByVariableId(final Integer variableId) {

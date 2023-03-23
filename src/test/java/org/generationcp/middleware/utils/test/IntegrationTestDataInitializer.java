@@ -102,18 +102,16 @@ public class IntegrationTestDataInitializer {
 		this.stockDao = this.daoFactory.getStockDao();
 		this.dmsProjectDao = this.daoFactory.getDmsProjectDAO();
 		this.germplasmDao = this.daoFactory.getGermplasmDao();
-		this.experimentPropertyDao = new ExperimentPropertyDao();
+		this.experimentPropertyDao = this.daoFactory.getExperimentPropertyDao();
 		this.phenotypeDao = this.daoFactory.getPhenotypeDAO();
-		this.experimentPropertyDao.setSession(hibernateSessionProvider.getSession());
 		this.cvTermDao = this.daoFactory.getCvTermDao();
 		this.sampleDao = this.daoFactory.getSampleDao();
 		this.sampleListDao = this.daoFactory.getSampleListDao();
 		this.projectPropertyDao = this.daoFactory.getProjectPropertyDAO();
 		this.cropService = new CropServiceImpl(workbenchSessionProvider);
 		this.userService = new UserServiceImpl(workbenchSessionProvider);
-		this.studyTypeDAO = new StudyTypeDAO();
-		this.studyTypeDAO.setSession(hibernateSessionProvider.getSession());
-		this.nameDAO = new NameDAO(hibernateSessionProvider.getSession());
+		this.studyTypeDAO = this.daoFactory.getStudyTypeDao();
+		this.nameDAO = this.daoFactory.getNameDao();
 	}
 
 	public DmsProject createStudy(final String name, final String description, final int studyTypeId, final String programUUID,

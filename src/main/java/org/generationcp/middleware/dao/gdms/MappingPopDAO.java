@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -48,6 +49,10 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer> {
 	public static final String GET_ALL_PARENTS_FROM_MAPPING_POPULATION = "SELECT parent_a_nid, parent_b_nid " + "FROM gdms_mapping_pop";
 
 	public static final String COUNT_ALL_PARENTS_FROM_MAPPING_POPULATION = "SELECT count(parent_a_nid) " + "FROM gdms_mapping_pop";
+
+	public MappingPopDAO(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("rawtypes")
 	public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws MiddlewareQueryException {

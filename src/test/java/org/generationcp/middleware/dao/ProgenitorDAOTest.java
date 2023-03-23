@@ -21,8 +21,7 @@ public class ProgenitorDAOTest extends IntegrationTestBase {
 	@Before
 	public void setup() {
 		if (this.progenitorDao == null) {
-			this.progenitorDao = new ProgenitorDAO();
-			this.progenitorDao.setSession(this.sessionProvder.getSession());
+			this.progenitorDao = new ProgenitorDAO(this.sessionProvder.getSession());
 		}
 		
 		if (this.germplasmDao == null) {

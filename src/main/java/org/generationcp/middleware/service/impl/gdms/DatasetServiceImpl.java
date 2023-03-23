@@ -45,12 +45,9 @@ public class DatasetServiceImpl implements DatasetService {
 	private CharValuesDAO charValuesDAO;
 
 	public DatasetServiceImpl(final HibernateSessionProvider sessionProvider) {
-		this.datasetDAO = new DatasetDAO();
-		this.markerDAO = new MarkerDAO();
-		this.charValuesDAO = new CharValuesDAO();
-		this.datasetDAO.setSession(sessionProvider.getSession());
-		this.markerDAO.setSession(sessionProvider.getSession());
-		this.charValuesDAO.setSession(sessionProvider.getSession());
+		this.datasetDAO = new DatasetDAO(sessionProvider.getSession());
+		this.markerDAO = new MarkerDAO(sessionProvider.getSession());
+		this.charValuesDAO = new CharValuesDAO(sessionProvider.getSession());
 		this.sampleService = new SampleServiceImpl(sessionProvider);
 	}
 

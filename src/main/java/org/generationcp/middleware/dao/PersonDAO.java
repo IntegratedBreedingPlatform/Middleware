@@ -19,6 +19,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -35,6 +36,10 @@ import java.util.Map;
 public class PersonDAO extends GenericDAO<Person, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PersonDAO.class);
+
+	public PersonDAO(final Session session) {
+		super(session);
+	}
 
 	public boolean isPersonWithEmailExists(final String email) throws MiddlewareQueryException {
 		try {

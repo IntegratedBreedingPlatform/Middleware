@@ -11,29 +11,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class GetSampleNumbersVisitor implements AdvanceRequestVisitor<List<Integer>> {
+public class GetSampleDTOsVisitor implements AdvanceRequestVisitor<List<SampleDTO>> {
 
 	private final Integer experimentId;
 	private final Map<Integer, List<SampleDTO>> samplesByExperimentId;
 
-	public GetSampleNumbersVisitor(final Integer experimentId,
+	public GetSampleDTOsVisitor(final Integer experimentId,
 		final Map<Integer, List<SampleDTO>> samplesByExperimentId) {
 		this.experimentId = experimentId;
 		this.samplesByExperimentId = samplesByExperimentId;
 	}
 
 	@Override
-	public List<Integer> visit(final AdvanceStudyRequest request) {
+	public List<SampleDTO> visit(final AdvanceStudyRequest request) {
 		return new ArrayList<>();
 	}
 
 	@Override
-	public List<Integer> visit(final AdvanceSamplesRequest request) {
+	public List<SampleDTO> visit(final AdvanceSamplesRequest request) {
 		final List<SampleDTO> sampleDTOS = this.samplesByExperimentId.get(this.experimentId);
+
 		if (CollectionUtils.isEmpty(sampleDTOS)) {
 			return new ArrayList<>();
 		}
-		return sampleDTOS.stream().map(SampleDTO::getSampleNumber).collect(Collectors.toList());
+
+		if (!CollectionUtils.isEmpty(request.getExcludedAdvancedRows())) {
+			return sampleDTOS.stream().filter(sample -> !request.getExcludedAdvancedRows().contains(
+				sample.getSampleId())).collect(Collectors.toList());
+		}
+
+		return sampleDTOS;
 	}
 
 }

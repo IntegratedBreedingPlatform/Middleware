@@ -16,6 +16,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -24,6 +25,10 @@ import org.hibernate.criterion.Restrictions;
  */
 @SuppressWarnings("unchecked")
 public class PhenotypeOutlierDao extends GenericDAO<PhenotypeOutlier, Integer> {
+
+	public PhenotypeOutlierDao(final Session session) {
+		super(session);
+	}
 
 	public PhenotypeOutlier getPhenotypeOutlierByPhenotypeId(Integer phenotypeId) throws MiddlewareQueryException {
 

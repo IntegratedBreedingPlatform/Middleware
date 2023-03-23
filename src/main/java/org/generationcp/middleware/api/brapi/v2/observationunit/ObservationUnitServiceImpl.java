@@ -43,6 +43,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
@@ -111,6 +112,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	@Resource
 	private DatasetService datasetService;
+
+	@Resource
+	private SiteAnalysisService siteAnalysisService;
 
 	private final HibernateSessionProvider sessionProvider;
 	private final DaoFactory daoFactory;
@@ -291,6 +295,11 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 			final ExperimentModel experimentModel = new ExperimentModel();
 			if (isObservationUnitForMeansDataset) {
+				// If the study does not have an existing means dataset, create a new one.
+				if (!trialIdMeansDatasetMap.containsKey(trialDbId)) {
+					final int meansDatasetId = this.siteAnalysisService.createMeansDataset(trialDbId);
+					trialIdMeansDatasetMap.put(trialDbId, new DmsProject(meansDatasetId));
+				}
 				experimentModel.setProject(trialIdMeansDatasetMap.get(trialDbId));
 				experimentModel.setTypeId(TermId.AVERAGE_EXPERIMENT.getId());
 			} else {

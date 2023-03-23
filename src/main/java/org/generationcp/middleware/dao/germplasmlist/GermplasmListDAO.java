@@ -101,6 +101,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	private static final String FILTER_BY_PROGRAM_UUID = " AND (program_uuid = :programUUID OR program_uuid IS NULL)";
 
+	public GermplasmListDAO(final Session session) {
+		super(session);
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<GermplasmList> getAllExceptDeleted(final int start, final int numOfRows) {
 		try {

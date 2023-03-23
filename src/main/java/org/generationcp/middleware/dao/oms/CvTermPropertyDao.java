@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.ArrayList;
@@ -29,6 +30,10 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
 
 	public static final String CVTERM_ID = "cvTermId";
 	public static final String TYPE_ID = "typeId";
+
+	public CvTermPropertyDao(final Session session) {
+		super(session);
+	}
 
 	public List<CVTermProperty> getByCvTermId(final int cvTermId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());

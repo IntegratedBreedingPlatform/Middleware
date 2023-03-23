@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 
 /**
  * DAO class for {@link Location}.
@@ -28,6 +29,10 @@ import org.hibernate.SQLQuery;
  *
  */
 public class LocationSearchDao extends GenericDAO<Location, Integer> {
+
+	public LocationSearchDao(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getLocationIds(List<Country> countries) throws MiddlewareQueryException {

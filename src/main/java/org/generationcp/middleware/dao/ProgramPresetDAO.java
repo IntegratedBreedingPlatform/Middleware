@@ -4,6 +4,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.ArrayList;
@@ -13,6 +14,10 @@ import java.util.List;
  * Created by cyrus on 12/16/14.
  */
 public class ProgramPresetDAO extends GenericDAO<ProgramPreset, Integer> {
+
+	public ProgramPresetDAO(final Session session) {
+		super(session);
+	}
 
 	public ProgramPreset getProgramPresetById(int id) throws MiddlewareQueryException {
 		return getById(id);

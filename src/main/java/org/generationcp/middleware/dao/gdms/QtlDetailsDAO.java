@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -81,6 +82,10 @@ public class QtlDetailsDAO extends GenericDAO<QtlDetails, Integer> {
 
 	public static final String COUNT_QTL_DATA_BY_QTL_TRAITS = "SELECT COUNT(*) " + "FROM gdms_qtl_details gqd " + "INNER JOIN gdms_qtl gq "
 			+ "ON gqd.qtl_id = gq.qtl_id " + "AND gqd.tid " + "IN (:qtlTraits) ";
+
+	public QtlDetailsDAO(final Session session) {
+		super(session);
+	}
 
 	public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, float min, float max, int start, int numOfRows)
 			throws MiddlewareQueryException {

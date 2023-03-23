@@ -56,22 +56,14 @@ public class WorkbenchUserDAOIntegrationTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() {
-		this.projectDao = new ProjectDAO();
-		this.projectDao.setSession(this.workbenchSessionProvider.getSession());
-		this.cropTypeDAO = new CropTypeDAO();
-		this.cropTypeDAO.setSession(this.workbenchSessionProvider.getSession());
-		this.workbenchUserDAO = new WorkbenchUserDAO();
-		this.workbenchUserDAO.setSession(this.workbenchSessionProvider.getSession());
-		this.personDAO = new PersonDAO();
-		this.personDAO.setSession(this.workbenchSessionProvider.getSession());
-		this.cropPersonDAO = new CropPersonDAO();
-		this.cropPersonDAO.setSession(this.workbenchSessionProvider.getSession());
-		this.roleDAO = new RoleDAO();
-		this.roleDAO.setSession(this.workbenchSessionProvider.getSession());
-		this.roleDAO = new RoleDAO();
-		this.roleDAO.setSession(this.workbenchSessionProvider.getSession());
-		this.userRoleDao = new UserRoleDao();
-		this.userRoleDao.setSession(this.workbenchSessionProvider.getSession());
+		this.projectDao = new ProjectDAO(this.workbenchSessionProvider.getSession());
+		this.cropTypeDAO = new CropTypeDAO(this.workbenchSessionProvider.getSession());
+		this.workbenchUserDAO = new WorkbenchUserDAO(this.workbenchSessionProvider.getSession());
+		this.personDAO = new PersonDAO(this.workbenchSessionProvider.getSession());
+		this.cropPersonDAO = new CropPersonDAO(this.workbenchSessionProvider.getSession());
+		this.roleDAO = new RoleDAO(this.workbenchSessionProvider.getSession());
+		this.roleDAO = new RoleDAO(this.workbenchSessionProvider.getSession());
+		this.userRoleDao = new UserRoleDao(this.workbenchSessionProvider.getSession());
 	}
 
 	@Test

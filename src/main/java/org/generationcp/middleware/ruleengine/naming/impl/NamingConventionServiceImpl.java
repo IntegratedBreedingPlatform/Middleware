@@ -22,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 @Service
@@ -50,8 +52,9 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 	@Override
 	public void generateAdvanceListName(final List<AdvancingSource> advancingSources) throws RuleException {
 
+		Map<String, Integer> keySequenceMap = new HashMap<>();
 		for (final AdvancingSource advancingSource : advancingSources) {
-
+			advancingSource.setKeySequenceMap(keySequenceMap);
 			final RuleExecutionContext namingExecutionContext =
 				this.setupNamingRuleExecutionContext(advancingSource, false);
 			final List<String> generatedNames = (List<String>) this.rulesService.runRules(namingExecutionContext);
@@ -67,6 +70,9 @@ public class NamingConventionServiceImpl implements NamingConventionService {
 
 				germplasm.getNames().add(derivativeName);
 			});
+
+			// Pass the key sequence map to the next entry to process
+			keySequenceMap = advancingSource.getKeySequenceMap();
 		}
 	}
 
