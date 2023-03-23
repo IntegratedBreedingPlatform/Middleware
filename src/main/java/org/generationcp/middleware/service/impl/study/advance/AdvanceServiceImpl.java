@@ -62,7 +62,6 @@ import org.generationcp.middleware.service.impl.study.advance.visitor.GetAllPlot
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetBreedingMethodVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetDatasetVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetExperimentSamplesVisitor;
-import org.generationcp.middleware.service.impl.study.advance.visitor.GetFilteredObservationsVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetObservationsVisibleColumnsVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetPlantSelectedVisitor;
 import org.generationcp.middleware.service.impl.study.advance.visitor.GetPreviewUniqueIdVisitor;
@@ -208,14 +207,11 @@ public class AdvanceServiceImpl implements AdvanceService {
 			this.getObservations(studyId, dataset.getDatasetId(), request.getInstanceIds(), request.getSelectedReplications(),
 				observationVisibleColumns);
 
-		final List<ObservationUnitRow> filteredObservations =
-			request.accept(new GetFilteredObservationsVisitor(observations));
-
-		if (CollectionUtils.isEmpty(filteredObservations)) {
+		if (CollectionUtils.isEmpty(observations)) {
 			return new ArrayList<>();
 		}
 
-		final long numberOfPlots = filteredObservations.size();
+		final long numberOfPlots = observations.size();
 
 		final List<MeasurementVariable> studyVariables =
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(studyId, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
@@ -261,7 +257,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Map<Integer, Location> locationsByLocationId =
 			locations.stream().collect(Collectors.toMap(Location::getLocid, location -> location));
 
-		final Set<Integer> gids = filteredObservations.stream()
+		final Set<Integer> gids = observations.stream()
 			.map(ObservationUnitRow::getGid)
 			.collect(Collectors.toSet());
 
@@ -282,7 +278,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Map<Integer, List<SampleDTO>> samplesByExperimentId =
 			request.accept(new GetExperimentSamplesVisitor(studyId, this.studyDataManager));
 
-		filteredObservations.forEach(row -> {
+		observations.forEach(row -> {
 			final BasicGermplasmDTO originGermplasm = originGermplasmsByGid.get(row.getGid());
 
 			// Get the selected breeding method
@@ -380,22 +376,21 @@ public class AdvanceServiceImpl implements AdvanceService {
 					final SampleDTO sampleDTO = (sampleDTOIterator.hasNext()) ? sampleDTOIterator.next() : null;
 					final String sampleNumber = sampleDTO != null ? String.valueOf(sampleDTO.getSampleNumber()) : null;
 
-					// Get uniqueId for preview
-					final Integer uniqueId =
-						request.accept(new GetPreviewUniqueIdVisitor(observation, sampleDTO));
+					// Get uniqueId for preview, returns null if specific line is deleted (on cases with multiple lines selected)
+					final String uniqueId =
+						request.accept(new GetPreviewUniqueIdVisitor(observation, sampleDTO, selectionNumber.get()));
+					boolean isDeleted = false;
+
+					if (!CollectionUtils.isEmpty(request.getExcludedAdvancedRows()) && request.getExcludedAdvancedRows()
+						.contains(uniqueId)) {
+						isDeleted = true;
+					}
 
 					// inherit 'selection history at fixation' and code names of parent if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
 						final List<BasicNameDTO> parentNames = namesByGids.get(germplasm.getGpid2());
 						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm, germplasm.getGpid2(), parentNames);
 						this.germplasmGroupingService.copyCodedNames(germplasm, parentNames);
-					}
-
-					// Finally, persisting the new advanced line with its derivative name. Also, it has the selection history at fixation and
-					// code name of the parent if it corresponds.
-					if (!isPreview) {
-						this.daoFactory.getGermplasmDao().save(germplasm);
-						advancedGermplasmGids.add(germplasm.getGid());
 					}
 
 					if (isPreview) {
@@ -407,8 +402,13 @@ public class AdvanceServiceImpl implements AdvanceService {
 								locationsByLocationId.get(germplasm.getLocationId()).getLname(),
 								entryNumber, plotNumber, plantNumber, pedigreeString,
 								originGermplasmName, germplasm.getMethod().getMcode(),
-								currentGermplasmNames.isEmpty() ? "" : currentGermplasmNames.get(0).getNval()));
-					} else {
+								currentGermplasmNames.isEmpty() ? "" : currentGermplasmNames.get(0).getNval(), isDeleted));
+					} else if (!isDeleted) {
+						// Finally, persisting the new advanced line with its derivative name. Also, it has the selection history at fixation and
+						// code name of the parent if it corresponds.
+						this.daoFactory.getGermplasmDao().save(germplasm);
+						advancedGermplasmGids.add(germplasm.getGid());
+
 						// Get all plots selection
 						final Boolean allPlotsSelected = request.accept(new GetAllPlotsSelectedVisitor());
 

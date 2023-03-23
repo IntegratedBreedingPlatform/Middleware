@@ -9,7 +9,6 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class GetSampleDTOsVisitor implements AdvanceRequestVisitor<List<SampleDTO>> {
 
@@ -33,11 +32,6 @@ public class GetSampleDTOsVisitor implements AdvanceRequestVisitor<List<SampleDT
 
 		if (CollectionUtils.isEmpty(sampleDTOS)) {
 			return new ArrayList<>();
-		}
-
-		if (!CollectionUtils.isEmpty(request.getExcludedAdvancedRows())) {
-			return sampleDTOS.stream().filter(sample -> !request.getExcludedAdvancedRows().contains(
-				sample.getSampleId())).collect(Collectors.toList());
 		}
 
 		return sampleDTOS;

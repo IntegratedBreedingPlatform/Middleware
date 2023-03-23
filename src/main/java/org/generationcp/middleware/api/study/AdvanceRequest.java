@@ -8,7 +8,7 @@ public interface AdvanceRequest {
 
 	List<Integer> getSelectedReplications();
 
-	List<Integer> getExcludedAdvancedRows();
+	List<String> getExcludedAdvancedRows();
 
 	AbstractAdvanceRequest.SelectionTraitRequest getSelectionTraitRequest();
 

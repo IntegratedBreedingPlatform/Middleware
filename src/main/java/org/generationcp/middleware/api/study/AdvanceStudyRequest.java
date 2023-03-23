@@ -12,7 +12,7 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 	private BulkingRequest bulkingRequest;
 
 	public Integer getDatasetId() {
-		return datasetId;
+		return this.datasetId;
 	}
 
 	public void setDatasetId(final Integer datasetId) {
@@ -20,7 +20,7 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 	}
 
 	public BreedingMethodSelectionRequest getBreedingMethodSelectionRequest() {
-		return breedingMethodSelectionRequest;
+		return this.breedingMethodSelectionRequest;
 	}
 
 	public void setBreedingMethodSelectionRequest(
@@ -29,7 +29,7 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 	}
 
 	public LineSelectionRequest getLineSelectionRequest() {
-		return lineSelectionRequest;
+		return this.lineSelectionRequest;
 	}
 
 	public void setLineSelectionRequest(final LineSelectionRequest lineSelectionRequest) {
@@ -37,7 +37,7 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 	}
 
 	public BulkingRequest getBulkingRequest() {
-		return bulkingRequest;
+		return this.bulkingRequest;
 	}
 
 	public void setBulkingRequest(final BulkingRequest bulkingRequest) {
@@ -78,7 +78,7 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 		private Integer methodVariateId;
 
 		public Integer getBreedingMethodId() {
-			return breedingMethodId;
+			return this.breedingMethodId;
 		}
 
 		public void setBreedingMethodId(final Integer breedingMethodId) {
@@ -86,7 +86,7 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 		}
 
 		public Integer getMethodVariateId() {
-			return methodVariateId;
+			return this.methodVariateId;
 		}
 
 		public void setMethodVariateId(final Integer methodVariateId) {
@@ -110,6 +110,7 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 
 	}
 
+
 	/**
 	 * If the breedingMethodId corresponds to a bulking method or if the methodVariateId was selected, then the BulkingRequest must has data
 	 * for all plots selected or the variate that defines which plots were selected
@@ -129,7 +130,7 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 		private Integer plotVariateId;
 
 		public Boolean getAllPlotsSelected() {
-			return allPlotsSelected;
+			return this.allPlotsSelected;
 		}
 
 		public void setAllPlotsSelected(final Boolean allPlotsSelected) {
@@ -137,7 +138,7 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 		}
 
 		public Integer getPlotVariateId() {
-			return plotVariateId;
+			return this.plotVariateId;
 		}
 
 		public void setPlotVariateId(final Integer plotVariateId) {
@@ -145,6 +146,7 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 		}
 
 	}
+
 
 	@AutoProperty
 	public static class LineSelectionRequest {
@@ -161,7 +163,7 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 		private Integer lineVariateId;
 
 		public Integer getLinesSelected() {
-			return linesSelected;
+			return this.linesSelected;
 		}
 
 		public void setLinesSelected(final Integer linesSelected) {
@@ -169,7 +171,7 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 		}
 
 		public Integer getLineVariateId() {
-			return lineVariateId;
+			return this.lineVariateId;
 		}
 
 		public void setLineVariateId(final Integer lineVariateId) {
@@ -193,4 +195,12 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 
 	}
 
+	public boolean hasMultipleLinesSelected() {
+		final AdvanceStudyRequest.LineSelectionRequest lsrequest = this.getLineSelectionRequest();
+		if (lsrequest != null && lsrequest.getLinesSelected() != null && lsrequest.getLinesSelected() > 1) {
+			return true;
+		}
+
+		return false;
+	}
 }
