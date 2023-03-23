@@ -368,7 +368,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 				final String plantNumber = observation.getVariableValueByVariableId(TermId.PLANT_NO.getId());
 				final String entryNumber = observation.getVariableValueByVariableId(TermId.ENTRY_NO.getId());
 				final List<BasicNameDTO> originGermplasmNames = advancingSource.getNames();
-				final String originGermplasmName = originGermplasmNames.isEmpty() ? "" : originGermplasmNames.get(0).getNval();
+				final String originGermplasmName = originGermplasmNames.isEmpty() ? "" :
+					originGermplasmNames.stream()
+						.filter(name -> name.getNstat().equals(1))
+						.findFirst().get().getNval(); //retrieve origin germplasm preferred name
 				final String pedigreeString = pedigreeStringMap.get(observation.getGid());
 
 				final Iterator<SampleDTO> sampleDTOIterator = advancingSource.getSampleDTOS().iterator();
