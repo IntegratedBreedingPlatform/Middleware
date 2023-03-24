@@ -7,9 +7,6 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class AdvanceGermplasmPreview {
 
-	// observation unit ID for studies, sample ID for samples
-	private String uniqueId;
-
 	private String trialInstance;
 	private String locationName;
 	private String entryNumber;
@@ -19,13 +16,11 @@ public class AdvanceGermplasmPreview {
 	private String immediateSource;
 	private String breedingMethodAbbr;
 	private String designation;
-	private Boolean isDeleted;
 
-	public AdvanceGermplasmPreview(final String uniqueId, final String trialInstance, final String locationName, final String entryNumber,
+	public AdvanceGermplasmPreview(final String trialInstance, final String locationName, final String entryNumber,
 		final String plotNumber,
 		final String plantNumber, final String cross, final String immediateSource, final String breedingMethodAbbr,
-		final String designation, final Boolean isDeleted) {
-		this.uniqueId = uniqueId;
+		final String designation) {
 		this.trialInstance = trialInstance;
 		this.locationName = locationName;
 		this.entryNumber = entryNumber;
@@ -35,15 +30,6 @@ public class AdvanceGermplasmPreview {
 		this.immediateSource = immediateSource;
 		this.breedingMethodAbbr = breedingMethodAbbr;
 		this.designation = designation;
-		this.isDeleted = isDeleted;
-	}
-
-	public String getUniqueId() {
-		return this.uniqueId;
-	}
-
-	public void setUniqueId(final String uniqueId) {
-		this.uniqueId = uniqueId;
 	}
 
 	public Integer getEntryNumberValue() {
@@ -120,14 +106,6 @@ public class AdvanceGermplasmPreview {
 
 	public void setDesignation(final String designation) {
 		this.designation = designation;
-	}
-
-	public boolean isDeleted() {
-		return this.isDeleted;
-	}
-
-	public void setDeleted(final boolean deleted) {
-		this.isDeleted = deleted;
 	}
 
 	@Override
