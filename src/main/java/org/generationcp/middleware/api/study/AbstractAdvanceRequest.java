@@ -12,8 +12,6 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 	private List<Integer> instanceIds;
 	private List<Integer> selectedReplications;
 
-	private List<String> excludedAdvancedRows;
-
 	private SelectionTraitRequest selectionTraitRequest;
 
 	@Override
@@ -32,15 +30,6 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 
 	public void setSelectedReplications(final List<Integer> selectedReplications) {
 		this.selectedReplications = selectedReplications;
-	}
-
-	@Override
-	public List<String> getExcludedAdvancedRows() {
-		return this.excludedAdvancedRows;
-	}
-
-	public void setExcludedAdvancedRows(final List<String> excludedAdvancedRows) {
-		this.excludedAdvancedRows = excludedAdvancedRows;
 	}
 
 	@Override

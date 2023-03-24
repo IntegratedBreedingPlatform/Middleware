@@ -195,13 +195,4 @@ public class AdvanceStudyRequest extends AbstractAdvanceRequest {
 
 	}
 
-	public boolean hasMultipleLinesSelected() {
-		final AdvanceStudyRequest.LineSelectionRequest lsrequest = this.getLineSelectionRequest();
-		if (lsrequest != null && ((lsrequest.getLinesSelected() != null && lsrequest.getLinesSelected() > 1)
-			|| lsrequest.getLineVariateId() != null)) {
-			return true;
-		}
-
-		return false;
-	}
 }
