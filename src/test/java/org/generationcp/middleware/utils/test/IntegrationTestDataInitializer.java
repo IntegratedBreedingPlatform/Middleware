@@ -233,7 +233,7 @@ public class IntegrationTestDataInitializer {
 		return experimentModel;
 	}
 
-	private void saveExperimentProperty(final ExperimentModel experimentModel, final Integer typeId, final String value) {
+	public void saveExperimentProperty(final ExperimentModel experimentModel, final Integer typeId, final String value) {
 		final ExperimentProperty experimentProperty = new ExperimentProperty();
 		experimentModel.setProperties(new ArrayList<>(Collections.singleton(experimentProperty)));
 		experimentProperty.setExperiment(experimentModel);
@@ -273,6 +273,7 @@ public class IntegrationTestDataInitializer {
 
 		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid());
 		germplasmName.setTypeId(2);
+		germplasm.setPreferredName(germplasmName);
 		this.nameDAO.save(germplasmName);
 
 		final StockModel stockModel = new StockModel();
@@ -310,6 +311,7 @@ public class IntegrationTestDataInitializer {
 			sample.setWell("WELL-" + i);
 			sample.setExperiment(experimentModel);
 			sample.setSampleNumber(i);
+			sample.setSamplingDate(new Date());
 			this.sampleDao.saveOrUpdate(sample);
 			samples.add(sample);
 			i++;

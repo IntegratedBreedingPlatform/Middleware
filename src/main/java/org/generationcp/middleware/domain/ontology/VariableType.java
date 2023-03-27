@@ -51,7 +51,8 @@ public enum VariableType {
 	GERMPLASM_PASSPORT(1813, "Germplasm Passport", "Germplasm Passport", PhenotypicType.UNASSIGNED),
 	GERMPLASM_ATTRIBUTE(1814, "Germplasm Attribute", "Germplasm Attribute", PhenotypicType.UNASSIGNED),
 	ENTRY_DETAIL(1815, "Entry Detail", "Variables that describes list entries", PhenotypicType.ENTRY_DETAIL),
-	INVENTORY_ATTRIBUTE(1816, "Inventory Attribute", "Inventory Attribute", PhenotypicType.UNASSIGNED);
+	INVENTORY_ATTRIBUTE(1816, "Inventory Attribute", "Inventory Attribute", PhenotypicType.UNASSIGNED),
+	GENOTYPE_MARKER(1817, "Genotype Marker", "Genotype Marker", PhenotypicType.UNASSIGNED);
 
 
 	private final Integer id;
