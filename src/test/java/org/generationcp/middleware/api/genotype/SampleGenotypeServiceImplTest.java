@@ -105,6 +105,8 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		genotypes.add(this.createSampleGenotypeImportRequestDto(sample, DEFAULT_MARKER_3, "T"));
 		this.sampleGenotypeService.importSampleGenotypes(genotypes);
 
+		this.sessionProvder.getSession().flush();
+
 		// Retrieve the imported Sample Genotype Records
 		final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
 		sampleGenotypeSearchRequestDTO.setStudyId(this.study.getProjectId());
@@ -154,6 +156,8 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		genotypes.add(this.createSampleGenotypeImportRequestDto(subObservationSample, DEFAULT_MARKER_2, "C"));
 		genotypes.add(this.createSampleGenotypeImportRequestDto(subObservationSample, DEFAULT_MARKER_3, "G"));
 		this.sampleGenotypeService.importSampleGenotypes(genotypes);
+
+		this.sessionProvder.getSession().flush();
 
 		// Retrieve the imported Sample Genotype Records
 		final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
@@ -205,6 +209,8 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		genotypes.add(this.createSampleGenotypeImportRequestDto(secondInstanceSample, DEFAULT_MARKER_2, "C"));
 		genotypes.add(this.createSampleGenotypeImportRequestDto(secondInstanceSample, DEFAULT_MARKER_3, "G"));
 		this.sampleGenotypeService.importSampleGenotypes(genotypes);
+
+		this.sessionProvder.getSession().flush();
 
 		// Retrieve the imported Sample Genotype Records
 		final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
