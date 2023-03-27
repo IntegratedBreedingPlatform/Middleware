@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet id="v23.2.0-1" author="mderamos">
+    <changeSet id="v23.3.0-1" author="mderamos">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE cvterm_id = 1817;
@@ -17,7 +17,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="v23.2.0-2" author="mderamos">
+    <changeSet id="v23.3.0-2" author="mderamos">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="genotype"/>
@@ -54,7 +54,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="v23.2.0-3" author="mderamos">
+    <changeSet id="v23.3.0-3" author="mderamos">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Genome" AND cv_id = 1020;
@@ -67,7 +67,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="v23.2.0-4" author="mderamos">
+    <changeSet id="v23.3.0-4" author="mderamos">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Text" AND cv_id = 1030;
@@ -80,7 +80,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="v23.2.0-5" author="mderamos">
+    <changeSet id="v23.3.0-5" author="mderamos">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name IN ("PZE-101093951", "PZE-0186065237", "PZE-0186365075");
