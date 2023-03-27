@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.crop.CropService;
+import org.generationcp.middleware.dao.GenotypeDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
@@ -85,6 +86,9 @@ public class SampleListServiceImplTest {
 	@Mock
 	private UserService userService;
 
+	@Mock
+	private GenotypeDao genotypeDao;
+
 	private SampleListServiceImpl sampleListService;
 
 	@Before
@@ -100,6 +104,7 @@ public class SampleListServiceImplTest {
 		this.sampleListService.setDaoFactory(daoFactory);
 		when(daoFactory.getSampleDao()).thenReturn(this.sampleDao);
 		when(daoFactory.getSampleListDao()).thenReturn(this.sampleListDao);
+		when(daoFactory.getGenotypeDao()).thenReturn(this.genotypeDao);
 
 		final WorkbenchUser createdBy = new WorkbenchUser();
 		createdBy.setName(ADMIN);
@@ -565,10 +570,9 @@ public class SampleListServiceImplTest {
 
 	@Test
 	public void testGetSampleListEntries() {
-		final Integer sampleListId = 1;
 		final List<Integer> sampleIds = Arrays.asList(1, 2);
-		this.sampleListService.getSampleListEntries(sampleListId, sampleIds);
-		Mockito.verify(this.sampleDao).getSamples(sampleListId, sampleIds);
+		this.sampleListService.getSampleListEntries(sampleIds);
+		Mockito.verify(this.sampleDao).getSamples(sampleIds);
 	}
 
 	@Test
@@ -576,6 +580,7 @@ public class SampleListServiceImplTest {
 		final Integer sampleListId = 1;
 		final List<Integer> sampleIds = Arrays.asList(1, 2);
 		this.sampleListService.deleteSamples(sampleListId, sampleIds);
+		Mockito.verify(this.genotypeDao).deleteSampleGenotypes(sampleIds);
 		Mockito.verify(this.sampleDao).deleteBySampleIds(sampleListId, sampleIds);
 		Mockito.verify(this.sampleDao).reOrderEntries(sampleListId);
 	}

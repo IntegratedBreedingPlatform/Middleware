@@ -17,6 +17,8 @@ import org.generationcp.middleware.api.cropparameter.CropParameterService;
 import org.generationcp.middleware.api.cropparameter.CropParameterServiceImpl;
 import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.file.FileMetadataServiceImpl;
+import org.generationcp.middleware.api.genotype.SampleGenotypeService;
+import org.generationcp.middleware.api.genotype.SampleGenotypeServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
@@ -423,6 +425,10 @@ public class ManagerFactory implements Serializable {
 
 	public AdvanceService getAdvanceService() {
 		return new AdvanceServiceImpl(this.sessionProvider);
+	}
+
+	public SampleGenotypeService getSampleGenotypeService() {
+		return new SampleGenotypeServiceImpl(this.sessionProvider);
 	}
 
 }

@@ -139,6 +139,7 @@
         <mapping class="org.generationcp.middleware.pojos.GermplasmStudySource"/>
         <mapping class="org.generationcp.middleware.pojos.file.FileMetadata"/>
         <mapping class="org.generationcp.middleware.pojos.CropParameter"/>
+        <mapping class="org.generationcp.middleware.pojos.Genotype"/>
 
     </session-factory>
 </hibernate-configuration>

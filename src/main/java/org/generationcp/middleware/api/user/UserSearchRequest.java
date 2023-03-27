@@ -16,6 +16,8 @@ public class UserSearchRequest {
 
 	public String lastName;
 
+	public String fullName;
+
 	public String email;
 
 	public List<String> crops;
@@ -39,42 +41,50 @@ public class UserSearchRequest {
 	}
 
 	public String getUserName() {
-		return userName;
+		return this.userName;
 	}
 
-	public void setUserName(String userName) {
+	public void setUserName(final String userName) {
 		this.userName = userName;
 	}
 
 	public String getFirstName() {
-		return firstName;
+		return this.firstName;
 	}
 
-	public void setFirstName(String firstName) {
+	public void setFirstName(final String firstName) {
 		this.firstName = firstName;
 	}
 
 	public String getLastName() {
-		return lastName;
+		return this.lastName;
 	}
 
-	public void setLastName(String lastName) {
+	public void setLastName(final String lastName) {
 		this.lastName = lastName;
 	}
 
-	public String getEmail() {
-		return email;
+	public String getFullName() {
+		return this.fullName;
 	}
 
-	public void setEmail(String email) {
+	public void setFullName(final String fullName) {
+		this.fullName = fullName;
+	}
+
+	public String getEmail() {
+		return this.email;
+	}
+
+	public void setEmail(final String email) {
 		this.email = email;
 	}
 
 	public List<String> getCrops() {
-		return crops;
+		return this.crops;
 	}
 
-	public void setCrops(List<String> crops) {
+	public void setCrops(final List<String> crops) {
 		this.crops = crops;
 	}
 

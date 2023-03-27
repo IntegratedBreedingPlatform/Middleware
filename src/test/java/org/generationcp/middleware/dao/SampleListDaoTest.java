@@ -1,7 +1,9 @@
 package org.generationcp.middleware.dao;
 
 import com.google.common.collect.Ordering;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.genotype.SampleGenotypeService;
 import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.api.role.RoleServiceImpl;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -15,8 +17,10 @@ import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
@@ -31,9 +35,11 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.user.UserServiceImpl;
+import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,12 +47,18 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 public class SampleListDaoTest extends IntegrationTestBase {
+
+	public static final String DEFAULT_MARKER_1 = "PZE-101093951";
+	public static final String DEFAULT_MARKER_2 = "PZE-0186065237";
+	public static final String DEFAULT_MARKER_3 = "PZE-0186365075";
 
 	public static final String P = "P";
 	public static final String ADMIN = "admin";
@@ -58,6 +70,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	public static final String S = "S";
 	public static final String PROGRAM_UUID = "c35c7769-bdad-4c70-a6c4-78c0dbf784e5";
 
+	private IntegrationTestDataInitializer testDataInitializer;
 	private SampleListDao sampleListDao;
 	private PersonDAO personDAO;
 	private SampleDao sampleDao;
@@ -71,6 +84,9 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	private RoleService roleService;
 	private UserService userService;
 
+	@Resource
+	private SampleGenotypeService sampleGenotypeService;
+
 	private DaoFactory daoFactory;
 	private WorkbenchDaoFactory workbenchDaoFactory;
 
@@ -80,6 +96,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	public void setUp() throws Exception {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
+		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 
 		this.sampleListDao = this.daoFactory.getSampleListDao();
 		this.sampleDao = this.daoFactory.getSampleDao();
@@ -97,6 +114,49 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		this.createSampleListForSearch("TEST-LIST-1", true);
 		this.createSampleListForSearch("TEST-LIST-2", false);
 		this.createSampleListForSearch("TEST-LIST-3", false);
+	}
+
+	@Test
+	public void testGetSampleListsByStudy() {
+
+		final DmsProject study =
+			this.testDataInitializer.createDmsProject(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), null,
+				this.daoFactory.getDmsProjectDAO().getById(1), null);
+		final DmsProject plotDataset = this.testDataInitializer
+			.createDmsProject(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), study, study,
+				DatasetTypeEnum.PLOT_DATA);
+		final Geolocation trialInstance1 = this.testDataInitializer.createTestGeolocation("1", 101);
+
+		final List<ExperimentModel>
+			experimentModels =
+			this.testDataInitializer.createTestExperimentsWithStock(study, plotDataset, null, trialInstance1, 1);
+
+		final SampleList sampleList =
+			this.testDataInitializer.createTestSampleList(RandomStringUtils.randomAlphabetic(10), 1);
+
+		// Add one sample in the list
+		final List<Sample> samples = this.testDataInitializer.addSamples(experimentModels, sampleList, 1);
+
+		final List<SampleListDTO> result = this.sampleListDao.getSampleListsByStudy(study.getProjectId(), false);
+		Assert.assertEquals(1, result.size());
+		Assert.assertEquals(sampleList.getId(), result.get(0).getListId());
+		Assert.assertEquals(sampleList.getListName(), result.get(0).getListName());
+		Assert.assertEquals(sampleList.getDescription(), result.get(0).getDescription());
+
+		final List<SampleListDTO> result2 = this.sampleListDao.getSampleListsByStudy(study.getProjectId(), true);
+		Assert.assertEquals(0, result2.size());
+
+		final Sample sample = samples.get(0);
+		// Create Sample Genotype records
+		final List<SampleGenotypeImportRequestDto> genotypes = new ArrayList<>();
+		genotypes.add(this.createSampleGenotypeImportRequestDto(sample, DEFAULT_MARKER_1, "C"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(sample, DEFAULT_MARKER_2, "G"));
+		genotypes.add(this.createSampleGenotypeImportRequestDto(sample, DEFAULT_MARKER_3, "T"));
+		this.sampleGenotypeService.importSampleGenotypes(genotypes);
+
+		final List<SampleListDTO> result3 = this.sampleListDao.getSampleListsByStudy(study.getProjectId(), true);
+		Assert.assertEquals(1, result3.size());
+
 	}
 
 	@Test
@@ -424,6 +484,19 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		return stockModel;
 
+	}
+
+	private SampleGenotypeImportRequestDto createSampleGenotypeImportRequestDto(final Sample sample, final String markerVariableName,
+		final String value) {
+
+		final CVTerm markerVariable = this.daoFactory.getCvTermDao().getByName(markerVariableName);
+		Assert.assertNotNull("Marker variable should exist", markerVariable);
+
+		final SampleGenotypeImportRequestDto sampleGenotypeImportRequestDto = new SampleGenotypeImportRequestDto();
+		sampleGenotypeImportRequestDto.setSampleId(String.valueOf(sample.getSampleId()));
+		sampleGenotypeImportRequestDto.setVariableId(String.valueOf(markerVariable.getCvTermId()));
+		sampleGenotypeImportRequestDto.setValue(value);
+		return sampleGenotypeImportRequestDto;
 	}
 
 }
