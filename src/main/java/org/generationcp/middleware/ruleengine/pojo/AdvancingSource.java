@@ -2,7 +2,6 @@ package org.generationcp.middleware.ruleengine.pojo;
 
 import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
-import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -34,7 +33,7 @@ public class AdvancingSource {
 	private Integer harvestLocationId;
 
 	private final Integer plantsSelected;
-	private final List<SampleDTO> sampleDTOS;
+	private final List<Integer> sampleNumbers;
 
 	private String rootName;
 	private Integer rootNameType;
@@ -58,7 +57,7 @@ public class AdvancingSource {
 		final Method breedingMethod,
 		final Method sourceMethod,
 		final String season, final String selectionTraitValue,
-		final Integer plantSelected, final List<SampleDTO> sampleDTOS) {
+		final Integer plantSelected, final List<Integer> sampleNumbers) {
 
 		this.originGermplasm = originGermplasm;
 		this.names = names;
@@ -70,7 +69,7 @@ public class AdvancingSource {
 		this.season = season;
 		this.selectionTraitValue = selectionTraitValue;
 		this.plantsSelected = plantSelected;
-		this.sampleDTOS = sampleDTOS;
+		this.sampleNumbers = sampleNumbers;
 
 		// We are setting this properties due to keep backward compatibility with the AdvancingSource of the old advance process
 		this.locationAbbreviation = "";
@@ -137,8 +136,8 @@ public class AdvancingSource {
 		return this.plantsSelected;
 	}
 
-	public List<SampleDTO> getSampleDTOS() {
-		return this.sampleDTOS;
+	public List<Integer> getSampleNumbers() {
+		return this.sampleNumbers;
 	}
 
 	public String getRootName() {

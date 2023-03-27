@@ -7,9 +7,6 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class AdvanceGermplasmPreview {
 
-	// observation unit ID for studies, sample ID for samples
-	private Integer uniqueId;
-
 	private String trialInstance;
 	private String locationName;
 	private String entryNumber;
@@ -20,11 +17,10 @@ public class AdvanceGermplasmPreview {
 	private String breedingMethodAbbr;
 	private String designation;
 
-	public AdvanceGermplasmPreview(final Integer uniqueId, final String trialInstance, final String locationName, final String entryNumber,
+	public AdvanceGermplasmPreview(final String trialInstance, final String locationName, final String entryNumber,
 		final String plotNumber,
 		final String plantNumber, final String cross, final String immediateSource, final String breedingMethodAbbr,
 		final String designation) {
-		this.uniqueId = uniqueId;
 		this.trialInstance = trialInstance;
 		this.locationName = locationName;
 		this.entryNumber = entryNumber;
@@ -34,14 +30,6 @@ public class AdvanceGermplasmPreview {
 		this.immediateSource = immediateSource;
 		this.breedingMethodAbbr = breedingMethodAbbr;
 		this.designation = designation;
-	}
-
-	public Integer getUniqueId() {
-		return this.uniqueId;
-	}
-
-	public void setUniqueId(final Integer uniqueId) {
-		this.uniqueId = uniqueId;
 	}
 
 	public Integer getEntryNumberValue() {
