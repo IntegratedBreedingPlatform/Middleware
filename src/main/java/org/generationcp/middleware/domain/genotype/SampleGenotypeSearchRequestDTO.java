@@ -25,12 +25,14 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 	 */
 	private Set<String> visibleColumns = new HashSet<>();
 
-	/**
-	 * This is used by DataTables to ensure that the Ajax returns from server-side processing requests are drawn in sequence
-	 */
-	private String draw;
-
 	private GenotypeFilter filter = new GenotypeFilter();
+
+	public SampleGenotypeSearchRequestDTO() {
+	}
+
+	public SampleGenotypeSearchRequestDTO(final Integer studyId) {
+		this.studyId = studyId;
+	}
 
 	public int getStudyId() {
 		return this.studyId;
@@ -38,14 +40,6 @@ public class SampleGenotypeSearchRequestDTO extends SearchRequestDto {
 
 	public void setStudyId(final int studyId) {
 		this.studyId = studyId;
-	}
-
-	public String getDraw() {
-		return this.draw;
-	}
-
-	public void setDraw(final String draw) {
-		this.draw = draw;
 	}
 
 	public GenotypeFilter getFilter() {

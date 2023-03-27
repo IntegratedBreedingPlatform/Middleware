@@ -80,9 +80,9 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 
 	@Override
 	public List<SampleGenotypeDTO> searchSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO, final Pageable pageable) {
-		this.updateSearchDTO(searchRequestDTO);
+		this.populateSampleGenotypeVariables(searchRequestDTO);
 		if (!CollectionUtils.isEmpty(searchRequestDTO.getSampleGenotypeVariables())) {
-			this.updateTakenByIds(searchRequestDTO);
+			this.populateTakenByIdsByUserIds(searchRequestDTO);
 			final List<SampleGenotypeDTO> sampleGenotypeDTOS = this.daoFactory.getGenotypeDao().searchGenotypes(searchRequestDTO, pageable);
 			this.populateTakenBy(sampleGenotypeDTOS);
 			return sampleGenotypeDTOS;
@@ -91,13 +91,8 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	}
 
 	@Override
-	public long countSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
-		return this.daoFactory.getGenotypeDao().countGenotypes(searchRequestDTO);
-	}
-
-	@Override
 	public long countFilteredSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
-		this.updateTakenByIds(searchRequestDTO);
+		this.populateTakenByIdsByUserIds(searchRequestDTO);
 		return this.daoFactory.getGenotypeDao().countFilteredGenotypes(searchRequestDTO);
 	}
 
@@ -154,7 +149,7 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 		return variables;
 	}
 
-	private void updateTakenByIds(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
+	private void populateTakenByIdsByUserIds(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
 		final UserSearchRequest userSearchRequest = new UserSearchRequest();
 		if (searchRequestDTO.getFilter() !=null && MapUtils.isNotEmpty(searchRequestDTO.getFilter().getFilteredTextValues())
 			&& searchRequestDTO.getFilter().getFilteredTextValues().containsKey(String.valueOf(TermId.TAKEN_BY.getId()))) {
@@ -164,7 +159,7 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 		}
 	}
 
-	public void addSampleColumns(final List<MeasurementVariable> variables) {
+	private void addSampleColumns(final List<MeasurementVariable> variables) {
 		variables.add(this.addTermIdColumn(TermId.SAMPLE_NAME));
 		variables.add(this.addTermIdColumn(TermId.SAMPLE_UUID));
 		final MeasurementVariable samplingDateVariable = this.addTermIdColumn(TermId.SAMPLING_DATE);
@@ -174,7 +169,7 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 		variables.add(this.addTermIdColumn(TermId.TAKEN_BY));
 	}
 
-	private void updateSearchDTO(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
+	private void populateSampleGenotypeVariables(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
 
 		final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
 		filter.setStudyId(searchRequestDTO.getStudyId());

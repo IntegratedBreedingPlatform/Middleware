@@ -402,20 +402,6 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
-	public long countGenotypes(final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO) {
-		final StringBuilder subQuery = new StringBuilder("SELECT s.sample_id ");
-		subQuery.append(GENOTYPE_SEARCH_FROM_QUERY);
-		subQuery.append(" GROUP BY s.sample_id ");
-		final StringBuilder mainSql = new StringBuilder("SELECT COUNT(*) FROM ( \n");
-		mainSql.append(subQuery);
-		mainSql.append(") a \n");
-
-		final SQLQuery query = this.getSession().createSQLQuery(mainSql.toString());
-
-		query.setParameter("studyId", sampleGenotypeSearchRequestDTO.getStudyId());
-		return ((BigInteger) query.uniqueResult()).longValue();
-	}
-
 	public Map<Integer, String> getStandardSampleGenotypeVariables(final Map<String, String> finalColumnsQueryMap) {
 		finalColumnsQueryMap.putAll(mainVariablesMap);
 		// Set the actual standard variable names from ontology as column names in query

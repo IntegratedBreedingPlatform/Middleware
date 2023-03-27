@@ -113,7 +113,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 			sampleGenotypeDTOList = this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null);
 
 		Assert.assertEquals(1, sampleGenotypeDTOList.size());
-		Assert.assertEquals(1, this.sampleGenotypeService.countSampleGenotypes(sampleGenotypeSearchRequestDTO));
+		Assert.assertEquals(1, this.sampleGenotypeService.countFilteredSampleGenotypes(new SampleGenotypeSearchRequestDTO(this.study.getProjectId())));
 		Assert.assertEquals(1, this.sampleGenotypeService.countSampleGenotypesBySampleList(sampleList.getId()));
 		final SampleGenotypeDTO sampleGenotypeDTO = sampleGenotypeDTOList.get(0);
 		Assert.assertEquals("C", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
@@ -165,7 +165,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 
 		Assert.assertEquals(1, sampleGenotypeDTOList.size());
 		Assert.assertEquals(1, this.sampleGenotypeService.countFilteredSampleGenotypes(sampleGenotypeSearchRequestDTO));
-		Assert.assertEquals(2, this.sampleGenotypeService.countSampleGenotypes(sampleGenotypeSearchRequestDTO));
+		Assert.assertEquals(2, this.sampleGenotypeService.countFilteredSampleGenotypes(new SampleGenotypeSearchRequestDTO(this.study.getProjectId())));
 		Assert.assertEquals(2, this.sampleGenotypeService.countSampleGenotypesBySampleList(sampleList.getId()));
 		final SampleGenotypeDTO sampleGenotypeDTO = sampleGenotypeDTOList.get(0);
 		Assert.assertEquals("C", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
@@ -216,7 +216,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 
 		Assert.assertEquals(1, sampleGenotypeDTOList.size());
 		Assert.assertEquals(1, this.sampleGenotypeService.countFilteredSampleGenotypes(sampleGenotypeSearchRequestDTO));
-		Assert.assertEquals(2, this.sampleGenotypeService.countSampleGenotypes(sampleGenotypeSearchRequestDTO));
+		Assert.assertEquals(2, this.sampleGenotypeService.countFilteredSampleGenotypes(new SampleGenotypeSearchRequestDTO(this.study.getProjectId())));
 		Assert.assertEquals(2, this.sampleGenotypeService.countSampleGenotypesBySampleList(sampleList.getId()));
 		final SampleGenotypeDTO sampleGenotypeDTO = sampleGenotypeDTOList.get(0);
 		Assert.assertEquals("C", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
@@ -289,7 +289,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 				sampleGenotypeDTOList = this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null);
 		Assert.assertEquals(1, sampleGenotypeDTOList.size());
 		Assert.assertEquals(1, this.sampleGenotypeService.countFilteredSampleGenotypes(sampleGenotypeSearchRequestDTO));
-		Assert.assertEquals(2, this.sampleGenotypeService.countSampleGenotypes(sampleGenotypeSearchRequestDTO));
+		Assert.assertEquals(2, this.sampleGenotypeService.countFilteredSampleGenotypes(new SampleGenotypeSearchRequestDTO(this.study.getProjectId())));
 		Assert.assertEquals(2, this.sampleGenotypeService.countSampleGenotypesBySampleList(sampleList.getId()));
 		final SampleGenotypeDTO sampleGenotypeDTO = sampleGenotypeDTOList.get(0);
 		Assert.assertEquals("C", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());

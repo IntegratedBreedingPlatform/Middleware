@@ -12,11 +12,9 @@ import java.util.Map;
 
 public interface SampleGenotypeService {
 
-	List<Integer> importSampleGenotypes(final List<SampleGenotypeImportRequestDto> sampleGenotypeImportRequestDtos);
+	List<Integer> importSampleGenotypes(List<SampleGenotypeImportRequestDto> sampleGenotypeImportRequestDtos);
 
 	List<SampleGenotypeDTO> searchSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO, Pageable pageable);
-
-	long countSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO);
 
 	long countFilteredSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO);
 
