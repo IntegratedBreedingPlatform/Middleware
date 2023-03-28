@@ -47,6 +47,7 @@ public enum PermissionsEnum {
 	MS_SAMPLE_LISTS,
 	MS_EXPORT_SAMPLE_LIST,
 	MS_DELETE_SAMPLES,
+	MS_IMPORT_GENOTYPES,
 	MS_STUDY_ACTIONS,
 	MS_DESIGN_AND_PLANNING_OPTIONS,
 	MS_CREATE_PLANTING_LABELS,
@@ -77,4 +78,6 @@ public enum PermissionsEnum {
 		Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name(), MS_SAMPLE_LISTS.name(), MS_EXPORT_SAMPLE_LIST.name());
 	public static final List<String> DELETE_SAMPLES_PERMISSIONS =
 		Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name(), MS_SAMPLE_LISTS.name(), MS_DELETE_SAMPLES.name());
+	public static final List<String> IMPORT_GENOTYPES_PERMISSIONS =
+		Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name(), MS_SAMPLE_LISTS.name(), MS_IMPORT_GENOTYPES.name());
 }
