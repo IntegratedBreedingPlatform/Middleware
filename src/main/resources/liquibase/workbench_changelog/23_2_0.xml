@@ -686,7 +686,7 @@
 	<changeSet author="cuenyad" id="v23.2.0-35">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_SAMPLE_LIST';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_SAMPLE_LISTS';
              </sqlCheck>
  		</preConditions>
 		<comment>View Sample List permission</comment>
