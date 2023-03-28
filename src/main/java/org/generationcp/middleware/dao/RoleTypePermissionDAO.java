@@ -39,7 +39,7 @@ public class RoleTypePermissionDAO extends GenericDAO<RoleTypePermission, RoleTy
 				criteria.add(Restrictions.eq("parent.permissionId", parentId));
 			}
 
-			criteria.addOrder(Order.asc("id"));
+			criteria.addOrder(Order.asc("permission.rank"));
 			toReturn = criteria.list();
 
 		} catch (final HibernateException e) {
