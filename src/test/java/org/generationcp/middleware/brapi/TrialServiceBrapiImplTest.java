@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
@@ -30,7 +31,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.service.api.user.ContactVariable;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
@@ -125,10 +125,10 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountStudies() {
+	public void testCountSearchTrials() {
 		// Empty filter will retrieve all studies in crop
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		final long initialCount = this.trialServiceBrapi.countStudies(studySearchFilter);
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		final long initialCount = this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO);
 
 		// Add new study with new location ID
 		final DmsProject newStudy = this.testDataInitializer
@@ -147,18 +147,18 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// New study should be retrieved for empty filter
-		Assert.assertEquals((int) initialCount + 1, this.trialServiceBrapi.countStudies(studySearchFilter));
+		Assert.assertEquals((int) initialCount + 1, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
-		studySearchFilter.setProgramDbId(this.commonTestProject.getUniqueID());
+		trialSearchRequestDTO.setProgramDbIds(Arrays.asList(this.commonTestProject.getUniqueID()));
 		Assert
-			.assertEquals(2, this.trialServiceBrapi.countStudies(studySearchFilter));
-		studySearchFilter.setLocationDbId(String.valueOf(location1));
+			.assertEquals(2, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
+		trialSearchRequestDTO.setLocationDbIds(Arrays.asList(String.valueOf(location1)));
 		// Expecting only one to be retrieved when filtered by location
-		Assert.assertEquals(1, this.trialServiceBrapi.countStudies(studySearchFilter));
+		Assert.assertEquals(1, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
 	}
 
 	@Test
-	public void testGetStudies() {
+	public void testSearchTrials() {
 		// Add new completed study assigned new location ID
 		final DmsProject newStudy = this.testDataInitializer
 			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
@@ -181,11 +181,11 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID, sorted by descending study name
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setProgramDbId(this.commonTestProject.getUniqueID());
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setProgramDbIds(Arrays.asList(this.commonTestProject.getUniqueID()));
 		List<StudySummary> studies =
-			this.trialServiceBrapi.getStudies(
-				studySearchFilter, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
 		Assert.assertEquals(2, studies.size());
 		StudySummary study1 = studies.get(1);
 		Assert.assertEquals(this.study.getProjectId(), study1.getTrialDbId());
@@ -207,9 +207,9 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(contactName, study2.getContacts().get(0).getName());
 		Assert.assertFalse(study2.isActive());
 
-		studySearchFilter.setLocationDbId(String.valueOf(location1));
+		trialSearchRequestDTO.setLocationDbIds(Arrays.asList(String.valueOf(location1)));
 		// Expecting only one study to be retrieved when filtered by location
-		studies = this.trialServiceBrapi.getStudies(studySearchFilter, null);
+		studies = this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null);
 		Assert.assertEquals(1, studies.size());
 		study1 = studies.get(0);
 		Assert.assertEquals(newStudy.getProjectId(), study1.getTrialDbId());
@@ -219,7 +219,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudies_FilterByStudyExternalReference() {
+	public void testSearchTrials_FilterByStudyExternalReference() {
 		// Add new completed study assigned new location ID
 		final DmsProject newStudy = this.testDataInitializer
 			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
@@ -237,13 +237,13 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.sessionProvder.getSession().flush();
 
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setExternalReferenceSource(studyExternalReference.getSource());
-		studySearchFilter.setExternalReferenceID(studyExternalReference.getReferenceId());
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setExternalReferenceSources(Arrays.asList(studyExternalReference.getSource()));
+		trialSearchRequestDTO.setExternalReferenceIds(Arrays.asList(studyExternalReference.getReferenceId()));
 
 		final List<StudySummary> studies =
-			this.trialServiceBrapi.getStudies(
-				studySearchFilter, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
 		Assert.assertEquals(1, studies.size());
 		final StudySummary study2 = studies.get(0);
 		Assert.assertEquals(newStudy.getProjectId(), study2.getTrialDbId());
@@ -251,7 +251,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountStudies_FilterByStudyExternalReference() {
+	public void testCountSearchTrials_FilterByStudyExternalReference() {
 		// Add new completed study assigned new location ID
 		final DmsProject newStudy = this.testDataInitializer
 			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
@@ -269,15 +269,15 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.sessionProvder.getSession().flush();
 
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setExternalReferenceSource(studyExternalReference.getSource());
-		studySearchFilter.setExternalReferenceID(studyExternalReference.getReferenceId());
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setExternalReferenceSources(Arrays.asList(studyExternalReference.getSource()));
+		trialSearchRequestDTO.setExternalReferenceIds(Arrays.asList(studyExternalReference.getReferenceId()));
 
-		Assert.assertEquals(1, this.trialServiceBrapi.countStudies(studySearchFilter));
+		Assert.assertEquals(1, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
 	}
 
 	@Test
-	public void testGetStudiesWithDeletedStudy() {
+	public void testSearchTrialsWithDeletedStudy() {
 		// Add new study assigned new location ID
 		final DmsProject newStudy = this.testDataInitializer
 			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
@@ -298,11 +298,11 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID, sorted by descending study name
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setProgramDbId(this.commonTestProject.getUniqueID());
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setProgramDbIds(Arrays.asList(this.commonTestProject.getUniqueID()));
 		List<StudySummary> studies =
-			this.trialServiceBrapi.getStudies(
-				studySearchFilter, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
 		Assert.assertEquals("Deleted study is not included", 2, studies.size());
 		StudySummary study1 = studies.get(1);
 		Assert.assertEquals(this.study.getProjectId(), study1.getTrialDbId());
@@ -321,8 +321,8 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(0, study2.getContacts().size());
 
 		// Expecting only one study to be retrieved when filtered by location
-		studySearchFilter.setLocationDbId(String.valueOf(location1));
-		studies = this.trialServiceBrapi.getStudies(studySearchFilter, null);
+		trialSearchRequestDTO.setLocationDbIds(Arrays.asList(String.valueOf(location1)));
+		studies = this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null);
 		Assert.assertEquals(1, studies.size());
 		study1 = studies.get(0);
 		Assert.assertEquals(newStudy.getProjectId(), study1.getTrialDbId());
@@ -332,10 +332,10 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountStudiesWithDeletedStudy() {
+	public void testCountSearchTrialsWithDeletedStudy() {
 		// Empty filter will retrieve all studies in crop
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		final long initialCount = this.trialServiceBrapi.countStudies(studySearchFilter);
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		final long initialCount = this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO);
 
 		// Add new study with new location ID
 		final DmsProject newStudy = this.testDataInitializer
@@ -357,14 +357,14 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// New study should be retrieved for empty filter
-		Assert.assertEquals((int) initialCount + 1, this.trialServiceBrapi.countStudies(studySearchFilter));
+		Assert.assertEquals((int) initialCount + 1, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
-		studySearchFilter.setProgramDbId(this.commonTestProject.getUniqueID());
+		trialSearchRequestDTO.setProgramDbIds(Arrays.asList(this.commonTestProject.getUniqueID()));
 		Assert
-			.assertEquals(2, this.trialServiceBrapi.countStudies(studySearchFilter));
-		studySearchFilter.setLocationDbId(String.valueOf(location1));
+			.assertEquals(2, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
+		trialSearchRequestDTO.setLocationDbIds(Arrays.asList(String.valueOf(location1)));
 		// Expecting only one to be retrieved when filtered by location
-		Assert.assertEquals(1, this.trialServiceBrapi.countStudies(studySearchFilter));
+		Assert.assertEquals(1, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
 	}
 
 	@Test

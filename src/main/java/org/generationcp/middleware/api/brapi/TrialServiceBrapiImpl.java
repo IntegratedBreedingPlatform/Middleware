@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -37,7 +38,6 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.service.api.user.ContactVariable;
@@ -237,8 +237,8 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 	}
 
 	@Override
-	public List<StudySummary> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
-		final List<StudySummary> studies = this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter, pageable);
+	public List<StudySummary> searchTrials(final TrialSearchRequestDTO trialSearchRequestDTO, final Pageable pageable) {
+		final List<StudySummary> studies = this.daoFactory.getTrialSearchDao().searchTrials(trialSearchRequestDTO, pageable);
 		if (!CollectionUtils.isEmpty(studies)) {
 			final List<Integer> studyIds = studies.stream().map(StudySummary::getTrialDbId).collect(Collectors.toList());
 			final Map<Integer, List<ProjectProperty>> propsMap = this.daoFactory.getProjectPropertyDAO().getPropsForProjectIds(studyIds);
@@ -246,7 +246,7 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
 				this.daoFactory.getStudyExternalReferenceDAO().getExternalReferences(studyIds).stream().collect(groupingBy(
 					ExternalReferenceDTO::getEntityId));
-			final Map<Integer, List<InstanceMetadata>> trialInstancesMap = this.retrieveTrialInstancesMap(studySearchFilter, studyIds);
+			final Map<Integer, List<InstanceMetadata>> trialInstancesMap = this.retrieveTrialInstancesMap(trialSearchRequestDTO, studyIds);
 			final Map<Integer, MeasurementVariable> studySettingsVariablesMap = this.getVariablesMap(propsMap);
 			for (final StudySummary studySummary : studies) {
 				final Integer studyId = studySummary.getTrialDbId();
@@ -260,10 +260,10 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		return studies;
 	}
 
-	private Map<Integer, List<InstanceMetadata>> retrieveTrialInstancesMap(final StudySearchFilter studySearchFilter,
+	private Map<Integer, List<InstanceMetadata>> retrieveTrialInstancesMap(final TrialSearchRequestDTO trialSearchRequestDTO,
 		final List<Integer> studyIds) {
-		final List<Integer> locationIds = studySearchFilter.getLocationDbId() != null ?
-			Collections.singletonList(Integer.parseInt(studySearchFilter.getLocationDbId())) :
+		final List<Integer> locationIds = !CollectionUtils.isEmpty(trialSearchRequestDTO.getLocationDbIds()) ?
+			trialSearchRequestDTO.getLocationDbIds().stream().map(s -> Integer.parseInt(s)).collect(Collectors.toList()) :
 			Collections.emptyList();
 		return
 			this.daoFactory.getGeolocationDao().getInstanceMetadata(studyIds, locationIds).stream().collect(groupingBy(
@@ -271,8 +271,8 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 	}
 
 	@Override
-	public long countStudies(final StudySearchFilter studySearchFilter) {
-		return this.daoFactory.getDmsProjectDAO().countStudies(studySearchFilter);
+	public long countSearchTrials(final TrialSearchRequestDTO trialSearchRequestDTO) {
+		return this.daoFactory.getTrialSearchDao().countSearchTrials(trialSearchRequestDTO);
 	}
 
 	@Override
@@ -306,9 +306,9 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		}
 		// Unless the session is flushed, the latest changes are not reflected in DTOs returned by method
 		this.sessionProvider.getSession().flush();
-		final StudySearchFilter filter = new StudySearchFilter();
-		filter.setTrialDbIds(studyIds);
-		return this.getStudies(filter, null);
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialDbIds(studyIds);
+		return this.searchTrials(trialSearchRequestDTO, null);
 	}
 
 	private Map<Integer, List<ValueReference>> collectCategoricalVariables(final Map<String, MeasurementVariable> variableNamesMap,
