@@ -1702,7 +1702,7 @@
                 	SELECT count(*) > 1 FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
 					WHERE p.name IN ('CREATE_STUDIES', 'CLOSE_STUDY', 'DELETE_STUDY', 'LOCK_STUDY', 'MS_GERMPLASM_AND_CHECKS',
 									 'MS_TREATMENT_FACTORS', 'MS_EXPERIMENTAL_DESIGN', 'MS_ENVIRONMENT', 'MS_STUDY_SETTINGS',
-									 'MS_CROSSES_AND_SELECTIONS', 'MS_INVENTORY', 'MS_SAMPLE_LISTS'
+									 'MS_CROSSES_AND_SELECTIONS', 'MS_INVENTORY', 'MS_SAMPLE_LISTS',
 									 'MS_SSA_RESULTS' ,'MS_OBSERVATIONS', 'MS_SAMPLE_GENOTYPES', 'MS_STUDY_ACTIONS');
             	</sqlCheck>
 				<not>
@@ -1796,11 +1796,11 @@
 			DROP TABLE roles_affected_temporary;
 
 			#Delete the permissions that has study action permission as a parent.
-			DELETE role_permission WHERE role_id in (
-			SELECT DISTINCT(rp.role_id) FROM role_permission rp INNER JOIN  permission p ON rp.permission_id = p.permission_id
-			WHERE p.name IN ('MS_MANAGE_OBSERVATION_UNITS','MS_WITHDRAW_INVENTORY',
+			DELETE FROM role_permission WHERE role_id in (SELECT ROLE.ID FROM (
+				SELECT DISTINCT(rp.role_id) AS ID FROM role_permission rp INNER JOIN  permission p ON rp.permission_id = p.permission_id
+					WHERE p.name IN ('MS_MANAGE_OBSERVATION_UNITS','MS_WITHDRAW_INVENTORY',
 							 'MS_CREATE_PENDING_WITHDRAWALS','MS_CREATE_CONFIRMED_WITHDRAWALS',
-							 'MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES','MS_CREATE_LOTS'));
+							 'MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES','MS_CREATE_LOTS')) AS ROLE);
 
  		</sql>
  	</changeSet>
