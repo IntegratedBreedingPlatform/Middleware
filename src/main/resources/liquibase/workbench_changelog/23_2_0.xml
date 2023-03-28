@@ -744,6 +744,67 @@
  	</changeSet>
 
 	<changeSet author="cuenyad" id="v23.2.0-38">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_IMPORT_GENOTYPES';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>Import Genotypes permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @mg_sample_genotpyes_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LISTS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_IMPORT_GENOTYPES', 'Import Genotypes', @mg_sample_genotpyes_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_IMPORT_GENOTYPES');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+
+	<changeSet author="cuenyad" id="v23.2.0-39">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SAMPLE_GENOTYPES';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>Sample Genotypes permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @mg_studies_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_STUDIES');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_SAMPLE_GENOTYPES', 'Sample Genotypes', @mg_studies_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_GENOTYPES');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-40">
+		<preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_SAMPLE_GENOTYPES';
+             </sqlCheck>
+ 		</preConditions>
+        <comment>View Sample Genotpyes permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @mg_sample_genotpyes_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_GENOTYPES');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_VIEW_SAMPLE_GENOTYPES', 'View Sample Genotypes', @mg_sample_genotpyes_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_SAMPLE_GENOTYPES');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.2.0-41">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SSA_RESULTS';
