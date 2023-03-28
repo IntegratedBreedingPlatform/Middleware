@@ -59,6 +59,14 @@ public class Permission {
 		this.permissionId = permissionId;
 	}
 
+	public Integer getRank() {
+		return this.rank;
+	}
+
+	public void setRank(final Integer rank) {
+		this.rank = rank;
+	}
+
 	public String getName() {
 		return this.name;
 	}
