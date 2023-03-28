@@ -1703,7 +1703,7 @@
 					WHERE p.name IN ('CREATE_STUDIES', 'CLOSE_STUDY', 'DELETE_STUDY', 'LOCK_STUDY', 'MS_GERMPLASM_AND_CHECKS',
 									 'MS_TREATMENT_FACTORS', 'MS_EXPERIMENTAL_DESIGN', 'MS_ENVIRONMENT', 'MS_STUDY_SETTINGS',
 									 'MS_CROSSES_AND_SELECTIONS', 'MS_INVENTORY', 'MS_SAMPLE_LISTS'
-									 'MS_SSA_RESULTS' ,'MS_OBSERVATIONS');
+									 'MS_SSA_RESULTS' ,'MS_OBSERVATIONS', 'MS_SAMPLE_GENOTYPES', 'MS_STUDY_ACTIONS');
             	</sqlCheck>
 				<not>
 					<tableExists tableName="roles_affected_temporary"></tableExists>
@@ -1726,6 +1726,8 @@
 			SET @study_sample_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LISTS');
 			SET @single_site_results_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SSA_RESULTS');
 			SET @observation_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_OBSERVATIONS');
+			SET @sample_genotypes_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_GENOTYPES');
+			SET @study_actions = (SELECT permission_id FROM permission WHERE name = 'MS_STUDY_ACTIONS');
 
 
 			#Create roles_affected_temporary Table
