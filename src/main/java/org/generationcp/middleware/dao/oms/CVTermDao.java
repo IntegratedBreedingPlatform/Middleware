@@ -1109,7 +1109,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
 				.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.HAS_PROPERTY.getId())
 				.append(" AND cvr.object_id  IN (:propertyIds) ")
-				.append("INNER JOIN cvtermprop cvp ON cvp.cvterm_id = cvt.cvterm_id AND cvp.type_id = ").append(TermId.VARIABLE_TYPE.getId())
+				.append("INNER JOIN cvtermprop cvp ON cvp.cvterm_id = cvt.cvterm_id AND cvp.type_id = ")
+				.append(TermId.VARIABLE_TYPE.getId())
 				.append(" and cvp.value = '").append(VariableType.TRAIT.getName())
 				.append("' ORDER BY cvr.object_id ");
 
@@ -1474,7 +1475,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.in("name", termNames));
 			criteria.add(Restrictions.eq("cvId", cvId.getId()));
-			if(!showObsoletes) {
+			if (!showObsoletes) {
 				criteria.add(Restrictions.eq("isObsolete", 0));
 			}
 
@@ -2135,8 +2136,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		if (!isEmpty(variableFilter.getVariableTypes())) {
 			paramBuilder.append(" and cpvartype.value in (:variableTypeNames) ");
-			paramBuilder.setParameterList("variableTypeNames", variableFilter.getVariableTypes().stream().map(VariableType::getName).collect(
-				Collectors.toList()));
+			paramBuilder.setParameterList("variableTypeNames",
+				variableFilter.getVariableTypes().stream().map(VariableType::getName).collect(
+					Collectors.toList()));
 		}
 
 		final SqlTextFilter nameFilter = variableFilter.getNameFilter();

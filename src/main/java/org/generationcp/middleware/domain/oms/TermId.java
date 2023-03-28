@@ -167,8 +167,12 @@ public enum TermId {
 	// added so that we can represent non existing terms and avoid returning null in case of retrieving term by a given ID
 	, NONEXISTENT(-1), SAMPLES(-2), GID_ACTIVE_LOTS_COUNT(-3), GID_AVAILABLE_BALANCE(-4), GID_UNIT(-5), STOCK_ID(-1727),
 
+
 	// germplasm list
-	IMMEDIATE_SOURCE_GID(-6), GROUP_SOURCE_GID(-8), GERMPLASM_REFERENCE(-11)
+	IMMEDIATE_SOURCE_GID(-6), GROUP_SOURCE_GID(-8), GERMPLASM_REFERENCE(-11),
+
+	// samples
+	SAMPLE_NAME(-12), SAMPLE_UUID(-13), SAMPLING_DATE(-14), TAKEN_BY(-15)
 
 	//TODO : Should find a way not to hard code
 	, PROJECT_PREFIX(3001), HABITAT_DESIGNATION(3002), PERSON_ID(1901);

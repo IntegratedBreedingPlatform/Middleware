@@ -445,4 +445,8 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="sampleGenotypeService" class="org.generationcp.middleware.api.genotype.SampleGenotypeServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
 </beans>

@@ -50,7 +50,7 @@ public interface SampleListService {
 	 * @param programUUID
 	 */
 	SampleList moveSampleList(final Integer sampleListId, final Integer newParentFolderId, final boolean isCropList,
-			final String programUUID);
+		final String programUUID);
 
 	/**
 	 * Delete a folder
@@ -65,6 +65,8 @@ public interface SampleListService {
 	long countSamplesByDatasetId(Integer datasetId);
 
 	List<SampleListDTO> getSampleLists(final List<Integer> datasetIds);
+
+	List<SampleListDTO> getSampleListsByStudy(Integer studyId, boolean withGenotypesOnly);
 
 	SampleList getSampleList(final Integer sampleListId);
 
@@ -118,13 +120,15 @@ public interface SampleListService {
 	 * @param programUUID
 	 * @return
 	 */
-	List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID, final Pageable pageable);
+	List<SampleList> searchSampleLists(final String searchString, final boolean exactMatch, final String programUUID,
+		final Pageable pageable);
 
 	void updateSamplePlateInfo(Integer sampleListId, Map<String, SamplePlateInfo> plateInfoMap);
 
 	String getObservationVariableName(Integer sampleListId);
 
-	List<SampleDTO> getSampleListEntries(Integer sampleListId, List<Integer> sampleIds);
+	List<SampleDTO> getSampleListEntries(List<Integer> sampleIds);
 
 	void deleteSamples(Integer sampleListId, List<Integer> sampleIds);
+
 }

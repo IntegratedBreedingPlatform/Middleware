@@ -270,7 +270,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			).setResultTransformer(Transformers.aliasToBean(SampleDetailsBean.class));
 	}
 
-	public List<SampleDTO> getSamples(final Integer sampleListId, final List<Integer> sampleIds) {
+	public List<SampleDTO> getSamples(final List<Integer> sampleIds) {
 		return this.getSampleDTOS(this.getSession().createCriteria(Sample.class, SAMPLE) //
 				.add(Restrictions.in(SAMPLE_ID, sampleIds)));
 	}

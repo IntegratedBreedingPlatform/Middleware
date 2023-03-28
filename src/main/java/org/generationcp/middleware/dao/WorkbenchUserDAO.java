@@ -478,6 +478,10 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			criteria.add(Restrictions.like("person.lastName", userSearchRequest.getLastName(), MatchMode.ANYWHERE));
 		}
 
+		if (StringUtils.isNotEmpty(userSearchRequest.getFullName())) {
+			criteria.add(Restrictions.like("person.fullName", userSearchRequest.getFullName(), MatchMode.ANYWHERE));
+		}
+
 		if (StringUtils.isNotEmpty(userSearchRequest.getEmail())) {
 			criteria.add(Restrictions.like("person.email", userSearchRequest.getEmail(), MatchMode.ANYWHERE));
 		}
