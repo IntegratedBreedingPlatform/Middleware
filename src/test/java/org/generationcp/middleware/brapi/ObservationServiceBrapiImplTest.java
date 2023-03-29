@@ -23,7 +23,7 @@ import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -108,7 +108,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 	private Project commonTestProject;
 	private WorkbenchUser testUser;
 	private DaoFactory daoFactory;
-	private StudySummary studySummary;
+	private TrialSummary trialSummary;
 	private StudyInstanceDto studyInstanceDto;
 	private Germplasm germplasm;
 	private String observationUnitDbId;
@@ -136,11 +136,11 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
 
-		this.studySummary = this.trialServiceBrapi
-			.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid()).get(0);
+		this.trialSummary = this.trialServiceBrapi
+			.saveTrials(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid()).get(0);
 
 		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
-		dto.setTrialDbId(String.valueOf(this.studySummary.getTrialDbId()));
+		dto.setTrialDbId(String.valueOf(this.trialSummary.getTrialDbId()));
 		this.studyInstanceDto = this.studyServiceBrapi
 			.saveStudyInstances(this.crop.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
 
@@ -156,7 +156,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(germplasmName);
 
 		final ObservationUnitImportRequestDto observationUnitImportRequestDto = new ObservationUnitImportRequestDto();
-		observationUnitImportRequestDto.setTrialDbId(this.studySummary.getTrialDbId().toString());
+		observationUnitImportRequestDto.setTrialDbId(this.trialSummary.getTrialDbId().toString());
 		observationUnitImportRequestDto.setStudyDbId(this.studyInstanceDto.getStudyDbId());
 		observationUnitImportRequestDto.setProgramDbId(this.commonTestProject.getUniqueID());
 		observationUnitImportRequestDto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
@@ -300,7 +300,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 			.createObservations(Arrays.asList(observationDtoForTrait, observationDtoForSelectionMethod, observationDtoForAnalysis));
 
 		final int plotDatasetId = this.daoFactory.getDmsProjectDAO()
-			.getDatasetsByTypeForStudy(this.studySummary.getTrialDbId(), DatasetTypeEnum.PLOT_DATA.getId()).get(0).getProjectId();
+			.getDatasetsByTypeForStudy(this.trialSummary.getTrialDbId(), DatasetTypeEnum.PLOT_DATA.getId()).get(0).getProjectId();
 
 		final Map<Integer, Map<Integer, ProjectProperty>> datasetVariablesMaps =
 			this.daoFactory.getProjectPropertyDAO().getPropsForProjectIds(Arrays.asList(plotDatasetId))
@@ -331,7 +331,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		final int meansDatasetId = this.createMeansDataset();
 
 		final List<Geolocation> environmentGeolocations =
-			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(this.studySummary.getTrialDbId());
+			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(this.trialSummary.getTrialDbId());
 
 		final List<ExperimentModel> experimentModels = this.daoFactory.getExperimentDao()
 			.getObservationUnits(meansDatasetId, environmentGeolocations.stream().map(Geolocation::getLocationId).collect(
@@ -379,7 +379,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		final int summaryStatisticsDatasetId = this.createSummaryStatisticsDataset();
 
 		final List<Geolocation> environmentGeolocations =
-			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(this.studySummary.getTrialDbId());
+			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(this.trialSummary.getTrialDbId());
 
 		final List<ExperimentModel> experimentModels = this.daoFactory.getExperimentDao()
 			.getObservationUnits(summaryStatisticsDatasetId, environmentGeolocations.stream().map(Geolocation::getLocationId).collect(
@@ -515,7 +515,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	private int createMeansDataset() {
-		final int testStudyId = this.studySummary.getTrialDbId();
+		final int testStudyId = this.trialSummary.getTrialDbId();
 
 		final CVTerm existingAnalysisVariable =
 			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ANALYSIS);
@@ -537,7 +537,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	private int createSummaryStatisticsDataset() {
-		final int testStudyId = this.studySummary.getTrialDbId();
+		final int testStudyId = this.trialSummary.getTrialDbId();
 
 		final CVTerm existingSummaryVariable =
 			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ANALYSIS_SUMMARY);

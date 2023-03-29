@@ -1,7 +1,7 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang.BooleanUtils;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -47,7 +47,7 @@ public class TrialSearchDao extends GenericDAO<DmsProject, Integer> {
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
-	public List<StudySummary> searchTrials(final TrialSearchRequestDTO trialSearchRequestDTO, final Pageable pageable) {
+	public List<TrialSummary> searchTrials(final TrialSearchRequestDTO trialSearchRequestDTO, final Pageable pageable) {
 		final SQLQuery sqlQuery =
 			this.getSession().createSQLQuery(this.createSearchTrialsQueryString(trialSearchRequestDTO, pageable));
 
@@ -69,20 +69,20 @@ public class TrialSearchDao extends GenericDAO<DmsProject, Integer> {
 		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 		final List<Map<String, Object>> results = sqlQuery.list();
 
-		final List<StudySummary> studyList = new ArrayList<>();
+		final List<TrialSummary> studyList = new ArrayList<>();
 		for (final Map<String, Object> result : results) {
-			final StudySummary studySummary = new StudySummary();
-			studySummary.setTrialDbId((Integer) result.get(TRIAL_DB_ID));
-			studySummary.setName(String.valueOf(result.get(TRIAL_NAME)));
-			studySummary.setDescription(String.valueOf(result.get(TRIAL_DESCRIPTION)));
-			studySummary.setObservationUnitId(String.valueOf(result.get(TRIAL_PUI)));
-			studySummary.setStartDate(Util.tryParseDate((String) result.get(START_DATE)));
-			studySummary.setEndDate(Util.tryParseDate((String) result.get(END_DATE)));
-			studySummary.setProgramDbId(String.valueOf(result.get(PROGRAM_DB_ID)));
-			studySummary.setProgramName(String.valueOf(result.get(PROGRAM_NAME)));
-			studySummary.setLocationId(String.valueOf(result.get(LOCATION_DB_ID)));
-			studySummary.setActive(((Integer) result.get(ACTIVE)) == 1);
-			studyList.add(studySummary);
+			final TrialSummary trialSummary = new TrialSummary();
+			trialSummary.setTrialDbId((Integer) result.get(TRIAL_DB_ID));
+			trialSummary.setName(String.valueOf(result.get(TRIAL_NAME)));
+			trialSummary.setDescription(String.valueOf(result.get(TRIAL_DESCRIPTION)));
+			trialSummary.setObservationUnitId(String.valueOf(result.get(TRIAL_PUI)));
+			trialSummary.setStartDate(Util.tryParseDate((String) result.get(START_DATE)));
+			trialSummary.setEndDate(Util.tryParseDate((String) result.get(END_DATE)));
+			trialSummary.setProgramDbId(String.valueOf(result.get(PROGRAM_DB_ID)));
+			trialSummary.setProgramName(String.valueOf(result.get(PROGRAM_NAME)));
+			trialSummary.setLocationId(String.valueOf(result.get(LOCATION_DB_ID)));
+			trialSummary.setActive(((Integer) result.get(ACTIVE)) == 1);
+			studyList.add(trialSummary);
 		}
 		return studyList;
 	}

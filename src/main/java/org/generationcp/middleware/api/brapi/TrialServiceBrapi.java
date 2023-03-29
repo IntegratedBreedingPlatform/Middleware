@@ -1,9 +1,8 @@
 package org.generationcp.middleware.api.brapi;
 
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.springframework.data.domain.Pageable;
 
@@ -22,8 +21,8 @@ public interface TrialServiceBrapi {
 
 	long countSearchTrials(TrialSearchRequestDTO trialSearchRequestDTO);
 
-	List<StudySummary> searchTrials(TrialSearchRequestDTO trialSearchRequestDTO, Pageable pageable);
+	List<TrialSummary> searchTrials(TrialSearchRequestDTO trialSearchRequestDTO, Pageable pageable);
 
-	List<StudySummary> saveStudies(String crop, List<TrialImportRequestDTO> trialImportRequestDtoList, Integer userId);
+	List<TrialSummary> saveTrials(String crop, List<TrialImportRequestDTO> trialImportRequestDtoList, Integer userId);
 
 }

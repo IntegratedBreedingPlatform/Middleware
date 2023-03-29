@@ -9,7 +9,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -237,10 +237,10 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 	}
 
 	@Override
-	public List<StudySummary> searchTrials(final TrialSearchRequestDTO trialSearchRequestDTO, final Pageable pageable) {
-		final List<StudySummary> studies = this.daoFactory.getTrialSearchDao().searchTrials(trialSearchRequestDTO, pageable);
+	public List<TrialSummary> searchTrials(final TrialSearchRequestDTO trialSearchRequestDTO, final Pageable pageable) {
+		final List<TrialSummary> studies = this.daoFactory.getTrialSearchDao().searchTrials(trialSearchRequestDTO, pageable);
 		if (!CollectionUtils.isEmpty(studies)) {
-			final List<Integer> studyIds = studies.stream().map(StudySummary::getTrialDbId).collect(Collectors.toList());
+			final List<Integer> studyIds = studies.stream().map(TrialSummary::getTrialDbId).collect(Collectors.toList());
 			final Map<Integer, List<ProjectProperty>> propsMap = this.daoFactory.getProjectPropertyDAO().getPropsForProjectIds(studyIds);
 			final Map<Integer, List<ValueReference>> categoricalValuesMap = this.getCategoricalValuesMap(propsMap);
 			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
@@ -248,11 +248,11 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 					ExternalReferenceDTO::getEntityId));
 			final Map<Integer, List<InstanceMetadata>> trialInstancesMap = this.retrieveTrialInstancesMap(trialSearchRequestDTO, studyIds);
 			final Map<Integer, MeasurementVariable> studySettingsVariablesMap = this.getVariablesMap(propsMap);
-			for (final StudySummary studySummary : studies) {
-				final Integer studyId = studySummary.getTrialDbId();
-				this.retrieveStudySettings(propsMap, studySettingsVariablesMap, categoricalValuesMap, studySummary, studyId);
-				studySummary.setExternalReferences(externalReferencesMap.get(studyId.toString()));
-				studySummary
+			for (final TrialSummary trialSummary : studies) {
+				final Integer studyId = trialSummary.getTrialDbId();
+				this.retrieveStudySettings(propsMap, studySettingsVariablesMap, categoricalValuesMap, trialSummary, studyId);
+				trialSummary.setExternalReferences(externalReferencesMap.get(studyId.toString()));
+				trialSummary
 					.setInstanceMetaData(trialInstancesMap.get(studyId));
 
 			}
@@ -276,7 +276,7 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 	}
 
 	@Override
-	public List<StudySummary> saveStudies(final String cropName, final List<TrialImportRequestDTO> trialImportRequestDtoList,
+	public List<TrialSummary> saveTrials(final String cropName, final List<TrialImportRequestDTO> trialImportRequestDtoList,
 		final Integer userId) {
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(cropName);
 		final List<String> studyIds = new ArrayList<>();
@@ -556,7 +556,7 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 	private void retrieveStudySettings(final Map<Integer, List<ProjectProperty>> propsMap,
 		final Map<Integer, MeasurementVariable> studySettingsVariablesMap,
 		final Map<Integer, List<ValueReference>> categoricalVariablesMap,
-		final StudySummary studySummary, final Integer studyId) {
+		final TrialSummary trialSummary, final Integer studyId) {
 		final Map<String, String> additionalProps = Maps.newHashMap();
 		if (!CollectionUtils.isEmpty(propsMap.get(studyId))) {
 			final ContactDto contactDto = new ContactDto();
@@ -570,9 +570,9 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 				}
 			});
 			if (contactDto.atLeastOneContactDetailProvided()) {
-				studySummary.setContacts(Collections.singletonList(contactDto));
+				trialSummary.setContacts(Collections.singletonList(contactDto));
 			}
-			studySummary.setAdditionalInfo(additionalProps);
+			trialSummary.setAdditionalInfo(additionalProps);
 		}
 	}
 

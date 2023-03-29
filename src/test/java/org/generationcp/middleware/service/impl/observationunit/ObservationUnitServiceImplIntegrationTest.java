@@ -15,7 +15,7 @@ import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -71,7 +71,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 	private WorkbenchUser testUser;
 	private DaoFactory daoFactory;
 	private WorkbenchDaoFactory workbenchDaoFactory;
-	private StudySummary studySummary;
+	private TrialSummary trialSummary;
 	private StudyInstanceDto studyInstanceDto;
 	private Germplasm germplasm;
 
@@ -95,11 +95,11 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
 
-		this.studySummary = this.trialServiceBrapi
-			.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid()).get(0);
+		this.trialSummary = this.trialServiceBrapi
+			.saveTrials(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid()).get(0);
 
 		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
-		dto.setTrialDbId(String.valueOf(this.studySummary.getTrialDbId()));
+		dto.setTrialDbId(String.valueOf(this.trialSummary.getTrialDbId()));
 		this.studyInstanceDto = this.studyServiceBrapi
 			.saveStudyInstances(this.crop.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
 
@@ -212,7 +212,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 	@Test
 	public void testImportObservationUnits_WithValidVariableHavingInvalidVariableType() {
 		final ObservationUnitImportRequestDto dto = new ObservationUnitImportRequestDto();
-		dto.setTrialDbId(this.studySummary.getTrialDbId().toString());
+		dto.setTrialDbId(this.trialSummary.getTrialDbId().toString());
 		dto.setStudyDbId(this.studyInstanceDto.getStudyDbId());
 		dto.setProgramDbId(this.commonTestProject.getUniqueID());
 		dto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
@@ -256,7 +256,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 	@Test
 	public void testImportObservationUnits_WithValidVariableHavingInvalidVariableValue() {
 		final ObservationUnitImportRequestDto dto = new ObservationUnitImportRequestDto();
-		dto.setTrialDbId(this.studySummary.getTrialDbId().toString());
+		dto.setTrialDbId(this.trialSummary.getTrialDbId().toString());
 		dto.setStudyDbId(this.studyInstanceDto.getStudyDbId());
 		dto.setProgramDbId(this.commonTestProject.getUniqueID());
 		dto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
@@ -300,7 +300,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 	@Test
 	public void testImportObservationUnits_WithValidVariableHavingInvalidVariable() {
 		final ObservationUnitImportRequestDto dto = new ObservationUnitImportRequestDto();
-		dto.setTrialDbId(this.studySummary.getTrialDbId().toString());
+		dto.setTrialDbId(this.trialSummary.getTrialDbId().toString());
 		dto.setStudyDbId(this.studyInstanceDto.getStudyDbId());
 		dto.setProgramDbId(this.commonTestProject.getUniqueID());
 		dto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
@@ -372,7 +372,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 
 	private ObservationUnitImportRequestDto createObservationUnitImportRequestDto() {
 		final ObservationUnitImportRequestDto dto = new ObservationUnitImportRequestDto();
-		dto.setTrialDbId(this.studySummary.getTrialDbId().toString());
+		dto.setTrialDbId(this.trialSummary.getTrialDbId().toString());
 		dto.setStudyDbId(this.studyInstanceDto.getStudyDbId());
 		dto.setProgramDbId(this.commonTestProject.getUniqueID());
 		dto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
@@ -416,7 +416,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 
 	private ObservationUnitImportRequestDto createObservationUnitImportRequestDtoForMeansLevel() {
 		final ObservationUnitImportRequestDto dto = new ObservationUnitImportRequestDto();
-		dto.setTrialDbId(this.studySummary.getTrialDbId().toString());
+		dto.setTrialDbId(this.trialSummary.getTrialDbId().toString());
 		dto.setStudyDbId(this.studyInstanceDto.getStudyDbId());
 		dto.setProgramDbId(this.commonTestProject.getUniqueID());
 		dto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
