@@ -416,7 +416,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		Assert.assertNotNull("Marker variable should exist", markerVariable);
 
 		final SampleGenotypeImportRequestDto sampleGenotypeImportRequestDto = new SampleGenotypeImportRequestDto();
-		sampleGenotypeImportRequestDto.setSampleId(String.valueOf(sample.getSampleId()));
+		sampleGenotypeImportRequestDto.setSampleUID(String.valueOf(sample.getSampleId()));
 		sampleGenotypeImportRequestDto.setVariableId(String.valueOf(markerVariable.getCvTermId()));
 		sampleGenotypeImportRequestDto.setValue(value);
 		return sampleGenotypeImportRequestDto;
