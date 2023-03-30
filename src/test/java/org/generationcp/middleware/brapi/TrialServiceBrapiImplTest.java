@@ -187,35 +187,35 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 			this.trialServiceBrapi.searchTrials(
 				trialSearchRequestDTO, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
 		Assert.assertEquals(2, trialSummaries.size());
-		TrialSummary study1 = trialSummaries.get(1);
-		Assert.assertEquals(this.study.getProjectId(), study1.getTrialDbId());
-		Assert.assertEquals(this.study.getName(), study1.getName());
-		Assert.assertEquals(this.study.getDescription(), study1.getDescription());
-		Assert.assertEquals(this.study.getProgramUUID(), study1.getProgramDbId());
-		Assert.assertEquals(this.studyExperiment.getObsUnitId(), study1.getObservationUnitId());
-		Assert.assertEquals(0, study1.getContacts().size());
-		Assert.assertTrue(study1.isActive());
+		TrialSummary trial1 = trialSummaries.get(1);
+		Assert.assertEquals(this.study.getProjectId(), trial1.getTrialDbId());
+		Assert.assertEquals(this.study.getName(), trial1.getName());
+		Assert.assertEquals(this.study.getDescription(), trial1.getDescription());
+		Assert.assertEquals(this.study.getProgramUUID(), trial1.getProgramDbId());
+		Assert.assertEquals(this.studyExperiment.getObsUnitId(), trial1.getObservationUnitId());
+		Assert.assertEquals(0, trial1.getContacts().size());
+		Assert.assertTrue(trial1.isActive());
 
-		final TrialSummary study2 = trialSummaries.get(0);
-		Assert.assertEquals(newStudy.getProjectId(), study2.getTrialDbId());
-		Assert.assertEquals(newStudy.getName(), study2.getName());
-		Assert.assertEquals(newStudy.getDescription(), study2.getDescription());
-		Assert.assertEquals(newStudy.getProgramUUID(), study2.getProgramDbId());
-		Assert.assertEquals(newStudyExperiment.getObsUnitId(), study2.getObservationUnitId());
-		Assert.assertEquals(1, study2.getInstanceMetaData().size());
-		Assert.assertEquals(1, study2.getContacts().size());
-		Assert.assertEquals(contactName, study2.getContacts().get(0).getName());
-		Assert.assertFalse(study2.isActive());
+		final TrialSummary trial2 = trialSummaries.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trial2.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), trial2.getName());
+		Assert.assertEquals(newStudy.getDescription(), trial2.getDescription());
+		Assert.assertEquals(newStudy.getProgramUUID(), trial2.getProgramDbId());
+		Assert.assertEquals(newStudyExperiment.getObsUnitId(), trial2.getObservationUnitId());
+		Assert.assertEquals(1, trial2.getInstanceMetaData().size());
+		Assert.assertEquals(1, trial2.getContacts().size());
+		Assert.assertEquals(contactName, trial2.getContacts().get(0).getName());
+		Assert.assertFalse(trial2.isActive());
 
 		trialSearchRequestDTO.setLocationDbIds(Arrays.asList(String.valueOf(location1)));
 		// Expecting only one study to be retrieved when filtered by location
 		trialSummaries = this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null);
 		Assert.assertEquals(1, trialSummaries.size());
-		study1 = trialSummaries.get(0);
-		Assert.assertEquals(newStudy.getProjectId(), study1.getTrialDbId());
+		trial1 = trialSummaries.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trial1.getTrialDbId());
 		// Expecting environments of retrieved study to also be filtered by location
-		Assert.assertEquals(1, study1.getInstanceMetaData().size());
-		Assert.assertEquals(String.valueOf(location1), study1.getInstanceMetaData().get(0).getLocationDbId().toString());
+		Assert.assertEquals(1, trial1.getInstanceMetaData().size());
+		Assert.assertEquals(String.valueOf(location1), trial1.getInstanceMetaData().get(0).getLocationDbId().toString());
 	}
 
 	@Test
@@ -368,7 +368,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_AllInfoSaved() {
+	public void testSaveTrials_AllInfoSaved() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -426,7 +426,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_WithInvalidStudyVariableNames() {
+	public void testSaveTrials_WithInvalidStudyVariableNames() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -456,7 +456,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_WithInvalidStudyVariableValues() {
+	public void testSaveTrials_WithInvalidStudyVariableValues() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -495,7 +495,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_WithValidVariablesHavingNonStudyDetailVariableType() {
+	public void testSaveTrials_WithValidVariablesHavingNonStudyDetailVariableType() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -535,7 +535,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_WithCooperatorVariable() {
+	public void testSaveTrials_WithCooperatorVariable() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -568,7 +568,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_WithCooperatorVariable_PersonDoesNotExist() {
+	public void testSaveTrials_WithCooperatorVariable_PersonDoesNotExist() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -599,7 +599,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_WithCooperatorVariable_PersonMultipleMatches() {
+	public void testSaveTrials_WithCooperatorVariable_PersonMultipleMatches() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -633,7 +633,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_WithCooperatorVariable_PersonExistButNoAccessToCrop() {
+	public void testSaveTrials_WithCooperatorVariable_PersonExistButNoAccessToCrop() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -672,7 +672,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_WithPrincipalInvestigatorVariable() {
+	public void testSaveTrials_WithPrincipalInvestigatorVariable() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -704,7 +704,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_WithPrincipalInvestigatorVariable_PersonDoesNotExist() {
+	public void testSaveTrials_WithPrincipalInvestigatorVariable_PersonDoesNotExist() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -735,7 +735,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_WithPrincipalInvestigatorVariable_PersonMultipleMatches() {
+	public void testSaveTrials_WithPrincipalInvestigatorVariable_PersonMultipleMatches() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -769,7 +769,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_WithPrincipalInvestigatorVariable_PersonExistButNoAccessToCrop() {
+	public void testSaveTrials_WithPrincipalInvestigatorVariable_PersonExistButNoAccessToCrop() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
