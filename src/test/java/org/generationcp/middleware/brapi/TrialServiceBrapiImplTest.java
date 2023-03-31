@@ -45,6 +45,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -216,6 +218,200 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		// Expecting environments of retrieved study to also be filtered by location
 		Assert.assertEquals(1, trial1.getInstanceMetaData().size());
 		Assert.assertEquals(String.valueOf(location1), trial1.getInstanceMetaData().get(0).getLocationDbId().toString());
+	}
+
+	@Test
+	public void testSearchTrials_FilterByStudyDbId() {
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), 6,
+				this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				"20200101", "20201231");
+
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setStudyDbIds(Arrays.asList(String.valueOf(geolocation.getLocationId())));
+
+		final List<TrialSummary> result1 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(1, result1.size());
+		final TrialSummary trialSummary = result1.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trialSummary.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), trialSummary.getName());
+
+		trialSearchRequestDTO.setStudyDbIds(Arrays.asList("invalid studyDbId"));
+		final List<TrialSummary> result2 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(0, result2.size());
+	}
+
+	@Test
+	public void testSearchTrials_FilterByTrialName() {
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), 6,
+				this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				"20200101", "20201231");
+
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialNames(Arrays.asList(String.valueOf(newStudy.getName())));
+
+		final List<TrialSummary> result1 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(1, result1.size());
+		final TrialSummary trialSummary = result1.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trialSummary.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), trialSummary.getName());
+
+		trialSearchRequestDTO.setTrialNames(Arrays.asList("invalid trialName"));
+		final List<TrialSummary> result2 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(0, result2.size());
+	}
+
+	@Test
+	public void testSearchTrials_FilterByTrialPUI() {
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), 6,
+				this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				"20200101", "20201231");
+
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialPUIs(Arrays.asList(String.valueOf(newStudyExperiment.getObsUnitId())));
+
+		final List<TrialSummary> result1 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(1, result1.size());
+		final TrialSummary trialSummary = result1.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trialSummary.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), trialSummary.getName());
+
+		trialSearchRequestDTO.setTrialPUIs(Arrays.asList("invalid trialPUI"));
+		final List<TrialSummary> result2 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(0, result2.size());
+	}
+
+	@Test
+	public void testSearchTrials_FilterByActive_TrialIsActive() {
+		final LocalDate currentDate = LocalDate.now();
+		final LocalDate nextDayDate = currentDate.plusDays(1);
+		final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+		final String startDate = currentDate.format(formatter);
+		final String endDate = nextDayDate.format(formatter);
+
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), 6,
+				this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				startDate, endDate);
+
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialDbIds(Arrays.asList(String.valueOf(newStudy.getProjectId())));
+		trialSearchRequestDTO.setActive(true);
+
+		final List<TrialSummary> result1 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(1, result1.size());
+		final TrialSummary trialSummary = result1.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trialSummary.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), trialSummary.getName());
+
+	}
+
+	@Test
+	public void testSearchTrials_FilterByActive_TrialIsInactive() {
+		final LocalDate currentDate = LocalDate.now();
+		final LocalDate nextDayDate = currentDate.plusDays(1);
+		final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+		final String startDate = currentDate.minusDays(1).format(formatter);
+		final String endDate = currentDate.minusDays(1).format(formatter);
+
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), 6,
+				this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				startDate, endDate);
+
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialDbIds(Arrays.asList(String.valueOf(newStudy.getProjectId())));
+		trialSearchRequestDTO.setActive(false);
+
+		final List<TrialSummary> result1 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(1, result1.size());
+		final TrialSummary trialSummary = result1.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trialSummary.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), trialSummary.getName());
+
 	}
 
 	@Test
