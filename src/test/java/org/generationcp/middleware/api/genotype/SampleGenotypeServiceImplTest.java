@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.api.genotype;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -135,14 +136,17 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.subObservationDataset, plotExperimentModels.get(0),
 				this.trialInstance1, 1);
 
-		final SampleList sampleList =
+		final SampleList observationSampleList =
 			this.testDataInitializer.createTestSampleList(RandomStringUtils.randomAlphabetic(10), this.user.getUserid());
+
+		final SampleList subobservationSampleList =
+				this.testDataInitializer.createTestSampleList(RandomStringUtils.randomAlphabetic(10), this.user.getUserid());
 
 		// Add samples in the list
 		final List<Sample> plotObservationSamples =
-			this.testDataInitializer.addSamples(plotExperimentModels, sampleList, this.user.getUserid());
+			this.testDataInitializer.addSamples(plotExperimentModels, observationSampleList, this.user.getUserid());
 		final List<Sample> subObservationSamples =
-			this.testDataInitializer.addSamples(subObservationExperimentModels, sampleList, this.user.getUserid());
+			this.testDataInitializer.addSamples(subObservationExperimentModels, subobservationSampleList, this.user.getUserid());
 
 		final Sample observationSample = plotObservationSamples.get(0);
 		final Sample subObservationSample = subObservationSamples.get(0);
@@ -170,7 +174,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(1, sampleGenotypeDTOList.size());
 		Assert.assertEquals(1, this.sampleGenotypeService.countFilteredSampleGenotypes(sampleGenotypeSearchRequestDTO));
 		Assert.assertEquals(2, this.sampleGenotypeService.countFilteredSampleGenotypes(new SampleGenotypeSearchRequestDTO(this.study.getProjectId())));
-		Assert.assertEquals(2, this.sampleGenotypeService.countSampleGenotypesBySampleList(sampleList.getId()));
+		Assert.assertEquals(1, this.sampleGenotypeService.countSampleGenotypesBySampleList(observationSampleList.getId()));
 		final SampleGenotypeDTO sampleGenotypeDTO = sampleGenotypeDTOList.get(0);
 		Assert.assertEquals("C", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
 		Assert.assertEquals("G", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_2).getValue());
@@ -188,14 +192,16 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 			secondInstanceExperimentModels =
 			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plotDataset, null, this.trialInstance2, 1);
 
-		final SampleList sampleList =
+		final SampleList firstInstanceSampleList =
 			this.testDataInitializer.createTestSampleList(RandomStringUtils.randomAlphabetic(10), this.user.getUserid());
 
+		final SampleList secondInstanceSampleList =
+				this.testDataInitializer.createTestSampleList(RandomStringUtils.randomAlphabetic(10), this.user.getUserid());
 		// Add samples in the list
 		final List<Sample> firstInstanceSamples =
-			this.testDataInitializer.addSamples(firstInstanceExperimentModels, sampleList, this.user.getUserid());
+			this.testDataInitializer.addSamples(firstInstanceExperimentModels, firstInstanceSampleList, this.user.getUserid());
 		final List<Sample> secondInstanceSamples =
-			this.testDataInitializer.addSamples(secondInstanceExperimentModels, sampleList, this.user.getUserid());
+			this.testDataInitializer.addSamples(secondInstanceExperimentModels, secondInstanceSampleList, this.user.getUserid());
 
 		final Sample firstInstanceSample = firstInstanceSamples.get(0);
 		final Sample secondInstanceSample = secondInstanceSamples.get(0);
@@ -223,7 +229,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(1, sampleGenotypeDTOList.size());
 		Assert.assertEquals(1, this.sampleGenotypeService.countFilteredSampleGenotypes(sampleGenotypeSearchRequestDTO));
 		Assert.assertEquals(2, this.sampleGenotypeService.countFilteredSampleGenotypes(new SampleGenotypeSearchRequestDTO(this.study.getProjectId())));
-		Assert.assertEquals(2, this.sampleGenotypeService.countSampleGenotypesBySampleList(sampleList.getId()));
+		Assert.assertEquals(1, this.sampleGenotypeService.countSampleGenotypesBySampleList(firstInstanceSampleList.getId()));
 		final SampleGenotypeDTO sampleGenotypeDTO = sampleGenotypeDTOList.get(0);
 		Assert.assertEquals("C", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
 		Assert.assertEquals("G", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_2).getValue());
@@ -243,14 +249,16 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 				secondInstanceExperimentModels =
 				this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plotDataset, null, this.trialInstance2, 1);
 
-		final SampleList sampleList =
+		final SampleList firstInstanceSampleList =
+				this.testDataInitializer.createTestSampleList(RandomStringUtils.randomAlphabetic(10), this.user.getUserid());
+		final SampleList secondInstanceSampleList =
 				this.testDataInitializer.createTestSampleList(RandomStringUtils.randomAlphabetic(10), this.user.getUserid());
 
 		// Add samples in the list
 		final List<Sample> firstInstanceSamples =
-				this.testDataInitializer.addSamples(firstInstanceExperimentModels, sampleList, this.user.getUserid());
+				this.testDataInitializer.addSamples(firstInstanceExperimentModels, firstInstanceSampleList, this.user.getUserid());
 		final List<Sample> secondInstanceSamples =
-				this.testDataInitializer.addSamples(secondInstanceExperimentModels, sampleList, this.user.getUserid());
+				this.testDataInitializer.addSamples(secondInstanceExperimentModels, secondInstanceSampleList, this.user.getUserid());
 
 		final Sample firstInstanceSample = firstInstanceSamples.get(0);
 		final Sample secondInstanceSample = secondInstanceSamples.get(0);
@@ -267,7 +275,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 
 		this.sessionProvder.getSession().flush();
 
-		final List<MeasurementVariable> measurementVariables = this.sampleGenotypeService.getSampleGenotypeColumns(study.getProjectId(), Collections.singletonList(sampleList.getId()));
+		final List<MeasurementVariable> measurementVariables = this.sampleGenotypeService.getSampleGenotypeColumns(study.getProjectId(), Collections.singletonList(firstInstanceSampleList.getId()));
 		final Map<Integer, String> variableNameMap = measurementVariables.stream().filter(var -> var.getVariableType() != null)
 				.collect(Collectors.toMap(MeasurementVariable::getTermId, MeasurementVariable::getName));
 		// Retrieve the imported Sample Genotype Records
@@ -296,7 +304,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(1, sampleGenotypeDTOList.size());
 		Assert.assertEquals(1, this.sampleGenotypeService.countFilteredSampleGenotypes(sampleGenotypeSearchRequestDTO));
 		Assert.assertEquals(2, this.sampleGenotypeService.countFilteredSampleGenotypes(new SampleGenotypeSearchRequestDTO(this.study.getProjectId())));
-		Assert.assertEquals(2, this.sampleGenotypeService.countSampleGenotypesBySampleList(sampleList.getId()));
+		Assert.assertEquals(1, this.sampleGenotypeService.countSampleGenotypesBySampleList(firstInstanceSampleList.getId()));
 		final SampleGenotypeDTO sampleGenotypeDTO = sampleGenotypeDTOList.get(0);
 		Assert.assertEquals("C", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_1).getValue());
 		Assert.assertEquals("G", sampleGenotypeDTO.getGenotypeDataMap().get(DEFAULT_MARKER_2).getValue());
@@ -416,7 +424,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		Assert.assertNotNull("Marker variable should exist", markerVariable);
 
 		final SampleGenotypeImportRequestDto sampleGenotypeImportRequestDto = new SampleGenotypeImportRequestDto();
-		sampleGenotypeImportRequestDto.setSampleUID(String.valueOf(sample.getSampleId()));
+		sampleGenotypeImportRequestDto.setSampleUID(String.valueOf(sample.getSampleBusinessKey()));
 		sampleGenotypeImportRequestDto.setVariableId(String.valueOf(markerVariable.getCvTermId()));
 		sampleGenotypeImportRequestDto.setValue(value);
 		return sampleGenotypeImportRequestDto;

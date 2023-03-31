@@ -493,7 +493,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		Assert.assertNotNull("Marker variable should exist", markerVariable);
 
 		final SampleGenotypeImportRequestDto sampleGenotypeImportRequestDto = new SampleGenotypeImportRequestDto();
-		sampleGenotypeImportRequestDto.setSampleUID(String.valueOf(sample.getSampleId()));
+		sampleGenotypeImportRequestDto.setSampleUID(String.valueOf(sample.getSampleBusinessKey()));
 		sampleGenotypeImportRequestDto.setVariableId(String.valueOf(markerVariable.getCvTermId()));
 		sampleGenotypeImportRequestDto.setValue(value);
 		return sampleGenotypeImportRequestDto;
