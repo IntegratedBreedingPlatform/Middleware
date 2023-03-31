@@ -64,14 +64,14 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		this.plotDataset = this.testDataInitializer
 			.createDmsProject(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), this.study, this.study,
 				DatasetTypeEnum.PLOT_DATA);
-		this.testDataInitializer.addProjectProp(plotDataset, TermId.GID.getId(), TermId.GID.name(), VariableType.GERMPLASM_DESCRIPTOR, null, 4);
-		this.testDataInitializer.addProjectProp(plotDataset, TermId.DESIG.getId(), TermId.DESIG.name(), VariableType.GERMPLASM_DESCRIPTOR, null, 5);
-		this.testDataInitializer.addProjectProp(plotDataset, TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(), VariableType.ENVIRONMENT_DETAIL, null, 3);
-		this.testDataInitializer.addProjectProp(plotDataset, TermId.REP_NO.getId(), TermId.REP_NO.name(), VariableType.EXPERIMENTAL_DESIGN, null, 8);
-		this.testDataInitializer.addProjectProp(plotDataset, TermId.PLOT_NO.getId(), TermId.PLOT_NO.name(), VariableType.EXPERIMENTAL_DESIGN, null, 9);
-		this.testDataInitializer.addProjectProp(plotDataset, TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name(), VariableType.EXPERIMENTAL_DESIGN, null, 10);
-		this.testDataInitializer.addProjectProp(plotDataset, TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), VariableType.ENVIRONMENT_DETAIL, null, 6);
-		this.testDataInitializer.addProjectProp(plotDataset, TermId.ENTRY_TYPE.getId(), TermId.ENTRY_TYPE.name(), VariableType.ENVIRONMENT_DETAIL, null, 7);
+		this.testDataInitializer.addProjectProp(this.plotDataset, TermId.GID.getId(), TermId.GID.name(), VariableType.GERMPLASM_DESCRIPTOR, null, 4);
+		this.testDataInitializer.addProjectProp(this.plotDataset, TermId.DESIG.getId(), TermId.DESIG.name(), VariableType.GERMPLASM_DESCRIPTOR, null, 5);
+		this.testDataInitializer.addProjectProp(this.plotDataset, TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.name(), VariableType.ENVIRONMENT_DETAIL, null, 3);
+		this.testDataInitializer.addProjectProp(this.plotDataset, TermId.REP_NO.getId(), TermId.REP_NO.name(), VariableType.EXPERIMENTAL_DESIGN, null, 8);
+		this.testDataInitializer.addProjectProp(this.plotDataset, TermId.PLOT_NO.getId(), TermId.PLOT_NO.name(), VariableType.EXPERIMENTAL_DESIGN, null, 9);
+		this.testDataInitializer.addProjectProp(this.plotDataset, TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name(), VariableType.EXPERIMENTAL_DESIGN, null, 10);
+		this.testDataInitializer.addProjectProp(this.plotDataset, TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), VariableType.ENVIRONMENT_DETAIL, null, 6);
+		this.testDataInitializer.addProjectProp(this.plotDataset, TermId.ENTRY_TYPE.getId(), TermId.ENTRY_TYPE.name(), VariableType.ENVIRONMENT_DETAIL, null, 7);
 		this.subObservationDataset = this.testDataInitializer
 			.createDmsProject(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), this.study, this.plotDataset,
 				DatasetTypeEnum.PLANT_SUBOBSERVATIONS);
@@ -275,7 +275,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 
 		this.sessionProvder.getSession().flush();
 
-		final List<MeasurementVariable> measurementVariables = this.sampleGenotypeService.getSampleGenotypeColumns(study.getProjectId(), Collections.singletonList(firstInstanceSampleList.getId()));
+		final List<MeasurementVariable> measurementVariables = this.sampleGenotypeService.getSampleGenotypeColumns(this.study.getProjectId(), Collections.singletonList(firstInstanceSampleList.getId()));
 		final Map<Integer, String> variableNameMap = measurementVariables.stream().filter(var -> var.getVariableType() != null)
 				.collect(Collectors.toMap(MeasurementVariable::getTermId, MeasurementVariable::getName));
 		// Retrieve the imported Sample Genotype Records
@@ -388,7 +388,7 @@ public class SampleGenotypeServiceImplTest extends IntegrationTestBase {
 		genotypes.add(this.createSampleGenotypeImportRequestDto(sample, DEFAULT_MARKER_3, "T"));
 		this.sampleGenotypeService.importSampleGenotypes(genotypes);
 
-		final List<MeasurementVariable> columns = this.sampleGenotypeService.getSampleGenotypeColumns(study.getProjectId(), Collections.singletonList(sampleList.getId()));
+		final List<MeasurementVariable> columns = this.sampleGenotypeService.getSampleGenotypeColumns(this.study.getProjectId(), Collections.singletonList(sampleList.getId()));
 		Assert.assertTrue(
 				columns.stream().filter(measurementVariable -> measurementVariable.getName().equalsIgnoreCase(DEFAULT_MARKER_1))
 						.findAny().isPresent());
