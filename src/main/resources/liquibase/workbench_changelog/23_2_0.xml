@@ -1695,7 +1695,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.2.0-83">
+	<!--<changeSet author="cuenyad" id="v23.2.0-83">
          <preConditions onFail="MARK_RAN">
 			<and>
             	<sqlCheck expectedResult="0">
@@ -1803,5 +1803,5 @@
 							 'MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES','MS_CREATE_LOTS')) AS ROLE);
 
  		</sql>
- 	</changeSet>
+ 	</changeSet>-->
 </databaseChangeLog>
