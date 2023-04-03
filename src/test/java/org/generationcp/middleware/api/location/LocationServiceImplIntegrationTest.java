@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -54,7 +55,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testCountLocationsByFilterNotRecoveredLocation() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationTypeName("DUMMYLOCTYOE");
+		locationSearchRequest.setLocationTypes(Arrays.asList("DUMMYLOCTYOE"));
 		final long countLocation = this.locationService.countFilteredLocations(locationSearchRequest, null);
 		assertThat("Expected country location size equals to zero", 0 == countLocation);
 	}
@@ -62,7 +63,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetLocationsByFilter() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationTypeName("COUNTRY");
+		locationSearchRequest.setLocationTypes(Arrays.asList("COUNTRY"));
 		final List<org.generationcp.middleware.api.location.Location> locationList =
 			this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		assertThat("Expected list of location size > zero", !locationList.isEmpty());
@@ -71,7 +72,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetLocationsByFilterNotRecoveredLocation() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
+		locationSearchRequest.setLocationTypes(Arrays.asList("DUMMYLOCTYPE"));
 		final List<org.generationcp.middleware.api.location.Location> locationList =
 			this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		assertThat("Expected list of location size equals to zero", locationList.isEmpty());
@@ -181,7 +182,8 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
-			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(),
+				storageLocationDTO.getId());
 		final ProgramLocationDefault savedProgramLocationDefault = this.daoFactory.getProgramLocationDefaultDAO()
 			.getById(programLocationDefault.getId());
 		Assert.assertEquals(savedProgramLocationDefault, programLocationDefault);
@@ -192,7 +194,8 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
-			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(),
+				storageLocationDTO.getId());
 		final ProgramLocationDefault savedProgramLocationDefault = this.daoFactory.getProgramLocationDefaultDAO()
 			.getById(programLocationDefault.getId());
 		final LocationDTO newBreedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
@@ -212,7 +215,8 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
-			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(),
+				storageLocationDTO.getId());
 		final ProgramLocationDefault savedProgramLocationDefault =
 			this.locationService.getProgramLocationDefault(programLocationDefault.getProgramUUID());
 		Assert.assertEquals(programLocationDefault, savedProgramLocationDefault);
@@ -223,19 +227,23 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
-			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
-		final LocationDTO defaultBreedingLocation = this.locationService.getDefaultBreedingLocation(programLocationDefault.getProgramUUID());
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(),
+				storageLocationDTO.getId());
+		final LocationDTO defaultBreedingLocation =
+			this.locationService.getDefaultBreedingLocation(programLocationDefault.getProgramUUID());
 		Assert.assertNotNull(defaultBreedingLocation);
 		Assert.assertThat("Expected same Location id", breedingLocationDTO.getId(), equalTo(defaultBreedingLocation.getId()));
 		Assert.assertThat("Expected same Location name", breedingLocationDTO.getName(), equalTo(defaultBreedingLocation.getName()));
-		Assert.assertThat("Expected same Location Abbr", breedingLocationDTO.getAbbreviation(), equalTo(defaultBreedingLocation.getAbbreviation()));
+		Assert.assertThat("Expected same Location Abbr", breedingLocationDTO.getAbbreviation(),
+			equalTo(defaultBreedingLocation.getAbbreviation()));
 		Assert.assertThat("Expected same Location type", breedingLocationDTO.getType(), equalTo(defaultBreedingLocation.getType()));
 
 		Assert.assertThat("Expected same altitude", breedingLocationDTO.getAltitude(), equalTo(defaultBreedingLocation.getAltitude()));
 		Assert.assertThat("Expected same latitude", breedingLocationDTO.getLatitude(), equalTo(defaultBreedingLocation.getLatitude()));
 		Assert.assertThat("Expected same longitude", breedingLocationDTO.getLongitude(), equalTo(defaultBreedingLocation.getLongitude()));
 		Assert.assertThat("Expected same country id", breedingLocationDTO.getCountryId(), equalTo(defaultBreedingLocation.getCountryId()));
-		Assert.assertThat("Expected same province id", breedingLocationDTO.getProvinceId(), equalTo(defaultBreedingLocation.getProvinceId()));
+		Assert.assertThat("Expected same province id", breedingLocationDTO.getProvinceId(),
+			equalTo(defaultBreedingLocation.getProvinceId()));
 	}
 
 	@Test
@@ -243,12 +251,14 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
-			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(),
+				storageLocationDTO.getId());
 		final LocationDTO defaultStorageLocation = this.locationService.getDefaultStorageLocation(programLocationDefault.getProgramUUID());
 		Assert.assertNotNull(defaultStorageLocation);
 		Assert.assertThat("Expected same Location id", storageLocationDTO.getId(), equalTo(defaultStorageLocation.getId()));
 		Assert.assertThat("Expected same Location name", storageLocationDTO.getName(), equalTo(defaultStorageLocation.getName()));
-		Assert.assertThat("Expected same Location Abbr", storageLocationDTO.getAbbreviation(), equalTo(defaultStorageLocation.getAbbreviation()));
+		Assert.assertThat("Expected same Location Abbr", storageLocationDTO.getAbbreviation(),
+			equalTo(defaultStorageLocation.getAbbreviation()));
 		Assert.assertThat("Expected same Location type", storageLocationDTO.getType(), equalTo(defaultStorageLocation.getType()));
 
 		Assert.assertThat("Expected same altitude", storageLocationDTO.getAltitude(), equalTo(defaultStorageLocation.getAltitude()));
@@ -263,7 +273,8 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
-			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(),
+				storageLocationDTO.getId());
 		Assert.assertTrue(this.locationService.isProgramBreedingLocationDefault(breedingLocationDTO.getId()));
 	}
 
@@ -272,7 +283,8 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
-			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(),
+				storageLocationDTO.getId());
 		Assert.assertTrue(this.locationService.isProgramStorageLocationDefault(storageLocationDTO.getId()));
 	}
 
@@ -374,8 +386,9 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testGetUserDefinedFieldByFieldTable() throws MiddlewareQueryException {
 		final String tableName = "LOCATION";
 		final String fieldType = "LTYPE";
-		final List<UserDefinedField> userDefinedField = this.daoFactory.getUserDefinedFieldDAO().getByFieldTableNameAndType(tableName, ImmutableSet
-			.of(fieldType));
+		final List<UserDefinedField> userDefinedField =
+			this.daoFactory.getUserDefinedFieldDAO().getByFieldTableNameAndType(tableName, ImmutableSet
+				.of(fieldType));
 		Debug.println(
 			IntegrationTestBase.INDENT,
 			"testGetUserDefineFieldByTableNameAndType(type=" + tableName + "): " + userDefinedField.size());

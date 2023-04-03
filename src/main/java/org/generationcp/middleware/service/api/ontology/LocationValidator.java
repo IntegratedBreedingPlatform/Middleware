@@ -28,11 +28,11 @@ public class LocationValidator implements VariableValueValidator {
 			final LocationSearchRequest request = new LocationSearchRequest();
 			final Integer scaleId = variable.getScaleId();
 			if (SCALE_LOC_ABBR.equals(scaleId)) {
-				request.setLocationAbbreviations(Collections.singletonList(value));
+				request.setAbbreviations(Collections.singletonList(value));
 
 			} else if (SCALE_LOC_ID.equals(scaleId)) {
 				if (NumberUtils.isDigits(value)) {
-					request.setLocationIds(Collections.singletonList(Integer.parseInt(value)));
+					request.setLocationDbIds(Collections.singletonList(Integer.parseInt(value)));
 				} else {
 					return false;
 				}

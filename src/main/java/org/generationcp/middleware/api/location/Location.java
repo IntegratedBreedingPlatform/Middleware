@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.api.location;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,7 @@ import org.generationcp.middleware.api.location.Coordinate;
 @JsonPropertyOrder({"locationDbId", "locationType", "name", "abbreviation", "countryCode", "countryName", "latitude", "longitude",
 	"altitude", "coordinateDescription", "coordinateUncertainty", "coordinates", "documentationURL", "environmentType", "exposure", "instituteAddress",
 	"instituteName", "siteStatus", "slope", "topography", "attributes", "additionalInfo"})
-public class Location {
+public class Location implements Serializable {
 
 	private String locationDbId;
 
