@@ -102,6 +102,7 @@ public class Location implements Serializable {
 		this.locationDbId = locationDbId;
 		this.locationType = locationType;
 		this.name = name;
+		this.locationName = name;
 		this.abbreviation = abbreviation;
 		this.countryCode = countryCode;
 		this.countryName = countryName;
