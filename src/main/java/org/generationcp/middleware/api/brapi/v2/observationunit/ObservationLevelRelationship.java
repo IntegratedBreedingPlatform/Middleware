@@ -1,7 +1,10 @@
 package org.generationcp.middleware.api.brapi.v2.observationunit;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
+@AutoProperty
 public class ObservationLevelRelationship {
 
 	@JsonIgnore
@@ -50,5 +53,20 @@ public class ObservationLevelRelationship {
 
 	public void setLevelOrder(final Integer levelOrder) {
 		this.levelOrder = levelOrder;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return Pojomatic.equals(this, o);
 	}
 }

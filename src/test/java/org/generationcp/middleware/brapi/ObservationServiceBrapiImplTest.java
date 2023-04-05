@@ -205,7 +205,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		final List<ObservationDto> observationDtos = this.createObservationDtos();
 		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
 		observationSearchRequestDto.setObservationDbIds(
-			observationDtos.stream().map(o -> Integer.valueOf(o.getObservationDbId())).collect(Collectors.toList()));
+			observationDtos.stream().map(o -> o.getObservationDbId()).collect(Collectors.toList()));
 		final long observationsCount = this.observationServiceBrapi.countObservations(observationSearchRequestDto);
 		Assert.assertEquals((long) 1, observationsCount);
 	}
@@ -216,7 +216,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 
 		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
 		observationSearchRequestDto.setObservationDbIds(
-			observationDtos.stream().map(o -> Integer.valueOf(o.getObservationDbId())).collect(Collectors.toList()));
+			observationDtos.stream().map(o -> o.getObservationDbId()).collect(Collectors.toList()));
 		final ObservationDto observationDto = this.observationServiceBrapi
 			.searchObservations(observationSearchRequestDto, null).get(0);
 		Assert.assertEquals(observationDtos.get(0).getObservationDbId().toString(), observationDto.getObservationDbId());
@@ -262,7 +262,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 
 		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
 		observationSearchRequestDto.setObservationDbIds(
-			observationDtos.stream().map(o -> Integer.valueOf(o.getObservationDbId())).collect(Collectors.toList()));
+			observationDtos.stream().map(o -> o.getObservationDbId()).collect(Collectors.toList()));
 		final ObservationDto resultObservationDto = this.observationServiceBrapi
 			.searchObservations(observationSearchRequestDto, null).get(0);
 		Assert.assertEquals(observationDtos.get(0).getObservationDbId(), resultObservationDto.getObservationDbId());
