@@ -286,11 +286,16 @@ public class LocationSearchDAOQuery {
     final Coordinate coordinateFilter = request.getCoordinates();
     if (coordinateFilter != null) {
       final List<Double> coordinatesList = coordinateFilter.getGeometry().getCoordinates();
-      if (!CollectionUtils.isEmpty(coordinatesList) && coordinatesList.size() == 2) {
-        sqlQueryBuilder.append(" AND g.lat = :latitude ");
-        sqlQueryBuilder.setParameter("latitude", coordinatesList.get(0));
+      if (!CollectionUtils.isEmpty(coordinatesList) && coordinatesList.size() >= 2) {
         sqlQueryBuilder.append(" AND g.lon = :longitude ");
-        sqlQueryBuilder.setParameter("longitude", coordinatesList.get(1));
+        sqlQueryBuilder.setParameter("longitude", coordinatesList.get(0));
+        sqlQueryBuilder.append(" AND g.lat = :latitude ");
+        sqlQueryBuilder.setParameter("latitude", coordinatesList.get(1));
+
+        if (coordinatesList.size() == 3) {
+          sqlQueryBuilder.append(" AND g.alt = :altitude ");
+          sqlQueryBuilder.setParameter("altitude", coordinatesList.get(2));
+        }
       }
     }
 
