@@ -121,7 +121,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
 
-		this.workbenchTestDataUtil.setUpWorkbench(workbenchDaoFactory);
+		this.workbenchTestDataUtil.setUpWorkbench(this.workbenchDaoFactory);
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 			this.crop = this.programService.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
@@ -154,6 +154,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(this.germplasm.getGid());
 		germplasmName.setTypeId(2);
 		this.daoFactory.getNameDao().save(germplasmName);
+		this.germplasm.setPreferredName(germplasmName);
 
 		final ObservationUnitImportRequestDto observationUnitImportRequestDto = new ObservationUnitImportRequestDto();
 		observationUnitImportRequestDto.setTrialDbId(this.studySummary.getTrialDbId().toString());
@@ -214,12 +215,30 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 	public void testSearchObservations() {
 		final List<ObservationDto> observationDtos = this.createObservationDtos();
 
-		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
-		observationSearchRequestDto.setObservationDbIds(
+		final ObservationSearchRequestDto searchRequestDto = new ObservationSearchRequestDto();
+		searchRequestDto.setObservationDbIds(
 			observationDtos.stream().map(o -> o.getObservationDbId()).collect(Collectors.toList()));
+		searchRequestDto.setGermplasmNames(Collections.singletonList(this.germplasm.getPreferredName().getNval()));
+		searchRequestDto.setTrialDbIds(Collections.singletonList(this.studySummary.getTrialDbId().toString()));
+		searchRequestDto.setTrialNames(Collections.singletonList(this.studySummary.getName()));
+		searchRequestDto.setStudyDbIds(Collections.singletonList(this.studyInstanceDto.getStudyDbId()));
+		searchRequestDto.setStudyNames(Collections.singletonList(this.studySummary.getName() + " Environment Number 1"));
+		searchRequestDto.setLocationDbIds(Collections.singletonList(this.studyInstanceDto.getLocationDbId()));
+		searchRequestDto.setLocationNames(Collections.singletonList(this.studyInstanceDto.getLocationName()));
+		searchRequestDto.setObservationVariableDbIds(Collections.singletonList(this.variableDTO.getObservationVariableDbId()));
+		searchRequestDto.setObservationVariableNames(Collections.singletonList(this.variableDTO.getObservationVariableName()));
+		searchRequestDto.setProgramDbIds(Collections.singletonList(this.studySummary.getProgramDbId()));
+		searchRequestDto.setExternalReferenceIds(Collections.singletonList(REF_ID));
+		searchRequestDto.setExternalReferenceSources(Collections.singletonList(REF_SOURCE));
+		final ObservationLevelRelationship plotRelationship = new ObservationLevelRelationship();
+		plotRelationship.setLevelCode("1");
+		plotRelationship.setLevelName("PLOT");
+		searchRequestDto.setObservationLevels(Collections.singletonList(plotRelationship));
+
+
 		final ObservationDto observationDto = this.observationServiceBrapi
-			.searchObservations(observationSearchRequestDto, null).get(0);
-		Assert.assertEquals(observationDtos.get(0).getObservationDbId().toString(), observationDto.getObservationDbId());
+			.searchObservations(searchRequestDto, null).get(0);
+		Assert.assertEquals(observationDtos.get(0).getObservationDbId(), observationDto.getObservationDbId());
 		Assert.assertEquals(this.observationUnitDbId, observationDto.getObservationUnitDbId());
 		Assert.assertEquals(this.variableDTO.getObservationVariableDbId(), observationDto.getObservationVariableDbId());
 		Assert.assertEquals(this.germplasm.getGermplasmUUID(), observationDto.getGermplasmDbId());
