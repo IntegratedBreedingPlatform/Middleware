@@ -1,6 +1,5 @@
 package org.generationcp.middleware.api.brapi.v2.observation;
 
-import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
