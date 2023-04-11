@@ -1,6 +1,7 @@
 package org.generationcp.middleware.dao.location;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.location.Coordinate;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.util.DAOQueryUtils;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class LocationSearchDAOQuery {
 
@@ -153,13 +155,16 @@ public class LocationSearchDAOQuery {
   private static String getCountQueryJoins(final LocationSearchRequest request, final String programUUID) {
     final StringBuilder joinBuilder = new StringBuilder();
     if (request.getLatitudeFrom() != null || request.getLatitudeTo() != null || request.getLongitudeFrom() != null
-        || request.getLongitudeTo() != null || request.getAltitudeFrom() != null || request.getAltitudeTo() != null) {
+        || request.getLongitudeTo() != null || request.getAltitudeMin() != null || request.getAltitudeMax() != null
+        || request.getCoordinates() != null) {
       joinBuilder.append(GEOREF_JOIN_QUERY);
     }
-    if (!StringUtils.isEmpty(request.getLocationTypeName())) {
+    if (!CollectionUtils.isEmpty(request.getLocationTypes())) {
       joinBuilder.append(LOCATION_TYPE_JOIN_QUERY);
     }
-    if (!StringUtils.isEmpty(request.getCountryName())) {
+
+    if (!StringUtils.isEmpty(request.getCountryName()) || !CollectionUtils.isEmpty(request.getCountryNames())
+        || !CollectionUtils.isEmpty(request.getCountryCodes()) || !CollectionUtils.isEmpty(request.getCountryIds())) {
       joinBuilder.append(COUNTRY_JOIN_QUERY);
     }
     if (!StringUtils.isEmpty(request.getProvinceName())) {
@@ -176,18 +181,35 @@ public class LocationSearchDAOQuery {
   }
 
   private static void addFilters(final SQLQueryBuilder sqlQueryBuilder, final LocationSearchRequest request) {
-    if (!StringUtils.isEmpty(request.getLocationTypeName())) {
-      sqlQueryBuilder.append(" AND ud.fname = :locationType ");
-      sqlQueryBuilder.setParameter("locationType", request.getLocationTypeName());
-    }
-    if (!CollectionUtils.isEmpty(request.getLocationIds())) {
+
+    if (!CollectionUtils.isEmpty(request.getLocationDbIds())) {
       sqlQueryBuilder.append(" AND l.locid IN (:locationId) ");
-      sqlQueryBuilder.setParameter("locationId", request.getLocationIds());
+      sqlQueryBuilder.setParameter("locationId", request.getLocationDbIds());
+    }
+
+    if (!CollectionUtils.isEmpty(request.getLocationNames())) {
+      sqlQueryBuilder.append(" AND l.lname IN (:locationNames) ");
+      sqlQueryBuilder.setParameter("locationNames", request.getLocationNames());
+    }
+
+    if (!CollectionUtils.isEmpty(request.getLocationNames())) {
+      sqlQueryBuilder.append(" AND l.lname IN (:locationNames) ");
+      sqlQueryBuilder.setParameter("locationNames", request.getLocationNames());
     }
 
     if (!StringUtils.isEmpty(request.getCountryName())) {
       sqlQueryBuilder.append(" AND c.isoabbr LIKE :countryName ");
       sqlQueryBuilder.setParameter("countryName", "%" + request.getCountryName() + "%");
+    }
+
+    if (!CollectionUtils.isEmpty(request.getCountryNames())) {
+      sqlQueryBuilder.append(" AND c.isoabbr IN (:countryNames) ");
+      sqlQueryBuilder.setParameter("countryNames", request.getCountryNames());
+    }
+
+    if (!CollectionUtils.isEmpty(request.getCountryCodes())) {
+      sqlQueryBuilder.append(" AND c.isothree IN (:countryCodes) ");
+      sqlQueryBuilder.setParameter("countryCodes", request.getCountryCodes());
     }
 
     if (!StringUtils.isEmpty(request.getProvinceName())) {
@@ -200,9 +222,14 @@ public class LocationSearchDAOQuery {
       sqlQueryBuilder.setParameter("locationTypeIds", request.getLocationTypeIds());
     }
 
-    if (!CollectionUtils.isEmpty(request.getLocationAbbreviations())) {
+    if (!CollectionUtils.isEmpty(request.getLocationTypes())) {
+      sqlQueryBuilder.append(" AND ud.fname IN (:locationTypes) ");
+      sqlQueryBuilder.setParameter("locationTypes", request.getLocationTypes());
+    }
+
+    if (!CollectionUtils.isEmpty(request.getAbbreviations())) {
       sqlQueryBuilder.append(" AND l.labbr IN (:locationAbbrs) ");
-      sqlQueryBuilder.setParameter("locationAbbrs", request.getLocationAbbreviations());
+      sqlQueryBuilder.setParameter("locationAbbrs", request.getAbbreviations());
     }
 
     if (!CollectionUtils.isEmpty(request.getCountryIds())) {
@@ -246,14 +273,30 @@ public class LocationSearchDAOQuery {
       sqlQueryBuilder.setParameter("longitudeTo", request.getLongitudeTo());
     }
 
-    if (request.getAltitudeFrom() != null) {
+    if (request.getAltitudeMin() != null) {
       sqlQueryBuilder.append(" AND g.alt >= :altitudeFrom ");
-      sqlQueryBuilder.setParameter("altitudeFrom", request.getAltitudeFrom());
+      sqlQueryBuilder.setParameter("altitudeFrom", request.getAltitudeMin());
     }
 
-    if (request.getAltitudeTo() != null) {
+    if (request.getAltitudeMax() != null) {
       sqlQueryBuilder.append(" AND g.alt <= :altitudeTo ");
-      sqlQueryBuilder.setParameter("altitudeTo", request.getAltitudeTo());
+      sqlQueryBuilder.setParameter("altitudeTo", request.getAltitudeMax());
+    }
+
+    final Coordinate coordinateFilter = request.getCoordinates();
+    if (coordinateFilter != null) {
+      final List<Double> coordinatesList = coordinateFilter.getGeometry().getCoordinates();
+      if (!CollectionUtils.isEmpty(coordinatesList) && coordinatesList.size() >= 2) {
+        sqlQueryBuilder.append(" AND g.lon = :longitude ");
+        sqlQueryBuilder.setParameter("longitude", coordinatesList.get(0));
+        sqlQueryBuilder.append(" AND g.lat = :latitude ");
+        sqlQueryBuilder.setParameter("latitude", coordinatesList.get(1));
+
+        if (coordinatesList.size() == 3) {
+          sqlQueryBuilder.append(" AND g.alt = :altitude ");
+          sqlQueryBuilder.setParameter("altitude", coordinatesList.get(2));
+        }
+      }
     }
 
     if (request.getFilterFavoriteProgramUUID() != null) {
