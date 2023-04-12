@@ -945,7 +945,7 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADD_OBSERVATION_TRAIT_VARIABLES';
              </sqlCheck>
  		</preConditions>
-        <comment>Add trait variables permission</comment>
+        <comment>Add 'Add trait variables to observations' permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @observation_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_OBSERVATIONS');
 
@@ -965,7 +965,7 @@
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADD_OBSERVATION_SELECTION_VARIABLES';
              </sqlCheck>
  		</preConditions>
-        <comment>Add Selection variables permission</comment>
+        <comment>Add 'Add Selection variables to observations' permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @observation_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_OBSERVATIONS');
 
