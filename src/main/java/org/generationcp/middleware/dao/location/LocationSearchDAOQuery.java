@@ -192,11 +192,6 @@ public class LocationSearchDAOQuery {
       sqlQueryBuilder.setParameter("locationNames", request.getLocationNames());
     }
 
-    if (!CollectionUtils.isEmpty(request.getLocationNames())) {
-      sqlQueryBuilder.append(" AND l.lname IN (:locationNames) ");
-      sqlQueryBuilder.setParameter("locationNames", request.getLocationNames());
-    }
-
     if (!StringUtils.isEmpty(request.getCountryName())) {
       sqlQueryBuilder.append(" AND c.isoabbr LIKE :countryName ");
       sqlQueryBuilder.setParameter("countryName", "%" + request.getCountryName() + "%");
