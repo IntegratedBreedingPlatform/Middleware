@@ -1,44 +1,64 @@
 package org.generationcp.middleware.api.brapi.v2.observation;
 
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.List;
 
 @AutoProperty
-public class ObservationSearchRequestDto {
+public class ObservationSearchRequestDto extends SearchRequestDto {
 
-	private List<Integer> observationDbIds;
-	private List<String> observationUnitDbIds;
+
+	private List<String> commonCropNames;
+	private List<String> externalReferenceIds;
+	private List<String> externalReferenceSources;
 	private List<String> germplasmDbIds;
-	private List<String> observationVariableDbIds;
-	private List<Integer> studyDbIds;
-	private List<Integer> locationDbIds;
-	private List<Integer> trialDbIds;
-	private List<String> programDbIds;
-	private String seasonDbId;
-	private String observationUnitLevelName;
-	private String observationUnitLevelOrder;
-	private String observationUnitLevelCode;
+	private List<String> germplasmNames;
+	private List<String> locationDbIds;
+	private List<String> locationNames;
+	private List<String> observationDbIds;
+	private List<ObservationLevelRelationship> observationLevelRelationships;
+	private List<ObservationLevelRelationship> observationLevels;
 	private String observationTimeStampRangeStart;
 	private String observationTimeStampRangeEnd;
-	private String externalReferenceID;
-	private String externalReferenceSource;
+	private List<String> observationUnitDbIds;
+	private List<String> observationVariableDbIds;
+	private List<String> observationVariableNames;
+	private List<String> observationVariablePUIs;
+	private List<String> programDbIds;
+	private List<String> programNames;
+	private List<String> seasonDbIds;
+	private List<String> studyDbIds;
+	private List<String> studyNames;
+	private List<String> trialDbIds;
+	private List<String> trialNames;
+	private int page;
+	private int pageSize;
 
-	public List<Integer> getObservationDbIds() {
-		return this.observationDbIds;
+	public List<String> getCommonCropNames() {
+		return this.commonCropNames;
 	}
 
-	public void setObservationDbIds(final List<Integer> observationDbIds) {
-		this.observationDbIds = observationDbIds;
+	public void setCommonCropNames(final List<String> commonCropNames) {
+		this.commonCropNames = commonCropNames;
 	}
 
-	public List<String> getObservationUnitDbIds() {
-		return this.observationUnitDbIds;
+	public List<String> getExternalReferenceIds() {
+		return this.externalReferenceIds;
 	}
 
-	public void setObservationUnitDbIds(final List<String> observationUnitDbIds) {
-		this.observationUnitDbIds = observationUnitDbIds;
+	public void setExternalReferenceIds(final List<String> externalReferenceIds) {
+		this.externalReferenceIds = externalReferenceIds;
+	}
+
+	public List<String> getExternalReferenceSources() {
+		return this.externalReferenceSources;
+	}
+
+	public void setExternalReferenceSources(final List<String> externalReferenceSources) {
+		this.externalReferenceSources = externalReferenceSources;
 	}
 
 	public List<String> getGermplasmDbIds() {
@@ -49,76 +69,52 @@ public class ObservationSearchRequestDto {
 		this.germplasmDbIds = germplasmDbIds;
 	}
 
-	public List<String> getObservationVariableDbIds() {
-		return this.observationVariableDbIds;
+	public List<String> getGermplasmNames() {
+		return this.germplasmNames;
 	}
 
-	public void setObservationVariableDbIds(final List<String> observationVariableDbIds) {
-		this.observationVariableDbIds = observationVariableDbIds;
+	public void setGermplasmNames(final List<String> germplasmNames) {
+		this.germplasmNames = germplasmNames;
 	}
 
-	public List<Integer> getStudyDbIds() {
-		return this.studyDbIds;
-	}
-
-	public void setStudyDbIds(final List<Integer> studyDbIds) {
-		this.studyDbIds = studyDbIds;
-	}
-
-	public List<Integer> getLocationDbIds() {
+	public List<String> getLocationDbIds() {
 		return this.locationDbIds;
 	}
 
-	public void setLocationDbIds(final List<Integer> locationDbIds) {
+	public void setLocationDbIds(final List<String> locationDbIds) {
 		this.locationDbIds = locationDbIds;
 	}
 
-	public List<Integer> getTrialDbIds() {
-		return this.trialDbIds;
+	public List<String> getLocationNames() {
+		return this.locationNames;
 	}
 
-	public void setTrialDbIds(final List<Integer> trialDbIds) {
-		this.trialDbIds = trialDbIds;
+	public void setLocationNames(final List<String> locationNames) {
+		this.locationNames = locationNames;
 	}
 
-	public List<String> getProgramDbIds() {
-		return this.programDbIds;
+	public List<String> getObservationDbIds() {
+		return this.observationDbIds;
 	}
 
-	public void setProgramDbIds(final List<String> programDbIds) {
-		this.programDbIds = programDbIds;
+	public void setObservationDbIds(final List<String> observationDbIds) {
+		this.observationDbIds = observationDbIds;
 	}
 
-	public String getSeasonDbId() {
-		return this.seasonDbId;
+	public List<ObservationLevelRelationship> getObservationLevelRelationships() {
+		return this.observationLevelRelationships;
 	}
 
-	public void setSeasonDbId(final String seasonDbId) {
-		this.seasonDbId = seasonDbId;
+	public void setObservationLevelRelationships(final List<ObservationLevelRelationship> observationLevelRelationships) {
+		this.observationLevelRelationships = observationLevelRelationships;
 	}
 
-	public String getObservationUnitLevelName() {
-		return this.observationUnitLevelName;
+	public List<ObservationLevelRelationship> getObservationLevels() {
+		return this.observationLevels;
 	}
 
-	public void setObservationUnitLevelName(final String observationUnitLevelName) {
-		this.observationUnitLevelName = observationUnitLevelName;
-	}
-
-	public String getObservationUnitLevelOrder() {
-		return this.observationUnitLevelOrder;
-	}
-
-	public void setObservationUnitLevelOrder(final String observationUnitLevelOrder) {
-		this.observationUnitLevelOrder = observationUnitLevelOrder;
-	}
-
-	public String getObservationUnitLevelCode() {
-		return this.observationUnitLevelCode;
-	}
-
-	public void setObservationUnitLevelCode(final String observationUnitLevelCode) {
-		this.observationUnitLevelCode = observationUnitLevelCode;
+	public void setObservationLevels(final List<ObservationLevelRelationship> observationLevels) {
+		this.observationLevels = observationLevels;
 	}
 
 	public String getObservationTimeStampRangeStart() {
@@ -137,21 +133,111 @@ public class ObservationSearchRequestDto {
 		this.observationTimeStampRangeEnd = observationTimeStampRangeEnd;
 	}
 
-	public String getExternalReferenceID() {
-		return this.externalReferenceID;
+	public List<String> getObservationUnitDbIds() {
+		return this.observationUnitDbIds;
 	}
 
-	public void setExternalReferenceID(final String externalReferenceID) {
-		this.externalReferenceID = externalReferenceID;
+	public void setObservationUnitDbIds(final List<String> observationUnitDbIds) {
+		this.observationUnitDbIds = observationUnitDbIds;
 	}
 
-	public String getExternalReferenceSource() {
-		return this.externalReferenceSource;
+	public List<String> getObservationVariableDbIds() {
+		return this.observationVariableDbIds;
 	}
 
-	public void setExternalReferenceSource(final String externalReferenceSource) {
-		this.externalReferenceSource = externalReferenceSource;
+	public void setObservationVariableDbIds(final List<String> observationVariableDbIds) {
+		this.observationVariableDbIds = observationVariableDbIds;
 	}
+
+	public List<String> getObservationVariableNames() {
+		return this.observationVariableNames;
+	}
+
+	public void setObservationVariableNames(final List<String> observationVariableNames) {
+		this.observationVariableNames = observationVariableNames;
+	}
+
+	public List<String> getObservationVariablePUIs() {
+		return this.observationVariablePUIs;
+	}
+
+	public void setObservationVariablePUIs(final List<String> observationVariablePUIs) {
+		this.observationVariablePUIs = observationVariablePUIs;
+	}
+
+	public List<String> getProgramDbIds() {
+		return this.programDbIds;
+	}
+
+	public void setProgramDbIds(final List<String> programDbIds) {
+		this.programDbIds = programDbIds;
+	}
+
+	public List<String> getProgramNames() {
+		return this.programNames;
+	}
+
+	public void setProgramNames(final List<String> programNames) {
+		this.programNames = programNames;
+	}
+
+	public List<String> getSeasonDbIds() {
+		return this.seasonDbIds;
+	}
+
+	public void setSeasonDbIds(final List<String> seasonDbIds) {
+		this.seasonDbIds = seasonDbIds;
+	}
+
+	public List<String> getStudyDbIds() {
+		return this.studyDbIds;
+	}
+
+	public void setStudyDbIds(final List<String> studyDbIds) {
+		this.studyDbIds = studyDbIds;
+	}
+
+	public List<String> getStudyNames() {
+		return this.studyNames;
+	}
+
+	public void setStudyNames(final List<String> studyNames) {
+		this.studyNames = studyNames;
+	}
+
+	public List<String> getTrialDbIds() {
+		return this.trialDbIds;
+	}
+
+	public void setTrialDbIds(final List<String> trialDbIds) {
+		this.trialDbIds = trialDbIds;
+	}
+
+	public List<String> getTrialNames() {
+		return this.trialNames;
+	}
+
+	public void setTrialNames(final List<String> trialNames) {
+		this.trialNames = trialNames;
+	}
+
+	public int getPage() {
+		return this.page;
+	}
+
+	public void setPage(final int page) {
+		this.page = page;
+	}
+
+	public int getPageSize() {
+		return this.pageSize;
+	}
+
+	public void setPageSize(final int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+
 
 	@Override
 	public int hashCode() {
