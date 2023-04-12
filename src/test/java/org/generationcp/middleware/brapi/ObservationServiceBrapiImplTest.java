@@ -219,15 +219,15 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		searchRequestDto.setObservationDbIds(
 			observationDtos.stream().map(o -> o.getObservationDbId()).collect(Collectors.toList()));
 		searchRequestDto.setGermplasmNames(Collections.singletonList(this.germplasm.getPreferredName().getNval()));
-		searchRequestDto.setTrialDbIds(Collections.singletonList(this.studySummary.getTrialDbId().toString()));
-		searchRequestDto.setTrialNames(Collections.singletonList(this.studySummary.getName()));
+		searchRequestDto.setTrialDbIds(Collections.singletonList(this.trialSummary.getTrialDbId().toString()));
+		searchRequestDto.setTrialNames(Collections.singletonList(this.trialSummary.getName()));
 		searchRequestDto.setStudyDbIds(Collections.singletonList(this.studyInstanceDto.getStudyDbId()));
-		searchRequestDto.setStudyNames(Collections.singletonList(this.studySummary.getName() + " Environment Number 1"));
+		searchRequestDto.setStudyNames(Collections.singletonList(this.trialSummary.getName() + " Environment Number 1"));
 		searchRequestDto.setLocationDbIds(Collections.singletonList(this.studyInstanceDto.getLocationDbId()));
 		searchRequestDto.setLocationNames(Collections.singletonList(this.studyInstanceDto.getLocationName()));
 		searchRequestDto.setObservationVariableDbIds(Collections.singletonList(this.variableDTO.getObservationVariableDbId()));
 		searchRequestDto.setObservationVariableNames(Collections.singletonList(this.variableDTO.getObservationVariableName()));
-		searchRequestDto.setProgramDbIds(Collections.singletonList(this.studySummary.getProgramDbId()));
+		searchRequestDto.setProgramDbIds(Collections.singletonList(this.trialSummary.getProgramDbId()));
 		searchRequestDto.setExternalReferenceIds(Collections.singletonList(REF_ID));
 		searchRequestDto.setExternalReferenceSources(Collections.singletonList(REF_SOURCE));
 		final ObservationLevelRelationship plotRelationship = new ObservationLevelRelationship();
