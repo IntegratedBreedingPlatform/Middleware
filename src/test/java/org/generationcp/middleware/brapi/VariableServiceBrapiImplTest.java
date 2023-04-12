@@ -10,7 +10,7 @@ import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.crop.CropService;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -205,10 +205,10 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		trialImportRequestDTO.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
 		trialImportRequestDTO.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		trialImportRequestDTO.setProgramDbId(this.commonTestProject.getUniqueID());
-		final StudySummary studySummary = this.trialServiceBrapi
-			.saveStudies(this.cropType.getCropName(), Collections.singletonList(trialImportRequestDTO), this.testUser.getUserid()).get(0);
+		final TrialSummary trialSummary = this.trialServiceBrapi
+			.saveTrials(this.cropType.getCropName(), Collections.singletonList(trialImportRequestDTO), this.testUser.getUserid()).get(0);
 		final StudyImportRequestDTO instance = new StudyImportRequestDTO();
-		instance.setTrialDbId(studySummary.getTrialDbId().toString());
+		instance.setTrialDbId(trialSummary.getTrialDbId().toString());
 		instance.setLocationDbId("0");
 		final StudyInstanceDto savedInstance = this.studyServiceBrapi
 			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(instance), this.testUser.getUserid()).get(0);
@@ -239,10 +239,10 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		trialImportRequestDTO.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
 		trialImportRequestDTO.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		trialImportRequestDTO.setProgramDbId(this.commonTestProject.getUniqueID());
-		final StudySummary studySummary = this.trialServiceBrapi
-			.saveStudies(this.cropType.getCropName(), Collections.singletonList(trialImportRequestDTO), this.testUser.getUserid()).get(0);
+		final TrialSummary trialSummary = this.trialServiceBrapi
+			.saveTrials(this.cropType.getCropName(), Collections.singletonList(trialImportRequestDTO), this.testUser.getUserid()).get(0);
 		final StudyImportRequestDTO instance = new StudyImportRequestDTO();
-		instance.setTrialDbId(studySummary.getTrialDbId().toString());
+		instance.setTrialDbId(trialSummary.getTrialDbId().toString());
 		instance.setLocationDbId("0");
 		final StudyInstanceDto savedInstance = this.studyServiceBrapi
 			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(instance), this.testUser.getUserid()).get(0);
@@ -296,10 +296,10 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		trialImportRequestDTO.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
 		trialImportRequestDTO.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		trialImportRequestDTO.setProgramDbId(this.commonTestProject.getUniqueID());
-		final StudySummary studySummary = this.trialServiceBrapi
-			.saveStudies(this.cropType.getCropName(), Collections.singletonList(trialImportRequestDTO), this.testUser.getUserid()).get(0);
+		final TrialSummary trialSummary = this.trialServiceBrapi
+			.saveTrials(this.cropType.getCropName(), Collections.singletonList(trialImportRequestDTO), this.testUser.getUserid()).get(0);
 		final StudyImportRequestDTO instance = new StudyImportRequestDTO();
-		instance.setTrialDbId(studySummary.getTrialDbId().toString());
+		instance.setTrialDbId(trialSummary.getTrialDbId().toString());
 		instance.setLocationDbId("0");
 		final StudyInstanceDto savedInstance = this.studyServiceBrapi
 			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(instance), this.testUser.getUserid()).get(0);

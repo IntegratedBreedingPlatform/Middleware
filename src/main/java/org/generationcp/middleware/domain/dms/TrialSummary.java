@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @AutoProperty
-public class StudySummary implements Serializable {
+public class TrialSummary implements Serializable {
 
 	private static final long serialVersionUID = -515769070343491680L;
 

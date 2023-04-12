@@ -12,10 +12,11 @@ import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.dao.CropPersonDAO;
 import org.generationcp.middleware.dao.WorkbenchUserDAO;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
@@ -30,7 +31,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.service.api.user.ContactVariable;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
@@ -45,6 +45,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -125,10 +127,10 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountStudies() {
+	public void testCountSearchTrials() {
 		// Empty filter will retrieve all studies in crop
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		final long initialCount = this.trialServiceBrapi.countStudies(studySearchFilter);
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		final long initialCount = this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO);
 
 		// Add new study with new location ID
 		final DmsProject newStudy = this.testDataInitializer
@@ -147,18 +149,18 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// New study should be retrieved for empty filter
-		Assert.assertEquals((int) initialCount + 1, this.trialServiceBrapi.countStudies(studySearchFilter));
+		Assert.assertEquals((int) initialCount + 1, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
-		studySearchFilter.setProgramDbId(this.commonTestProject.getUniqueID());
+		trialSearchRequestDTO.setProgramDbIds(Arrays.asList(this.commonTestProject.getUniqueID()));
 		Assert
-			.assertEquals(2, this.trialServiceBrapi.countStudies(studySearchFilter));
-		studySearchFilter.setLocationDbId(String.valueOf(location1));
+			.assertEquals(2, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
+		trialSearchRequestDTO.setLocationDbIds(Arrays.asList(String.valueOf(location1)));
 		// Expecting only one to be retrieved when filtered by location
-		Assert.assertEquals(1, this.trialServiceBrapi.countStudies(studySearchFilter));
+		Assert.assertEquals(1, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
 	}
 
 	@Test
-	public void testGetStudies() {
+	public void testSearchTrials() {
 		// Add new completed study assigned new location ID
 		final DmsProject newStudy = this.testDataInitializer
 			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
@@ -181,45 +183,239 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID, sorted by descending study name
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setProgramDbId(this.commonTestProject.getUniqueID());
-		List<StudySummary> studies =
-			this.trialServiceBrapi.getStudies(
-				studySearchFilter, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
-		Assert.assertEquals(2, studies.size());
-		StudySummary study1 = studies.get(1);
-		Assert.assertEquals(this.study.getProjectId(), study1.getTrialDbId());
-		Assert.assertEquals(this.study.getName(), study1.getName());
-		Assert.assertEquals(this.study.getDescription(), study1.getDescription());
-		Assert.assertEquals(this.study.getProgramUUID(), study1.getProgramDbId());
-		Assert.assertEquals(this.studyExperiment.getObsUnitId(), study1.getObservationUnitId());
-		Assert.assertEquals(0, study1.getContacts().size());
-		Assert.assertTrue(study1.isActive());
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setProgramDbIds(Arrays.asList(this.commonTestProject.getUniqueID()));
+		List<TrialSummary> trialSummaries =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
+		Assert.assertEquals(2, trialSummaries.size());
+		TrialSummary trial1 = trialSummaries.get(1);
+		Assert.assertEquals(this.study.getProjectId(), trial1.getTrialDbId());
+		Assert.assertEquals(this.study.getName(), trial1.getName());
+		Assert.assertEquals(this.study.getDescription(), trial1.getDescription());
+		Assert.assertEquals(this.study.getProgramUUID(), trial1.getProgramDbId());
+		Assert.assertEquals(this.studyExperiment.getObsUnitId(), trial1.getObservationUnitId());
+		Assert.assertEquals(0, trial1.getContacts().size());
+		Assert.assertTrue(trial1.isActive());
 
-		final StudySummary study2 = studies.get(0);
-		Assert.assertEquals(newStudy.getProjectId(), study2.getTrialDbId());
-		Assert.assertEquals(newStudy.getName(), study2.getName());
-		Assert.assertEquals(newStudy.getDescription(), study2.getDescription());
-		Assert.assertEquals(newStudy.getProgramUUID(), study2.getProgramDbId());
-		Assert.assertEquals(newStudyExperiment.getObsUnitId(), study2.getObservationUnitId());
-		Assert.assertEquals(1, study2.getInstanceMetaData().size());
-		Assert.assertEquals(1, study2.getContacts().size());
-		Assert.assertEquals(contactName, study2.getContacts().get(0).getName());
-		Assert.assertFalse(study2.isActive());
+		final TrialSummary trial2 = trialSummaries.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trial2.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), trial2.getName());
+		Assert.assertEquals(newStudy.getDescription(), trial2.getDescription());
+		Assert.assertEquals(newStudy.getProgramUUID(), trial2.getProgramDbId());
+		Assert.assertEquals(newStudyExperiment.getObsUnitId(), trial2.getObservationUnitId());
+		Assert.assertEquals(1, trial2.getInstanceMetaData().size());
+		Assert.assertEquals(1, trial2.getContacts().size());
+		Assert.assertEquals(contactName, trial2.getContacts().get(0).getName());
+		Assert.assertFalse(trial2.isActive());
 
-		studySearchFilter.setLocationDbId(String.valueOf(location1));
+		trialSearchRequestDTO.setLocationDbIds(Arrays.asList(String.valueOf(location1)));
 		// Expecting only one study to be retrieved when filtered by location
-		studies = this.trialServiceBrapi.getStudies(studySearchFilter, null);
-		Assert.assertEquals(1, studies.size());
-		study1 = studies.get(0);
-		Assert.assertEquals(newStudy.getProjectId(), study1.getTrialDbId());
+		trialSummaries = this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null);
+		Assert.assertEquals(1, trialSummaries.size());
+		trial1 = trialSummaries.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trial1.getTrialDbId());
 		// Expecting environments of retrieved study to also be filtered by location
-		Assert.assertEquals(1, study1.getInstanceMetaData().size());
-		Assert.assertEquals(String.valueOf(location1), study1.getInstanceMetaData().get(0).getLocationDbId().toString());
+		Assert.assertEquals(1, trial1.getInstanceMetaData().size());
+		Assert.assertEquals(String.valueOf(location1), trial1.getInstanceMetaData().get(0).getLocationDbId().toString());
 	}
 
 	@Test
-	public void testGetStudies_FilterByStudyExternalReference() {
+	public void testSearchTrials_FilterByStudyDbId() {
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), 6,
+				this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				"20200101", "20201231");
+
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setStudyDbIds(Arrays.asList(String.valueOf(geolocation.getLocationId())));
+
+		final List<TrialSummary> result1 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(1, result1.size());
+		final TrialSummary trialSummary = result1.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trialSummary.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), trialSummary.getName());
+
+		trialSearchRequestDTO.setStudyDbIds(Arrays.asList("invalid studyDbId"));
+		final List<TrialSummary> result2 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(0, result2.size());
+	}
+
+	@Test
+	public void testSearchTrials_FilterByTrialName() {
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), 6,
+				this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				"20200101", "20201231");
+
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialNames(Arrays.asList(String.valueOf(newStudy.getName())));
+
+		final List<TrialSummary> result1 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(1, result1.size());
+		final TrialSummary trialSummary = result1.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trialSummary.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), trialSummary.getName());
+
+		trialSearchRequestDTO.setTrialNames(Arrays.asList("invalid trialName"));
+		final List<TrialSummary> result2 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(0, result2.size());
+	}
+
+	@Test
+	public void testSearchTrials_FilterByTrialPUI() {
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), 6,
+				this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				"20200101", "20201231");
+
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialPUIs(Arrays.asList(String.valueOf(newStudyExperiment.getObsUnitId())));
+
+		final List<TrialSummary> result1 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(1, result1.size());
+		final TrialSummary trialSummary = result1.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trialSummary.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), trialSummary.getName());
+
+		trialSearchRequestDTO.setTrialPUIs(Arrays.asList("invalid trialPUI"));
+		final List<TrialSummary> result2 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(0, result2.size());
+	}
+
+	@Test
+	public void testSearchTrials_FilterByActive_TrialIsActive() {
+		final LocalDate currentDate = LocalDate.now();
+		final LocalDate nextDayDate = currentDate.plusDays(1);
+		final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+		final String startDate = currentDate.format(formatter);
+		final String endDate = nextDayDate.format(formatter);
+
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), 6,
+				this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				startDate, endDate);
+
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialDbIds(Arrays.asList(String.valueOf(newStudy.getProjectId())));
+		trialSearchRequestDTO.setActive(true);
+
+		final List<TrialSummary> result1 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(1, result1.size());
+		final TrialSummary trialSummary = result1.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trialSummary.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), trialSummary.getName());
+
+	}
+
+	@Test
+	public void testSearchTrials_FilterByActive_TrialIsInactive() {
+		final LocalDate currentDate = LocalDate.now();
+		final LocalDate nextDayDate = currentDate.plusDays(1);
+		final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+		final String startDate = currentDate.minusDays(1).format(formatter);
+		final String endDate = currentDate.minusDays(1).format(formatter);
+
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), 6,
+				this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				startDate, endDate);
+
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialDbIds(Arrays.asList(String.valueOf(newStudy.getProjectId())));
+		trialSearchRequestDTO.setActive(false);
+
+		final List<TrialSummary> result1 =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, null));
+		Assert.assertEquals(1, result1.size());
+		final TrialSummary trialSummary = result1.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), trialSummary.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), trialSummary.getName());
+
+	}
+
+	@Test
+	public void testSearchTrials_FilterByStudyExternalReference() {
 		// Add new completed study assigned new location ID
 		final DmsProject newStudy = this.testDataInitializer
 			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
@@ -237,21 +433,21 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.sessionProvder.getSession().flush();
 
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setExternalReferenceSource(studyExternalReference.getSource());
-		studySearchFilter.setExternalReferenceID(studyExternalReference.getReferenceId());
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setExternalReferenceSources(Arrays.asList(studyExternalReference.getSource()));
+		trialSearchRequestDTO.setExternalReferenceIds(Arrays.asList(studyExternalReference.getReferenceId()));
 
-		final List<StudySummary> studies =
-			this.trialServiceBrapi.getStudies(
-				studySearchFilter, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
-		Assert.assertEquals(1, studies.size());
-		final StudySummary study2 = studies.get(0);
+		final List<TrialSummary> trialSummaries =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
+		Assert.assertEquals(1, trialSummaries.size());
+		final TrialSummary study2 = trialSummaries.get(0);
 		Assert.assertEquals(newStudy.getProjectId(), study2.getTrialDbId());
 		Assert.assertEquals(newStudy.getName(), study2.getName());
 	}
 
 	@Test
-	public void testCountStudies_FilterByStudyExternalReference() {
+	public void testCountSearchTrials_FilterByStudyExternalReference() {
 		// Add new completed study assigned new location ID
 		final DmsProject newStudy = this.testDataInitializer
 			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
@@ -269,15 +465,15 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.sessionProvder.getSession().flush();
 
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setExternalReferenceSource(studyExternalReference.getSource());
-		studySearchFilter.setExternalReferenceID(studyExternalReference.getReferenceId());
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setExternalReferenceSources(Arrays.asList(studyExternalReference.getSource()));
+		trialSearchRequestDTO.setExternalReferenceIds(Arrays.asList(studyExternalReference.getReferenceId()));
 
-		Assert.assertEquals(1, this.trialServiceBrapi.countStudies(studySearchFilter));
+		Assert.assertEquals(1, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
 	}
 
 	@Test
-	public void testGetStudiesWithDeletedStudy() {
+	public void testSearchTrialsWithDeletedStudy() {
 		// Add new study assigned new location ID
 		final DmsProject newStudy = this.testDataInitializer
 			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
@@ -298,20 +494,20 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID, sorted by descending study name
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setProgramDbId(this.commonTestProject.getUniqueID());
-		List<StudySummary> studies =
-			this.trialServiceBrapi.getStudies(
-				studySearchFilter, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
-		Assert.assertEquals("Deleted study is not included", 2, studies.size());
-		StudySummary study1 = studies.get(1);
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setProgramDbIds(Arrays.asList(this.commonTestProject.getUniqueID()));
+		List<TrialSummary> trialSummaries =
+			this.trialServiceBrapi.searchTrials(
+				trialSearchRequestDTO, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
+		Assert.assertEquals("Deleted study is not included", 2, trialSummaries.size());
+		TrialSummary study1 = trialSummaries.get(1);
 		Assert.assertEquals(this.study.getProjectId(), study1.getTrialDbId());
 		Assert.assertEquals(this.study.getName(), study1.getName());
 		Assert.assertEquals(this.study.getDescription(), study1.getDescription());
 		Assert.assertEquals(this.study.getProgramUUID(), study1.getProgramDbId());
 		Assert.assertEquals(this.studyExperiment.getObsUnitId(), study1.getObservationUnitId());
 		Assert.assertEquals(0, study1.getContacts().size());
-		final StudySummary study2 = studies.get(0);
+		final TrialSummary study2 = trialSummaries.get(0);
 		Assert.assertEquals(newStudy.getProjectId(), study2.getTrialDbId());
 		Assert.assertEquals(newStudy.getName(), study2.getName());
 		Assert.assertEquals(newStudy.getDescription(), study2.getDescription());
@@ -321,10 +517,10 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(0, study2.getContacts().size());
 
 		// Expecting only one study to be retrieved when filtered by location
-		studySearchFilter.setLocationDbId(String.valueOf(location1));
-		studies = this.trialServiceBrapi.getStudies(studySearchFilter, null);
-		Assert.assertEquals(1, studies.size());
-		study1 = studies.get(0);
+		trialSearchRequestDTO.setLocationDbIds(Arrays.asList(String.valueOf(location1)));
+		trialSummaries = this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null);
+		Assert.assertEquals(1, trialSummaries.size());
+		study1 = trialSummaries.get(0);
 		Assert.assertEquals(newStudy.getProjectId(), study1.getTrialDbId());
 		// Expecting environments of retrieved study to also be filtered by location
 		Assert.assertEquals(1, study1.getInstanceMetaData().size());
@@ -332,10 +528,10 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountStudiesWithDeletedStudy() {
+	public void testCountSearchTrialsWithDeletedStudy() {
 		// Empty filter will retrieve all studies in crop
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		final long initialCount = this.trialServiceBrapi.countStudies(studySearchFilter);
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		final long initialCount = this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO);
 
 		// Add new study with new location ID
 		final DmsProject newStudy = this.testDataInitializer
@@ -357,18 +553,18 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// New study should be retrieved for empty filter
-		Assert.assertEquals((int) initialCount + 1, this.trialServiceBrapi.countStudies(studySearchFilter));
+		Assert.assertEquals((int) initialCount + 1, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
-		studySearchFilter.setProgramDbId(this.commonTestProject.getUniqueID());
+		trialSearchRequestDTO.setProgramDbIds(Arrays.asList(this.commonTestProject.getUniqueID()));
 		Assert
-			.assertEquals(2, this.trialServiceBrapi.countStudies(studySearchFilter));
-		studySearchFilter.setLocationDbId(String.valueOf(location1));
+			.assertEquals(2, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
+		trialSearchRequestDTO.setLocationDbIds(Arrays.asList(String.valueOf(location1)));
 		// Expecting only one to be retrieved when filtered by location
-		Assert.assertEquals(1, this.trialServiceBrapi.countStudies(studySearchFilter));
+		Assert.assertEquals(1, this.trialServiceBrapi.countSearchTrials(trialSearchRequestDTO));
 	}
 
 	@Test
-	public void testSaveStudy_AllInfoSaved() {
+	public void testSaveTrials_AllInfoSaved() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -403,10 +599,10 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		externalReference.setReferenceSource(RandomStringUtils.randomAlphabetic(20));
 		importRequest2.setExternalReferences(Collections.singletonList(externalReference));
 
-		final List<StudySummary> savedStudies = this.trialServiceBrapi
-			.saveStudies(this.crop.getCropName(), Arrays.asList(importRequest1, importRequest2), this.testUser.getUserid());
+		final List<TrialSummary> savedStudies = this.trialServiceBrapi
+			.saveTrials(this.crop.getCropName(), Arrays.asList(importRequest1, importRequest2), this.testUser.getUserid());
 		Assert.assertEquals(2, savedStudies.size());
-		final StudySummary study1 = savedStudies.get(0);
+		final TrialSummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
 		Assert.assertNotNull(study1.getContacts());
 		Assert.assertEquals(1, study1.getContacts().size());
@@ -420,13 +616,13 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 			Assert.assertEquals(importRequest1.getAdditionalInfo().get(key), study1.getAdditionalInfo().get(key));
 		}
 
-		final StudySummary study2 = savedStudies.get(1);
+		final TrialSummary study2 = savedStudies.get(1);
 		this.verifyStudySummary(importRequest2, study2);
 		Assert.assertTrue(CollectionUtils.isEmpty(study2.getContacts()));
 	}
 
 	@Test
-	public void testSaveStudy_WithInvalidStudyVariableNames() {
+	public void testSaveTrials_WithInvalidStudyVariableNames() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -443,11 +639,11 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 			"20210501");
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+		final List<TrialSummary> savedStudies =
+			this.trialServiceBrapi.saveTrials(this.crop.getCropName(), Collections.singletonList(importRequest1),
 				this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
-		final StudySummary study1 = savedStudies.get(0);
+		final TrialSummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
 		Assert.assertNotNull(study1.getAdditionalInfo());
 		// Verify invalid study variable name was not saved, but the valid ones were
@@ -456,7 +652,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_WithInvalidStudyVariableValues() {
+	public void testSaveTrials_WithInvalidStudyVariableValues() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -478,11 +674,11 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		settingsMap.put(categoricalVariable.getName(), RandomStringUtils.randomAlphabetic(30));
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+		final List<TrialSummary> savedStudies =
+			this.trialServiceBrapi.saveTrials(this.crop.getCropName(), Collections.singletonList(importRequest1),
 				this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
-		final StudySummary study1 = savedStudies.get(0);
+		final TrialSummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
 		final List<ProjectProperty> projectProperties = this.daoFactory.getProjectPropertyDAO().getByProjectId(study1.getTrialDbId());
 
@@ -495,7 +691,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy_WithValidVariablesHavingNonStudyDetailVariableType() {
+	public void testSaveTrials_WithValidVariablesHavingNonStudyDetailVariableType() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -525,17 +721,17 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+		final List<TrialSummary> savedStudies =
+			this.trialServiceBrapi.saveTrials(this.crop.getCropName(), Collections.singletonList(importRequest1),
 				this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
-		final StudySummary study1 = savedStudies.get(0);
+		final TrialSummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
 		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
 	}
 
 	@Test
-	public void testSaveStudy_WithCooperatorVariable() {
+	public void testSaveTrials_WithCooperatorVariable() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -556,19 +752,19 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+		final List<TrialSummary> savedStudies =
+			this.trialServiceBrapi.saveTrials(this.crop.getCropName(), Collections.singletonList(importRequest1),
 				this.testUser.getUserid());
 
 		Assert.assertEquals(1, savedStudies.size());
-		final StudySummary study1 = savedStudies.get(0);
+		final TrialSummary study1 = savedStudies.get(0);
 
 		Assert.assertEquals(user.getPerson().getDisplayName(), study1.getAdditionalInfo().get(cooperatorVariable.getName()));
 		Assert.assertEquals("1", study1.getAdditionalInfo().get(cooperatorIdVariable.getName()));
 	}
 
 	@Test
-	public void testSaveStudy_WithCooperatorVariable_PersonDoesNotExist() {
+	public void testSaveTrials_WithCooperatorVariable_PersonDoesNotExist() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -589,17 +785,17 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+		final List<TrialSummary> savedStudies =
+			this.trialServiceBrapi.saveTrials(this.crop.getCropName(), Collections.singletonList(importRequest1),
 				this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
-		final StudySummary study1 = savedStudies.get(0);
+		final TrialSummary study1 = savedStudies.get(0);
 
 		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
 	}
 
 	@Test
-	public void testSaveStudy_WithCooperatorVariable_PersonMultipleMatches() {
+	public void testSaveTrials_WithCooperatorVariable_PersonMultipleMatches() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -623,17 +819,17 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+		final List<TrialSummary> savedStudies =
+			this.trialServiceBrapi.saveTrials(this.crop.getCropName(), Collections.singletonList(importRequest1),
 				this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
-		final StudySummary study1 = savedStudies.get(0);
+		final TrialSummary study1 = savedStudies.get(0);
 
 		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
 	}
 
 	@Test
-	public void testSaveStudy_WithCooperatorVariable_PersonExistButNoAccessToCrop() {
+	public void testSaveTrials_WithCooperatorVariable_PersonExistButNoAccessToCrop() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -662,17 +858,17 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+		final List<TrialSummary> savedStudies =
+			this.trialServiceBrapi.saveTrials(this.crop.getCropName(), Collections.singletonList(importRequest1),
 				this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
-		final StudySummary study1 = savedStudies.get(0);
+		final TrialSummary study1 = savedStudies.get(0);
 
 		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
 	}
 
 	@Test
-	public void testSaveStudy_WithPrincipalInvestigatorVariable() {
+	public void testSaveTrials_WithPrincipalInvestigatorVariable() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -693,18 +889,18 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+		final List<TrialSummary> savedStudies =
+			this.trialServiceBrapi.saveTrials(this.crop.getCropName(), Collections.singletonList(importRequest1),
 				this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
-		final StudySummary study1 = savedStudies.get(0);
+		final TrialSummary study1 = savedStudies.get(0);
 
 		Assert.assertEquals(user.getPerson().getDisplayName(), study1.getAdditionalInfo().get(piNameVariable.getName()));
 		Assert.assertEquals("1", study1.getAdditionalInfo().get(piNameIDVariable.getName()));
 	}
 
 	@Test
-	public void testSaveStudy_WithPrincipalInvestigatorVariable_PersonDoesNotExist() {
+	public void testSaveTrials_WithPrincipalInvestigatorVariable_PersonDoesNotExist() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -725,17 +921,17 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+		final List<TrialSummary> savedStudies =
+			this.trialServiceBrapi.saveTrials(this.crop.getCropName(), Collections.singletonList(importRequest1),
 				this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
-		final StudySummary study1 = savedStudies.get(0);
+		final TrialSummary study1 = savedStudies.get(0);
 
 		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
 	}
 
 	@Test
-	public void testSaveStudy_WithPrincipalInvestigatorVariable_PersonMultipleMatches() {
+	public void testSaveTrials_WithPrincipalInvestigatorVariable_PersonMultipleMatches() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -759,17 +955,17 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+		final List<TrialSummary> savedStudies =
+			this.trialServiceBrapi.saveTrials(this.crop.getCropName(), Collections.singletonList(importRequest1),
 				this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
-		final StudySummary study1 = savedStudies.get(0);
+		final TrialSummary study1 = savedStudies.get(0);
 
 		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
 	}
 
 	@Test
-	public void testSaveStudy_WithPrincipalInvestigatorVariable_PersonExistButNoAccessToCrop() {
+	public void testSaveTrials_WithPrincipalInvestigatorVariable_PersonExistButNoAccessToCrop() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
@@ -798,16 +994,16 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies =
-			this.trialServiceBrapi.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1),
+		final List<TrialSummary> savedStudies =
+			this.trialServiceBrapi.saveTrials(this.crop.getCropName(), Collections.singletonList(importRequest1),
 				this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
-		final StudySummary study1 = savedStudies.get(0);
+		final TrialSummary study1 = savedStudies.get(0);
 
 		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
 	}
 
-	private void verifyStudySummary(final TrialImportRequestDTO importRequestDTO, final StudySummary study) {
+	private void verifyStudySummary(final TrialImportRequestDTO importRequestDTO, final TrialSummary study) {
 		Assert.assertEquals(importRequestDTO.getProgramDbId(), study.getProgramDbId());
 		Assert.assertEquals(importRequestDTO.getTrialDescription(), study.getDescription());
 		Assert.assertEquals(importRequestDTO.getTrialName(), study.getName());

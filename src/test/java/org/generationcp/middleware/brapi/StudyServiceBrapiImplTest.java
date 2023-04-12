@@ -11,7 +11,7 @@ import org.generationcp.middleware.api.brapi.v2.study.StudyUpdateRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -100,7 +100,7 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testSaveStudyInstance_AllInfoSaved() {
-		final StudySummary trial = this.createTrial();
+		final TrialSummary trial = this.createTrial();
 		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
 		dto.setTrialDbId(String.valueOf(trial.getTrialDbId()));
 		dto.setLocationDbId("0");
@@ -146,7 +146,7 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testSaveStudyInstances_WithValidVariableHavingInvalidVariableType() {
-		final StudySummary trial = this.createTrial();
+		final TrialSummary trial = this.createTrial();
 		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
 		dto.setTrialDbId(String.valueOf(trial.getTrialDbId()));
 		dto.setLocationDbId("0");
@@ -169,7 +169,7 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testSaveStudyInstances_WithValidVariableHavingInvalidVariableValue() {
-		final StudySummary trial = this.createTrial();
+		final TrialSummary trial = this.createTrial();
 		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
 		dto.setTrialDbId(String.valueOf(trial.getTrialDbId()));
 		dto.setLocationDbId("0");
@@ -192,7 +192,7 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testSaveStudyInstances_WithInvalidVariable() {
-		final StudySummary trial = this.createTrial();
+		final TrialSummary trial = this.createTrial();
 		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
 		dto.setTrialDbId(String.valueOf(trial.getTrialDbId()));
 		dto.setLocationDbId("0");
@@ -213,7 +213,7 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testUpdateStudyInstance_AllInfoSaved() {
-		final StudySummary trial = this.createTrial();
+		final TrialSummary trial = this.createTrial();
 
 		final List<ValueReference> seasonPossibleValues = this.daoFactory.getCvTermRelationshipDao()
 			.getCategoriesForCategoricalVariables(Collections.singletonList(TermId.SEASON_VAR.getId())).get(TermId.SEASON_VAR.getId());
@@ -517,14 +517,14 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		assertThat(externalReferenceDTO.getReferenceID(), is(expectedReferenceId));
 	}
 
-	private StudySummary createTrial() {
+	private TrialSummary createTrial() {
 		final TrialImportRequestDTO dto = new TrialImportRequestDTO();
 		dto.setStartDate("2019-01-01");
 		dto.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
 		dto.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		dto.setProgramDbId(this.commonTestProject.getUniqueID());
 
-		return this.trialServiceBrapi.saveStudies(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid())
+		return this.trialServiceBrapi.saveTrials(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid())
 			.get(0);
 	}
 
