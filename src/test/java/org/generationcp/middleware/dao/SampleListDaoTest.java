@@ -4,13 +4,10 @@ import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.genotype.SampleGenotypeService;
-import org.generationcp.middleware.api.role.RoleService;
-import org.generationcp.middleware.api.role.RoleServiceImpl;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
-import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
@@ -79,9 +76,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	private DmsProjectDao dmsProjectDao;
 	private StockDao stockDao;
 	private ExperimentPropertyDao experimentPropertyDao;
-	private GermplasmDAO germplasmDao;
-	private ProjectPropertyDao projectPropertyDao;
-	private RoleService roleService;
 	private UserService userService;
 
 	@Resource
@@ -106,9 +100,6 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		this.experimentPropertyDao = new ExperimentPropertyDao(this.sessionProvder.getSession());
 		this.geolocationDao = new GeolocationDao(this.sessionProvder.getSession());
 		this.dmsProjectDao = new DmsProjectDao(this.sessionProvder.getSession());
-		this.germplasmDao = new GermplasmDAO(this.sessionProvder.getSession());
-		this.projectPropertyDao = new ProjectPropertyDao(this.sessionProvder.getSession());
-		this.roleService = new RoleServiceImpl(this.workbenchSessionProvider);
 		this.userService = new UserServiceImpl(this.workbenchSessionProvider);
 		// Create three sample lists test data for search
 		this.createSampleListForSearch("TEST-LIST-1", true);
@@ -493,7 +484,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		Assert.assertNotNull("Marker variable should exist", markerVariable);
 
 		final SampleGenotypeImportRequestDto sampleGenotypeImportRequestDto = new SampleGenotypeImportRequestDto();
-		sampleGenotypeImportRequestDto.setSampleId(String.valueOf(sample.getSampleId()));
+		sampleGenotypeImportRequestDto.setSampleUID(String.valueOf(sample.getSampleBusinessKey()));
 		sampleGenotypeImportRequestDto.setVariableId(String.valueOf(markerVariable.getCvTermId()));
 		sampleGenotypeImportRequestDto.setValue(value);
 		return sampleGenotypeImportRequestDto;

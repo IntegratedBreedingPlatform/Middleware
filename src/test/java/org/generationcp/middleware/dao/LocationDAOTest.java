@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetLocations() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationTypeName("Country");
+		locationSearchRequest.setLocationTypes(Arrays.asList("Country"));
 		final List<org.generationcp.middleware.api.location.Location> locationList =
 			this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected list of country location size > zero", locationList != null && locationList.size() > 0);
@@ -46,7 +47,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final Location location = this.saveTestLocation();
 
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationAbbreviations(Collections.singletonList(location.getLabbr()));
+		locationSearchRequest.setAbbreviations(Collections.singletonList(location.getLabbr()));
 		final List<org.generationcp.middleware.api.location.Location> locationList =
 			this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected to return filtered list by abbreviation", locationList != null && locationList.size() > 0);
@@ -55,7 +56,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetLocationsWithWrongLocType() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
+		locationSearchRequest.setLocationTypes(Arrays.asList("DUMMYLOCTYPE"));
 		final List<org.generationcp.middleware.api.location.Location> locationList =
 			this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected list of location size equals to zero", locationList != null && locationList.size() == 0);
@@ -65,7 +66,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void testCountLocations() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationTypeName("COUNTRY");
+		locationSearchRequest.setLocationTypes(Arrays.asList("COUNTRY"));
 		final long countLocation = this.locationDAO.countSearchLocation(locationSearchRequest, null);
 		MatcherAssert.assertThat("Expected country location size > zero", countLocation > 0);
 	}
@@ -73,7 +74,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void testCountLocationsNotFoundLocation() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
+		locationSearchRequest.setLocationTypes(Arrays.asList("DUMMYLOCTYPE"));
 		final long countLocation = this.locationDAO.countSearchLocation(locationSearchRequest, null);
 		MatcherAssert.assertThat("Expected country location size equals to zero by this locationType = 000100000405", countLocation == 0);
 
@@ -170,7 +171,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		// Philippines
 		final Integer locationId = 171;
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationIds(Collections.singletonList(locationId));
+		locationSearchRequest.setLocationDbIds(Collections.singletonList(locationId));
 		final List<LocationDTO> locations =
 			this.locationDAO
 				.searchLocations(locationSearchRequest,
@@ -184,7 +185,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		// Philippines
 		final String locationAbbreviation = "PHL";
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationAbbreviations(Collections.singletonList(locationAbbreviation));
+		locationSearchRequest.setAbbreviations(Collections.singletonList(locationAbbreviation));
 		final List<LocationDTO> locations =
 			this.locationDAO
 				.searchLocations(locationSearchRequest,

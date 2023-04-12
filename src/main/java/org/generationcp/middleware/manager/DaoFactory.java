@@ -35,6 +35,7 @@ import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.StudyExternalReferenceDao;
 import org.generationcp.middleware.dao.StudyInstanceExternalReferenceDao;
 import org.generationcp.middleware.dao.StudyTypeDAO;
+import org.generationcp.middleware.dao.TrialSearchDao;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
 import org.generationcp.middleware.dao.audit.germplasm.GermplasmAuditDAO;
@@ -496,5 +497,10 @@ public class DaoFactory {
 
 	public GenotypeDao getGenotypeDao() {
 		return new GenotypeDao(this.sessionProvider.getSession());
+	}
+
+	public TrialSearchDao getTrialSearchDao() {
+		return new TrialSearchDao(this.sessionProvider.getSession());
+
 	}
 }

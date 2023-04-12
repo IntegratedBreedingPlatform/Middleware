@@ -1,5 +1,8 @@
 package org.generationcp.middleware.api.location.search;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.generationcp.middleware.api.location.Coordinate;
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -10,34 +13,65 @@ import java.util.List;
 import java.util.Set;
 
 @AutoProperty
-public class LocationSearchRequest {
+public class LocationSearchRequest extends SearchRequestDto {
 
+	@JsonIgnore
 	private String favoriteProgramUUID;
+
+	@JsonIgnore
 	private Set<Integer> locationTypeIds = new HashSet<>();
-	private List<Integer> locationIds = new ArrayList<>();
-	private List<String> locationAbbreviations = new ArrayList<>();
-	private String locationTypeName;
+
+	private List<Integer> locationDbIds = new ArrayList<>();
+	private List<String> locationNames = new ArrayList<>();
+	private List<String> locationTypes = new ArrayList<>();
+	private List<String> abbreviations = new ArrayList<>();
+
+	@JsonIgnore
 	private SqlTextFilter locationNameFilter;
+
+	@JsonIgnore
 	private Set<Integer> countryIds = new HashSet<>();
+
+	@JsonIgnore
 	private Set<Integer> provinceIds = new HashSet<>();
+
+	@JsonIgnore
 	private String countryName;
+
+	@JsonIgnore
 	private String provinceName;
+
+	@JsonIgnore
 	private Double latitudeFrom;
+
+	@JsonIgnore
 	private Double latitudeTo;
+
+	@JsonIgnore
 	private Double longitudeFrom;
+
+	@JsonIgnore
 	private Double longitudeTo;
-	private Double altitudeFrom;
-	private Double altitudeTo;
+
+	private Double altitudeMin;
+	private Double altitudeMax;
+
+	@JsonIgnore
 	private Boolean filterFavoriteProgramUUID;
+
+	private Coordinate coordinates;
+	private List<String> countryCodes = new ArrayList<>();
+	private List<String> countryNames = new ArrayList<>();
 
 	public LocationSearchRequest() {
 
 	}
 
-	public LocationSearchRequest(final Set<Integer> locationTypeIds, final List<Integer> locationIds, final List<String> locationAbbreviations, final SqlTextFilter locationNameFilter) {
+	public LocationSearchRequest(final Set<Integer> locationTypeIds, final List<Integer> locationDbIds,
+		final List<String> locationAbbreviations, final SqlTextFilter locationNameFilter) {
 		this.locationTypeIds = locationTypeIds;
-		this.locationIds = locationIds;
-		this.locationAbbreviations = locationAbbreviations;
+		this.locationDbIds = locationDbIds;
+		this.abbreviations = locationAbbreviations;
 		this.locationNameFilter = locationNameFilter;
 	}
 
@@ -57,20 +91,20 @@ public class LocationSearchRequest {
 		this.locationTypeIds = locationTypeIds;
 	}
 
-	public List<Integer> getLocationIds() {
-		return this.locationIds;
+	public List<Integer> getLocationDbIds() {
+		return this.locationDbIds;
 	}
 
-	public void setLocationIds(final List<Integer> locationIds) {
-		this.locationIds = locationIds;
+	public void setLocationDbIds(final List<Integer> locationDbIds) {
+		this.locationDbIds = locationDbIds;
 	}
 
-	public List<String> getLocationAbbreviations() {
-		return this.locationAbbreviations;
+	public List<String> getAbbreviations() {
+		return this.abbreviations;
 	}
 
-	public void setLocationAbbreviations(final List<String> locationAbbreviations) {
-		this.locationAbbreviations = locationAbbreviations;
+	public void setAbbreviations(final List<String> abbreviations) {
+		this.abbreviations = abbreviations;
 	}
 
 	public SqlTextFilter getLocationNameFilter() {
@@ -79,14 +113,6 @@ public class LocationSearchRequest {
 
 	public void setLocationNameFilter(final SqlTextFilter locationNameFilter) {
 		this.locationNameFilter = locationNameFilter;
-	}
-
-	public String getLocationTypeName() {
-		return this.locationTypeName;
-	}
-
-	public void setLocationTypeName(final String locationType) {
-		this.locationTypeName = locationType;
 	}
 
 	public Set<Integer> getCountryIds() {
@@ -106,7 +132,7 @@ public class LocationSearchRequest {
 	}
 
 	public String getCountryName() {
-		return countryName;
+		return this.countryName;
 	}
 
 	public void setCountryName(final String countryName) {
@@ -114,7 +140,7 @@ public class LocationSearchRequest {
 	}
 
 	public String getProvinceName() {
-		return provinceName;
+		return this.provinceName;
 	}
 
 	public void setProvinceName(final String provinceName) {
@@ -122,7 +148,7 @@ public class LocationSearchRequest {
 	}
 
 	public Double getLatitudeFrom() {
-		return latitudeFrom;
+		return this.latitudeFrom;
 	}
 
 	public void setLatitudeFrom(final Double latitudeFrom) {
@@ -130,7 +156,7 @@ public class LocationSearchRequest {
 	}
 
 	public Double getLatitudeTo() {
-		return latitudeTo;
+		return this.latitudeTo;
 	}
 
 	public void setLatitudeTo(final Double latitudeTo) {
@@ -138,7 +164,7 @@ public class LocationSearchRequest {
 	}
 
 	public Double getLongitudeFrom() {
-		return longitudeFrom;
+		return this.longitudeFrom;
 	}
 
 	public void setLongitudeFrom(final Double longitudeFrom) {
@@ -146,35 +172,75 @@ public class LocationSearchRequest {
 	}
 
 	public Double getLongitudeTo() {
-		return longitudeTo;
+		return this.longitudeTo;
 	}
 
 	public void setLongitudeTo(final Double longitudeTo) {
 		this.longitudeTo = longitudeTo;
 	}
 
-	public Double getAltitudeFrom() {
-		return altitudeFrom;
+	public Double getAltitudeMin() {
+		return this.altitudeMin;
 	}
 
-	public void setAltitudeFrom(final Double altitudeFrom) {
-		this.altitudeFrom = altitudeFrom;
+	public void setAltitudeMin(final Double altitudeMin) {
+		this.altitudeMin = altitudeMin;
 	}
 
-	public Double getAltitudeTo() {
-		return altitudeTo;
+	public Double getAltitudeMax() {
+		return this.altitudeMax;
 	}
 
-	public void setAltitudeTo(final Double altitudeTo) {
-		this.altitudeTo = altitudeTo;
+	public void setAltitudeMax(final Double altitudeMax) {
+		this.altitudeMax = altitudeMax;
 	}
 
 	public Boolean getFilterFavoriteProgramUUID() {
-		return filterFavoriteProgramUUID;
+		return this.filterFavoriteProgramUUID;
 	}
 
 	public void setFilterFavoriteProgramUUID(final Boolean filterFavoriteProgramUUID) {
 		this.filterFavoriteProgramUUID = filterFavoriteProgramUUID;
+	}
+
+	public List<String> getLocationNames() {
+		return this.locationNames;
+	}
+
+	public void setLocationNames(final List<String> locationNames) {
+		this.locationNames = locationNames;
+	}
+
+	public List<String> getLocationTypes() {
+		return this.locationTypes;
+	}
+
+	public void setLocationTypes(final List<String> locationTypes) {
+		this.locationTypes = locationTypes;
+	}
+
+	public Coordinate getCoordinates() {
+		return this.coordinates;
+	}
+
+	public void setCoordinates(final Coordinate coordinates) {
+		this.coordinates = coordinates;
+	}
+
+	public List<String> getCountryCodes() {
+		return this.countryCodes;
+	}
+
+	public void setCountryCodes(final List<String> countryCodes) {
+		this.countryCodes = countryCodes;
+	}
+
+	public List<String> getCountryNames() {
+		return this.countryNames;
+	}
+
+	public void setCountryNames(final List<String> countryNames) {
+		this.countryNames = countryNames;
 	}
 
 	@Override

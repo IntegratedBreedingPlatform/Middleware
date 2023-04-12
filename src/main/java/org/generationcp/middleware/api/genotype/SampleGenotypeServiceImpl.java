@@ -14,6 +14,7 @@ import org.generationcp.middleware.domain.genotype.SampleGenotypeVariablesSearch
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
@@ -37,6 +38,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,9 +67,13 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	public List<Integer> importSampleGenotypes(final List<SampleGenotypeImportRequestDto> sampleGenotypeImportRequestDtos) {
 		final List<Integer> genotypeIds = new ArrayList<>();
 		final GenotypeDao genotypeDao = this.daoFactory.getGenotypeDao();
+		final Set<String> sampleUID = sampleGenotypeImportRequestDtos.stream()
+				.map(SampleGenotypeImportRequestDto::getSampleUID).collect(Collectors.toSet());
+		final List<SampleDTO> sampleDTOS =this.daoFactory.getSampleDao().getBySampleBks(sampleUID);
+		final Map<String, Integer> sampleUIDToSampleIdMap = sampleDTOS.stream().collect(Collectors.toMap(SampleDTO::getSampleBusinessKey, SampleDTO::getSampleId));
 		for (final SampleGenotypeImportRequestDto importRequestDto : sampleGenotypeImportRequestDtos) {
 			final Genotype genotype = new Genotype();
-			genotype.setSample(new Sample(Integer.valueOf(importRequestDto.getSampleId())));
+			genotype.setSample(new Sample(sampleUIDToSampleIdMap.get(importRequestDto.getSampleUID())));
 			final CVTerm variable = new CVTerm();
 			variable.setCvTermId(Integer.valueOf(importRequestDto.getVariableId()));
 			genotype.setVariable(variable);
