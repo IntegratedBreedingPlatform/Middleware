@@ -761,16 +761,16 @@
 	<changeSet author="cuenyad" id="v23.4.0-39">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
-                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_IMPORT_GENOTYPES';
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_IMPORT_GENOTYPES_OPTIONS';
              </sqlCheck>
  		</preConditions>
 		<comment>Add Import Genotypes permission</comment>
  		<sql dbms="mysql" splitStatements="true">
 			SET @mg_sample_genotpyes_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_SAMPLE_LISTS');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_IMPORT_GENOTYPES', 'Import Genotypes', @mg_sample_genotpyes_permission_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_IMPORT_GENOTYPES_OPTIONS', 'Import Genotypes Options', @mg_sample_genotpyes_permission_id);
 
-			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_IMPORT_GENOTYPES');
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_IMPORT_GENOTYPES_OPTIONS');
 
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
 			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
@@ -778,8 +778,47 @@
  		</sql>
  	</changeSet>
 
-
 	<changeSet author="cuenyad" id="v23.4.0-40">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_IMPORT_GENOTYPES_FROM_GIGWA';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>Add Import Genotypes From Gigwa permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @mg_import_genotypes_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_IMPORT_GENOTYPES_OPTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_IMPORT_GENOTYPES_FROM_GIGWA', 'Import Genotypes From Gigwa', @mg_import_genotypes_options_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_IMPORT_GENOTYPES_FROM_GIGWA');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.4.0-41">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_IMPORT_GENOTYPES_FROM_FILE';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>Add Import Genotypes From File permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @mg_import_genotypes_options_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_IMPORT_GENOTYPES_OPTIONS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`) VALUES ('MS_IMPORT_GENOTYPES_FROM_FILE', 'Import Genotypes From File', @mg_import_genotypes_options_permission_id);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_IMPORT_GENOTYPES_FROM_FILE');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+ 		</sql>
+ 	</changeSet>
+
+	<changeSet author="cuenyad" id="v23.4.0-42">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SAMPLE_GENOTYPES';
@@ -799,7 +838,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-41">
+	<changeSet author="cuenyad" id="v23.4.0-43">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_SAMPLE_GENOTYPES';
@@ -819,7 +858,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-42">
+	<changeSet author="cuenyad" id="v23.4.0-44">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SSA_RESULTS';
@@ -839,7 +878,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-43">
+	<changeSet author="cuenyad" id="v23.4.0-45">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_SSA_RESULTS';
@@ -859,7 +898,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-44">
+	<changeSet author="cuenyad" id="v23.4.0-46">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SSA_SUMMARY_STATISTICS';
@@ -879,7 +918,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-45">
+	<changeSet author="cuenyad" id="v23.4.0-47">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_SSA_MEANS_BLUE';
@@ -899,7 +938,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-46">
+	<changeSet author="cuenyad" id="v23.4.0-48">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_OBSERVATIONS';
@@ -919,7 +958,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-47">
+	<changeSet author="cuenyad" id="v23.4.0-49">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_OBSERVATIONS';
@@ -939,7 +978,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-48">
+	<changeSet author="cuenyad" id="v23.4.0-50">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADD_OBSERVATION_TRAIT_VARIABLES';
@@ -959,7 +998,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-49">
+	<changeSet author="cuenyad" id="v23.4.0-51">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADD_OBSERVATION_SELECTION_VARIABLES';
@@ -980,7 +1019,7 @@
  	</changeSet>
 
 
-	<changeSet author="cuenyad" id="v23.4.0-50">
+	<changeSet author="cuenyad" id="v23.4.0-52">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MANAGE_PENDING_OBSERVATIONS';
@@ -1000,7 +1039,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-51">
+	<changeSet author="cuenyad" id="v23.4.0-53">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MANAGE_CONFIRMED_OBSERVATIONS';
@@ -1020,7 +1059,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-52">
+	<changeSet author="cuenyad" id="v23.4.0-54">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ACCEPT_PENDING_OBSERVATION';
@@ -1040,7 +1079,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-53">
+	<changeSet author="cuenyad" id="v23.4.0-55">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_STUDY_ACTIONS';
@@ -1060,7 +1099,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-54">
+	<changeSet author="cuenyad" id="v23.4.0-56">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="1">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CREATE_LOTS' AND
@@ -1076,7 +1115,7 @@
  	</changeSet>
 
 
-	<changeSet author="cuenyad" id="v23.4.0-55">
+	<changeSet author="cuenyad" id="v23.4.0-57">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="1">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MANAGE_OBSERVATION_UNITS' AND
@@ -1091,7 +1130,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-56">
+	<changeSet author="cuenyad" id="v23.4.0-58">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CREATE_GENOTYPING_SAMPLES';
@@ -1111,7 +1150,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-57">
+	<changeSet author="cuenyad" id="v23.4.0-59">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXECUTE_CALCULATED_VARIABLES';
@@ -1131,7 +1170,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-58">
+	<changeSet author="cuenyad" id="v23.4.0-60">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_DESIGN_AND_PLANNING_OPTIONS';
@@ -1151,7 +1190,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-59">
+	<changeSet author="cuenyad" id="v23.4.0-61">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPORT_DESIGN_TEMPLATE';
@@ -1171,7 +1210,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-60">
+	<changeSet author="cuenyad" id="v23.4.0-62">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CREATE_PLANTING_LABELS';
@@ -1191,7 +1230,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-61">
+	<changeSet author="cuenyad" id="v23.4.0-63">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADVANCES';
@@ -1211,7 +1250,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-62">
+	<changeSet author="cuenyad" id="v23.4.0-64">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADVANCE_STUDY';
@@ -1231,7 +1270,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-63">
+	<changeSet author="cuenyad" id="v23.4.0-65">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ADVANCE_STUDY_FOR_PLANTS';
@@ -1251,7 +1290,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-64">
+	<changeSet author="cuenyad" id="v23.4.0-66">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ANALYZE_WITH_STA_BRAPP';
@@ -1271,7 +1310,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-65">
+	<changeSet author="cuenyad" id="v23.4.0-67">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_ANALYZE_WITH_DECISION_SUPPORT';
@@ -1291,7 +1330,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-66">
+	<changeSet author="cuenyad" id="v23.4.0-68">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CREATE_SUB_OBSERVATION_UNITS';
@@ -1311,7 +1350,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-67">
+	<changeSet author="cuenyad" id="v23.4.0-69">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CHANGE_PLOT_ENTRY';
@@ -1331,7 +1370,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-68">
+	<changeSet author="cuenyad" id="v23.4.0-70">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPORT_STUDY_BOOK';
@@ -1351,7 +1390,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-69">
+	<changeSet author="cuenyad" id="v23.4.0-71">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPORT_STUDY_ENTRIES';
@@ -1371,7 +1410,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-70">
+	<changeSet author="cuenyad" id="v23.4.0-72">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="1">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MANAGE_FILES';
@@ -1386,7 +1425,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-71">
+	<changeSet author="cuenyad" id="v23.4.0-73">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="1">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MANAGE_FILES';
@@ -1400,7 +1439,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-72">
+	<changeSet author="cuenyad" id="v23.4.0-74">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CROSSING_OPTIONS';
@@ -1420,7 +1459,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-73">
+	<changeSet author="cuenyad" id="v23.4.0-75">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EXPORT_CROSSING_TEMPLATE';
@@ -1440,7 +1479,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-74">
+	<changeSet author="cuenyad" id="v23.4.0-76">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_IMPORT_CROSSES';
@@ -1460,7 +1499,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-75">
+	<changeSet author="cuenyad" id="v23.4.0-77">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_DESIGN_NEW_CROSSES';
@@ -1480,7 +1519,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-76">
+	<changeSet author="cuenyad" id="v23.4.0-78">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_FIELD_MAP_OPTIONS';
@@ -1500,7 +1539,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-77">
+	<changeSet author="cuenyad" id="v23.4.0-79">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_MAKE_FIELD_MAP';
@@ -1520,7 +1559,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-78">
+	<changeSet author="cuenyad" id="v23.4.0-80">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_FIELD_MAP';
@@ -1540,7 +1579,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-79">
+	<changeSet author="cuenyad" id="v23.4.0-81">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_DELETE_FIELD_MAP';
@@ -1560,7 +1599,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-80">
+	<changeSet author="cuenyad" id="v23.4.0-82">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_CREATE_GEOREFERENCE';
@@ -1580,7 +1619,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-81">
+	<changeSet author="cuenyad" id="v23.4.0-83">
 		<preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_EDIT_GEOREFERENCE';
@@ -1600,7 +1639,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-82">
+	<changeSet author="cuenyad" id="v23.4.0-84">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="permission" columnName="rank"/>
@@ -1614,7 +1653,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-83">
+	<changeSet author="cuenyad" id="v23.4.0-85">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<tableExists tableName="permission"/>
@@ -1667,7 +1706,9 @@
 			UPDATE	PERMISSION	SET	RANK =	1	WHERE	NAME =	'MS_VIEW_SAMPLE_LIST';
 			UPDATE	PERMISSION	SET	RANK =	2	WHERE	NAME =	'MS_EXPORT_SAMPLE_LIST';
 			UPDATE	PERMISSION	SET	RANK =	3	WHERE	NAME =	'MS_DELETE_SAMPLES';
-			UPDATE	PERMISSION	SET	RANK =	4	WHERE	NAME =	'MS_IMPORT_GENOTYPES';
+			UPDATE	PERMISSION	SET	RANK =	4	WHERE	NAME =	'MS_IMPORT_GENOTYPES_OPTIONS';
+			UPDATE	PERMISSION	SET	RANK =	5	WHERE	NAME =	'MS_IMPORT_GENOTYPES_FROM_GIGWA';
+			UPDATE	PERMISSION	SET	RANK =	6	WHERE	NAME =	'MS_IMPORT_GENOTYPES_FROM_FILE';
 			UPDATE	PERMISSION	SET	RANK =	14	WHERE	NAME =	'MS_SAMPLE_GENOTYPES';
 			UPDATE	PERMISSION	SET	RANK =	1	WHERE	NAME =	'MS_VIEW_SAMPLE_GENOTYPES';
 			UPDATE	PERMISSION	SET	RANK =	15	WHERE	NAME =	'MS_INVENTORY';
@@ -1710,7 +1751,7 @@
  		</sql>
  	</changeSet>
 
-	<changeSet author="cuenyad" id="v23.4.0-84">
+	<changeSet author="cuenyad" id="v23.4.0-86">
          <preConditions onFail="MARK_RAN">
 			<and>
             	<sqlCheck expectedResult="1">
