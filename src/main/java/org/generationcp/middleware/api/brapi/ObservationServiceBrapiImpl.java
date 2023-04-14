@@ -1,5 +1,7 @@
 package org.generationcp.middleware.api.brapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
@@ -11,6 +13,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
@@ -28,8 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +79,15 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 						ExternalReferenceDTO::getEntityId));
 			for (final ObservationDto observationDto : observationDtos) {
 				observationDto.setExternalReferences(externalReferencesMap.get(observationDto.getObservationDbId()));
+
+				if (!StringUtils.isEmpty(observationDto.getJsonProps())) {
+					try {
+						observationDto.setAdditionalInfo(new ObjectMapper().readValue(observationDto.getJsonProps(), HashMap.class));
+					} catch (final IOException e) {
+						throw new MiddlewareQueryException("Error in updatePhenotypeValues in ObservationServiceBrapiImpl: "
+							+ e.getMessage(), e);
+					}
+				}
 			}
 		}
 		return observationDtos;
@@ -210,6 +224,10 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		phenotype.setUpdatedBy(loggedInUser);
 		phenotype.setObservableId(Integer.valueOf(observation.getObservationVariableDbId()));
 		phenotype.setExperiment(experimentModelMap.get(observation.getObservationUnitDbId()));
+
+		// update json props from observation request
+		this.updatePhenotypeJsonProps(observation, phenotype);
+
 		this.setPhenotypeExternalReferences(observation, phenotype);
 		return this.daoFactory.getPhenotypeDAO().save(phenotype);
 	}
@@ -228,11 +246,24 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		} else {
 			this.updatePhenotypeValues(validValuesForCategoricalVariables, inputObservation, existingPhenotype);
 		}
+		this.updatePhenotypeJsonProps(inputObservation, existingPhenotype);
 
 		// Add or update observation/phenotype instance external references
 		this.addOrUpdateInstanceExternalReferences(inputObservation.getExternalReferences(), existingPhenotype);
 
 		return dao.update(existingPhenotype);
+	}
+
+	private void updatePhenotypeJsonProps(final ObservationDto inputObservation, final Phenotype phenotype) {
+		// update json props from observation request
+		if (!CollectionUtils.isEmpty(inputObservation.getAdditionalInfo())) {
+			try {
+				phenotype.setJsonProps(new ObjectMapper().writeValueAsString(inputObservation.getAdditionalInfo()));
+			} catch (final JsonProcessingException e) {
+				throw new MiddlewareQueryException("Error in updatePhenotypeJsonProps in ObservationServiceBrapiImpl: "
+					+ e.getMessage(), e);
+			}
+		}
 	}
 
 	private void addOrUpdateInstanceExternalReferences(final List<ExternalReferenceDTO> externalReferenceDTOList,

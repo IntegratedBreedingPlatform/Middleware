@@ -36,6 +36,9 @@ public class ObservationDto {
 	private String uploadedBy;
 	private String value;
 
+	@JsonIgnore
+	private String jsonProps;
+
 	public Map<String, String> getAdditionalInfo() {
 		return this.additionalInfo;
 	}
@@ -157,8 +160,18 @@ public class ObservationDto {
 	}
 
 	@JsonIgnore
+	public String getJsonProps() {
+		return this.jsonProps;
+	}
+
+	@JsonIgnore
+	public void setJsonProps(final String jsonProps) {
+		this.jsonProps = jsonProps;
+	}
+
+	@JsonIgnore
 	public void setSeasonName(final String seasonName) {
-		if(StringUtils.isNotEmpty(seasonName)) {
+		if (StringUtils.isNotEmpty(seasonName)) {
 			if (this.season == null) {
 				this.season = new SeasonDto();
 			}
@@ -168,7 +181,7 @@ public class ObservationDto {
 
 	@JsonIgnore
 	public void setSeasonDbId(final String seasonDbId) {
-		if(StringUtils.isNotEmpty(seasonDbId)) {
+		if (StringUtils.isNotEmpty(seasonDbId)) {
 			if (this.season == null) {
 				this.season = new SeasonDto();
 			}
