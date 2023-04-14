@@ -202,7 +202,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		final Map<Integer, List<ValueReference>> validValuesForCategoricalVariables,
 		final ObservationDto observation) {
 		final Phenotype phenotype = new Phenotype();
-		this.updatePhenotypeValues(validValuesForCategoricalVariables, observation, phenotype);
+		this.populatePhenotypeValues(validValuesForCategoricalVariables, observation, phenotype);
 
 		final Date currentDate = new Date();
 		final Integer loggedInUser = this.userService.getCurrentlyLoggedInUserId();
@@ -232,7 +232,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 			existingPhenotype.setDraftValue(null);
 			existingPhenotype.setDraftCValueId(null);
 		} else {
-			this.updatePhenotypeValues(validValuesForCategoricalVariables, inputObservation, existingPhenotype);
+			this.populatePhenotypeValues(validValuesForCategoricalVariables, inputObservation, existingPhenotype);
 		}
 		this.populatePhenotypeJsonProps(inputObservation, existingPhenotype);
 
@@ -271,7 +271,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		}
 	}
 
-	private void updatePhenotypeValues(final Map<Integer, List<ValueReference>> validValuesForCategoricalVariables,
+	private void populatePhenotypeValues(final Map<Integer, List<ValueReference>> validValuesForCategoricalVariables,
 		final ObservationDto observation,
 		final Phenotype phenotype) {
 		final String variableId = observation.getObservationVariableDbId();
