@@ -1700,6 +1700,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		sqlQuery.addScalar("seasonName", StringType.INSTANCE);
 		sqlQuery.addScalar("seasonDbId", StringType.INSTANCE);
 		sqlQuery.addScalar("jsonProps", StringType.INSTANCE);
+		sqlQuery.addScalar("additionalInfoJson", StringType.INSTANCE);
 	}
 
 	public long countObservations(final ObservationSearchRequestDto observationSearchRequestDto) {
@@ -1739,6 +1740,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		sql.append("p.value AS value, ");
 		sql.append("cvtermSeason.definition AS seasonName, ");
 		sql.append("cvtermSeason.cvterm_id AS seasonDbId, ");
+		sql.append("p.json_props AS additionalInfoJson, ");
 		sql.append("obs_unit.json_props AS jsonProps ");
 		this.addObservationSearchQueryJoins(sql);
 		this.addObservationSearchQueryFilter(observationSearchRequestDto, sql);
