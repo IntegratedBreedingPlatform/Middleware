@@ -214,8 +214,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		phenotype.setObservableId(Integer.valueOf(observation.getObservationVariableDbId()));
 		phenotype.setExperiment(experimentModelMap.get(observation.getObservationUnitDbId()));
 
-		// update json props from observation request
-		this.updatePhenotypeJsonProps(observation, phenotype);
+		this.populatePhenotypeJsonProps(observation, phenotype);
 
 		this.setPhenotypeExternalReferences(observation, phenotype);
 		return this.daoFactory.getPhenotypeDAO().save(phenotype);
@@ -235,7 +234,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		} else {
 			this.updatePhenotypeValues(validValuesForCategoricalVariables, inputObservation, existingPhenotype);
 		}
-		this.updatePhenotypeJsonProps(inputObservation, existingPhenotype);
+		this.populatePhenotypeJsonProps(inputObservation, existingPhenotype);
 
 		// Add or update observation/phenotype instance external references
 		this.addOrUpdateInstanceExternalReferences(inputObservation.getExternalReferences(), existingPhenotype);
@@ -243,7 +242,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		return dao.update(existingPhenotype);
 	}
 
-	private void updatePhenotypeJsonProps(final ObservationDto inputObservation, final Phenotype phenotype) {
+	private void populatePhenotypeJsonProps(final ObservationDto inputObservation, final Phenotype phenotype) {
 		// update json props from observation request
 		if (!CollectionUtils.isEmpty(inputObservation.getAdditionalInfo())) {
 			try {
