@@ -2,23 +2,33 @@ package org.generationcp.middleware.api.brapi.v2.observation;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @AutoProperty
 public class ObservationDto {
-
+	private static final Logger LOG = LoggerFactory.getLogger(ObservationDto.class);
 	private Map<String, String> additionalInfo;
 	private String collector;
 	private List<ExternalReferenceDTO> externalReferences;
+
+	@JsonView(BrapiView.BrapiV2_1.class)
+	private Map<String, Object> geoCoordinates;
 	private String germplasmDbId;
 	private String germplasmName;
 	private String observationDbId;
@@ -37,7 +47,7 @@ public class ObservationDto {
 	private String value;
 
 	@JsonIgnore
-	private String jsonProps;
+	private String additionalInfoJson;
 
 	public Map<String, String> getAdditionalInfo() {
 		return this.additionalInfo;
@@ -61,6 +71,14 @@ public class ObservationDto {
 
 	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
 		this.externalReferences = externalReferences;
+	}
+
+	public Map<String, Object> getGeoCoordinates() {
+		return this.geoCoordinates;
+	}
+
+	public void setGeoCoordinates(final Map<String, Object> geoCoordinates) {
+		this.geoCoordinates = geoCoordinates;
 	}
 
 	public String getGermplasmDbId() {
@@ -160,13 +178,26 @@ public class ObservationDto {
 	}
 
 	@JsonIgnore
-	public String getJsonProps() {
-		return this.jsonProps;
+	public void setAdditionalInfoJson(final String additionalInfoJson) {
+		if (StringUtils.isNotEmpty(additionalInfoJson)) {
+			try {
+				this.setAdditionalInfo(new ObjectMapper().readValue(additionalInfoJson, HashMap.class));
+			} catch (final IOException e) {
+				LOG.error("couldn't parse phenotype.json_props column for observationDbId=" + this.observationDbId, e);
+			}
+		}
 	}
 
 	@JsonIgnore
 	public void setJsonProps(final String jsonProps) {
-		this.jsonProps = jsonProps;
+		if (StringUtils.isNotEmpty(jsonProps)) {
+			try {
+				final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
+				this.geoCoordinates = ((Map<String, Object>) jsonProp.get("geoCoordinates"));
+			} catch (final IOException e) {
+				LOG.error("couldn't parse experiment.json_props column for observationDbId=" + this.observationDbId, e);
+			}
+		}
 	}
 
 	@JsonIgnore

@@ -6,18 +6,18 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class SampleGenotypeImportRequestDto {
 
-	private String sampleId;
+	private String sampleUID;
 
 	private String variableId;
 
 	private String value;
 
-	public String getSampleId() {
-		return this.sampleId;
+	public String getSampleUID() {
+		return this.sampleUID;
 	}
 
-	public void setSampleId(final String sampleId) {
-		this.sampleId = sampleId;
+	public void setSampleUID(final String sampleUID) {
+		this.sampleUID = sampleUID;
 	}
 
 	public String getVariableId() {

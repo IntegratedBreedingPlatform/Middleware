@@ -31,10 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -79,15 +77,6 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 						ExternalReferenceDTO::getEntityId));
 			for (final ObservationDto observationDto : observationDtos) {
 				observationDto.setExternalReferences(externalReferencesMap.get(observationDto.getObservationDbId()));
-
-				if (!StringUtils.isEmpty(observationDto.getJsonProps())) {
-					try {
-						observationDto.setAdditionalInfo(new ObjectMapper().readValue(observationDto.getJsonProps(), HashMap.class));
-					} catch (final IOException e) {
-						throw new MiddlewareQueryException("Error in updatePhenotypeValues in ObservationServiceBrapiImpl: "
-							+ e.getMessage(), e);
-					}
-				}
 			}
 		}
 		return observationDtos;
@@ -101,7 +90,6 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 	@Override
 	public List<ObservationDto> createObservations(final List<ObservationDto> observations) {
 
-		final List<Integer> observationDbIds = new ArrayList<>();
 		final Map<String, ExperimentModel> experimentModelMap = this.daoFactory.getExperimentDao()
 			.getByObsUnitIds(observations.stream().map(ObservationDto::getObservationUnitDbId).collect(Collectors.toList())).stream()
 			.collect(Collectors.toMap(ExperimentModel::getObsUnitId, Function.identity()));
@@ -133,6 +121,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 			}
 		}
 
+		final List<String> observationDbIds = new ArrayList<>();
 		for (final ObservationDto observation : observations) {
 
 			final Phenotype saved;
@@ -145,7 +134,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 				saved = this.createNewPhenotype(experimentModelMap, validValuesForCategoricalVariables,
 					observation);
 			}
-			observationDbIds.add(saved.getPhenotypeId());
+			observationDbIds.add(saved.getPhenotypeId().toString());
 		}
 		this.sessionProvider.getSession().flush();
 		if (!CollectionUtils.isEmpty(observationDbIds)) {
@@ -188,7 +177,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 			}
 		}
 
-		final List<Integer> observationDbIds = new ArrayList<>();
+		final List<String> observationDbIds = new ArrayList<>();
 		for (final ObservationDto observation : observations) {
 			final Phenotype updatedPhenotype;
 			if (existingObservationsMap.containsKey(observation.getObservationUnitDbId(),
@@ -196,7 +185,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 				updatedPhenotype = this.updateExistingPhenotype(validValuesForCategoricalVariables, observation,
 					(ObservationDto) existingObservationsMap.get(observation.getObservationUnitDbId(),
 						observation.getObservationVariableDbId()));
-				observationDbIds.add(updatedPhenotype.getPhenotypeId());
+				observationDbIds.add(updatedPhenotype.getPhenotypeId().toString());
 			}
 		}
 		this.sessionProvider.getSession().flush();

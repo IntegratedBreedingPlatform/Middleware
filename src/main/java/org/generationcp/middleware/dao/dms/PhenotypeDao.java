@@ -1700,6 +1700,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		sqlQuery.addScalar("seasonName", StringType.INSTANCE);
 		sqlQuery.addScalar("seasonDbId", StringType.INSTANCE);
 		sqlQuery.addScalar("jsonProps", StringType.INSTANCE);
+		sqlQuery.addScalar("additionalInfoJson", StringType.INSTANCE);
 	}
 
 	public long countObservations(final ObservationSearchRequestDto observationSearchRequestDto) {
@@ -1739,7 +1740,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		sql.append("p.value AS value, ");
 		sql.append("cvtermSeason.definition AS seasonName, ");
 		sql.append("cvtermSeason.cvterm_id AS seasonDbId, ");
-		sql.append("p.json_props AS jsonProps ");
+		sql.append("p.json_props AS additionalInfoJson, ");
+		sql.append("obs_unit.json_props AS jsonProps ");
 		this.addObservationSearchQueryJoins(sql);
 		this.addObservationSearchQueryFilter(observationSearchRequestDto, sql);
 		return sql.toString();
@@ -1749,6 +1751,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		stringBuilder.append("FROM ");
 		stringBuilder.append("phenotype p ");
 		stringBuilder.append("INNER JOIN nd_experiment obs_unit ON p.nd_experiment_id = obs_unit.nd_experiment_id ");
+		stringBuilder.append("LEFT JOIN nd_experimentprop plotNumber ON plotNumber.nd_experiment_id = obs_unit.nd_experiment_id AND plotNumber.type_id = "
+				+ TermId.PLOT_NO.getId() + " ");
 		stringBuilder.append("INNER JOIN nd_geolocation instance ON instance.nd_geolocation_id = obs_unit.nd_geolocation_id ");
 		// Use LEFT JOIN to stock, germplsm and names so that we can also retrieve the SUMMARY_STATISTICS records -- which don't have germplasm associated to it.
 		stringBuilder.append("LEFT JOIN stock ON obs_unit.stock_id = stock.stock_id ");
@@ -1756,10 +1760,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		stringBuilder.append("LEFT JOIN names ON stock.dbxref_id = names.gid AND names.nstat = 1 ");
 		stringBuilder.append("INNER JOIN cvterm ON p.observable_id = cvterm.cvterm_id ");
 		stringBuilder.append("INNER JOIN project plot ON plot.project_id = obs_unit.project_id ");
+		stringBuilder.append("LEFT JOIN dataset_type ON dataset_type.dataset_type_id = plot.dataset_type_id ");
 		stringBuilder.append("INNER JOIN project trial ON plot.study_id = trial.project_id ");
 		stringBuilder.append(
 			"INNER JOIN nd_geolocationprop location_prop ON location_prop.nd_geolocation_id = instance.nd_geolocation_id ");
 		stringBuilder.append("AND location_prop.type_id = " + TermId.LOCATION_ID.getId() + " ");
+		stringBuilder.append("INNER JOIN location loc ON loc.locid = location_prop.value ");
 		stringBuilder.append(
 			"LEFT OUTER JOIN nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = instance.nd_geolocation_id ");
 		stringBuilder.append("AND geopropSeason.type_id = " + TermId.SEASON_VAR.getId() + " ");
@@ -1779,29 +1785,44 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getGermplasmDbIds())) {
 			sqlQuery.setParameterList("germplasmDbIds", observationSearchRequestDto.getGermplasmDbIds());
 		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getGermplasmNames())) {
+			sqlQuery.setParameterList("germplasmNames", observationSearchRequestDto.getGermplasmNames());
+		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationVariableDbIds())) {
 			sqlQuery.setParameterList("observationVariableDbIds", observationSearchRequestDto.getObservationVariableDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationVariableNames())) {
+			sqlQuery.setParameterList("observationVariableNames", observationSearchRequestDto.getObservationVariableNames());
 		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getStudyDbIds())) {
 			sqlQuery.setParameterList("studyDbIds", observationSearchRequestDto.getStudyDbIds());
 		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getStudyNames())) {
+			sqlQuery.setParameterList("studyNames", observationSearchRequestDto.getStudyNames());
+		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getLocationDbIds())) {
 			sqlQuery.setParameterList("locationDbIds", observationSearchRequestDto.getLocationDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getLocationNames())) {
+			sqlQuery.setParameterList("locationNames", observationSearchRequestDto.getLocationNames());
 		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getTrialDbIds())) {
 			sqlQuery.setParameterList("trialDbIds", observationSearchRequestDto.getTrialDbIds());
 		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getTrialNames())) {
+			sqlQuery.setParameterList("trialNames", observationSearchRequestDto.getTrialNames());
+		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getProgramDbIds())) {
 			sqlQuery.setParameterList("programDbIds", observationSearchRequestDto.getProgramDbIds());
 		}
-		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceID())) {
-			sqlQuery.setParameter("referenceId", observationSearchRequestDto.getExternalReferenceID());
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getExternalReferenceIds())) {
+			sqlQuery.setParameterList("referenceIds", observationSearchRequestDto.getExternalReferenceIds());
 		}
-		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceSource())) {
-			sqlQuery.setParameter("referenceSource", observationSearchRequestDto.getExternalReferenceSource());
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getExternalReferenceSources())) {
+			sqlQuery.setParameterList("referenceSources", observationSearchRequestDto.getExternalReferenceSources());
 		}
-		if (!StringUtil.isEmpty(observationSearchRequestDto.getSeasonDbId())) {
-			sqlQuery.setParameter("seasonDbId", observationSearchRequestDto.getSeasonDbId());
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getSeasonDbIds())) {
+			sqlQuery.setParameterList("seasonDbIds", observationSearchRequestDto.getSeasonDbIds());
 		}
 		if (!StringUtil.isEmpty(observationSearchRequestDto.getObservationTimeStampRangeStart())) {
 			sqlQuery.setParameter("observationTimeStampRangeStart", observationSearchRequestDto.getObservationTimeStampRangeStart());
@@ -1810,6 +1831,25 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			sqlQuery.setParameter("observationTimeStampRangeEnd", observationSearchRequestDto.getObservationTimeStampRangeEnd());
 		}
 
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationLevels())) {
+			final List<String> observationLevelCodes = observationSearchRequestDto.getObservationLevels()
+					.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelCode()))
+					.map(ObservationLevelRelationship::getLevelCode)
+					.collect(Collectors.toList());
+			if (!CollectionUtils.isEmpty(observationLevelCodes)) {
+				sqlQuery.setParameterList("observationLevelCodes", observationLevelCodes);
+			}
+
+
+			final Set<String> datasetTypeNames = observationSearchRequestDto.getObservationLevels()
+					.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelName()))
+					.map(obs -> ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(obs.getLevelName()))
+					.collect(Collectors.toSet());
+
+			if (!CollectionUtils.isEmpty(datasetTypeNames)) {
+				sqlQuery.setParameterList("datasetTypeNames", datasetTypeNames);
+			}
+		}
 	}
 
 	private void addObservationSearchQueryFilter(final ObservationSearchRequestDto observationSearchRequestDto,
@@ -1823,31 +1863,46 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getGermplasmDbIds())) {
 			stringBuilder.append("AND germplsm.germplsm_uuid in (:germplasmDbIds) ");
 		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getGermplasmNames())) {
+			stringBuilder.append("AND names.nval in (:germplasmNames) ");
+		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationVariableDbIds())) {
 			stringBuilder.append("AND p.observable_id in (:observationVariableDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationVariableNames())) {
+			stringBuilder.append("AND cvterm.name in (:observationVariableNames) ");
 		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getStudyDbIds())) {
 			stringBuilder.append("AND instance.nd_geolocation_id in (:studyDbIds) ");
 		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getStudyNames())) {
+			stringBuilder.append("AND CONCAT(trial.name, ' Environment Number ', instance.description) in (:studyNames) ");
+		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getLocationDbIds())) {
 			stringBuilder.append("AND location_prop.value in (:locationDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getLocationNames())) {
+			stringBuilder.append("AND loc.lname in (:locationNames) ");
 		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getTrialDbIds())) {
 			stringBuilder.append("AND trial.project_id in (:trialDbIds) ");
 		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getTrialNames())) {
+			stringBuilder.append("AND trial.name in (:trialNames) ");
+		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getProgramDbIds())) {
 			stringBuilder.append("AND trial.program_uuid in (:programDbIds) ");
 		}
-		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceID())) {
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getExternalReferenceIds())) {
 			stringBuilder.append("AND EXISTS (SELECT * FROM external_reference_phenotype pref ");
-			stringBuilder.append("WHERE p.phenotype_id = pref.phenotype_id AND pref.reference_id = :referenceId) ");
+			stringBuilder.append("WHERE p.phenotype_id = pref.phenotype_id AND pref.reference_id IN (:referenceIds)) ");
 		}
-		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceSource())) {
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getExternalReferenceSources())) {
 			stringBuilder.append("AND EXISTS (SELECT * FROM external_reference_phenotype pref ");
-			stringBuilder.append("WHERE p.phenotype_id = pref.phenotype_id AND pref.reference_source = :referenceSource) ");
+			stringBuilder.append("WHERE p.phenotype_id = pref.phenotype_id AND pref.reference_source IN (:referenceSources)) ");
 		}
-		if (!StringUtil.isEmpty(observationSearchRequestDto.getSeasonDbId())) {
-			stringBuilder.append("AND cvtermSeason.cvterm_id = :seasonDbId ");
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getSeasonDbIds())) {
+			stringBuilder.append("AND cvtermSeason.cvterm_id IN (:seasonDbIds) ");
 		}
 		if (!StringUtil.isEmpty(observationSearchRequestDto.getObservationTimeStampRangeStart())) {
 			stringBuilder.append("AND p.created_date >= :observationTimeStampRangeStart ");
@@ -1855,5 +1910,27 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		if (!StringUtil.isEmpty(observationSearchRequestDto.getObservationTimeStampRangeEnd())) {
 			stringBuilder.append("AND p.created_date <= :observationTimeStampRangeEnd ");
 		}
+
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationLevels())) {
+			final List<String> observationLevelCodes = observationSearchRequestDto.getObservationLevels()
+					.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelCode()))
+					.map(ObservationLevelRelationship::getLevelCode)
+					.collect(Collectors.toList());
+			if (!CollectionUtils.isEmpty(observationLevelCodes)) {
+				// currently, we only handle observation level codes for plot datasets
+				stringBuilder.append(" AND (dataset_type.name = 'PLOT' AND plotNumber.value IN (:observationLevelCodes)) ");
+			}
+
+			// dataset type name filter from observation level names
+			final Set<String> datasetTypeNames = observationSearchRequestDto.getObservationLevels()
+					.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelName()))
+					.map(obs -> ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(obs.getLevelName()))
+					.collect(Collectors.toSet());
+
+			if (!CollectionUtils.isEmpty(datasetTypeNames)) {
+				stringBuilder.append(" AND dataset_type.name IN (:datasetTypeNames) ");
+			}
+		}
+
 	}
 }

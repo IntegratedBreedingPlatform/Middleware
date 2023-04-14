@@ -27,7 +27,6 @@ import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -68,7 +67,6 @@ import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
@@ -258,9 +256,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final List<String> BRAPI_INSTANCES_SORTABLE_FIELDS = Arrays
 		.asList("programDbId", "programName", "studyDbId", "studyName", "trialDbId", "trialName", "studyTypeDbId", "studyTypeName",
 			"seasonDbId", "season", "startDate", "endDate", "locationDbId", "locationName");
-
-	private static final List<String> BRAPI_STUDIES_SORTABLE_FIELDS = Arrays
-		.asList("programDbId", "programName", "trialDbId", "trialName", "startDate", "endDate", "locationDbId");
 
 	public DmsProjectDao(final Session session) {
 		super(session);
@@ -1356,13 +1351,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
-	public long countStudies(final StudySearchFilter studySearchFilter) {
-		final SQLQuery sqlQuery =
-			this.getSession().createSQLQuery(this.createCountStudyQueryString(studySearchFilter));
-		this.addStudySearchFilterParameters(sqlQuery, studySearchFilter);
-		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
-	}
-
 	public List<StudyInstanceDto> getStudyInstances(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 
 		final SQLQuery sqlQuery =
@@ -1441,46 +1429,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studyInstanceDtoList.add(studyInstanceDto);
 		}
 		return studyInstanceDtoList;
-	}
-
-	public List<StudySummary> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
-		final SQLQuery sqlQuery =
-			this.getSession().createSQLQuery(this.createStudyQueryString(studySearchFilter, pageable));
-
-		sqlQuery.addScalar("trialDbId");
-		sqlQuery.addScalar("trialName");
-		sqlQuery.addScalar("trialDescription");
-		sqlQuery.addScalar("trialPUI");
-		sqlQuery.addScalar("startDate");
-		sqlQuery.addScalar("endDate");
-		sqlQuery.addScalar("active", new IntegerType());
-		sqlQuery.addScalar("programDbId");
-		sqlQuery.addScalar("programName");
-		sqlQuery.addScalar("locationDbId");
-
-		this.addStudySearchFilterParameters(sqlQuery, studySearchFilter);
-
-		addPaginationToSQLQuery(sqlQuery, pageable);
-
-		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-		final List<Map<String, Object>> results = sqlQuery.list();
-
-		final List<StudySummary> studyList = new ArrayList<>();
-		for (final Map<String, Object> result : results) {
-			final StudySummary studySummary = new StudySummary();
-			studySummary.setTrialDbId((Integer) result.get("trialDbId"));
-			studySummary.setName(String.valueOf(result.get("trialName")));
-			studySummary.setDescription(String.valueOf(result.get("trialDescription")));
-			studySummary.setObservationUnitId(String.valueOf(result.get("trialPUI")));
-			studySummary.setStartDate(Util.tryParseDate((String) result.get("startDate")));
-			studySummary.setEndDate(Util.tryParseDate((String) result.get("endDate")));
-			studySummary.setProgramDbId(String.valueOf(result.get("programDbId")));
-			studySummary.setProgramName(String.valueOf(result.get("programName")));
-			studySummary.setLocationId(String.valueOf(result.get("locationDbId")));
-			studySummary.setActive(((Integer) result.get("active")) == 1);
-			studyList.add(studySummary);
-		}
-		return studyList;
 	}
 
 	private void addStudySearchFilterParameters(final SQLQuery sqlQuery, final StudySearchFilter studySearchFilter) {
@@ -1580,44 +1528,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return sql.toString();
 	}
 
-	private String createCountStudyQueryString(final StudySearchFilter studySearchFilter) {
-		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT pmain.project_id) ");
-		this.appendStudySummaryFromQuery(sql);
-		this.appendStudySearchFilter(sql, studySearchFilter);
-		return sql.toString();
-	}
-
-	private String createStudyQueryString(final StudySearchFilter studySearchFilter, final Pageable pageable) {
-		final StringBuilder sql = new StringBuilder(" SELECT  ");
-		sql.append("     pmain.project_id AS trialDbId, ");
-		sql.append(" 	 pmain.name AS trialName, ");
-		sql.append(" 	 pmain.description AS trialDescription, ");
-		sql.append(" 	 study_exp.obs_unit_id AS trialPUI, ");
-		sql.append("     pmain.start_date AS startDate, ");
-		sql.append("     pmain.end_date AS endDate, ");
-		sql.append(
-			"     CASE WHEN pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) "
-				+ "THEN 0 ELSE 1 END AS active, ");
-		sql.append("     wp.project_name AS programName, ");
-		sql.append("     pmain.program_uuid AS programDbId, ");
-		// locationDbId is not unique to study but can have different value per environment.
-		// Get the MIN or MAX depending on sort parameter and direction
-		if (pageable != null && pageable.getSort() != null && pageable.getSort().getOrderFor("locationDbId") != null
-			&& Sort.Direction.DESC.equals(pageable.getSort().getOrderFor("locationDbId").getDirection())) {
-			sql.append("     MAX(geopropLocation.value) as locationDbId ");
-		} else {
-			sql.append("     MIN(geopropLocation.value) as locationDbId ");
-		}
-
-		this.appendStudySummaryFromQuery(sql);
-		this.appendStudySearchFilter(sql, studySearchFilter);
-		sql.append(" GROUP BY pmain.project_id ");
-
-		addPageRequestOrderBy(sql, pageable, DmsProjectDao.BRAPI_STUDIES_SORTABLE_FIELDS);
-
-		return sql.toString();
-	}
-
 	private void appendStudyInstanceFromQuery(final StringBuilder sql) {
 		sql.append(" FROM ");
 		sql.append("     nd_geolocation geoloc ");
@@ -1657,26 +1567,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append(" WHERE ");
 		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ");
 		sql.append("     AND pmain.deleted = 0 ");//Exclude Deleted Studies
-	}
-
-	private void appendStudySummaryFromQuery(final StringBuilder sql) {
-		sql.append(" FROM ");
-		sql.append("     nd_geolocation geoloc ");
-		sql.append("         INNER JOIN ");
-		sql.append("     nd_experiment study_exp ON study_exp.nd_geolocation_id = geoloc.nd_geolocation_id AND study_exp.type_id = "
-			+ TermId.STUDY_EXPERIMENT.getId());
-		sql.append("         LEFT JOIN ");
-		sql.append("     nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id AND nde.type_id = "
-			+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
-		sql.append("         INNER JOIN ");
-		sql.append("     project pmain ON pmain.project_id = study_exp.project_id ");
-		sql.append("         LEFT OUTER JOIN ");
-		sql.append(
-			"     nd_geolocationprop geopropLocation ON geopropLocation.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropLocation.type_id = "
-				+ TermId.LOCATION_ID.getId());
-		sql.append("         LEFT OUTER JOIN workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
-		sql.append("         LEFT JOIN external_reference_study er ON er.study_id = pmain.project_id ");
-		sql.append(" WHERE pmain.deleted = 0 ");//Exclude Deleted Studies
 	}
 
 	private void appendStudySearchFilter(final StringBuilder sql, final StudySearchFilter studySearchFilter) {
