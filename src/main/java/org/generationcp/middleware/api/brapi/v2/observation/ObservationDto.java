@@ -46,6 +46,9 @@ public class ObservationDto {
 	private String uploadedBy;
 	private String value;
 
+	@JsonIgnore
+	private String additionalInfoJson;
+
 	public Map<String, String> getAdditionalInfo() {
 		return this.additionalInfo;
 	}
@@ -175,20 +178,31 @@ public class ObservationDto {
 	}
 
 	@JsonIgnore
+	public void setAdditionalInfoJson(final String additionalInfoJson) {
+		if (StringUtils.isNotEmpty(additionalInfoJson)) {
+			try {
+				this.setAdditionalInfo(new ObjectMapper().readValue(additionalInfoJson, HashMap.class));
+			} catch (final IOException e) {
+				LOG.error("couldn't parse phenotype.json_props column for observationDbId=" + this.observationDbId, e);
+			}
+		}
+	}
+
+	@JsonIgnore
 	public void setJsonProps(final String jsonProps) {
 		if (StringUtils.isNotEmpty(jsonProps)) {
 			try {
 				final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
 				this.geoCoordinates = ((Map<String, Object>) jsonProp.get("geoCoordinates"));
 			} catch (final IOException e) {
-				LOG.error("couldn't parse json_props column for observationDbId=" + this.observationDbId, e);
+				LOG.error("couldn't parse experiment.json_props column for observationDbId=" + this.observationDbId, e);
 			}
 		}
 	}
 
 	@JsonIgnore
 	public void setSeasonName(final String seasonName) {
-		if(StringUtils.isNotEmpty(seasonName)) {
+		if (StringUtils.isNotEmpty(seasonName)) {
 			if (this.season == null) {
 				this.season = new SeasonDto();
 			}
@@ -198,7 +212,7 @@ public class ObservationDto {
 
 	@JsonIgnore
 	public void setSeasonDbId(final String seasonDbId) {
-		if(StringUtils.isNotEmpty(seasonDbId)) {
+		if (StringUtils.isNotEmpty(seasonDbId)) {
 			if (this.season == null) {
 				this.season = new SeasonDto();
 			}

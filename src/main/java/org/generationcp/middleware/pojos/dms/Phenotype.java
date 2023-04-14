@@ -38,12 +38,11 @@ import java.util.Objects;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_phenotype
- *
+ * <p>
  * A phenotypic statement, or a single atomic phenotypic observation, is a controlled sentence describing observable effects of non-wild
  * type function. E.g. Obs=eye, attribute=color, cvalue=red.
  *
  * @author Joyce Avestro
- *
  */
 @Entity
 @Table(name = "phenotype")
@@ -53,10 +52,11 @@ public class Phenotype implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public static final String MISSING_VALUE = "missing";
 
+
 	public enum ValueStatus {
 
-		OUT_OF_SYNC ("OUT_OF_SYNC"),
-		MANUALLY_EDITED ("MANUALLY_EDITED");
+		OUT_OF_SYNC("OUT_OF_SYNC"),
+		MANUALLY_EDITED("MANUALLY_EDITED");
 
 		ValueStatus(final String name) {
 			this.name = name;
@@ -69,6 +69,7 @@ public class Phenotype implements Serializable {
 		}
 
 	}
+
 
 	@Id
 	@TableGenerator(name = "phenotypeIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value", pkColumnValue = "phenotype", allocationSize = 500)
@@ -128,6 +129,9 @@ public class Phenotype implements Serializable {
 	// References cvterm
 	@Column(name = "draft_cvalue_id")
 	private Integer draftCValueId;
+
+	@Column(name = "json_props")
+	private String jsonProps;
 
 	@OneToMany(mappedBy = "phenotype", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PhenotypeExternalReference> externalReferences = new ArrayList<>();
@@ -279,15 +283,15 @@ public class Phenotype implements Serializable {
 	}
 
 	public List<PhenotypeExternalReference> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
-	public void setExternalReferences(List<PhenotypeExternalReference> externalReferences) {
+	public void setExternalReferences(final List<PhenotypeExternalReference> externalReferences) {
 		this.externalReferences = externalReferences;
 	}
 
 	public Integer getCreatedBy() {
-		return createdBy;
+		return this.createdBy;
 	}
 
 	public void setCreatedBy(final Integer createdBy) {
@@ -295,11 +299,19 @@ public class Phenotype implements Serializable {
 	}
 
 	public Integer getUpdatedBy() {
-		return updatedBy;
+		return this.updatedBy;
 	}
 
 	public void setUpdatedBy(final Integer updatedBy) {
 		this.updatedBy = updatedBy;
+	}
+
+	public String getJsonProps() {
+		return this.jsonProps;
+	}
+
+	public void setJsonProps(final String jsonProps) {
+		this.jsonProps = jsonProps;
 	}
 
 	@Override
