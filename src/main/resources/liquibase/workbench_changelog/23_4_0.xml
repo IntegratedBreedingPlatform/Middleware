@@ -1435,7 +1435,7 @@
  		<sql dbms="mysql" splitStatements="true">
 			SET @ms_manage_file_permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_MANAGE_FILES');
 
-			update permission set name = 'MS_MANAGE_FILES_OBSERVATIONS ', description='Manage Files Observations'  where permission_id = @ms_manage_file_permission_id
+			update permission set name = 'MS_MANAGE_FILES_OBSERVATIONS', description='Manage Files Observations'  where permission_id = @ms_manage_file_permission_id
  		</sql>
  	</changeSet>
 
