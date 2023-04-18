@@ -1785,7 +1785,6 @@
 			#Delete the permissions that has permission as a parent.
 			DELETE rp FROM role_permission rp
 				INNER JOIN roles_affected_temporary rat on rat.role_id = rp.role_id
-				INNER JOIN role r ON rp.role_id = r.id
 				INNER JOIN permission p ON rp.permission_id = p.permission_id
 				WHERE p.name IN ('MS_MANAGE_OBSERVATION_UNITS','MS_WITHDRAW_INVENTORY',
 								 'MS_CREATE_PENDING_WITHDRAWALS','MS_CREATE_CONFIRMED_WITHDRAWALS',
