@@ -74,6 +74,7 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		this.cropPermission.setPermissionId(nextInt());
 		this.cropPermission.setName(randomAlphabetic(10));
 		this.cropPermission.setDescription(randomAlphabetic(10));
+		this.cropPermission.setRank(1);
 		this.workbenchDaoFactory.getPermissionDAO().save(this.cropPermission);
 		this.cropAdminRole.getPermissions().add(this.cropPermission);
 		this.workbenchDaoFactory.getRoleDAO().saveOrUpdate(this.cropAdminRole);
@@ -88,6 +89,7 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		this.programPermission.setPermissionId(nextInt());
 		this.programPermission.setName(randomAlphabetic(10));
 		this.programPermission.setDescription(randomAlphabetic(10));
+		this.programPermission.setRank(1);
 		this.workbenchDaoFactory.getPermissionDAO().save(this.programPermission);
 		this.programAdminRole.getPermissions().add(this.programPermission);
 		this.workbenchDaoFactory.getRoleDAO().saveOrUpdate(this.programAdminRole);
