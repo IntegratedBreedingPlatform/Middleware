@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.generationcp.middleware.pojos.dms.Phenotype.MISSING_VALUE;
+
 public class DerivedVariableServiceImpl implements DerivedVariableService {
 
 	public static final List<Integer> CALCULATED_VARIABLE_VARIABLE_TYPES = Collections.unmodifiableList(
@@ -224,6 +226,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		phenotype.setcValue(categoricalValueId == null || categoricalValueId == 0 ? null : categoricalValueId);
 		phenotype.setChanged(true);
 		phenotype.setValueStatus(null);
+		phenotype.setValueStatus(MISSING_VALUE.equals(value) ? Phenotype.ValueStatus.MANUALLY_EDITED : null);
 		phenotypeDao.update(phenotype);
 	}
 
@@ -241,6 +244,7 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 		final Integer observationUnitId = observation.getObservationUnitId();
 		phenotype.setExperiment(new ExperimentModel(observationUnitId));
 		phenotype.setName(String.valueOf(variableId));
+		phenotype.setValueStatus(MISSING_VALUE.equals(observation.getValue()) ? Phenotype.ValueStatus.MANUALLY_EDITED : null);
 		this.daoFactory.getPhenotypeDAO().save(phenotype);
 	}
 
