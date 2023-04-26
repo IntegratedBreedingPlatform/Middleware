@@ -1,0 +1,34 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="abatac" id="v23.5.0-1">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'CREATE_LIST';
+             </sqlCheck>
+ 		</preConditions>
+		<comment>Add Create List permission</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+			SET @mg_germplasm_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_GERMPLASM');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`, `rank`) VALUES ('CREATE_LIST', 'Create List', @mg_germplasm_permission_id, 1);
+
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'CREATE_LIST');
+
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+			insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+
+			-- If the existing roles have any of these permissions: MANAGE_GERMPLASM_LISTS, IMPORT_GERMPLASM_LISTS or IMPORT_GERMPLASM,
+			-- then enable/check CREATE_LIST permission by default.
+			INSERT INTO role_permission(role_id, permission_id)
+			SELECT DISTINCT(rp.role_id), @permission_id FROM role_permission rp INNER JOIN  permission p ON rp.permission_id = p.permission_id
+			WHERE p.name IN ('MANAGE_GERMPLASM_LISTS','IMPORT_GERMPLASM_LISTS','IMPORT_GERMPLASM')
+			GROUP BY rp.role_id;
+ 		</sql>
+ 	</changeSet>
+
+</databaseChangeLog>
