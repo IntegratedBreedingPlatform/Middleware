@@ -1,6 +1,5 @@
 package org.generationcp.middleware.api.location.search;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.generationcp.middleware.api.location.Coordinate;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
@@ -15,10 +14,8 @@ import java.util.Set;
 @AutoProperty
 public class LocationSearchRequest extends SearchRequestDto {
 
-	@JsonIgnore
 	private String favoriteProgramUUID;
 
-	@JsonIgnore
 	private Set<Integer> locationTypeIds = new HashSet<>();
 
 	private List<Integer> locationDbIds = new ArrayList<>();
@@ -26,37 +23,19 @@ public class LocationSearchRequest extends SearchRequestDto {
 	private List<String> locationTypes = new ArrayList<>();
 	private List<String> abbreviations = new ArrayList<>();
 
-	@JsonIgnore
 	private SqlTextFilter locationNameFilter;
-
-	@JsonIgnore
 	private Set<Integer> countryIds = new HashSet<>();
-
-	@JsonIgnore
 	private Set<Integer> provinceIds = new HashSet<>();
-
-	@JsonIgnore
 	private String countryName;
-
-	@JsonIgnore
 	private String provinceName;
-
-	@JsonIgnore
 	private Double latitudeFrom;
-
-	@JsonIgnore
 	private Double latitudeTo;
-
-	@JsonIgnore
 	private Double longitudeFrom;
-
-	@JsonIgnore
 	private Double longitudeTo;
 
 	private Double altitudeMin;
 	private Double altitudeMax;
 
-	@JsonIgnore
 	private Boolean filterFavoriteProgramUUID;
 
 	private Coordinate coordinates;

@@ -44,6 +44,9 @@ public class Permission {
 	@OneToMany(mappedBy = "permission", fetch = FetchType.EAGER)
 	private final List<RoleTypePermission> roleTypePermissions = new ArrayList<>();
 
+	@Column(name = "rank", nullable = false)
+	private Integer rank;
+
 	public List<RoleTypePermission> getRoleTypePermissions() {
 		return this.roleTypePermissions;
 	}
@@ -54,6 +57,14 @@ public class Permission {
 
 	public void setPermissionId(final Integer permissionId) {
 		this.permissionId = permissionId;
+	}
+
+	public Integer getRank() {
+		return this.rank;
+	}
+
+	public void setRank(final Integer rank) {
+		this.rank = rank;
 	}
 
 	public String getName() {
