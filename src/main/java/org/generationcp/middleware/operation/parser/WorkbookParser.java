@@ -279,7 +279,7 @@ public class WorkbookParser {
 
 		final String value = WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 0);
 
-		if (!value.equalsIgnoreCase(section.name())) {
+		if (!value.equalsIgnoreCase(section.getName())) {
 			throw new WorkbookParserException("Not found section " + section.getName());
 		}
 
