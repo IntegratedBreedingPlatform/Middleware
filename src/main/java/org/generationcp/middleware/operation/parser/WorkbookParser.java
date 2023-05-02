@@ -101,7 +101,10 @@ public class WorkbookParser {
 		OBSERVATION_UNIT("OBSERVATION UNIT", PhenotypicType.TRIAL_DESIGN, PhenotypicType.TRIAL_DESIGN.getLabelList().get(1), VariableType.EXPERIMENTAL_DESIGN),
 		TRAIT("TRAITS", PhenotypicType.VARIATE, PhenotypicType.VARIATE.getLabelList().get(1), VariableType.TRAIT),
 		SELECTIONS("SELECTIONS", PhenotypicType.VARIATE, PhenotypicType.VARIATE.getLabelList().get(1), VariableType.SELECTION_METHOD),
-		ENTRY_DETAILS("ENTRY DETAILS", PhenotypicType.ENTRY_DETAIL, PhenotypicType.ENTRY_DETAIL.getLabelList().get(0), VariableType.ENTRY_DETAIL);
+		ENTRY_DETAILS("ENTRY DETAILS", PhenotypicType.ENTRY_DETAIL, PhenotypicType.ENTRY_DETAIL.getLabelList().get(0), VariableType.ENTRY_DETAIL),
+		NAME_TYPE("NAME TYPE", PhenotypicType.UNASSIGNED, null, null),
+		GERMPLASM_PASSPORTS("GERMPLASM PASSPORTS", PhenotypicType.UNASSIGNED, null, VariableType.GERMPLASM_PASSPORT),
+		GERMPLASM_ATTRIBUTES("GERMPLASM ATTRIBUTES", PhenotypicType.UNASSIGNED, null, VariableType.GERMPLASM_ATTRIBUTE);
 
 		private final String name;
 
@@ -242,6 +245,12 @@ public class WorkbookParser {
 		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
 		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.GERMPLASM_DECRIPTORS));
 		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
+		this.skipSectionFromDescriptionSheetRows(excelWorkbook, Section.NAME_TYPE);
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
+		this.skipSectionFromDescriptionSheetRows(excelWorkbook, Section.GERMPLASM_PASSPORTS);
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
+		this.skipSectionFromDescriptionSheetRows(excelWorkbook, Section.GERMPLASM_ATTRIBUTES);
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
 		entryDetails.addAll(this.readMeasurementVariables(excelWorkbook, Section.ENTRY_DETAILS));
 		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
 		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.OBSERVATION_UNIT));
@@ -264,6 +273,22 @@ public class WorkbookParser {
 		}
 
 		return workbook;
+	}
+
+	private void skipSectionFromDescriptionSheetRows(final Workbook workbook, final Section section) throws WorkbookParserException {
+
+		if (this.isDescriptionSheetExists(workbook)) {
+
+			final String value = WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 0);
+
+			if (!value.equalsIgnoreCase(section.getName())) {
+				throw new WorkbookParserException("Not found section " + section.getName());
+			}
+
+			while (!WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 1)) {
+				this.rowIndex++;
+			}
+		}
 	}
 
 	protected boolean isDescriptionSheetExists(final Workbook wb) {
