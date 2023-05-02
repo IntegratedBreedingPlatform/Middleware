@@ -277,16 +277,18 @@ public class WorkbookParser {
 
 	private void skipSectionFromDescriptionSheetRows(final Workbook workbook, final Section section) throws WorkbookParserException {
 
-		final String value = WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 0);
+		if (this.isDescriptionSheetExists(workbook)) {
 
-		if (!value.equalsIgnoreCase(section.getName())) {
-			throw new WorkbookParserException("Not found section " + section.getName());
+			final String value = WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 0);
+
+			if (!value.equalsIgnoreCase(section.getName())) {
+				throw new WorkbookParserException("Not found section " + section.getName());
+			}
+
+			while (!WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 1)) {
+				this.rowIndex++;
+			}
 		}
-
-		while (!WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.rowIndex, 1)) {
-			this.rowIndex++;
-		}
-
 	}
 
 	protected boolean isDescriptionSheetExists(final Workbook wb) {
