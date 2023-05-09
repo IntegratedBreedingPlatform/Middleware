@@ -83,6 +83,8 @@ public class PlantingServiceImpl implements PlantingService {
 				TermId.GID.getId(), TermId.DESIG.getId(), TermId.ENTRY_TYPE.getId(), TermId.ENTRY_NO.getId(),
 				TermId.OBS_UNIT_ID.getId())).stream().collect(Collectors.toMap(CVTerm::getCvTermId, CVTerm::getName));
 
+		entryDetails.forEach(entryDetail -> requiredColumns.put(entryDetail.getTermId(), entryDetail.getName()));
+
 		searchDTO.getSearchRequest().setVisibleColumns(new HashSet<>(requiredColumns.values()));
 
 		// observation units
