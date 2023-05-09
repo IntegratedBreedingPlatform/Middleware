@@ -84,7 +84,6 @@ public class StandardVariableTestDataInitializer {
 	public static StandardVariable createStandardVariableTestData(final String name,
 		final PhenotypicType phenotypicType) {
 		final StandardVariable standardVariable = new StandardVariable();
-		standardVariable.setId(new Random().nextInt());
 		standardVariable.setName(name);
 		standardVariable.setPhenotypicType(phenotypicType);
 		// PSM combination should be unique but for testing this class, it is

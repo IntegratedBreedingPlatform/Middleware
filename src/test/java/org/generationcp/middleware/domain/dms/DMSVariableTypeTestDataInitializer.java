@@ -2,6 +2,7 @@ package org.generationcp.middleware.domain.dms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -14,8 +15,10 @@ public class DMSVariableTypeTestDataInitializer {
 	}
 
 	public static DMSVariableType createDmsVariableType(final String variableName, final String treatmentLabel) {
+		final StandardVariable stdVar = StandardVariableTestDataInitializer.createStandardVariableTestData(variableName, PhenotypicType.STUDY);
+		stdVar.setId(new Random().nextInt(100));
 		final DMSVariableType dmsVariableType = new DMSVariableType(variableName, variableName,
-				StandardVariableTestDataInitializer.createStandardVariableTestData(variableName, PhenotypicType.STUDY),
+				stdVar,
 				2);
 		dmsVariableType.setTreatmentLabel(treatmentLabel);
 		dmsVariableType.setRole(PhenotypicType.STUDY);
