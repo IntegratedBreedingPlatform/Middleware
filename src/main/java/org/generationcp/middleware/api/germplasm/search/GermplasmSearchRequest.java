@@ -42,6 +42,28 @@ public class GermplasmSearchRequest extends SearchRequestDto {
 		}
 	}
 
+	public static class AttributeRange {
+		private String fromValue;
+
+		private String toValue;
+
+		public String getFromValue() {
+			return fromValue;
+		}
+
+		public void setFromValue(String fromValue) {
+			this.fromValue = fromValue;
+		}
+
+		public String getToValue() {
+			return toValue;
+		}
+
+		public void setToValue(String toValue) {
+			this.toValue = toValue;
+		}
+	}
+
 	// filters
 
 	/**
@@ -79,6 +101,8 @@ public class GermplasmSearchRequest extends SearchRequestDto {
 	private Boolean withSampleOnly;
 	private Boolean inProgramListOnly;
 	private Map<String, String> attributes;
+
+	private Map<String, AttributeRange> attributeRangeMap;
 	private Map<String, String> nameTypes;
 	private SqlTextFilter externalReferenceSource;
 	private SqlTextFilter externalReferenceId;
@@ -323,6 +347,14 @@ public class GermplasmSearchRequest extends SearchRequestDto {
 
 	public void setAttributes(final Map<String, String> attributes) {
 		this.attributes = attributes;
+	}
+
+	public Map<String, AttributeRange> getAttributeRangeMap() {
+		return attributeRangeMap;
+	}
+
+	public void setAttributeRangeMap(Map<String, AttributeRange> attributeRangeMap) {
+		this.attributeRangeMap = attributeRangeMap;
 	}
 
 	public Map<String, String> getNameTypes() {
