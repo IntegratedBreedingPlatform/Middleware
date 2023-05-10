@@ -2150,6 +2150,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			paramBuilder.setParameter("variableName", GenericDAO.getParameter(type, value));
 		}
 
+		if (StringUtils.isNotEmpty(variableFilter.getNameOrAlias())) {
+			paramBuilder.append(" AND :nameOrAlias in (variable.name, vo.alias) ");
+			paramBuilder.setParameter("nameOrAlias", variableFilter.getNameOrAlias());
+		}
 		// TODO Complete
 	}
 }
