@@ -74,7 +74,7 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 		final Map<String, Integer> sampleUIDToSampleIdMap =
 			sampleDTOS.stream().collect(Collectors.toMap(SampleDTO::getSampleBusinessKey, SampleDTO::getSampleId));
 
-		// Retrieve the existing genotypes associated to samples
+		// Get existing genotype records per sampleId + variableId
 		final MultiKeyMap existingGenotypeMultiKeyMap = new MultiKeyMap();
 		this.daoFactory.getGenotypeDao().getGenotypesBySampleIds(new ArrayList<>(sampleUIDToSampleIdMap.values())).forEach(
 			genotype -> existingGenotypeMultiKeyMap.put(genotype.getSample().getSampleId(), genotype.getVariable().getCvTermId(),
@@ -86,13 +86,13 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 			final Integer variableId = Integer.valueOf(importRequestDto.getVariableId());
 
 			// If genotype record already exists (per sampleId + variableId), overwrite the value
+			// Else, create a new genotype record
 			if (existingGenotypeMultiKeyMap.containsKey(sampleId, variableId)) {
 				final Genotype existingGenotype = (Genotype) existingGenotypeMultiKeyMap.get(sampleId, variableId);
 				existingGenotype.setValue(importRequestDto.getValue());
 				genotypeDao.update(existingGenotype);
 				genotypeIds.add(existingGenotype.getId());
 			} else {
-				// Else, create a new genotype record
 				final Genotype genotype = new Genotype();
 				genotype.setSample(new Sample(sampleId));
 				final CVTerm variable = new CVTerm();
