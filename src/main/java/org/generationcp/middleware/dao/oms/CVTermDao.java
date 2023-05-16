@@ -2151,7 +2151,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 
 		if (StringUtils.isNotEmpty(variableFilter.getNameOrAlias())) {
-			paramBuilder.append(" AND :nameOrAlias in (variable.name, vo.alias) ");
+			paramBuilder.append(" AND lower(:nameOrAlias) in (lower(variable.name), lower(vo.alias)) ");
 			paramBuilder.setParameter("nameOrAlias", variableFilter.getNameOrAlias());
 		}
 		// TODO Complete
