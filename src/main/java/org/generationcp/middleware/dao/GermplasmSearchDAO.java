@@ -1013,22 +1013,22 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 				final Map.Entry<String, String> entry = iterator.next();
 				// String.format relative indexing (%<s): argument for the previous format specifier is re-used
 				queryBuilder.append(String.format(
-					" inner join ( " //
-						+ "    select a.gid " //
-						+ "    from atributs a " //
-						+ "      INNER JOIN cvterm cv on a.atype = cv.cvterm_id " //
-						+ "      INNER JOIN cvtermprop cp ON cp.type_id = %s and cv.cvterm_id = cp.cvterm_id " //
-						+ "      LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID " //
-						+ "      INNER JOIN cvterm vartype on vartype.name = cp.value and vartype.cvterm_id in (%s, %s) " //
-						+ "    WHERE (cv.name = :attributeKey%s or vo.alias = :attributeKey%<s) and a.aval like :attributeValue%<s " //
-						+ "    %s " //
-						+ ") T%s on T%<s.gid = a.gid ", //
-					TermId.VARIABLE_TYPE.getId(), //
-					VariableType.GERMPLASM_PASSPORT.getId(), //
-					VariableType.GERMPLASM_ATTRIBUTE.getId(), //
-					entry.getKey(), //
-					LIMIT_CLAUSE, //
-					i++ //
+					" inner join ( "
+						+ "    select a.gid "
+						+ "    from atributs a "
+						+ "      INNER JOIN cvterm cv on a.atype = cv.cvterm_id "
+						+ "      INNER JOIN cvtermprop cp ON cp.type_id = %s and cv.cvterm_id = cp.cvterm_id "
+						+ "      LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID "
+						+ "      INNER JOIN cvterm vartype on vartype.name = cp.value and vartype.cvterm_id in (%s, %s) "
+						+ "    WHERE (cv.name = :attributeKey%s or vo.alias = :attributeKey%<s) and a.aval like :attributeValue%<s "
+						+ "    %s "
+						+ ") T%s on T%<s.gid = a.gid ",
+					TermId.VARIABLE_TYPE.getId(),
+					VariableType.GERMPLASM_PASSPORT.getId(),
+					VariableType.GERMPLASM_ATTRIBUTE.getId(),
+					entry.getKey(),
+					LIMIT_CLAUSE,
+					i++
 				));
 			}
 
@@ -1066,24 +1066,24 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 				}
 				// String.format relative indexing (%<s): argument for the previous format specifier is re-used
 				queryBuilder.append(String.format(
-						" inner join ( " //
-								+ "    select a.gid " //
-								+ "    from atributs a " //
-								+ "      INNER JOIN cvterm cv on a.atype = cv.cvterm_id " //
-								+ "      INNER JOIN cvtermprop cp ON cp.type_id = %s and cv.cvterm_id = cp.cvterm_id " //
-								+ "      LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID " //
-								+ "      INNER JOIN cvterm vartype on vartype.name = cp.value and vartype.cvterm_id in (%s, %s) " //
-								+ "    WHERE (cv.name = :attributeKey%s or vo.alias = :attributeKey%<s) " //
-								+ attributeFromCondition //
-								+ attributeToCondition //
-								+ "    %s " //
-								+ ") T%s on T%<s.gid = a.gid ", //
-						TermId.VARIABLE_TYPE.getId(), //
-						VariableType.GERMPLASM_PASSPORT.getId(), //
-						VariableType.GERMPLASM_ATTRIBUTE.getId(), //
-						entry.getKey(), //
-						LIMIT_CLAUSE, //
-						i++ //
+						" inner join ( "
+								+ "    select a.gid "
+								+ "    from atributs a "
+								+ "      INNER JOIN cvterm cv on a.atype = cv.cvterm_id "
+								+ "      INNER JOIN cvtermprop cp ON cp.type_id = %s and cv.cvterm_id = cp.cvterm_id "
+								+ "      LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID "
+								+ "      INNER JOIN cvterm vartype on vartype.name = cp.value and vartype.cvterm_id in (%s, %s) "
+								+ "    WHERE (cv.name = :attributeKey%s or vo.alias = :attributeKey%<s) "
+								+ attributeFromCondition
+								+ attributeToCondition
+								+ "    %s "
+								+ ") T%s on T%<s.gid = a.gid ",
+						TermId.VARIABLE_TYPE.getId(),
+						VariableType.GERMPLASM_PASSPORT.getId(),
+						VariableType.GERMPLASM_ATTRIBUTE.getId(),
+						entry.getKey(),
+						LIMIT_CLAUSE,
+						i++
 				));
 			}
 
