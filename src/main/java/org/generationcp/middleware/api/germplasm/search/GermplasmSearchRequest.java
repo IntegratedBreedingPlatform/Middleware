@@ -48,18 +48,18 @@ public class GermplasmSearchRequest extends SearchRequestDto {
 		private String toValue;
 
 		public String getFromValue() {
-			return fromValue;
+			return this.fromValue;
 		}
 
-		public void setFromValue(String fromValue) {
+		public void setFromValue(final String fromValue) {
 			this.fromValue = fromValue;
 		}
 
 		public String getToValue() {
-			return toValue;
+			return this.toValue;
 		}
 
-		public void setToValue(String toValue) {
+		public void setToValue(final String toValue) {
 			this.toValue = toValue;
 		}
 	}
@@ -350,10 +350,10 @@ public class GermplasmSearchRequest extends SearchRequestDto {
 	}
 
 	public Map<String, AttributeRange> getAttributeRangeMap() {
-		return attributeRangeMap;
+		return this.attributeRangeMap;
 	}
 
-	public void setAttributeRangeMap(Map<String, AttributeRange> attributeRangeMap) {
+	public void setAttributeRangeMap(final Map<String, AttributeRange> attributeRangeMap) {
 		this.attributeRangeMap = attributeRangeMap;
 	}
 
