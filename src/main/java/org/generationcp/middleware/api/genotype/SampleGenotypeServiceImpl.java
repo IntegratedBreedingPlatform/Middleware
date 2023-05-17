@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.genotype;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.api.user.UserSearchRequest;
 import org.generationcp.middleware.dao.GenotypeDao;
@@ -67,19 +68,41 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	public List<Integer> importSampleGenotypes(final List<SampleGenotypeImportRequestDto> sampleGenotypeImportRequestDtos) {
 		final List<Integer> genotypeIds = new ArrayList<>();
 		final GenotypeDao genotypeDao = this.daoFactory.getGenotypeDao();
-		final Set<String> sampleUID = sampleGenotypeImportRequestDtos.stream()
-				.map(SampleGenotypeImportRequestDto::getSampleUID).collect(Collectors.toSet());
-		final List<SampleDTO> sampleDTOS =this.daoFactory.getSampleDao().getBySampleBks(sampleUID);
-		final Map<String, Integer> sampleUIDToSampleIdMap = sampleDTOS.stream().collect(Collectors.toMap(SampleDTO::getSampleBusinessKey, SampleDTO::getSampleId));
+		final Set<String> sampleUIDs = sampleGenotypeImportRequestDtos.stream()
+			.map(SampleGenotypeImportRequestDto::getSampleUID).collect(Collectors.toSet());
+		final List<SampleDTO> sampleDTOS = this.daoFactory.getSampleDao().getBySampleBks(sampleUIDs);
+		final Map<String, Integer> sampleUIDToSampleIdMap =
+			sampleDTOS.stream().collect(Collectors.toMap(SampleDTO::getSampleBusinessKey, SampleDTO::getSampleId));
+
+		// Get existing genotype records per sampleId + variableId
+		final MultiKeyMap existingGenotypeMultiKeyMap = new MultiKeyMap();
+		this.daoFactory.getGenotypeDao().getGenotypesBySampleIds(new ArrayList<>(sampleUIDToSampleIdMap.values())).forEach(
+			genotype -> existingGenotypeMultiKeyMap.put(genotype.getSample().getSampleId(), genotype.getVariable().getCvTermId(),
+				genotype));
+
 		for (final SampleGenotypeImportRequestDto importRequestDto : sampleGenotypeImportRequestDtos) {
-			final Genotype genotype = new Genotype();
-			genotype.setSample(new Sample(sampleUIDToSampleIdMap.get(importRequestDto.getSampleUID())));
-			final CVTerm variable = new CVTerm();
-			variable.setCvTermId(Integer.valueOf(importRequestDto.getVariableId()));
-			genotype.setVariable(variable);
-			genotype.setValue(importRequestDto.getValue());
-			genotypeDao.save(genotype);
-			genotypeIds.add(genotype.getId());
+
+			final Integer sampleId = sampleUIDToSampleIdMap.get(importRequestDto.getSampleUID());
+			final Integer variableId = Integer.valueOf(importRequestDto.getVariableId());
+
+			// If genotype record already exists (per sampleId + variableId), overwrite the value
+			// Else, create a new genotype record
+			if (existingGenotypeMultiKeyMap.containsKey(sampleId, variableId)) {
+				final Genotype existingGenotype = (Genotype) existingGenotypeMultiKeyMap.get(sampleId, variableId);
+				existingGenotype.setValue(importRequestDto.getValue());
+				genotypeDao.update(existingGenotype);
+				genotypeIds.add(existingGenotype.getId());
+			} else {
+				final Genotype genotype = new Genotype();
+				genotype.setSample(new Sample(sampleId));
+				final CVTerm variable = new CVTerm();
+				variable.setCvTermId(variableId);
+				genotype.setVariable(variable);
+				genotype.setValue(importRequestDto.getValue());
+				genotypeDao.save(genotype);
+				genotypeIds.add(genotype.getId());
+			}
+
 		}
 		return genotypeIds;
 	}
@@ -157,9 +180,10 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 
 	private void populateTakenByIdsByUserIds(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
 		final UserSearchRequest userSearchRequest = new UserSearchRequest();
-		if (searchRequestDTO.getFilter() !=null && MapUtils.isNotEmpty(searchRequestDTO.getFilter().getFilteredTextValues())
+		if (searchRequestDTO.getFilter() != null && MapUtils.isNotEmpty(searchRequestDTO.getFilter().getFilteredTextValues())
 			&& searchRequestDTO.getFilter().getFilteredTextValues().containsKey(String.valueOf(TermId.TAKEN_BY.getId()))) {
-			userSearchRequest.setFullName(searchRequestDTO.getFilter().getFilteredTextValues().get(String.valueOf(TermId.TAKEN_BY.getId())));
+			userSearchRequest.setFullName(
+				searchRequestDTO.getFilter().getFilteredTextValues().get(String.valueOf(TermId.TAKEN_BY.getId())));
 			final List<UserDto> userDtos = this.userService.searchUsers(userSearchRequest, null);
 			searchRequestDTO.setTakenByIds(userDtos.stream().map(UserDto::getId).collect(Collectors.toList()));
 		}
