@@ -957,6 +957,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			return true;
 		}
 
+		if (this.preFilterByAttributesTypesRange(germplasmSearchRequest, preFilteredGids, programUUID)) {
+			return true;
+		}
+
 		return this.filterByNameTypes(germplasmSearchRequest, preFilteredGids);
 	}
 
@@ -1009,22 +1013,22 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 				final Map.Entry<String, String> entry = iterator.next();
 				// String.format relative indexing (%<s): argument for the previous format specifier is re-used
 				queryBuilder.append(String.format(
-					" inner join ( " //
-						+ "    select a.gid " //
-						+ "    from atributs a " //
-						+ "      INNER JOIN cvterm cv on a.atype = cv.cvterm_id " //
-						+ "      INNER JOIN cvtermprop cp ON cp.type_id = %s and cv.cvterm_id = cp.cvterm_id " //
-						+ "      LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID " //
-						+ "      INNER JOIN cvterm vartype on vartype.name = cp.value and vartype.cvterm_id in (%s, %s) " //
-						+ "    WHERE (cv.name = :attributeKey%s or vo.alias = :attributeKey%<s) and a.aval like :attributeValue%<s " //
-						+ "    %s " //
-						+ ") T%s on T%<s.gid = a.gid ", //
-					TermId.VARIABLE_TYPE.getId(), //
-					VariableType.GERMPLASM_PASSPORT.getId(), //
-					VariableType.GERMPLASM_ATTRIBUTE.getId(), //
-					entry.getKey(), //
-					LIMIT_CLAUSE, //
-					i++ //
+					" inner join ( "
+						+ "    select a.gid "
+						+ "    from atributs a "
+						+ "      INNER JOIN cvterm cv on a.atype = cv.cvterm_id "
+						+ "      INNER JOIN cvtermprop cp ON cp.type_id = %s and cv.cvterm_id = cp.cvterm_id "
+						+ "      LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID "
+						+ "      INNER JOIN cvterm vartype on vartype.name = cp.value and vartype.cvterm_id in (%s, %s) "
+						+ "    WHERE (cv.name = :attributeKey%s or vo.alias = :attributeKey%<s) and a.aval like :attributeValue%<s "
+						+ "    %s "
+						+ ") T%s on T%<s.gid = a.gid ",
+					TermId.VARIABLE_TYPE.getId(),
+					VariableType.GERMPLASM_PASSPORT.getId(),
+					VariableType.GERMPLASM_ATTRIBUTE.getId(),
+					entry.getKey(),
+					LIMIT_CLAUSE,
+					i++
 				));
 			}
 
@@ -1033,6 +1037,67 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			for (final Map.Entry<String, String> entry : attributes.entrySet()) {
 				sqlQuery.setParameter("attributeKey" + entry.getKey(), entry.getKey());
 				sqlQuery.setParameter("attributeValue" + entry.getKey(), '%' + entry.getValue() + '%');
+			}
+			final List<Integer> gids = sqlQuery.list();
+			filterApplied = true;
+			this.findIntersectionOfMatchedGids(gids, preFilteredGids);
+		}
+		return filterApplied && preFilteredGids.isEmpty();
+	}
+
+	private boolean preFilterByAttributesTypesRange(final GermplasmSearchRequest germplasmSearchRequest, final List<Integer> preFilteredGids,
+											   final String programUUID) {
+		final Map<String, GermplasmSearchRequest.AttributeRange> attributes = germplasmSearchRequest.getAttributeRangeMap();
+		boolean filterApplied = false;
+		if (attributes != null && !attributes.isEmpty()) {
+			final StringBuilder queryBuilder = new StringBuilder();
+			queryBuilder.append(" select distinct a.gid from atributs a ");
+			final Iterator<Map.Entry<String, GermplasmSearchRequest.AttributeRange>> iterator = attributes.entrySet().iterator();
+			int i = 0;
+			while (iterator.hasNext()) {
+				final Map.Entry<String, GermplasmSearchRequest.AttributeRange> entry = iterator.next();
+				String attributeFromCondition = "";
+				if (StringUtils.isNotEmpty(entry.getValue().getFromValue())) {
+					attributeFromCondition = " and a.aval >= :attributeFromValue%<s ";
+				}
+				String attributeToCondition = "";
+				if (StringUtils.isNotEmpty(entry.getValue().getToValue())) {
+					attributeToCondition = " and :attributeToValue%<s >= a.aval ";
+				}
+				// String.format relative indexing (%<s): argument for the previous format specifier is re-used
+				queryBuilder.append(String.format(
+						" inner join ( "
+								+ "    select a.gid "
+								+ "    from atributs a "
+								+ "      INNER JOIN cvterm cv on a.atype = cv.cvterm_id "
+								+ "      INNER JOIN cvtermprop cp ON cp.type_id = %s and cv.cvterm_id = cp.cvterm_id "
+								+ "      LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID "
+								+ "      INNER JOIN cvterm vartype on vartype.name = cp.value and vartype.cvterm_id in (%s, %s) "
+								+ "    WHERE (cv.name = :attributeKey%s or vo.alias = :attributeKey%<s) "
+								+ attributeFromCondition
+								+ attributeToCondition
+								+ "    %s "
+								+ ") T%s on T%<s.gid = a.gid ",
+						TermId.VARIABLE_TYPE.getId(),
+						VariableType.GERMPLASM_PASSPORT.getId(),
+						VariableType.GERMPLASM_ATTRIBUTE.getId(),
+						entry.getKey(),
+						LIMIT_CLAUSE,
+						i++
+				));
+			}
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+			sqlQuery.setParameter("programUUID", programUUID);
+			for (final Map.Entry<String, GermplasmSearchRequest.AttributeRange> entry : attributes.entrySet()) {
+				sqlQuery.setParameter("attributeKey" + entry.getKey(), entry.getKey());
+				if (StringUtils.isNotEmpty(entry.getValue().getFromValue())) {
+					sqlQuery.setParameter("attributeFromValue" + entry.getKey(), entry.getValue().getFromValue());
+				}
+				if (StringUtils.isNotEmpty(entry.getValue().getToValue())) {
+					sqlQuery.setParameter("attributeToValue" + entry.getKey(), entry.getValue().getToValue());
+				}
+
 			}
 			final List<Integer> gids = sqlQuery.list();
 			filterApplied = true;
