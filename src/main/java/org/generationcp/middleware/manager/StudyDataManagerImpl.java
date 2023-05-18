@@ -1131,6 +1131,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return phenotypeMap;
 	}
 
+	@Override
+	public List<String> getAliasesForStudy(final Integer studyId) {
+		return this.daoFactory.getProjectPropertyDAO().getAliasesForStudy(studyId);
+	}
+
 	void setDataSetBuilder(final DataSetBuilder dataSetBuilder) {
 		this.dataSetBuilder = dataSetBuilder;
 	}
