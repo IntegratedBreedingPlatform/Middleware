@@ -77,7 +77,7 @@ public class PhenotypeQuery {
 		+ "   INNER JOIN project p ON ndep.project_id = p.project_id " //
 		+ "   INNER JOIN projectprop pp ON pp.project_id = p.project_id " //
 		+ "                             AND pp.variable_id = ph.observable_id " //
-		+ "                             AND pp.type_id = " + VariableType.TRAIT.getId() //
+		+ "                             AND pp.type_id IN ( " + VariableType.TRAIT.getId()  + ", " + VariableType.SELECTION_METHOD.getId() + " )" //
 		+ " WHERE ph.nd_experiment_id = nde.nd_experiment_id" //
 		;
 	// The following are just suffixes of above subquery. always append ) after to complete the statement
