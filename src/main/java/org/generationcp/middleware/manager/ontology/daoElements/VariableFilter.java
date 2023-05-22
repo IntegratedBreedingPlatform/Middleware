@@ -17,6 +17,7 @@ public class VariableFilter {
 	private boolean favoritesOnly;
 	private boolean showObsoletes = true;
 	private SqlTextFilter nameFilter;
+	private String nameOrAlias;
 
 	private final List<Integer> methodIds = new ArrayList<>();
 	private final List<Integer> propertyIds = new ArrayList<>();
@@ -169,6 +170,14 @@ public class VariableFilter {
 
 	public void setNameFilter(final SqlTextFilter nameFilter) {
 		this.nameFilter = nameFilter;
+	}
+
+	public String getNameOrAlias() {
+		return this.nameOrAlias;
+	}
+
+	public void setNameOrAlias(final String nameOrAlias) {
+		this.nameOrAlias = nameOrAlias;
 	}
 
 	@Override

@@ -46,6 +46,12 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 	private static final String TYPE_ID = "typeId";
 
+	private static final String QUERY_ALL_STUDY_ALIASES =
+		"SELECT pp.alias "
+			+ "FROM projectprop pp, project p "
+			+ "WHERE pp.project_id = p.project_id "
+			+ "  AND :studyId IN (p.project_id, p.parent_project_id)";
+
 	public ProjectPropertyDao(final Session session) {
 		super(session);
 	}
@@ -375,6 +381,12 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		criteria.add(Restrictions.eq("project.projectId", datasetId));
 		criteria.setProjection(Projections.property("variableId"));
 		return criteria.list();
+	}
+
+	public List<String> getAliasesForStudy(final Integer studyId) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(QUERY_ALL_STUDY_ALIASES);
+		sqlQuery.setParameter("studyId", studyId);
+		return sqlQuery.list();
 	}
 
 	private List<MeasurementVariableDto> getVariablesByStudy(final int studyIdentifier, final String query,

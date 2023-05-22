@@ -10,6 +10,7 @@ import java.util.List;
 public class VariableSearchRequest {
 
 	private SqlTextFilter nameFilter;
+	private String nameOrAlias;
 	private List<Integer> variableIds;
 	private List<Integer> variableTypeIds;
 
@@ -35,6 +36,14 @@ public class VariableSearchRequest {
 
 	public void setVariableTypeIds(final List<Integer> variableTypeIds) {
 		this.variableTypeIds = variableTypeIds;
+	}
+
+	public String getNameOrAlias() {
+		return this.nameOrAlias;
+	}
+
+	public void setNameOrAlias(final String nameOrAlias) {
+		this.nameOrAlias = nameOrAlias;
 	}
 
 	@Override
