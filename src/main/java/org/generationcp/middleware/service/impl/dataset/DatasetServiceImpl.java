@@ -765,7 +765,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final List<ObservationUnitRow> list = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
 		if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
-			final Set<Integer> gids = list.stream().filter(s -> s.getGid() != null).map(ObservationUnitRow::getGid).collect(Collectors.toSet());
+			final Set<Integer> gids =
+				list.stream().filter(s -> s.getGid() != null).map(ObservationUnitRow::getGid).collect(Collectors.toSet());
 			this.addParentsFromPedigreeTable(gids, list);
 		}
 		return list;
@@ -934,8 +935,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void rejectDatasetDraftData(final Integer datasetId) {
-		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
+	public void rejectDatasetDraftData(final Integer datasetId, final Set<Integer> instanceIds) {
+		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId, instanceIds);
 		for (final Phenotype phenotype : phenotypes) {
 			if (StringUtils.isEmpty(phenotype.getValue())) {
 				this.deletePhenotype(phenotype.getPhenotypeId(), false);
@@ -961,7 +962,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public Boolean hasDatasetDraftDataOutOfBounds(final Integer datasetId) {
 
-		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
+		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId, new HashSet<>());
 
 		if (!phenotypes.isEmpty()) {
 			final List<MeasurementVariable>
@@ -997,9 +998,9 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void acceptAllDatasetDraftData(final Integer studyId, final Integer datasetId) {
+	public void acceptDatasetDraftData(final Integer studyId, final Integer datasetId, final Set<Integer> instanceIds) {
 
-		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
+		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId, instanceIds);
 
 		if (!draftPhenotypes.isEmpty()) {
 
@@ -1019,8 +1020,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void acceptDraftDataAndSetOutOfBoundsToMissing(final Integer studyId, final Integer datasetId) {
-		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
+	public void acceptDraftDataAndSetOutOfBoundsToMissing(final Integer studyId, final Integer datasetId, final Set<Integer> instanceIds) {
+		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId, instanceIds);
 
 		if (!draftPhenotypes.isEmpty()) {
 			final List<MeasurementVariable>
@@ -1606,7 +1607,7 @@ public class DatasetServiceImpl implements DatasetService {
 	/**
 	 * @param draftMode False if either you are in Accepted view (e.g batch update in accepted view)
 	 *                  or you are going to accepted view (e.g accepting draft data)
-	 *                  FIXME IBP-2694
+	 *                                   FIXME IBP-2694
 	 */
 	private Phenotype updatePhenotypeValues(
 		final Integer categoricalValueId, final String value, final Integer draftCategoricalValueId, final String draftvalue,
