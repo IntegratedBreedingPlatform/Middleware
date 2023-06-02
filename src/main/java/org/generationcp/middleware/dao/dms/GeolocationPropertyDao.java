@@ -258,6 +258,12 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		return criteria.list();
 	}
 
+	public List<GeolocationProperty> getByGeolocationByGeolocationIdsAndVariableId(final List<Integer> geolocationIds) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.in("geolocation.locationId", geolocationIds));
+		return criteria.list();
+	}
+
 	public Map<Integer, List<MeasurementVariable>> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(
 		final List<Integer> geolocationIds, final List<Integer> variableIds) {
 		final Map<Integer, List<MeasurementVariable>> studyVariablesMap = new HashMap<>();
