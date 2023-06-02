@@ -102,6 +102,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
 	private static final String LOCATION_NAME = "LOCATION_NAME";
+	private static final String LOCATION_ID = "LOCATION_ID";
 	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 
 	private static final List<Integer> SUBOBS_COLUMNS_ALL_VARIABLE_TYPES = Lists.newArrayList(
@@ -1337,7 +1338,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 				for (final String variableName : table.columnKeySet()) {
 					String importedVariableValue = table.get(trialInstanceNumber, variableName);
-					if (StringUtils.isNotBlank(importedVariableValue)) {
+					// Ignore empty strings and LOCATION_ID, Location value will be set from LOCATION_NAME
+					if (StringUtils.isNotBlank(importedVariableValue) && !LOCATION_ID.equalsIgnoreCase(variableName)) {
 						final MeasurementVariable measurementVariable = mappedVariables.get(variableName);
 						if (StudyInstanceServiceImpl.GEOLOCATION_METADATA.contains(measurementVariable.getTermId())) {
 							hasGeolocationMetaDataChanges = true;
