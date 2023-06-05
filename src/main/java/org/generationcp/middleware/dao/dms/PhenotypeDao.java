@@ -1554,22 +1554,33 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return countOutOfSyncPerProjectMap;
 	}
 
-	public List<Phenotype> getDatasetDraftData(final Integer datasetId) {
-		final List<Map<String, Object>> results = this.getSession().createSQLQuery("select {ph.*}, {e.*}, "
-				+ " (select exists( "
-				+ "     select 1 from formula where target_variable_id = ph.observable_id and active = 1"
-				+ " )) as isDerivedTrait "
-				+ " from phenotype ph"
-				+ " inner join nd_experiment e on ph.nd_experiment_id = e.nd_experiment_id"
-				+ " inner join project p on e.project_id = p.project_id "
-				+ " where p.project_id = :datasetId "
-				+ " and (ph.draft_value is not null or ph.draft_cvalue_id is not null)")
+	public List<Phenotype> getDatasetDraftData(final Integer datasetId, final Set<Integer> instanceIds) {
+		final StringBuilder sql = new StringBuilder("select {ph.*}, {e.*}, "
+			+ " (select exists( "
+			+ "     select 1 from formula where target_variable_id = ph.observable_id and active = 1"
+			+ " )) as isDerivedTrait "
+			+ " from phenotype ph"
+			+ " inner join nd_experiment e on ph.nd_experiment_id = e.nd_experiment_id"
+			+ " inner join project p on e.project_id = p.project_id "
+			+ " where p.project_id = :datasetId "
+			+ " and (ph.draft_value is not null or ph.draft_cvalue_id is not null) ");
+
+		if (!CollectionUtils.isEmpty(instanceIds)) {
+			sql.append(" and e.nd_geolocation_id in (:instanceIds)");
+		}
+
+		final Query sqlQuery = this.getSession().createSQLQuery(sql.toString())
 			.addEntity("ph", Phenotype.class)
 			.addEntity("e", ExperimentModel.class)
 			.addScalar("isDerivedTrait", new BooleanType())
 			.setParameter("datasetId", datasetId)
-			.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-			.list();
+			.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP);
+
+		if (!CollectionUtils.isEmpty(instanceIds)) {
+			sqlQuery.setParameterList("instanceIds", instanceIds);
+		}
+
+		final List<Map<String, Object>> results = sqlQuery.list();
 
 		final List<Phenotype> phenotypes = new ArrayList<>();
 
@@ -1751,7 +1762,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		stringBuilder.append("FROM ");
 		stringBuilder.append("phenotype p ");
 		stringBuilder.append("INNER JOIN nd_experiment obs_unit ON p.nd_experiment_id = obs_unit.nd_experiment_id ");
-		stringBuilder.append("LEFT JOIN nd_experimentprop plotNumber ON plotNumber.nd_experiment_id = obs_unit.nd_experiment_id AND plotNumber.type_id = "
+		stringBuilder.append(
+			"LEFT JOIN nd_experimentprop plotNumber ON plotNumber.nd_experiment_id = obs_unit.nd_experiment_id AND plotNumber.type_id = "
 				+ TermId.PLOT_NO.getId() + " ");
 		stringBuilder.append("INNER JOIN nd_geolocation instance ON instance.nd_geolocation_id = obs_unit.nd_geolocation_id ");
 		// Use LEFT JOIN to stock, germplsm and names so that we can also retrieve the SUMMARY_STATISTICS records -- which don't have germplasm associated to it.
@@ -1833,18 +1845,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationLevels())) {
 			final List<String> observationLevelCodes = observationSearchRequestDto.getObservationLevels()
-					.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelCode()))
-					.map(ObservationLevelRelationship::getLevelCode)
-					.collect(Collectors.toList());
+				.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelCode()))
+				.map(ObservationLevelRelationship::getLevelCode)
+				.collect(Collectors.toList());
 			if (!CollectionUtils.isEmpty(observationLevelCodes)) {
 				sqlQuery.setParameterList("observationLevelCodes", observationLevelCodes);
 			}
 
-
 			final Set<String> datasetTypeNames = observationSearchRequestDto.getObservationLevels()
-					.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelName()))
-					.map(obs -> ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(obs.getLevelName()))
-					.collect(Collectors.toSet());
+				.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelName()))
+				.map(obs -> ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(obs.getLevelName()))
+				.collect(Collectors.toSet());
 
 			if (!CollectionUtils.isEmpty(datasetTypeNames)) {
 				sqlQuery.setParameterList("datasetTypeNames", datasetTypeNames);
@@ -1913,9 +1924,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationLevels())) {
 			final List<String> observationLevelCodes = observationSearchRequestDto.getObservationLevels()
-					.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelCode()))
-					.map(ObservationLevelRelationship::getLevelCode)
-					.collect(Collectors.toList());
+				.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelCode()))
+				.map(ObservationLevelRelationship::getLevelCode)
+				.collect(Collectors.toList());
 			if (!CollectionUtils.isEmpty(observationLevelCodes)) {
 				// currently, we only handle observation level codes for plot datasets
 				stringBuilder.append(" AND (dataset_type.name = 'PLOT' AND plotNumber.value IN (:observationLevelCodes)) ");
@@ -1923,9 +1934,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			// dataset type name filter from observation level names
 			final Set<String> datasetTypeNames = observationSearchRequestDto.getObservationLevels()
-					.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelName()))
-					.map(obs -> ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(obs.getLevelName()))
-					.collect(Collectors.toSet());
+				.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelName()))
+				.map(obs -> ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(obs.getLevelName()))
+				.collect(Collectors.toSet());
 
 			if (!CollectionUtils.isEmpty(datasetTypeNames)) {
 				stringBuilder.append(" AND dataset_type.name IN (:datasetTypeNames) ");
