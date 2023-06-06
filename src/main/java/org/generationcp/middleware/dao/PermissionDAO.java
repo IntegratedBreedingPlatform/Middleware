@@ -65,8 +65,7 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 		+ "                  and ur1.workbench_project_id = :projectId " //
 		+ "         )) " //
 		+ "  ) " //
-		+ "  or (r.role_type_id = "+ RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName " //
-		+ "       and (:isBrapi = 1 or ur.workbench_project_id = :projectId))) " //
+		+ "  or (r.role_type_id = "+ RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName and ur.workbench_project_id = :projectId)) " //
 		+ "and ur.userid = :userId and r.active = 1";
 
 	/**
@@ -114,17 +113,12 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 	}
 
 	public List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId) {
-		return this.getPermissions(userId, cropName, programId, 0);
-	}
-
-	public List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId, final int isBrapi) {
 		//FIXME. Try an user with ADMIN and MANAGE_PROGRAM_SETTINGS, Only ADMIN should be retrieved and given that MANAGE_PROGRAMS is not a row in the result, both permissions are returned
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(PermissionDAO.SQL_FILTERED_PERMISSIONS);
 			query.setParameter("userId", userId);
 			query.setParameter("cropName", cropName);
 			query.setParameter("projectId", programId);
-			query.setParameter("isBrapi", isBrapi);
 			query.addScalar("id").addScalar("name").addScalar("parentId")
 				.addScalar("description").addScalar("workbenchCategoryLinkId");
 			query.setResultTransformer(Transformers.aliasToBean(PermissionDto.class));
