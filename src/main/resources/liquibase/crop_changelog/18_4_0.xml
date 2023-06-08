@@ -73,7 +73,7 @@
 			</column>
 		</createTable>
 	</changeSet>
-	<changeSet author="vanina" id="v18.4.0-4-fix">
+	<changeSet author="nahuel" id="v18.4.0-4-fix">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="file_metadata_cvterm"/>
@@ -96,31 +96,6 @@
 
 		</sql>
 	</changeSet>
-	<!-- Commented changeSet for issue found it when create a Primary Key allowing null columns
-		 Ticket: IBP-6304 (Upgrade Mysql Server to 5.7) -->
-	<!-- changeSet author="nahuel" id="v18.4.0-4" >
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<tableExists tableName="file_metadata_cvterm"/>
-			</not>
-		</preConditions>
-		<comment>Create file_metadata_cvterm: cvterms to formally describe an image or file</comment>
-        <sql dbms="mysql" splitStatements="true">
-			create table file_metadata_cvterm
-			(
-				file_metadata_id int null,
-				cvterm_id int null,
-				constraint pk_file_metadata_cvterm
-					primary key (file_metadata_id, cvterm_id),
-				constraint fk_file_metadata_cvterm_cvterm_cvterm_id
-					foreign key (cvterm_id) references cvterm (cvterm_id),
-				constraint fk_file_metadata_cvterm_file_metadata_file_id
-					foreign key (file_metadata_id) references file_metadata (file_id)
-			)
-				comment 'cvterms to formally describe an image or file';
-
-		</sql>
-	</changeSet -->
 
 	<changeSet author="nahuel" id="v18.4.0-5" >
 		<preConditions onFail="MARK_RAN">
