@@ -357,9 +357,10 @@ public interface DatasetService {
 	/**
 	 * It will reject all the draft data for a dataset
 	 *
-	 * @param datasetId Id of the dataset
+	 * @param datasetId   Id of the dataset
+	 * @param instanceIds Id of the instance
 	 */
-	void rejectDatasetDraftData(Integer datasetId);
+	void rejectDatasetDraftData(Integer datasetId, Set<Integer> instanceIds);
 
 	/**
 	 * @param datasetId Id of the dataset
@@ -372,16 +373,18 @@ public interface DatasetService {
 	 *
 	 * @param studyId
 	 * @param datasetId
+	 * @param instanceIds
 	 */
-	void acceptAllDatasetDraftData(Integer studyId, Integer datasetId);
+	void acceptDatasetDraftData(Integer studyId, Integer datasetId, Set<Integer> instanceIds);
 
 	/**
 	 * Accepts the in bounds values for the draft data and set as missing the out of bounds values
 	 *
 	 * @param studyId
 	 * @param datasetId
+	 * @param instanceIds
 	 */
-	void acceptDraftDataAndSetOutOfBoundsToMissing(Integer studyId, Integer datasetId);
+	void acceptDraftDataAndSetOutOfBoundsToMissing(Integer studyId, Integer datasetId, Set<Integer> instanceIds);
 
 	/**
 	 * Accept the draft values that are retrieved after filtering by searchDTO.
