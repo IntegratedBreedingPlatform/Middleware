@@ -73,7 +73,7 @@
 			</column>
 		</createTable>
 	</changeSet>
-	<changeSet author="nahuel" id="v18.4.0-4-fix">
+	<changeSet author="cuenyad" id="v18.4.0-4-fix">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="file_metadata_cvterm"/>
