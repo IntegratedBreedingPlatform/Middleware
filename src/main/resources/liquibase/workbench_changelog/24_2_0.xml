@@ -33,4 +33,38 @@
 								  'GRAPHICAL_QUERIES'));
 		</sql>
  	</changeSet>
+	<changeSet author="cheryleigh" id="v24.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					select count(*)
+					from role_permission rp
+					where rp.role_id in (select id
+										from role
+										where role_type_id = 3)
+						and rp.permission_id in (select p.permission_id
+												from permission p
+												where p.name in ( 'MS_ANALYZE_WITH_STA_BRAPP',
+								'MS_ANALYZE_WITH_DECISION_SUPPORT',
+								'MS_CREATE_GEOREFERENCE',
+								'MS_EDIT_GEOREFERENCE',
+								'GRAPHICAL_QUERIES'))
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Delete BrAPI role_permission entries for program role type</comment>
+			<sql dbms="mysql" splitStatements="true">
+				DELETE FROM role_permission
+				where role_id in (select id
+									 from role
+									 where role_type_id = 3)
+					and permission_id in (select p.permission_id
+											 from permission p
+											 where p.name in ( 'MS_ANALYZE_WITH_STA_BRAPP',
+															 'MS_ANALYZE_WITH_DECISION_SUPPORT',
+															 'MS_CREATE_GEOREFERENCE',
+															 'MS_EDIT_GEOREFERENCE',
+															 'GRAPHICAL_QUERIES'));
+		</sql>
+ 	</changeSet>
 </databaseChangeLog>
