@@ -37,18 +37,16 @@
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">
-					select count(*)
-					from role_permission rp
-					where rp.role_id in (select id
-										from role
-										where role_type_id = 3)
-						and rp.permission_id in (select p.permission_id
-												from permission p
-												where p.name in ( 'MS_ANALYZE_WITH_STA_BRAPP',
-								'MS_ANALYZE_WITH_DECISION_SUPPORT',
-								'MS_CREATE_GEOREFERENCE',
-								'MS_EDIT_GEOREFERENCE',
-								'GRAPHICAL_QUERIES'))
+					SELECT COUNT(*)
+					FROM role_permission AS rp
+						JOIN role AS r ON rp.role_id = r.id
+						JOIN permission AS p ON rp.permission_id = p.permission_id
+					WHERE r.role_type_id = 3
+						AND p.name IN ('MS_ANALYZE_WITH_STA_BRAPP',
+										'MS_ANALYZE_WITH_DECISION_SUPPORT',
+										'MS_CREATE_GEOREFERENCE',
+										'MS_EDIT_GEOREFERENCE',
+										'GRAPHICAL_QUERIES', 'STUDIES')
 				</sqlCheck>
 			</not>
 		</preConditions>
