@@ -1277,11 +1277,7 @@ public class DatasetServiceImpl implements DatasetService {
 						Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.ENVIRONMENT_CONDITION.getId()));
 
 		if (!measurementVariableList.isEmpty()) {
-			final Map<String, MeasurementVariable> mappedVariables = new HashMap<>();
-			measurementVariableList.forEach(measurementVariable -> {
-				mappedVariables.putIfAbsent(measurementVariable.getName(), measurementVariable);
-				mappedVariables.putIfAbsent(measurementVariable.getAlias(), measurementVariable);
-			});
+			final Map<String, MeasurementVariable> mappedVariables = getMappedVariablesMap(measurementVariableList);
 
 			final Map<String, ObservationUnitRow> trialInstanceMap =
 					this.getEnvironmentObservationUnitRows(measurementVariableList, studyId, datasetId);
@@ -1305,29 +1301,8 @@ public class DatasetServiceImpl implements DatasetService {
 					this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, measurementVariableList,
 							observationUnitIds);
 
-			final List<GeolocationProperty> geolocationProperties = this.daoFactory.getGeolocationPropertyDao()
-					.getByGeolocationByGeolocationIdsAndVariableId(instanceIds);
-			final Map<String, Map<Integer, GeolocationProperty>> instanceNoPropertyMap = new HashMap<>();
-			for(final GeolocationProperty property: geolocationProperties) {
-				final String instanceNumber = property.getGeolocation().getDescription();
-				instanceNoPropertyMap.putIfAbsent(instanceNumber, new HashMap<>());
-				instanceNoPropertyMap.get(instanceNumber).put(property.getTypeId(), property);
-			}
-
-
-			final List<String> locationNames = new ArrayList<>();
-			Map<String, Integer> locationNameLocationIdMap = new HashMap<>();
-			if (table.columnKeySet().contains(LOCATION_NAME)) {
-				for (final String observationUnitId : table.rowKeySet()) {
-					locationNames.add(table.get(observationUnitId, LOCATION_NAME));
-				}
-				if (!org.springframework.util.CollectionUtils.isEmpty(locationNames)) {
-					final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-					locationSearchRequest.setLocationNames(locationNames);
-					locationNameLocationIdMap = this.locationService.searchLocations(locationSearchRequest, null, null)
-							.stream().collect(Collectors.toMap(loc -> loc.getName().toUpperCase(), LocationDTO::getId));
-				}
-			}
+			final Map<String, Map<Integer, GeolocationProperty>> instanceNoPropertyMap = getInstanceNoPropertyMap(instanceIds);
+			final Map<String, Integer> locationNameLocationIdMap = getLocationNameLocationIdMap(table);
 
 
 			boolean hasGeolocationMetaDataChanges = false;
@@ -1363,8 +1338,10 @@ public class DatasetServiceImpl implements DatasetService {
 						}
 					}
 				}
-				this.updateDependentPhenotypesStatusByGeolocation(
-						geolocationMap.get(trialInstanceNumber).getLocationId(), new ArrayList<>(updatedVariableIds));
+				if (CollectionUtils.isNotEmpty(updatedVariableIds)) {
+					this.updateDependentPhenotypesStatusByGeolocation(
+							geolocationMap.get(trialInstanceNumber).getLocationId(), new ArrayList<>(updatedVariableIds));
+				}
 			}
 
 			// Save Geolocation metadata changes
@@ -1374,6 +1351,44 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			}
 		}
+	}
+
+	private static Map<String, MeasurementVariable> getMappedVariablesMap(List<MeasurementVariable> measurementVariableList) {
+		final Map<String, MeasurementVariable> mappedVariables = new HashMap<>();
+		measurementVariableList.forEach(measurementVariable -> {
+			mappedVariables.putIfAbsent(measurementVariable.getName(), measurementVariable);
+			mappedVariables.putIfAbsent(measurementVariable.getAlias(), measurementVariable);
+		});
+		return mappedVariables;
+	}
+
+	private Map<String, Integer> getLocationNameLocationIdMap(Table<String, String, String> table) {
+		final List<String> locationNames = new ArrayList<>();
+		Map<String, Integer> locationNameLocationIdMap = new HashMap<>();
+		if (table.columnKeySet().contains(LOCATION_NAME)) {
+			for (final String observationUnitId : table.rowKeySet()) {
+				locationNames.add(table.get(observationUnitId, LOCATION_NAME));
+			}
+			if (!org.springframework.util.CollectionUtils.isEmpty(locationNames)) {
+				final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+				locationSearchRequest.setLocationNames(locationNames);
+				locationNameLocationIdMap = this.locationService.searchLocations(locationSearchRequest, null, null)
+						.stream().collect(Collectors.toMap(loc -> loc.getName().toUpperCase(), LocationDTO::getId));
+			}
+		}
+		return locationNameLocationIdMap;
+	}
+
+	private Map<String, Map<Integer, GeolocationProperty>> getInstanceNoPropertyMap(List<Integer> instanceIds) {
+		final List<GeolocationProperty> geolocationProperties = this.daoFactory.getGeolocationPropertyDao()
+				.getByGeolocationByGeolocationIds(instanceIds);
+		final Map<String, Map<Integer, GeolocationProperty>> instanceNoPropertyMap = new HashMap<>();
+		for(final GeolocationProperty property: geolocationProperties) {
+			final String instanceNumber = property.getGeolocation().getDescription();
+			instanceNoPropertyMap.putIfAbsent(instanceNumber, new HashMap<>());
+			instanceNoPropertyMap.get(instanceNumber).put(property.getTypeId(), property);
+		}
+		return instanceNoPropertyMap;
 	}
 
 	@Override
@@ -1386,11 +1401,7 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 		if (!measurementVariableList.isEmpty()) {
-			final Map<String, MeasurementVariable> mappedVariables = new HashMap<>();
-			measurementVariableList.forEach(measurementVariable -> {
-				mappedVariables.putIfAbsent(measurementVariable.getName(), measurementVariable);
-				mappedVariables.putIfAbsent(measurementVariable.getAlias(), measurementVariable);
-			});
+			final Map<String, MeasurementVariable> mappedVariables = getMappedVariablesMap(measurementVariableList);
 			final List<String> observationUnitIds = new ArrayList<>(table.rowKeySet());
 
 			final Map<String, ObservationUnitRow> currentData =

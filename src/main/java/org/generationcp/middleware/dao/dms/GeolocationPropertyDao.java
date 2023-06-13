@@ -258,7 +258,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		return criteria.list();
 	}
 
-	public List<GeolocationProperty> getByGeolocationByGeolocationIdsAndVariableId(final List<Integer> geolocationIds) {
+	public List<GeolocationProperty> getByGeolocationByGeolocationIds(final List<Integer> geolocationIds) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.in("geolocation.locationId", geolocationIds));
 		return criteria.list();
