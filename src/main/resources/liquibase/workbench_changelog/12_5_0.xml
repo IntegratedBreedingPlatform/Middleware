@@ -424,8 +424,7 @@
 			ON UPDATE NO ACTION;
 		</sql>
 	</changeSet>
-
-	<changeSet author="vanina" id="v12.5.0-17">
+	<changeSet author="cuenyad" id="v12.5.0-17-fix">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="role_permission"/>
@@ -436,20 +435,20 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE role_permission (
-			role_id INT(11) NOT NULL,
-			permission_id INT(11) NULL,
-			PRIMARY KEY (role_id, permission_id),
-			INDEX fk_role_permission_2_idx (permission_id ASC),
-			CONSTRAINT fk_role_permission_1
-			FOREIGN KEY (role_id)
-			REFERENCES role (id)
-			ON DELETE NO ACTION
-			ON UPDATE NO ACTION,
-			CONSTRAINT fk_role_permission_2
-			FOREIGN KEY (permission_id)
-			REFERENCES permission (permission_id)
-			ON DELETE NO ACTION
-			ON UPDATE NO ACTION);
+				role_id INT(11) NOT NULL,
+				permission_id INT(11) NOT NULL,
+				PRIMARY KEY (role_id, permission_id),
+				INDEX fk_role_permission_2_idx (permission_id ASC),
+				CONSTRAINT fk_role_permission_1
+					FOREIGN KEY (role_id)
+					REFERENCES role (id)
+					ON DELETE NO ACTION
+					ON UPDATE NO ACTION,
+				CONSTRAINT fk_role_permission_2
+					FOREIGN KEY (permission_id)
+				REFERENCES permission (permission_id)
+					ON DELETE NO ACTION
+					ON UPDATE NO ACTION);
 		</sql>
 	</changeSet>
 
