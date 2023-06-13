@@ -1313,7 +1313,7 @@ public class DatasetServiceImpl implements DatasetService {
 				final Set<Integer> updatedVariableIds = new HashSet<>();
 
 				for (final String variableName : table.columnKeySet()) {
-					String importedVariableValue = table.get(trialInstanceNumber, variableName);
+					final String importedVariableValue = table.get(trialInstanceNumber, variableName);
 					// Ignore empty strings and LOCATION_ID, Location value will be set from LOCATION_NAME
 					if (StringUtils.isNotBlank(importedVariableValue) && !LOCATION_ID.equalsIgnoreCase(variableName)) {
 						final MeasurementVariable measurementVariable = mappedVariables.get(variableName);
@@ -1353,7 +1353,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 	}
 
-	private static Map<String, MeasurementVariable> getMappedVariablesMap(List<MeasurementVariable> measurementVariableList) {
+	private static Map<String, MeasurementVariable> getMappedVariablesMap(final List<MeasurementVariable> measurementVariableList) {
 		final Map<String, MeasurementVariable> mappedVariables = new HashMap<>();
 		measurementVariableList.forEach(measurementVariable -> {
 			mappedVariables.putIfAbsent(measurementVariable.getName(), measurementVariable);
@@ -1362,7 +1362,7 @@ public class DatasetServiceImpl implements DatasetService {
 		return mappedVariables;
 	}
 
-	private Map<String, Integer> getLocationNameLocationIdMap(Table<String, String, String> table) {
+	private Map<String, Integer> getLocationNameLocationIdMap(final Table<String, String, String> table) {
 		final List<String> locationNames = new ArrayList<>();
 		Map<String, Integer> locationNameLocationIdMap = new HashMap<>();
 		if (table.columnKeySet().contains(LOCATION_NAME)) {
@@ -1379,7 +1379,7 @@ public class DatasetServiceImpl implements DatasetService {
 		return locationNameLocationIdMap;
 	}
 
-	private Map<String, Map<Integer, GeolocationProperty>> getInstanceNoPropertyMap(List<Integer> instanceIds) {
+	private Map<String, Map<Integer, GeolocationProperty>> getInstanceNoPropertyMap(final List<Integer> instanceIds) {
 		final List<GeolocationProperty> geolocationProperties = this.daoFactory.getGeolocationPropertyDao()
 				.getByGeolocationByGeolocationIds(instanceIds);
 		final Map<String, Map<Integer, GeolocationProperty>> instanceNoPropertyMap = new HashMap<>();
@@ -1415,7 +1415,7 @@ public class DatasetServiceImpl implements DatasetService {
 				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
 
 				for (final String variableName : table.columnKeySet()) {
-					String importedVariableValue = table.get(observationUnitId, variableName);
+					final String importedVariableValue = table.get(observationUnitId, variableName);
 
 					final MeasurementVariable measurementVariable = mappedVariables.get(variableName);
 
@@ -1595,7 +1595,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private void saveEnvironmentDetailValue(final MeasurementVariable measurementVariable, final Geolocation geolocation, GeolocationProperty property,
 											String value, final Set<Integer> updatedVariableIds) {
-		BigInteger categoricalValueId = this.getCategoricalValueId(value, measurementVariable);
+		final BigInteger categoricalValueId = this.getCategoricalValueId(value, measurementVariable);
 		value = getDateValueIfNecessary(value, measurementVariable);
 
 		if (property == null) {
@@ -1612,10 +1612,10 @@ public class DatasetServiceImpl implements DatasetService {
 		this.daoFactory.getGeolocationPropertyDao().save(property);
 	}
 
-	private void saveImportedVariableValue(Table<String, Integer, Integer> observationDbIdsTable, String observationUnitId,
-										   Set<Phenotype> phenotypes, ObservationUnitRow currentRow, String importedVariableValue,
-										   MeasurementVariable measurementVariable, final boolean draftMode, final Set<Integer> updatedVariableIds) {
-		BigInteger categoricalValueId = this.getCategoricalValueId(importedVariableValue, measurementVariable);
+	private void saveImportedVariableValue(final Table<String, Integer, Integer> observationDbIdsTable, final String observationUnitId,
+										   final Set<Phenotype> phenotypes, final ObservationUnitRow currentRow, String importedVariableValue,
+										   final MeasurementVariable measurementVariable, final boolean draftMode, final Set<Integer> updatedVariableIds) {
+		final BigInteger categoricalValueId = this.getCategoricalValueId(importedVariableValue, measurementVariable);
 		importedVariableValue = getDateValueIfNecessary(importedVariableValue, measurementVariable);
 
 		final ObservationUnitData observationUnitData = currentRow.getVariables().get(measurementVariable.getName());
@@ -1669,7 +1669,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 	}
 
-	private static String getDateValueIfNecessary(String importedVariableValue, MeasurementVariable measurementVariable) {
+	private static String getDateValueIfNecessary(String importedVariableValue, final MeasurementVariable measurementVariable) {
 		if (measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
 			// In case the date is in yyyy-MM-dd format, try to parse it as number format yyyyMMdd
 			final String parsedDate =
@@ -1681,7 +1681,7 @@ public class DatasetServiceImpl implements DatasetService {
 		return importedVariableValue;
 	}
 
-	private static BigInteger getCategoricalValueId(String importedVariableValue, MeasurementVariable measurementVariable) {
+	private static BigInteger getCategoricalValueId(final String importedVariableValue, final MeasurementVariable measurementVariable) {
 		BigInteger categoricalValueId = null;
 		if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 			for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
