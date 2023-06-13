@@ -29,11 +29,8 @@ import java.util.List;
 @Deprecated
 public interface DeprecatedNamingConventionService {
 
-	void generateAdvanceListNames(List<DeprecatedAdvancingSource> advancingSourceItems, boolean checkForDuplicateName, List<ImportedGermplasm> germplasmList) throws
-		MiddlewareQueryException, RuleException;
-
 	/*
-	* Generated the names for the list of crosses based on on rules setup for the breeding methods
+	* Generated the names for the list of crosses based on rules setup for the breeding methods
 	*/
 	List<ImportedCross> generateCrossesList(List<ImportedCross> importedCrosses, DeprecatedAdvancingSourceList rows, boolean checkForDuplicateName,
 		Workbook workbook, List<Integer> gids) throws RuleException;

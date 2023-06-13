@@ -201,16 +201,6 @@ public interface FieldbookService {
 	 */
 	StandardVariable getStandardVariable(int id, String programUUID);
 
-	/**
-	 * Count plots with plants selectedof nursery.
-	 *
-	 * @param nurseryId
-	 *            the nursery id
-	 * @param variateIds
-	 *            the variate ids
-	 * @return the count
-	 */
-	int countPlotsWithRecordedVariatesInDataset(int nurseryId, List<Integer> variateIds);
 
 	/**
 	 * Gets the nursery variable settings.
