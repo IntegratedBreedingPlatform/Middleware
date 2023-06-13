@@ -3,11 +3,8 @@ package org.generationcp.middleware.ruleengine.namingdeprecated.impl;
 
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.RuleExecutionContext;
 import org.generationcp.middleware.ruleengine.RuleExecutionNamespace;
@@ -20,7 +17,6 @@ import org.generationcp.middleware.ruleengine.namingdeprecated.service.Deprecate
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSource;
 import org.generationcp.middleware.ruleengine.pojo.DeprecatedAdvancingSourceList;
 import org.generationcp.middleware.ruleengine.pojo.ImportedCross;
-import org.generationcp.middleware.ruleengine.pojo.ImportedGermplasm;
 import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.TimerWatch;
@@ -33,17 +29,13 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 @Deprecated
 @Service
 @Transactional
 public class DeprecatedNamingConventionServiceImpl implements DeprecatedNamingConventionService {
-
-	public static final int NAME_MAX_LENGTH = 5000;
 
 	@Resource
 	private FieldbookService fieldbookMiddlewareService;
@@ -62,56 +54,6 @@ public class DeprecatedNamingConventionServiceImpl implements DeprecatedNamingCo
 
 	@Resource
 	private ResourceBundleMessageSource messageSource;
-
-	@SuppressWarnings("unchecked")
-	@Deprecated
-	@Override
-	public void generateAdvanceListNames(final List<DeprecatedAdvancingSource> advancingSourceItems, final boolean checkForDuplicateName,
-		final List<ImportedGermplasm> germplasmList) throws MiddlewareQueryException, RuleException {
-
-		final TimerWatch timer = new TimerWatch("advance");
-		final Locale locale = LocaleContextHolder.getLocale();
-
-		Map<String, Integer> keySequenceMap = new HashMap<>();
-		final Iterator<ImportedGermplasm> germplasmIterator = germplasmList.iterator();
-		for (final DeprecatedAdvancingSource row : advancingSourceItems) {
-			if (row.getGermplasm() != null && row.getPlantsSelected() != null && row.getBreedingMethod() != null
-				&& row.getPlantsSelected() > 0 && row.getBreedingMethod().isBulkingMethod() != null) {
-				row.setKeySequenceMap(keySequenceMap);
-
-				final List<String> names;
-				final RuleExecutionContext namingExecutionContext =
-					this.setupNamingRuleExecutionContext(row, checkForDuplicateName);
-				names = (List<String>) this.rulesService.runRules(namingExecutionContext);
-
-				for (final String name : names) {
-					final ImportedGermplasm germplasm = germplasmIterator.next();
-					if (name.length() > NAME_MAX_LENGTH) {
-						throw new MiddlewareQueryException("error.save.resulting.name.exceeds.limit");
-					}
-					germplasm.setDesig(name);
-					this.assignNames(germplasm);
-				}
-
-				// Pass the key sequence map to the next entry to process
-				keySequenceMap = row.getKeySequenceMap();
-			}
-		}
-		timer.stop();
-	}
-
-	@Deprecated
-	protected void assignNames(final ImportedGermplasm germplasm) {
-		final List<Name> names = new ArrayList<>();
-
-		final Name name = new Name();
-		name.setTypeId(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID());
-		name.setNval(germplasm.getDesig());
-		name.setNstat(1);
-		names.add(name);
-
-		germplasm.setNames(names);
-	}
 
 	@Override
 	public List<ImportedCross> generateCrossesList(final List<ImportedCross> importedCrosses, final DeprecatedAdvancingSourceList rows,
@@ -180,7 +122,8 @@ public class DeprecatedNamingConventionServiceImpl implements DeprecatedNamingCo
 		return importedCrosses;
 	}
 
-	protected RuleExecutionContext setupNamingRuleExecutionContext(final DeprecatedAdvancingSource row, final boolean checkForDuplicateName) {
+	protected RuleExecutionContext setupNamingRuleExecutionContext(final DeprecatedAdvancingSource row,
+		final boolean checkForDuplicateName) {
 		List<String> sequenceList = Arrays.asList(this.ruleFactory.getRuleSequenceForNamespace(RuleExecutionNamespace.NAMING));
 
 		if (checkForDuplicateName) {
@@ -191,7 +134,7 @@ public class DeprecatedNamingConventionServiceImpl implements DeprecatedNamingCo
 
 		final DeprecatedNamingRuleExecutionContext context =
 			new DeprecatedNamingRuleExecutionContext(sequenceList, this.processCodeService, row, this.germplasmDataManager,
-				new ArrayList<String>());
+				new ArrayList<>());
 		context.setMessageSource(this.messageSource);
 
 		return context;

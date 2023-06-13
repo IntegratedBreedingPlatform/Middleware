@@ -425,11 +425,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public int countPlotsWithRecordedVariatesInDataset(final int datasetId, final List<Integer> variateIds) {
-		return this.studyDataManager.countPlotsWithRecordedVariatesInDataset(datasetId, variateIds);
-	}
-
-	@Override
 	public Workbook getStudyVariableSettings(final int id) {
 		return this.workbookBuilder.createStudyVariableSettings(id);
 	}
