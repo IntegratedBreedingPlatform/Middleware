@@ -102,7 +102,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		// block IDs to return to be used for locdes deletion
 		// only return if no other geolocation uses the block
 		try{
-			SQLQuery sqlQuery1 = this.getSession().createSQLQuery(GET_BLOCK_IDS_TO_DELETE)
+			final SQLQuery sqlQuery1 = this.getSession().createSQLQuery(GET_BLOCK_IDS_TO_DELETE)
 				.addScalar("nd_geolocation_id")
 				.addScalar("value");
 			sqlQuery1.setParameterList("geolocationIds", geolocationIds);
@@ -129,7 +129,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			// statement
 			this.getSession().flush();
 
-			SQLQuery sqlQuery1 = this.getSession().createSQLQuery(DELETE_GEOLOCATIONPROP_BY_ID_TYPE);
+			final SQLQuery sqlQuery1 = this.getSession().createSQLQuery(DELETE_GEOLOCATIONPROP_BY_ID_TYPE);
 			sqlQuery1.setParameterList("geolocationIds", geolocationIds);
 			sqlQuery1.setParameter("variableIds", TermId.BLOCK_ID.getId());
 			sqlQuery1.executeUpdate();
@@ -255,6 +255,12 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 	public List<GeolocationProperty> getByGeolocation(final Integer geolocationId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("geolocation.locationId", geolocationId));
+		return criteria.list();
+	}
+
+	public List<GeolocationProperty> getByGeolocationByGeolocationIds(final List<Integer> geolocationIds) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.in("geolocation.locationId", geolocationIds));
 		return criteria.list();
 	}
 

@@ -309,6 +309,15 @@ public interface DatasetService {
 	Table<String, Integer, Integer> importDataset(Integer datasetId, Table<String, String, String> table, Boolean draftMode, Boolean allowDateAndCharacterBlankValue);
 
 	/**
+	 * Import Environment Variable(Environment Condtion/Details) values
+	 *
+	 * @param studyId
+	 * @param datasetId
+	 * @param table
+	 */
+	void importEnvironmentVariableValues(Integer studyId, Integer datasetId, Table<String, String, String> table);
+
+	/**
 	 * Return all measurements variables from dataset
 	 *
 	 * @param datasetId
