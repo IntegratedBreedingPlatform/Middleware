@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.germplasm;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.germplasm.search.GermplasmAttributeSearchRequest;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.shared.AttributeDto;
@@ -22,6 +23,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +32,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTestBase {
+public class GermplasmAttributeServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private static final String NOTE_ATTRIBUTE = "NOTE_AA_text";
 	private static final String ATTRIBUTE_VALUE = RandomStringUtils.randomAlphanumeric(5);
@@ -100,8 +102,13 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 		final Integer createdAttributeId = this.createAttribute(germplasm.getGid());
-		final List<AttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(
-			germplasm.getGid(), VariableType.GERMPLASM_ATTRIBUTE.getId(), null);
+
+		final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
+		germplasmAttributeSearchRequest.setGids(Arrays.asList(germplasm.getGid()));
+		germplasmAttributeSearchRequest.setVariableTypeId(VariableType.GERMPLASM_ATTRIBUTE.getId());
+		germplasmAttributeSearchRequest.setProgramUUID(null);
+		final List<AttributeDto> germplasmAttributeDtos =
+			this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest);
 		final List<AttributeDto> filteredDtos = germplasmAttributeDtos.stream().filter(dto -> dto.getId().equals(createdAttributeId))
 			.collect(Collectors.toList());
 		Assert.assertFalse(CollectionUtils.isEmpty(filteredDtos));
