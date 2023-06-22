@@ -275,10 +275,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 		// Retrieve the germplasm attributes and passport descriptors of the germplasm being advanced.
 		// We will copy these attributes to the advanced germplasm later
 		// These maps will only be populated if the user opts to propagate these attributes.
-		final Map<Integer, List<AttributeDto>> germplasmAttributesMap = isPreview ?
-			new HashMap<>() : this.getAttributesMap(request, gids, VariableType.GERMPLASM_ATTRIBUTE);
-		final Map<Integer, List<AttributeDto>> germplasmPassportMap = isPreview ?
-			new HashMap<>() : this.getAttributesMap(request, gids, VariableType.GERMPLASM_PASSPORT);
+		final Map<Integer, List<AttributeDto>> germplasmAttributesMap = isPreview || request.isPropagatePassportDescriptorData() ?
+			new HashMap<>() : this.getAttributesDtoMap(gids, VariableType.GERMPLASM_ATTRIBUTE);
+		final Map<Integer, List<AttributeDto>> germplasmPassportMap = isPreview || request.isPropagateAttributesData() ?
+			new HashMap<>() : this.getAttributesDtoMap(gids, VariableType.GERMPLASM_PASSPORT);
 
 		// Getting data related at study level
 		final String seasonStudyLevel = this.seasonDataResolver.resolveStudyLevelData(studyEnvironmentVariables);
@@ -453,16 +453,12 @@ public class AdvanceServiceImpl implements AdvanceService {
 		return advancedGermplasmGids;
 	}
 
-	private Map<Integer, List<AttributeDto>> getAttributesMap(final AdvanceRequest request,
-		final Set<Integer> gids, final VariableType variableType) {
-		if (request.isPropagateAttributesData()) {
-			final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
-			germplasmAttributeSearchRequest.setGids(gids);
-			germplasmAttributeSearchRequest.setVariableTypeId(variableType.getId());
-			return this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest).stream()
-				.collect(Collectors.groupingBy(AttributeDto::getGid));
-		}
-		return new HashMap<>();
+	private Map<Integer, List<AttributeDto>> getAttributesDtoMap(final Set<Integer> gids, final VariableType variableType) {
+		final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
+		germplasmAttributeSearchRequest.setGids(gids);
+		germplasmAttributeSearchRequest.setVariableTypeId(variableType.getId());
+		return this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest).stream()
+			.collect(Collectors.groupingBy(AttributeDto::getGid));
 	}
 
 	private List<ObservationUnitRow> getObservations(final Integer studyId, final Integer plotDatasetId,
@@ -688,8 +684,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 				// Default passport descriptors variables should not be inherited from the source
 				if (!excludedVariableIdsForPropagation.contains(attributeDto.getVariableId())) {
 					this.daoFactory.getAttributeDAO()
-						.save(this.createGermplasmAttribute(advancedGermplasmGid, attributeDto.getValue(), attributeDto.getVariableId(),
-							attributeDto.getLocationId(), Integer.valueOf(attributeDto.getDate())));
+						.save(this.createGermplasmAttribute(advancedGermplasmGid, attributeDto.getValue(), attributeDto.getcValueId(),
+							attributeDto.getVariableId(), attributeDto.getLocationId(), Integer.valueOf(attributeDto.getDate())));
 				}
 			}));
 		}
@@ -715,19 +711,19 @@ public class AdvanceServiceImpl implements AdvanceService {
 			observation, studyEnvironmentVariables, locationNameByIds, studyInstancesByInstanceNumber, environmentVariables);
 
 		final Attribute plotCodeAttribute =
-			this.createGermplasmAttribute(advancedGermplasmGid, seedSource, plotCodeVariableId, locationId, date);
+			this.createGermplasmAttribute(advancedGermplasmGid, seedSource, null, plotCodeVariableId, locationId, date);
 		this.daoFactory.getAttributeDAO().save(plotCodeAttribute);
 
 		if (plotNumberVariableId != null) {
 			final Attribute plotNumberAttribute =
-				this.createGermplasmAttribute(advancedGermplasmGid, plotNumber, plotNumberVariableId, locationId, date);
+				this.createGermplasmAttribute(advancedGermplasmGid, plotNumber, null, plotNumberVariableId, locationId, date);
 			this.daoFactory.getAttributeDAO().save(plotNumberAttribute);
 		}
 
 		final String replicationNumber = observation.getVariableValueByVariableId(TermId.REP_NO.getId());
 		if (repNumberVariableId != null && !StringUtils.isEmpty(replicationNumber)) {
 			final Attribute replicationNumberAttribute =
-				this.createGermplasmAttribute(advancedGermplasmGid, replicationNumber, repNumberVariableId, locationId, date);
+				this.createGermplasmAttribute(advancedGermplasmGid, replicationNumber, null, repNumberVariableId, locationId, date);
 			this.daoFactory.getAttributeDAO().save(replicationNumberAttribute);
 		}
 
@@ -736,7 +732,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 		if (trialInstanceVariableId != null) {
 			final Attribute trialInstanceNumberAttribute =
-				this.createGermplasmAttribute(advancedGermplasmGid, observation.getTrialInstance().toString(), trialInstanceVariableId,
+				this.createGermplasmAttribute(advancedGermplasmGid, observation.getTrialInstance().toString(), null,
+					trialInstanceVariableId,
 					locationId, date);
 			this.daoFactory.getAttributeDAO().save(trialInstanceNumberAttribute);
 		}
@@ -779,7 +776,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 		// Adding attribute for samples advancement
 		if (sampleNumber != null) {
 			final Attribute plantNumberAttribute =
-				this.createGermplasmAttribute(advancedGermplasmGid, sampleNumber, plantNumberVariableId, locationId, date);
+				this.createGermplasmAttribute(advancedGermplasmGid, sampleNumber, null, plantNumberVariableId, locationId, date);
 			this.daoFactory.getAttributeDAO().save(plantNumberAttribute);
 			return;
 		}
@@ -792,14 +789,14 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final String plantNumber = observation.getVariableValueByVariableId(observationUnitVariable.getTermId());
 		if (DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId() == datasetTypeId && plantNumber != null) {
 			final Attribute plantNumberAttribute =
-				this.createGermplasmAttribute(advancedGermplasmGid, plantNumber, plantNumberVariableId, locationId, date);
+				this.createGermplasmAttribute(advancedGermplasmGid, plantNumber, null, plantNumberVariableId, locationId, date);
 			this.daoFactory.getAttributeDAO().save(plantNumberAttribute);
 		}
 	}
 
-	private Attribute createGermplasmAttribute(final Integer germplasmId, final String value, final Integer typeId,
+	private Attribute createGermplasmAttribute(final Integer germplasmId, final String value, final Integer cValueId, final Integer typeId,
 		final Integer locationId, final Integer date) {
-		return new Attribute(null, germplasmId, typeId, value, null, locationId, null, date);
+		return new Attribute(null, germplasmId, typeId, value, cValueId, locationId, null, date);
 	}
 
 	private MeasurementVariable getObservationUnitVariable(final DatasetDTO datasetDTO) {

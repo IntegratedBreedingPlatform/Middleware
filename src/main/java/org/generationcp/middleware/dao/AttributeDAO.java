@@ -204,6 +204,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("Select a.aid AS id, ");
 			queryString.append("a.gid as gid, ");
+			queryString.append("a.cval_id as cValueId, ");
 			queryString.append("cv.cvterm_id as variableId, ");
 			queryString.append("a.aval AS value, ");
 			queryString.append("IFNULL(vpo.alias, cv.name) AS variableName, ");

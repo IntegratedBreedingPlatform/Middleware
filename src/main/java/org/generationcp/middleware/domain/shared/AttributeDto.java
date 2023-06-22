@@ -10,6 +10,8 @@ public class AttributeDto extends AttributeRequestDto {
 
 	private Integer gid;
 
+	private Integer cValueId;
+
 	private String variableName;
 
 	private String variableDescription;
@@ -37,6 +39,14 @@ public class AttributeDto extends AttributeRequestDto {
 
 	public void setGid(final Integer gid) {
 		this.gid = gid;
+	}
+
+	public Integer getcValueId() {
+		return this.cValueId;
+	}
+
+	public void setcValueId(final Integer cValueId) {
+		this.cValueId = cValueId;
 	}
 
 	public String getVariableDescription() {
