@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -115,6 +114,7 @@ public class GermplasmAttributeServiceImplIntegrationTest extends IntegrationTes
 		Assert.assertFalse(CollectionUtils.isEmpty(filteredDtos));
 		final AttributeDto germplasmAttributeDto = filteredDtos.get(0);
 		Assert.assertEquals(createdAttributeId, germplasmAttributeDto.getId());
+		Assert.assertEquals(germplasm.getGid(), germplasmAttributeDto.getGid());
 		Assert.assertEquals(ATTRIBUTE_VALUE, germplasmAttributeDto.getValue());
 		Assert.assertEquals(NOTE_ATTRIBUTE, germplasmAttributeDto.getVariableName());
 		Assert.assertEquals(ATTRIBUTE_DATE, germplasmAttributeDto.getDate());

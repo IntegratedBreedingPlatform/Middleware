@@ -12,7 +12,6 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmAttributeSearchRequest;
@@ -204,6 +203,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("Select a.aid AS id, ");
+			queryString.append("a.gid as gid, ");
 			queryString.append("cv.cvterm_id as variableId, ");
 			queryString.append("a.aval AS value, ");
 			queryString.append("IFNULL(vpo.alias, cv.name) AS variableName, ");
@@ -220,7 +220,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 			queryString.append(
 				"INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id ");
 			queryString.append("LEFT JOIN location l on a.alocn = l.locid ");
-			queryString.append("LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = cv.cvterm_id ");
+			queryString.append("LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = cv.cvterm_id AND vpo.program_uuid = :programUUID ");
 			queryString.append("WHERE ");
 
 			final List<String> conditions = new ArrayList<>();
@@ -230,10 +230,6 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 
 			if (germplasmAttributeSearchRequest.getVariableTypeId() != null) {
 				conditions.add("cp.value = :variableTypeName");
-			}
-
-			if (StringUtils.isNotEmpty(germplasmAttributeSearchRequest.getProgramUUID())) {
-				conditions.add("vpo.program_uuid = :programUUID");
 			}
 
 			queryString.append(conditions.stream().collect(Collectors.joining(" AND ")));
@@ -250,10 +246,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 					VariableType.getById(germplasmAttributeSearchRequest.getVariableTypeId()).getName());
 			}
 
-			if (StringUtils.isNotEmpty(germplasmAttributeSearchRequest.getProgramUUID())) {
-				sqlQuery.setParameter(PROGRAM_UUID, germplasmAttributeSearchRequest.getProgramUUID());
-			}
-
+			sqlQuery.setParameter(PROGRAM_UUID, germplasmAttributeSearchRequest.getProgramUUID());
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(AttributeDto.class));
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
