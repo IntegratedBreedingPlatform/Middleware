@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasm;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -104,7 +105,7 @@ public class GermplasmAttributeServiceImplIntegrationTest extends IntegrationTes
 		final Integer createdAttributeId = this.createAttribute(germplasm.getGid());
 
 		final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
-		germplasmAttributeSearchRequest.setGids(Arrays.asList(germplasm.getGid()));
+		germplasmAttributeSearchRequest.setGids(Sets.newHashSet(germplasm.getGid()));
 		germplasmAttributeSearchRequest.setVariableTypeId(VariableType.GERMPLASM_ATTRIBUTE.getId());
 		germplasmAttributeSearchRequest.setProgramUUID(null);
 		final List<AttributeDto> germplasmAttributeDtos =

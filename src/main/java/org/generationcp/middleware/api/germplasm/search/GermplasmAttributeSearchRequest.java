@@ -3,22 +3,22 @@ package org.generationcp.middleware.api.germplasm.search;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.util.List;
+import java.util.Set;
 
 @AutoProperty
 public class GermplasmAttributeSearchRequest {
 
-	private List<Integer> gids;
+	private Set<Integer> gids;
 
 	private String programUUID;
 
 	private Integer variableTypeId;
 
-	public List<Integer> getGids() {
+	public Set<Integer> getGids() {
 		return this.gids;
 	}
 
-	public void setGids(final List<Integer> gids) {
+	public void setGids(final Set<Integer> gids) {
 		this.gids = gids;
 	}
 
