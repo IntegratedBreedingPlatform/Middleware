@@ -275,10 +275,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 		// Retrieve the germplasm attributes and passport descriptors of the germplasm being advanced.
 		// We will copy these attributes to the advanced germplasm later
 		// These maps will only be populated if the user opts to propagate these attributes.
-		final Map<Integer, List<AttributeDto>> germplasmAttributesMap = isPreview || request.isPropagatePassportDescriptorData() ?
-			new HashMap<>() : this.getAttributesDtoMap(gids, VariableType.GERMPLASM_ATTRIBUTE);
-		final Map<Integer, List<AttributeDto>> germplasmPassportMap = isPreview || request.isPropagateAttributesData() ?
+		final Map<Integer, List<AttributeDto>> germplasmPassportMap = isPreview || !request.isPropagatePassportDescriptorData() ?
 			new HashMap<>() : this.getAttributesDtoMap(gids, VariableType.GERMPLASM_PASSPORT);
+		final Map<Integer, List<AttributeDto>> germplasmAttributesMap = isPreview || !request.isPropagateAttributesData() ?
+			new HashMap<>() : this.getAttributesDtoMap(gids, VariableType.GERMPLASM_ATTRIBUTE);
 
 		// Getting data related at study level
 		final String seasonStudyLevel = this.seasonDataResolver.resolveStudyLevelData(studyEnvironmentVariables);
