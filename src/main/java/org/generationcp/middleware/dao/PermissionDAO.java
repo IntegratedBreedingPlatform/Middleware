@@ -65,7 +65,8 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 		+ "                  and ur1.workbench_project_id = :projectId " //
 		+ "         )) " //
 		+ "  ) " //
-		+ "  or (r.role_type_id = "+ RoleType.PROGRAM.getId() +" and ur.crop_name = :cropName and ur.workbench_project_id = :projectId)) " //
+		+ "  or (r.role_type_id = " + RoleType.PROGRAM.getId() + " and ur.crop_name = :cropName " //
+		+ "       and (:isBrapi = 1 or ur.workbench_project_id = :projectId))) " //
 		+ "and ur.userid = :userId and r.active = 1";
 
 	/**
@@ -94,9 +95,9 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 		+ "      where r1.role_type_id =  " + RoleType.PROGRAM.getId()  //
 		+ "        and ur1.crop_name = ur.crop_name and ur1.userid = ur.userid " //
 		+ " ) " //
-		+ " and p.name in ('" + PermissionsEnum.CROP_MANAGEMENT.toString()  //
-		+ "', '" + PermissionsEnum.MANAGE_PROGRAMS.toString()  //
-		+ "', '" + PermissionsEnum.ADD_PROGRAM.toString() + "')) " //
+		+ " and p.name in ('" + PermissionsEnum.CROP_MANAGEMENT  //
+		+ "', '" + PermissionsEnum.MANAGE_PROGRAMS  //
+		+ "', '" + PermissionsEnum.ADD_PROGRAM + "')) " //
 		+ " and ur.userid = :userId and r.active = 1";
 
 	private static final String PERMISSION_CHILDREN = "select " //
@@ -113,12 +114,17 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 	}
 
 	public List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId) {
+		return this.getPermissions(userId, cropName, programId, 0);
+	}
+
+	public List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId, final int isBrapi) {
 		//FIXME. Try an user with ADMIN and MANAGE_PROGRAM_SETTINGS, Only ADMIN should be retrieved and given that MANAGE_PROGRAMS is not a row in the result, both permissions are returned
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(PermissionDAO.SQL_FILTERED_PERMISSIONS);
 			query.setParameter("userId", userId);
 			query.setParameter("cropName", cropName);
 			query.setParameter("projectId", programId);
+			query.setParameter("isBrapi", isBrapi);
 			query.addScalar("id").addScalar("name").addScalar("parentId")
 				.addScalar("description").addScalar("workbenchCategoryLinkId");
 			query.setResultTransformer(Transformers.aliasToBean(PermissionDto.class));
@@ -138,7 +144,7 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 			 * 	 It will inject the CROP_MANAGEMENT, MANAGE_PROGRAMS, ADD_PROGRAM permissions - if not yet added -
 			 * 	 if the user has a role on any crop/program which has those permissions.
 			 * 	 CAVEAT: Code below could be improved (mainly copied pattern above) with the priority of having the RIGHT behavior over clean code
- 			 */
+			 */
 			final SQLQuery query2 = this.getSession().createSQLQuery(PermissionDAO.SQL_ADD_PROGRAM_PERMISSIONS);
 			query2.setParameter("userId", userId);
 			query2.addScalar("id").addScalar("name").addScalar("parentId")
