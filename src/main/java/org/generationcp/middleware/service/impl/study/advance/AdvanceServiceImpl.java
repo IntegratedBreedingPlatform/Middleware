@@ -17,13 +17,13 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.BasicGermplasmDTO;
 import org.generationcp.middleware.domain.germplasm.BasicNameDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sample.SampleDTO;
-import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -275,9 +275,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 		// Retrieve the germplasm attributes and passport descriptors of the germplasm being advanced.
 		// We will copy these attributes to the advanced germplasm later
 		// These maps will only be populated if the user opts to propagate these attributes.
-		final Map<Integer, List<AttributeDto>> germplasmPassportMap = isPreview || !request.isPropagatePassportDescriptorData() ?
+		final Map<Integer, List<GermplasmAttributeDto>> germplasmPassportMap = isPreview || !request.isPropagatePassportDescriptorData() ?
 			new HashMap<>() : this.getAttributesDtoMap(gids, VariableType.GERMPLASM_PASSPORT);
-		final Map<Integer, List<AttributeDto>> germplasmAttributesMap = isPreview || !request.isPropagateAttributesData() ?
+		final Map<Integer, List<GermplasmAttributeDto>> germplasmAttributesMap = isPreview || !request.isPropagateAttributesData() ?
 			new HashMap<>() : this.getAttributesDtoMap(gids, VariableType.GERMPLASM_ATTRIBUTE);
 
 		// Getting data related at study level
@@ -453,12 +453,12 @@ public class AdvanceServiceImpl implements AdvanceService {
 		return advancedGermplasmGids;
 	}
 
-	private Map<Integer, List<AttributeDto>> getAttributesDtoMap(final Set<Integer> gids, final VariableType variableType) {
+	private Map<Integer, List<GermplasmAttributeDto>> getAttributesDtoMap(final Set<Integer> gids, final VariableType variableType) {
 		final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
 		germplasmAttributeSearchRequest.setGids(gids);
 		germplasmAttributeSearchRequest.setVariableTypeId(variableType.getId());
 		return this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest).stream()
-			.collect(Collectors.groupingBy(AttributeDto::getGid));
+			.collect(Collectors.groupingBy(GermplasmAttributeDto::getGid));
 	}
 
 	private List<ObservationUnitRow> getObservations(final Integer studyId, final Integer plotDatasetId,
@@ -678,7 +678,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	private void propagateAttributesFromOriginalGermplasmToAdvancedGermplasm(final Integer originalGermplasmGid,
 		final Integer advancedGermplasmGid,
-		final Map<Integer, List<AttributeDto>> attributesMap, final List<Integer> excludedVariableIdsForPropagation) {
+		final Map<Integer, List<GermplasmAttributeDto>> attributesMap, final List<Integer> excludedVariableIdsForPropagation) {
 		if (attributesMap.containsKey(originalGermplasmGid)) {
 			attributesMap.get(originalGermplasmGid).forEach((attributeDto -> {
 				// Default passport descriptors variables should not be inherited from the source

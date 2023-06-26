@@ -120,8 +120,6 @@ public abstract class GenericAttributeDAO<T extends GenericAttribute> extends Ge
 
 	public void addQueryScalars(final SQLQuery sqlQuery) {
 		sqlQuery.addScalar("id");
-		sqlQuery.addScalar("gid");
-		sqlQuery.addScalar("cValueId");
 		sqlQuery.addScalar("variableId");
 		sqlQuery.addScalar("value");
 		sqlQuery.addScalar("variableName");

@@ -5,9 +5,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.germplasm.search.GermplasmAttributeSearchRequest;
+import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
@@ -107,12 +107,13 @@ public class GermplasmAttributeServiceImplIntegrationTest extends IntegrationTes
 		germplasmAttributeSearchRequest.setGids(Sets.newHashSet(germplasm.getGid()));
 		germplasmAttributeSearchRequest.setVariableTypeId(VariableType.GERMPLASM_ATTRIBUTE.getId());
 		germplasmAttributeSearchRequest.setProgramUUID(null);
-		final List<AttributeDto> germplasmAttributeDtos =
+		final List<GermplasmAttributeDto> germplasmAttributeDtos =
 			this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest);
-		final List<AttributeDto> filteredDtos = germplasmAttributeDtos.stream().filter(dto -> dto.getId().equals(createdAttributeId))
-			.collect(Collectors.toList());
+		final List<GermplasmAttributeDto> filteredDtos =
+			germplasmAttributeDtos.stream().filter(dto -> dto.getId().equals(createdAttributeId))
+				.collect(Collectors.toList());
 		Assert.assertFalse(CollectionUtils.isEmpty(filteredDtos));
-		final AttributeDto germplasmAttributeDto = filteredDtos.get(0);
+		final GermplasmAttributeDto germplasmAttributeDto = filteredDtos.get(0);
 		Assert.assertEquals(createdAttributeId, germplasmAttributeDto.getId());
 		Assert.assertEquals(germplasm.getGid(), germplasmAttributeDto.getGid());
 		Assert.assertEquals(ATTRIBUTE_VALUE, germplasmAttributeDto.getValue());

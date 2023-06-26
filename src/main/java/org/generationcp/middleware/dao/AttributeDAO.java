@@ -16,12 +16,12 @@ import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
 import org.generationcp.middleware.api.germplasm.search.GermplasmAttributeSearchRequest;
 import org.generationcp.middleware.dao.util.BrapiVariableUtils;
+import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
-import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.util.Util;
@@ -199,7 +199,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 		return attributeValue;
 	}
 
-	public List<AttributeDto> getGermplasmAttributeDtos(final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest) {
+	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("Select a.aid AS id, ");
@@ -236,6 +236,9 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 			queryString.append(conditions.stream().collect(Collectors.joining(" AND ")));
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
+
+			sqlQuery.addScalar("gid");
+			sqlQuery.addScalar("cValueId");
 			this.addQueryScalars(sqlQuery);
 
 			if (CollectionUtils.isNotEmpty(germplasmAttributeSearchRequest.getGids())) {
@@ -248,7 +251,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 			}
 
 			sqlQuery.setParameter(PROGRAM_UUID, germplasmAttributeSearchRequest.getProgramUUID());
-			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(AttributeDto.class));
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmAttributeDto.class));
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
