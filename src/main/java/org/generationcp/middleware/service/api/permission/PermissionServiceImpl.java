@@ -28,9 +28,9 @@ public class PermissionServiceImpl implements PermissionService {
 	}
 
 	@Override
-	public List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId, final Boolean isBrapi) {
-		final int isBrapiIntValue = isBrapi ? 1 : 0;
-		return this.workbenchDaoFactory.getPermissionDAO().getPermissions(userId, cropName, programId, isBrapiIntValue);
+	public List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId, final Boolean skipProgramValidation) {
+		final int skipProgramValidationInt = skipProgramValidation ? 1 : 0;
+		return this.workbenchDaoFactory.getPermissionDAO().getPermissions(userId, cropName, programId, skipProgramValidationInt);
 	}
 
 	@Override
