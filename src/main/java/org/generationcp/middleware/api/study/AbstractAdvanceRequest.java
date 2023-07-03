@@ -14,6 +14,10 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 
 	private SelectionTraitRequest selectionTraitRequest;
 
+	private boolean propagateAttributesData;
+
+	private boolean propagatePassportDescriptorData;
+
 	@Override
 	public List<Integer> getInstanceIds() {
 		return this.instanceIds;
@@ -39,6 +43,24 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 
 	public void setSelectionTraitRequest(final SelectionTraitRequest selectionTraitRequest) {
 		this.selectionTraitRequest = selectionTraitRequest;
+	}
+
+	@Override
+	public boolean isPropagateAttributesData() {
+		return this.propagateAttributesData;
+	}
+
+	public void setPropagateAttributesData(final boolean propagateAttributesData) {
+		this.propagateAttributesData = propagateAttributesData;
+	}
+
+	@Override
+	public boolean isPropagatePassportDescriptorData() {
+		return this.propagatePassportDescriptorData;
+	}
+
+	public void setPropagatePassportDescriptorData(final boolean propagatePassportDescriptorData) {
+		this.propagatePassportDescriptorData = propagatePassportDescriptorData;
 	}
 
 	@Override
