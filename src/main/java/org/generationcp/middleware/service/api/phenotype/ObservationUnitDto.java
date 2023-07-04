@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.brapi.v2.observationunit.Treatment;
 import org.generationcp.middleware.service.api.BrapiView;
@@ -74,7 +75,7 @@ public class ObservationUnitDto {
 	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
 	private String entryNumber;
 
-	private List<PhenotypeSearchObservationDTO> observations;
+	private List<ObservationDto> observations;
 
 	@JsonView(BrapiView.BrapiV1_2.class)
 	private String instanceNumber;
@@ -273,14 +274,14 @@ public class ObservationUnitDto {
 		this.entryType = entryType;
 	}
 
-	public List<PhenotypeSearchObservationDTO> getObservations() {
+	public List<ObservationDto> getObservations() {
 		if (this.observations == null) {
 			this.observations = new ArrayList<>();
 		}
 		return this.observations;
 	}
 
-	public void setObservations(final List<PhenotypeSearchObservationDTO> observations) {
+	public void setObservations(final List<ObservationDto> observations) {
 		this.observations = observations;
 	}
 

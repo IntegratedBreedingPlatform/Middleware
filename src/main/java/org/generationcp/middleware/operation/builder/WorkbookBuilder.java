@@ -57,6 +57,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -203,7 +204,6 @@ public class WorkbookBuilder extends Builder {
 			final VariableType varType = projectPropRoleMapping.get(stdVariableId);
 			if (varType != null) {
 				stdVariable.setPhenotypicType(varType.getRole());
-
 
 				if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
 					String value = projectProperty.getValue();
@@ -568,8 +568,9 @@ public class WorkbookBuilder extends Builder {
 		final List<MeasurementData> measurementDataList) {
 
 		for (final MeasurementVariable nameType : nameTypes) {
-			final MeasurementData measurementData = new MeasurementData(nameType.getName(), experiment.getNameValueMap().get(nameType.getTermId()), false,
-				this.getDataType(DataType.CHARACTER_VARIABLE.getId()), nameType);
+			final MeasurementData measurementData =
+				new MeasurementData(nameType.getName(), experiment.getNameValueMap().get(nameType.getTermId()), false,
+					this.getDataType(DataType.CHARACTER_VARIABLE.getId()), nameType);
 			measurementDataList.add(measurementData);
 		}
 	}
@@ -692,6 +693,7 @@ public class WorkbookBuilder extends Builder {
 		final List<TreatmentVariable> treatmentFactors = new ArrayList<>();
 		List<MeasurementVariable> factors;
 		final Map<String, VariableTypeList> treatmentMap = new HashMap<>();
+		final Set<Integer> levelVariableIds = new HashSet<>();
 		if (variables != null && variables.getFactors() != null
 			&& !variables.getFactors().getVariableTypes().isEmpty()) {
 			for (final DMSVariableType variable : variables.getFactors().getVariableTypes()) {
@@ -702,6 +704,11 @@ public class WorkbookBuilder extends Builder {
 						list = new VariableTypeList();
 						treatmentMap.put(variable.getTreatmentLabel(), list);
 					}
+
+					if (StringUtils.equals(variable.getTreatmentLabel(), variable.getStandardVariable().getName())) {
+						levelVariableIds.add(variable.getId());
+					}
+
 					list.add(variable);
 				}
 			}
@@ -711,7 +718,7 @@ public class WorkbookBuilder extends Builder {
 				factors = this.getMeasurementVariableTransformer().transform(treatmentMap.get(key), false);
 				final TreatmentVariable treatment = new TreatmentVariable();
 				for (final MeasurementVariable factor : factors) {
-					if (factor.getName().equals(key)) {
+					if (levelVariableIds.contains(factor.getTermId())) {
 						treatment.setLevelVariable(factor);
 					} else {
 						treatment.setValueVariable(factor);
@@ -968,8 +975,9 @@ public class WorkbookBuilder extends Builder {
 			if (standardVariableDataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
 				&& standardVariable.getId() != TermId.EXPERIMENT_DESIGN_FACTOR.getId()) {
 				final Integer id = value != null && NumberUtils.isNumber(value) ? Integer.valueOf(value) : null;
-				final MeasurementData measurementData = new MeasurementData(variableType.getLocalName(), variable.getDisplayValue(), isEditable,
-					this.getDataType(standardVariableDataTypeId), id, factor);
+				final MeasurementData measurementData =
+					new MeasurementData(variableType.getLocalName(), variable.getDisplayValue(), isEditable,
+						this.getDataType(standardVariableDataTypeId), id, factor);
 				measurementData.setMeasurementDataId(variable.getVariableDataId());
 				return measurementData;
 			}

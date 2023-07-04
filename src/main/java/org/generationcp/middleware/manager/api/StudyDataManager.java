@@ -579,6 +579,7 @@ public interface StudyDataManager {
 
 	boolean renameStudy(String newStudyName, int studyId, String programUUID);
 
+	List<String> getAliasesForStudy(Integer studyId);
 	/**
 	 * Please, DO NOT USE this method! This method it's being used as a workaround to fix an issue advancing a study.
 	 *

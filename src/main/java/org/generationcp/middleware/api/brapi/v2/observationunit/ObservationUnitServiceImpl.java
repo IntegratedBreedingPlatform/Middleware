@@ -49,7 +49,6 @@ import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFac
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -186,9 +185,8 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	private void addObservationsPerObservationUnit(final ObservationSearchRequestDto observationSearchRequest,
 		final List<ObservationUnitDto> observationUnitDtos) {
 		final List<ObservationDto> observationDtos = this.observationService.searchObservations(observationSearchRequest, null);
-		final Map<String, List<PhenotypeSearchObservationDTO>> phenotypeObservationsMap = observationDtos.stream()
-			.map(observation -> new PhenotypeSearchObservationDTO(observation))
-			.collect(groupingBy(PhenotypeSearchObservationDTO::getObservationUnitDbId));
+		final Map<String, List<ObservationDto>> phenotypeObservationsMap = observationDtos.stream()
+			.collect(groupingBy(ObservationDto::getObservationUnitDbId));
 
 		for (final ObservationUnitDto dto : observationUnitDtos) {
 			dto.setObservations(phenotypeObservationsMap.get(dto.getObservationUnitDbId()));

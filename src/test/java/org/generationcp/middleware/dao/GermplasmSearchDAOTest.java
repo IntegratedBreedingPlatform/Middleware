@@ -24,6 +24,7 @@ import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataIni
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
@@ -43,7 +44,9 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,12 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -96,6 +94,8 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
+	private IntegrationTestDataInitializer testDataInitializer;
+
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	// pedigree tests
@@ -132,6 +132,8 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.sessionProvder, this.daoFactory);
 		}
+
+		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 
 		this.cropType = new CropType();
 		this.cropType.setUseUUID(false);
@@ -442,6 +444,33 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		externalReferenceSourceFilter.setType(SqlTextFilter.Type.EXACTMATCH);
 		externalReferenceSourceFilter.setValue(germplasmExternalReference.getSource());
 		searchParameter.setExternalReferenceSource(externalReferenceSourceFilter);
+
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
+		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
+	}
+
+	@Test
+	public void testSearchGermplasm_WithAttributeRangeFilter() {
+		//Create a new germplasm with -1 gnpgs
+		final Germplasm germplasm = GermplasmTestDataInitializer
+				.createGermplasm(this.germplasmDate, this.femaleParentGID, this.maleParentGID, -1, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID,
+						1, "LocationName");
+
+		final Integer gid = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final CVTerm numericVariable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.GERMPLASM_ATTRIBUTE);
+		final Attribute attribute = new Attribute();
+		attribute.setGermplasmId(gid);
+		attribute.setTypeId(numericVariable.getCvTermId());
+		attribute.setAval("2");
+		attribute.setAdate(this.germplasmDate);
+		this.daoFactory.getAttributeDAO().saveOrUpdate(attribute);
+		this.sessionProvder.getSession().flush();
+		final GermplasmSearchRequest searchParameter = this.createSearchRequest(gid);
+		final GermplasmSearchRequest.AttributeRange range = new GermplasmSearchRequest.AttributeRange();
+		range.setFromValue("1");
+		range.setToValue("3");
+		searchParameter.setAttributeRangeMap(new HashMap<>());
+		searchParameter.getAttributeRangeMap().put(numericVariable.getName(), range);
 
 		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());

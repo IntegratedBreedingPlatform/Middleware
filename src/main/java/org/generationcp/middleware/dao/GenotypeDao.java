@@ -15,9 +15,12 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Genotype;
+import org.generationcp.middleware.pojos.workbench.CropPerson;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -543,5 +546,11 @@ public class GenotypeDao extends GenericDAO<Genotype, Integer> {
 			final String message = "Error with countSampleGenotypesBySampleList(listId=" + listId + "): " + e.getMessage();
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public List<Genotype> getGenotypesBySampleIds(final List<Integer> sampleIds) {
+		final Criteria criteria = this.getSession().createCriteria(Genotype.class);
+		criteria.add(Restrictions.in("sample.sampleId", sampleIds));
+		return criteria.list();
 	}
 }
