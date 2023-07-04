@@ -1,9 +1,10 @@
 package org.generationcp.middleware.api.germplasm;
 
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
-import org.generationcp.middleware.domain.shared.AttributeDto;
-import org.generationcp.middleware.domain.shared.AttributeRequestDto;
+import org.generationcp.middleware.api.germplasm.search.GermplasmAttributeSearchRequest;
+import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Map;
 
 public interface GermplasmAttributeService {
 
-	List<AttributeDto> getGermplasmAttributeDtos(Integer gid, Integer variableTypeId, String programUUID);
+	List<GermplasmAttributeDto> getGermplasmAttributeDtos(GermplasmAttributeSearchRequest germplasmAttributeSearchRequest);
 
 	Integer createGermplasmAttribute(Integer gid, AttributeRequestDto dto);
 

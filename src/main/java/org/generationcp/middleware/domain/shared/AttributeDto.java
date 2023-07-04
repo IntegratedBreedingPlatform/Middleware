@@ -1,9 +1,7 @@
 package org.generationcp.middleware.domain.shared;
 
-import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
-
 
 @AutoProperty
 public class AttributeDto extends AttributeRequestDto {
@@ -55,7 +53,7 @@ public class AttributeDto extends AttributeRequestDto {
 		this.variableTypeName = variableTypeName;
 	}
 
-		public String getVariableName() {
+	public String getVariableName() {
 		return this.variableName;
 	}
 
