@@ -12,4 +12,7 @@ public interface AdvanceRequest {
 
 	<T> T accept(AdvanceRequestVisitor<T> visitor);
 
+	boolean isPropagateAttributesData();
+
+	boolean isPropagatePassportDescriptorData();
 }

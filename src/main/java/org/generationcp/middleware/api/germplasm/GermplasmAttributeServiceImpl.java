@@ -1,9 +1,10 @@
 package org.generationcp.middleware.api.germplasm;
 
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
-import org.generationcp.middleware.domain.shared.AttributeDto;
-import org.generationcp.middleware.domain.shared.AttributeRequestDto;
+import org.generationcp.middleware.api.germplasm.search.GermplasmAttributeSearchRequest;
+import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
@@ -27,9 +28,8 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	//FIXME Should receive a filter object, to be addressed in IBP-4765
-	public List<AttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId, final String programUUID) {
-		return this.daoFactory.getAttributeDAO().getGermplasmAttributeDtos(gid, variableTypeId, programUUID);
+	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest) {
+		return this.daoFactory.getAttributeDAO().getGermplasmAttributeDtos(germplasmAttributeSearchRequest);
 	}
 
 	@Override
