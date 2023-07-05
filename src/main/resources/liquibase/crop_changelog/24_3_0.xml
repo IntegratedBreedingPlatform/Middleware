@@ -6,7 +6,7 @@
 
 
 	
-	<changeSet id="v23.5.0-1" author="rowena">
+	<changeSet id="v24.3.0-1" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Seed Storage" AND cv_id = 1011;
@@ -20,7 +20,7 @@
 	</changeSet>	
 	
 	
-	<changeSet id="v23.5.0-2" author="rowena">
+	<changeSet id="v24.3.0-2" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Packing Status property" AND cv_id = 1010;
@@ -40,7 +40,7 @@
         </sql>
     </changeSet>				
 	    
-    <changeSet id="v23.5.0-3" author="rowena">
+    <changeSet id="v24.3.0-3" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Described" AND cv_id = 1020;
@@ -53,7 +53,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="v23.5.0-4" author="rowena">
+    <changeSet id="v24.3.0-4" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Packing status" AND cv_id = 1030;
@@ -67,7 +67,7 @@
         </sql>
     </changeSet>   
 	
-    <changeSet id="v23.5.0-5" author="rowena">
+    <changeSet id="v24.3.0-5" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Packing status" AND cv_id = 1030;
@@ -80,7 +80,7 @@
 		</sql>
     </changeSet>   
 		
-	<changeSet id="v23.5.0-6" author="rowena">
+	<changeSet id="v24.3.0-6" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Packing_Status" and cv_id = 1040 ;
@@ -113,16 +113,16 @@
         </sql>
     </changeSet>	
 	
-	<changeSet id="v23.5.0-7" author="rowena">
+	<changeSet id="v24.3.0-7" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-                select count(*) from cv where name = 'Packing_Status' ;
+                select count(*) from cv where name = "Packing_Status" ;
             </sqlCheck>
         </preConditions>
         <comment>Add categories for Packing _Status</comment>
         <sql dbms="mysql" splitStatements="true">
-			set @variableId = (select cvterm_id from cvterm where name = 'Packing_Status' AND cv_id = 1040);
-			set @scaleId = (select cvterm_id from cvterm where name = 'Packing status' AND cv_id = 1030);
+			set @variableId = (select cvterm_id from cvterm where name = "Packing_Status" AND cv_id = 1040);
+			set @scaleId = (select cvterm_id from cvterm where name = "Packing status" AND cv_id = 1030);
 			
 			INSERT INTO cv ( name, definition)
 			VALUES (@variableId, "Packing_Status");
@@ -130,7 +130,7 @@
 			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
             VALUES (1105, @scaleId, 1130);
 			
-			set @cvId = (select max(cv_id) from cv where definition = 'Packing_Status');
+			set @cvId = (select max(cv_id) from cv where definition = "Packing_Status");
 			
 			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
             VALUES (@cvId, '1', '1=packed', null, 0, 0);
@@ -147,10 +147,10 @@
 			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
             VALUES (1190, @scaleId, @catvalue);
 
-`       </sql>
+        </sql>
     </changeSet>	
 	
-	 <changeSet id="v23.5.0-8" author="rowena">
+	 <changeSet id="v24.3.0-8" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Plot Number" AND cv_id = 1010;
@@ -163,7 +163,7 @@
         </sql>
     </changeSet>				
 				
-    <changeSet id="v23.5.0-9" author="rowena">
+    <changeSet id="v24.3.0-9" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Assigned Passport Descriptor" AND cv_id = 1020;
@@ -176,7 +176,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="v23.5.0-10" author="rowena">
+    <changeSet id="v24.3.0-10" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Text" AND cv_id = 1030;
@@ -189,7 +189,7 @@
         </sql>
     </changeSet>   
 	
-	<changeSet id="v23.5.0-11" author="rowena">
+	<changeSet id="v24.3.0-11" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "PLOT_NUMBER_AP_text" and cv_id = 1040 ;
@@ -226,7 +226,7 @@
     </changeSet>	
 	
 	
-	<changeSet id="v23.5.0-12" author="rowena">
+	<changeSet id="v24.3.0-12" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Trial Instance Number" AND cv_id = 1010;
@@ -247,7 +247,7 @@
 	    </sql>
     </changeSet>				
     
-	<changeSet id="v23.5.0-13" author="rowena">
+	<changeSet id="v24.3.0-13" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "INSTANCE_NUMBER_AP_text" and cv_id = 1040 ;
@@ -280,7 +280,7 @@
         </sql>
     </changeSet>	
 	
-	<changeSet id="v23.5.0-14" author="rowena">
+	<changeSet id="v24.3.0-14" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Replication Number" AND cv_id = 1010;
@@ -301,7 +301,7 @@
     </changeSet>				
     
   
-	<changeSet id="v23.5.0-15" author="rowena">
+	<changeSet id="v24.3.0-15" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "REP_NUMBER_AP_text" and cv_id = 1040 ;
@@ -334,7 +334,7 @@
         </sql>
     </changeSet>	
 	
-    <changeSet id="v23.5.0-16" author="rowena">
+    <changeSet id="v24.3.0-16" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Plant Number" AND cv_id = 1010;
@@ -356,7 +356,7 @@
     </changeSet>				
     
   
-	<changeSet id="v23.5.0-17" author="rowena">
+	<changeSet id="v24.3.0-17" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "PLANT_NUMBER_AP_text" and cv_id = 1040 ;
@@ -388,7 +388,7 @@
         </sql>
     </changeSet>	
 	
-	<changeSet id="v23.5.0-18" author="rowena">
+	<changeSet id="v24.3.0-18" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
 				SELECT COUNT(*)>0 FROM
@@ -423,7 +423,7 @@
 		</sql>
     </changeSet>
 	
-	<changeSet id="v23.5.0-19" author="rowena">
+	<changeSet id="v24.3.0-19" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                  SELECT  COUNT(1) > 0  FROM (
