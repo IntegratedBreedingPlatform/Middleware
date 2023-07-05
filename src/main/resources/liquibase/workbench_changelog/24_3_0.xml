@@ -1,0 +1,29 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	<changeSet author="cheryleigh" id="v24.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*)
+				FROM permission p, role_type_permission rtp
+				WHERE p.permission_id = rtp.permission_id
+					AND name in ( 'MS_ANALYZE_WITH_STA_BRAPP',
+								'MS_ANALYZE_WITH_DECISION_SUPPORT',
+								'MS_CREATE_GEOREFERENCE',
+								'MS_EDIT_GEOREFERENCE',
+								'GRAPHICAL_QUERIES')
+					AND role_type_id = 3
+			</sqlCheck>
+		</preConditions>
+		<comment>Revert deletion of BrAPI permissions for program role type</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', (SELECT permission_id FROM permission WHERE NAME = 'MS_ANALYZE_WITH_STA_BRAPP'), '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', (SELECT permission_id FROM permission WHERE NAME = 'MS_ANALYZE_WITH_DECISION_SUPPORT'), '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', (SELECT permission_id FROM permission WHERE NAME = 'MS_CREATE_GEOREFERENCE'), '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', (SELECT permission_id FROM permission WHERE NAME = 'MS_EDIT_GEOREFERENCE'), '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', (SELECT permission_id FROM permission WHERE NAME = 'GRAPHICAL_QUERIES'), '1');
+		</sql>
+ 	</changeSet>
+</databaseChangeLog>
