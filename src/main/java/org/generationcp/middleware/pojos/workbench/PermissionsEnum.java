@@ -57,7 +57,9 @@ public enum PermissionsEnum {
 	MS_OBSERVATIONS,
 	MS_MANAGE_PENDING_OBSERVATIONS,
 	MS_MANAGE_CONFIRMED_OBSERVATIONS,
-	MS_ACCEPT_PENDING_OBSERVATION;
+	MS_ACCEPT_PENDING_OBSERVATION,
+
+	MS_VIEW_GERMPLASM_DETAILS;
 
 	public static final String HAS_CREATE_LOTS_BATCH = " or hasAnyAuthority('ADMIN'"
 		+ ", 'STUDIES'"
@@ -91,4 +93,7 @@ public enum PermissionsEnum {
 
 	public static final List<String> IMPORT_GENOTYPES_FROM_FILE_PERMISSIONS =
 		Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name(), MS_SAMPLE_LISTS.name(), MS_IMPORT_GENOTYPES_OPTIONS.name(), MS_IMPORT_GENOTYPES_FROM_FILE.name());
+
+	public static final List<String> VIEW_GERMPLASM_DETAILS_PERMISSIONS =
+			Arrays.asList(ADMIN.name(), STUDIES.name(), MANAGE_STUDIES.name(), MS_VIEW_GERMPLASM_DETAILS.name());
 }
