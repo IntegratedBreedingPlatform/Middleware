@@ -232,7 +232,7 @@
                 SELECT count(*) FROM cvterm WHERE name = "Trial Instance Number" AND cv_id = 1010;
             </sqlCheck>
         </preConditions>
-        <comment>Add cvterm Plot Number </comment>
+        <comment>Add cvterm Trial Instance Number </comment>
         <sql dbms="mysql" splitStatements="true">
 			
 			set @class = (SELECT cvterm_id FROM cvterm WHERE name = "Passport" AND cv_id = 1011);
@@ -286,7 +286,7 @@
                 SELECT count(*) FROM cvterm WHERE name = "Replication Number" AND cv_id = 1010;
             </sqlCheck>
         </preConditions>
-        <comment>Add cvterm Plot Number </comment>
+        <comment>Add cvterm Replication Number </comment>
         <sql dbms="mysql" splitStatements="true">
 			set @class = ( SELECT cvterm_id FROM cvterm WHERE name = "Passport" AND cv_id = 1011);
             INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
@@ -340,7 +340,7 @@
                 SELECT count(*) FROM cvterm WHERE name = "Plant Number" AND cv_id = 1010;
             </sqlCheck>
         </preConditions>
-        <comment>Add cvterm Plot Number </comment>
+        <comment>Add cvterm Plant Number </comment>
         <sql dbms="mysql" splitStatements="true">
 			set @class = ( SELECT cvterm_id FROM cvterm WHERE name = "Passport" AND cv_id = 1011);
 			
