@@ -103,6 +103,7 @@
 	<include file="crop_changelog/23_3_0.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/23_4_0.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/24_2_0.xml" relativeToChangelogFile="true"/>
+	<include file="crop_changelog/24_3_0.xml" relativeToChangelogFile="true"/>
 
 
 	<!-- The following change sets must be executed at last in order to ensure that all crop change sets has already been executed at this moment -->
