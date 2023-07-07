@@ -1439,8 +1439,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
 			sqlQuery.setParameter("locationDbId", studySearchFilter.getLocationDbId());
 		}
-		if (!StringUtils.isEmpty(studySearchFilter.getProgramDbId())) {
-			sqlQuery.setParameter("programDbId", studySearchFilter.getProgramDbId());
+		if (!CollectionUtils.isEmpty(studySearchFilter.getProgramDbIds())) {
+			sqlQuery.setParameterList("programDbIds", studySearchFilter.getProgramDbIds());
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getSeasonDbId())) {
 			sqlQuery.setParameter("seasonDbId", studySearchFilter.getSeasonDbId());
@@ -1576,8 +1576,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
 			sql.append(" AND geopropLocation.value = :locationDbId ");
 		}
-		if (!StringUtils.isEmpty(studySearchFilter.getProgramDbId())) {
-			sql.append(" AND pmain.program_uuid = :programDbId ");
+		if (!CollectionUtils.isEmpty(studySearchFilter.getProgramDbIds())) {
+			sql.append(" AND pmain.program_uuid IN (:programDbIds) ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getSeasonDbId())) {
 			sql.append(" AND cvtermSeason.cvterm_id = :seasonDbId ");
