@@ -52,11 +52,9 @@
 				SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'MS_VIEW_GERMPLASM_DETAILS';
 			</sqlCheck>
 		</preConditions>
-		<comment>Add Create List permission</comment>
+		<comment>Enable/check MS_VIEW_GERMPLASM_DETAILS permission by default if user has any permission under Manage Studies Permission</comment>
 		<sql dbms="mysql" splitStatements="true">
 			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MS_VIEW_GERMPLASM_DETAILS');
-			-- If the existing roles have any of the permissions under MANAGE_STUDIES
-			-- then enable/check MS_VIEW_GERMPLASM_DETAILS permission by default.
 			INSERT INTO role_permission(role_id, permission_id)
 			SELECT DISTINCT(rp.role_id), @permission_id FROM role_permission rp INNER JOIN  permission p ON rp.permission_id = p.permission_id
 			WHERE p.name IN ('VIEW_STUDIES', 'CREATE_STUDIES', 'CLOSE_STUDY', 'DELETE_STUDY', 'LOCK_STUDY', 'MS_GERMPLASM_AND_CHECKS', 'MS_TREATMENT_FACTORS',
