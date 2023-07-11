@@ -29,7 +29,7 @@
         <comment>Add cvterm Packing Status property</comment>
         <sql dbms="mysql" splitStatements="true">
 	        INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
-            VALUES (1010, 'Packing Status property', 'Packing status of the plot in the seed prep workflow.', null, 0, 0);
+            VALUES (1010, 'Packing status', 'Packing status of the plot in the seed prep workflow.', null, 0, 0);
 			
 			set @propertyId = (select cvterm_id from cvterm where name = 'Packing status' AND cv_id = 1010);
 			set @class = (SELECT cvterm_id FROM cvterm WHERE name = "Inventory" AND cv_id = 1011);	
