@@ -112,7 +112,7 @@
         <comment>Add categories for variable Packing_Status</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @variableId = (select cvterm_id from cvterm where name = "Packing_Status" AND cv_id = 1040);
-			set @scaleId = (select cvterm_id from cvterm where name = "Packing status" AND cv_id = 1030);
+			set @scaleId = (select cvterm_id from cvterm where name = "Packing status categories" AND cv_id = 1030);
 			
 			INSERT INTO cv ( name, definition)
 			VALUES (@variableId, "Packing_Status");
