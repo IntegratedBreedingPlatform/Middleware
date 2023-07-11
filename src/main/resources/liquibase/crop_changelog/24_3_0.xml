@@ -9,10 +9,10 @@
 	<changeSet id="v24.3.0-1" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-                SELECT count(*) FROM cvterm WHERE name = "Seed Storage" AND cv_id = 1011;
+                SELECT count(*) FROM cvterm WHERE name = "Inventory" AND cv_id = 1011;
             </sqlCheck>
         </preConditions>
-        <comment>Add cvterm Seed storage term class </comment>
+        <comment>Add cvterm class Inventory</comment>
         <sql dbms="mysql" splitStatements="true">
             INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
             VALUES (1011, 'Inventory', 'Inventory', null, 0, 0);
@@ -23,7 +23,7 @@
 	<changeSet id="v24.3.0-2" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-                SELECT count(*) FROM cvterm WHERE name = "Packing Status property" AND cv_id = 1010;
+                SELECT count(*) FROM cvterm WHERE name = "Packing status" AND cv_id = 1010;
             </sqlCheck>
         </preConditions>
         <comment>Add cvterm Packing Status property</comment>
@@ -31,7 +31,7 @@
 	        INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
             VALUES (1010, 'Packing Status property', 'Packing status of the plot in the seed prep workflow.', null, 0, 0);
 			
-			set @propertyId = (select cvterm_id from cvterm where name = 'Packing Status property' AND cv_id = 1010);
+			set @propertyId = (select cvterm_id from cvterm where name = 'Packing status' AND cv_id = 1010);
 			set @class = (SELECT cvterm_id FROM cvterm WHERE name = "Inventory" AND cv_id = 1011);	
 			
 			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
@@ -46,7 +46,7 @@
                 SELECT count(*) FROM cvterm WHERE name = "Described" AND cv_id = 1020;
             </sqlCheck>
         </preConditions>
-        <comment>Add cvterm entry for Method Described</comment>
+        <comment>Add method Described</comment>
         <sql dbms="mysql" splitStatements="true">
             INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
             VALUES (1020, 'Described', 'Described', null, 0, 0);
@@ -56,47 +56,34 @@
     <changeSet id="v24.3.0-4" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-                SELECT count(*) FROM cvterm WHERE name = "Packing status" AND cv_id = 1030;
+                SELECT count(*) FROM cvterm WHERE name = "Packing status categories" AND cv_id = 1030;
             </sqlCheck>
         </preConditions>
-        <comment>Add cvterm entry for Scale Packing status</comment>
+        <comment>Add scale Packing status categories</comment>
         <sql dbms="mysql" splitStatements="true">
             INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
-            VALUES (1030, 'Packing status', 'Packing status', null, 0, 0);
-			
+            VALUES (1030, 'Packing status categories', 'Packing status categories', null, 0, 0);
         </sql>
     </changeSet>   
 	
-    <changeSet id="v24.3.0-5" author="rowena">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT count(*) FROM cvterm WHERE name = "Packing status" AND cv_id = 1030;
-            </sqlCheck>
-        </preConditions>
-        <comment>Add cvterm entry for Scale Categorical</comment>
-        <sql dbms="mysql" splitStatements="true">
-            INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
-            VALUES (1030, 'Packing status', 'Packing status', null, 0, 0);
-		</sql>
-    </changeSet>   
 		
-	<changeSet id="v24.3.0-6" author="rowena">
+	<changeSet id="v24.3.0-5" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Packing_Status" and cv_id = 1040 ;
             </sqlCheck>
         </preConditions>
-        <comment>Add variable for Packing _Status</comment>
+        <comment>Add variable for Packing_Status</comment>
         <sql dbms="mysql" splitStatements="true">
             set @methodID = (select cvterm_id from cvterm where name = 'Described' AND cv_id = 1020);
-            set @scaleId = (select cvterm_id from cvterm where name = 'Packing status' AND cv_id = 1030);
-			set @propertyId = (select cvterm_id from cvterm where name = 'Packing Status property' AND cv_id = 1010);
+            set @scaleId = (select cvterm_id from cvterm where name = 'Packing status categories' AND cv_id = 1030);
+			set @propertyId = (select cvterm_id from cvterm where name = 'Packing status' AND cv_id = 1010);
 
             INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
             VALUES (1040, 'Packing_Status', 'Packing status of the plot in the seed prep workflow.', null, 0, 0);
            
             set @variableId = (select cvterm_id from cvterm where name = 'Packing_Status' AND cv_id = 1040);
-			set @propertyId = (select cvterm_id from cvterm where name = 'Packing Status property' AND cv_id = 1010);
+			set @propertyId = (select cvterm_id from cvterm where name = 'Packing status' AND cv_id = 1010);
 		
             INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
             VALUES (1200, @variableId, @propertyId);
@@ -108,18 +95,21 @@
             VALUES (1220, @variableId, @scaleId);
 			
             INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
-            VALUES (@variableId, 1800, 'Inventory Attribute', 0);
+            VALUES (@variableId, 1800, 'Trait', 0);
+			
+			INSERT INTO cvtermprop (cvterm_id, type_id, value, rank) 
+			VALUES (@variableId, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
 	
         </sql>
     </changeSet>	
 	
-	<changeSet id="v24.3.0-7" author="rowena">
+	<changeSet id="v24.3.0-6" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 select count(*) from cv where name = "Packing_Status" ;
             </sqlCheck>
         </preConditions>
-        <comment>Add categories for Packing _Status</comment>
+        <comment>Add categories for variable Packing_Status</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @variableId = (select cvterm_id from cvterm where name = "Packing_Status" AND cv_id = 1040);
 			set @scaleId = (select cvterm_id from cvterm where name = "Packing status" AND cv_id = 1030);
@@ -150,52 +140,52 @@
         </sql>
     </changeSet>	
 	
-	 <changeSet id="v24.3.0-8" author="rowena">
+	 <changeSet id="v24.3.0-7" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Plot Number" AND cv_id = 1010;
             </sqlCheck>
         </preConditions>
-        <comment>Add cvterm Plot Number </comment>
+        <comment>Add property Plot Number </comment>
         <sql dbms="mysql" splitStatements="true">
             INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
             VALUES (1010, 'Plot Number', 'Plot Number', null, 0, 0);
         </sql>
     </changeSet>				
 				
-    <changeSet id="v24.3.0-9" author="rowena">
+    <changeSet id="v24.3.0-8" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Assigned Passport Descriptor" AND cv_id = 1020;
             </sqlCheck>
         </preConditions>
-        <comment>Add cvterm entry for Method Assigned Passport Descriptor</comment>
+        <comment>Add method Assigned Passport Descriptor</comment>
         <sql dbms="mysql" splitStatements="true">
             INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
             VALUES (1020, 'Assigned Passport Descriptor', 'Standard method for assigned passport descriptor', null, 0, 0);
         </sql>
     </changeSet>
 
-    <changeSet id="v24.3.0-10" author="rowena">
+    <changeSet id="v24.3.0-9" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Text" AND cv_id = 1030;
             </sqlCheck>
         </preConditions>
-        <comment>Add cvterm entry for Scale Text</comment>
+        <comment>Add scale Text</comment>
         <sql dbms="mysql" splitStatements="true">
             INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
             VALUES (1030, 'Text', 'Text', null, 0, 0);
         </sql>
     </changeSet>   
 	
-	<changeSet id="v24.3.0-11" author="rowena">
+	<changeSet id="v24.3.0-10" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "PLOT_NUMBER_AP_text" and cv_id = 1040 ;
             </sqlCheck>
         </preConditions>
-        <comment>Add variable for Packing _Status</comment>
+        <comment>Add variable PLOT_NUMBER_AP_text</comment>
         <sql dbms="mysql" splitStatements="true">
             set @methodID = (select cvterm_id from cvterm where name = 'Assigned Passport Descriptor' AND cv_id = 1020);
             set @scaleId = (select cvterm_id from cvterm where name = 'Text' AND cv_id = 1030);
@@ -221,18 +211,21 @@
 
             INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
             VALUES (@variableId, 1800, 'Germplasm Passport', 0);
+			
+			INSERT INTO cvtermprop (cvterm_id, type_id, value, rank) 
+			VALUES (@variableId, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
 
         </sql>
     </changeSet>	
 	
 	
-	<changeSet id="v24.3.0-12" author="rowena">
+	<changeSet id="v24.3.0-11" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Trial Instance Number" AND cv_id = 1010;
             </sqlCheck>
         </preConditions>
-        <comment>Add cvterm Trial Instance Number </comment>
+        <comment>Add property Trial Instance Number </comment>
         <sql dbms="mysql" splitStatements="true">
 			
 			set @class = (SELECT cvterm_id FROM cvterm WHERE name = "Passport" AND cv_id = 1011);
@@ -247,13 +240,13 @@
 	    </sql>
     </changeSet>				
     
-	<changeSet id="v24.3.0-13" author="rowena">
+	<changeSet id="v24.3.0-12" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "INSTANCE_NUMBER_AP_text" and cv_id = 1040 ;
             </sqlCheck>
         </preConditions>
-        <comment>Add variable for Packing _Status</comment>
+        <comment>Add variable INSTANCE_NUMBER_AP_text</comment>
         <sql dbms="mysql" splitStatements="true">
             set @methodID = (select cvterm_id from cvterm where name = 'Assigned Passport Descriptor' AND cv_id = 1020);
             set @scaleId = (select cvterm_id from cvterm where name = 'Text' AND cv_id = 1030);
@@ -276,17 +269,20 @@
 
             INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
             VALUES (@variableId, 1800, 'Germplasm Passport', 0);
+			
+			INSERT INTO cvtermprop (cvterm_id, type_id, value, rank) 
+			VALUES (@variableId, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
 
         </sql>
     </changeSet>	
 	
-	<changeSet id="v24.3.0-14" author="rowena">
+	<changeSet id="v24.3.0-13" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Replication Number" AND cv_id = 1010;
             </sqlCheck>
         </preConditions>
-        <comment>Add cvterm Replication Number </comment>
+        <comment>Add property Replication Number </comment>
         <sql dbms="mysql" splitStatements="true">
 			set @class = ( SELECT cvterm_id FROM cvterm WHERE name = "Passport" AND cv_id = 1011);
             INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
@@ -301,13 +297,13 @@
     </changeSet>				
     
   
-	<changeSet id="v24.3.0-15" author="rowena">
+	<changeSet id="v24.3.0-14" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "REP_NUMBER_AP_text" and cv_id = 1040 ;
             </sqlCheck>
         </preConditions>
-        <comment>Add variable for Packing _Status</comment>
+        <comment>Add variable REP_NUMBER_AP_text</comment>
         <sql dbms="mysql" splitStatements="true">
             set @methodID = (select cvterm_id from cvterm where name = 'Assigned Passport Descriptor' AND cv_id = 1020);
             set @scaleId = (select cvterm_id from cvterm where name = 'Text' AND cv_id = 1030);
@@ -330,17 +326,20 @@
 
             INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
             VALUES (@variableId, 1800, 'Germplasm Passport', 0);
+			
+			INSERT INTO cvtermprop (cvterm_id, type_id, value, rank) 
+			VALUES (@variableId, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
 
         </sql>
     </changeSet>	
 	
-    <changeSet id="v24.3.0-16" author="rowena">
+    <changeSet id="v24.3.0-15" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Plant Number" AND cv_id = 1010;
             </sqlCheck>
         </preConditions>
-        <comment>Add cvterm Plant Number </comment>
+        <comment>Add property Plant Number </comment>
         <sql dbms="mysql" splitStatements="true">
 			set @class = ( SELECT cvterm_id FROM cvterm WHERE name = "Passport" AND cv_id = 1011);
 			
@@ -356,13 +355,13 @@
     </changeSet>				
     
   
-	<changeSet id="v24.3.0-17" author="rowena">
+	<changeSet id="v24.3.0-16" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "PLANT_NUMBER_AP_text" and cv_id = 1040 ;
             </sqlCheck>
         </preConditions>
-        <comment>Add variable for Packing _Status</comment>
+        <comment>Add variable PLANT_NUMBER_AP_text</comment>
         <sql dbms="mysql" splitStatements="true">
             set @methodID = (select cvterm_id from cvterm where name = 'Assigned Passport Descriptor' AND cv_id = 1020);
             set @scaleId = (select cvterm_id from cvterm where name = 'Text' AND cv_id = 1030);
@@ -384,6 +383,9 @@
 
             INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
             VALUES (@variableId, 1800, 'Germplasm Passport', 0);
+			
+			INSERT INTO cvtermprop (cvterm_id, type_id, value, rank) 
+			VALUES (@variableId, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
 
         </sql>
     </changeSet>	
