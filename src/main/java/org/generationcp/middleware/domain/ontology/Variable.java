@@ -45,6 +45,7 @@ public class Variable extends Term {
 	private Integer germplasm;
 	private Integer breedingMethods;
 	private Integer lists;
+	private Integer lots;
 
 	public Variable() {
 		this.setVocabularyId(CvId.VARIABLES.getId());
@@ -212,6 +213,14 @@ public class Variable extends Term {
 
 	public void setLists(final Integer lists) {
 		this.lists = lists;
+	}
+
+	public Integer getLots() {
+		return lots;
+	}
+
+	public void setLots(final Integer lots) {
+		this.lots = lots;
 	}
 
 	public Boolean getIsSystem() {
