@@ -4,14 +4,7 @@ import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
-import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory.manager.LotDepositDto;
-import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
-import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
-import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -320,25 +313,32 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 	}
 
-	@Override
-	public void saveAdjustmentTransactions(final Integer userId, final Set<Integer> lotIds, final Double balance, final String notes) {
-		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
-		final List<ExtendedLotDto> lots = this.lotService.searchLots(lotsSearchDto, null);
-		for (final ExtendedLotDto lotDto : lots) {
-			if (balance >= lotDto.getReservedTotal()) {
-				final Double amount = balance - lotDto.getActualBalance();
-				if (amount != 0) {
-					final Transaction transaction =
-						new Transaction(TransactionType.ADJUSTMENT, TransactionStatus.CONFIRMED, userId, notes, lotDto.getLotId(), amount);
-					daoFactory.getTransactionDAO().save(transaction);
-				}
-			} else {
-				throw new MiddlewareRequestException("", "lot.balance.update.invalid.available.balance",
-					String.valueOf(lotDto.getStockId()));
-			}
-		}
-	}
+    @Override
+    public void saveAdjustmentTransactions(final Integer userId, final List<LotUpdateBalanceRequestDto> lotUpdateBalanceRequestDtos) {
+        final List<String> lotUUIDs = lotUpdateBalanceRequestDtos.stream().map(LotUpdateBalanceRequestDto::getLotUUID).collect(Collectors.toList());
+        final Map<String, LotUpdateBalanceRequestDto> lotAdjustmentRequestDtoByLotUUIDMap =
+				lotUpdateBalanceRequestDtos.stream().collect(Collectors.toMap(LotUpdateBalanceRequestDto::getLotUUID, Function.identity()));
+        final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+        lotsSearchDto.setLotUUIDs(lotUUIDs);
+        final List<ExtendedLotDto> lots = this.lotService.searchLots(lotsSearchDto, null);
+        for (final ExtendedLotDto lotDto : lots) {
+
+            if (lotAdjustmentRequestDtoByLotUUIDMap.containsKey(lotDto.getLotUUID())) {
+                final LotUpdateBalanceRequestDto lotUpdateBalanceRequestDto = lotAdjustmentRequestDtoByLotUUIDMap.get(lotDto.getLotUUID());
+                if (lotUpdateBalanceRequestDto.getBalance() >= lotDto.getReservedTotal()) {
+                    final double amount = lotUpdateBalanceRequestDto.getBalance() - lotDto.getActualBalance();
+                    if (amount != 0) {
+                        final Transaction transaction =
+                                new Transaction(TransactionType.ADJUSTMENT, TransactionStatus.CONFIRMED, userId, lotUpdateBalanceRequestDto.getNotes(), lotDto.getLotId(), amount);
+                        this.daoFactory.getTransactionDAO().save(transaction);
+                    }
+                } else {
+                    throw new MiddlewareRequestException("", "lot.balance.update.invalid.available.balance",
+                            String.valueOf(lotDto.getStockId()));
+                }
+            }
+        }
+    }
 
 	public void setLotService(final LotService lotService) {
 		this.lotService = lotService;

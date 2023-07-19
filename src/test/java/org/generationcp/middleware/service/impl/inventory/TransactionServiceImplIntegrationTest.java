@@ -1,15 +1,12 @@
 package org.generationcp.middleware.service.impl.inventory;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
-import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
-import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
@@ -31,11 +28,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -219,12 +212,14 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test(expected = MiddlewareRequestException.class)
 	public void testSaveAdjustmentTransactions_InvalidNewBalance() {
-		this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singleton(this.lot.getId()), 1D, "");
+		final LotUpdateBalanceRequestDto lotUpdateBalanceRequestDto = new LotUpdateBalanceRequestDto(this.lot.getLotUuId(), 1D, "");
+		this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singletonList(lotUpdateBalanceRequestDto));
 	}
 
 	@Test
 	public void testSaveAdjustmentTransactions_OK() {
-		this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singleton(this.lot.getId()), 3D, "");
+		final LotUpdateBalanceRequestDto lotUpdateBalanceRequestDto = new LotUpdateBalanceRequestDto(this.lot.getLotUuId(), 3D, "");
+		this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singletonList(lotUpdateBalanceRequestDto));
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
@@ -234,7 +229,8 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testSaveAdjustmentTransactions_NoTransactionSaved() {
-		this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singleton(this.lot.getId()), 20D, "");
+		final LotUpdateBalanceRequestDto lotUpdateBalanceRequestDto = new LotUpdateBalanceRequestDto(this.lot.getLotUuId(), 20D, "");
+		this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singletonList(lotUpdateBalanceRequestDto));
 
 		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
 		transactionsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
@@ -252,6 +248,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	private void createLot() {
 		this.lot = new Lot(null, this.userId, EntityType.GERMPLSM.name(), this.gid, DEFAULT_SEED_STORE_ID, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
 			"Lot", RandomStringUtils.randomAlphabetic(35));
+		this.lot.setLotUuId(UUID.randomUUID().toString());
 		this.daoFactory.getLotDao().save(this.lot);
 	}
 
