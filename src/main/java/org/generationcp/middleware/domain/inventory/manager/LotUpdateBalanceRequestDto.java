@@ -18,6 +18,8 @@ public class LotUpdateBalanceRequestDto {
 
     private String lotUUID;
 
+    private String storageLocationAbbr;
+
     private Double balance;
 
     private String notes;
@@ -44,6 +46,14 @@ public class LotUpdateBalanceRequestDto {
 
     public void setNotes(final String notes) {
         this.notes = notes;
+    }
+
+    public String getStorageLocationAbbr() {
+        return this.storageLocationAbbr;
+    }
+
+    public void setStorageLocationAbbr(final String storageLocationAbbr) {
+        this.storageLocationAbbr = storageLocationAbbr;
     }
 
     @Override
