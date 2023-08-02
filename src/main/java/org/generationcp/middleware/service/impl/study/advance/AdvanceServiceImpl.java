@@ -680,12 +680,14 @@ public class AdvanceServiceImpl implements AdvanceService {
 		final Integer advancedGermplasmGid,
 		final Map<Integer, List<GermplasmAttributeDto>> attributesMap, final List<Integer> excludedVariableIdsForPropagation) {
 		if (attributesMap.containsKey(originalGermplasmGid)) {
+			final Integer date = Integer.valueOf(LocalDate.now().format(DATE_TIME_FORMATTER));
+
 			attributesMap.get(originalGermplasmGid).forEach((attributeDto -> {
 				// Default passport descriptors variables should not be inherited from the source
 				if (!excludedVariableIdsForPropagation.contains(attributeDto.getVariableId())) {
 					this.daoFactory.getAttributeDAO()
 						.save(this.createGermplasmAttribute(advancedGermplasmGid, attributeDto.getValue(), attributeDto.getcValueId(),
-							attributeDto.getVariableId(), attributeDto.getLocationId(), Integer.valueOf(attributeDto.getDate())));
+							attributeDto.getVariableId(), attributeDto.getLocationId(), date));
 				}
 			}));
 		}
