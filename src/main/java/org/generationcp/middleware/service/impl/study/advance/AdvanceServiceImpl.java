@@ -433,10 +433,10 @@ public class AdvanceServiceImpl implements AdvanceService {
 						// Propagate the Germplasm Passport from the original germplasm to the advanced germplasm
 						// Default passport descriptors variables should not be inherited from the source
 						this.propagateAttributesFromOriginalGermplasmToAdvancedGermplasm(advancingSource.getOriginGermplasm().getGid(),
-							germplasm.getGid(), germplasmPassportMap, defaultPassportDescriptorsVariableIds);
+							germplasm.getGid(), germplasmPassportMap, defaultPassportDescriptorsVariableIds, germplasm.getLocationId());
 						// Propagate the Germplasm Attributes from the original germplasm to the advanced germplasm
 						this.propagateAttributesFromOriginalGermplasmToAdvancedGermplasm(advancingSource.getOriginGermplasm().getGid(),
-							germplasm.getGid(), germplasmAttributesMap, new ArrayList<>());
+							germplasm.getGid(), germplasmAttributesMap, new ArrayList<>(), germplasm.getLocationId());
 
 						final GermplasmStudySourceInput germplasmStudySourceInput =
 							new GermplasmStudySourceInput(germplasm.getGid(), studyId,
@@ -678,7 +678,8 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	private void propagateAttributesFromOriginalGermplasmToAdvancedGermplasm(final Integer originalGermplasmGid,
 		final Integer advancedGermplasmGid,
-		final Map<Integer, List<GermplasmAttributeDto>> attributesMap, final List<Integer> excludedVariableIdsForPropagation) {
+		final Map<Integer, List<GermplasmAttributeDto>> attributesMap, final List<Integer> excludedVariableIdsForPropagation,
+		final Integer locationId) {
 		if (attributesMap.containsKey(originalGermplasmGid)) {
 			final Integer date = Integer.valueOf(LocalDate.now().format(DATE_TIME_FORMATTER));
 
@@ -687,7 +688,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 				if (!excludedVariableIdsForPropagation.contains(attributeDto.getVariableId())) {
 					this.daoFactory.getAttributeDAO()
 						.save(this.createGermplasmAttribute(advancedGermplasmGid, attributeDto.getValue(), attributeDto.getcValueId(),
-							attributeDto.getVariableId(), attributeDto.getLocationId(), date));
+							attributeDto.getVariableId(), locationId, date));
 				}
 			}));
 		}
