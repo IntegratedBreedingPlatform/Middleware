@@ -73,6 +73,21 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		final List<ObservationDto> observationDtos =
 			this.daoFactory.getPhenotypeDAO().searchObservations(observationSearchRequestDto, pageable);
 		if (!CollectionUtils.isEmpty(observationDtos)) {
+
+			final Map<Integer, Variable> variablesMap = this.getVariableMap(observationDtos);
+
+			observationDtos.forEach(o -> {
+				// If variable is datetime, convert yyyyMMdd to yyyy-MM-dd (brapi standard) format
+				final Integer variableId = Integer.valueOf(o.getObservationVariableDbId());
+				if (variablesMap.containsKey(variableId) && this.isDateTime(variablesMap.get(variableId))) {
+					try {
+						o.setValue(Util.convertDate(o.getValue(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
+					} catch (final ParseException e) {
+						o.setValue(org.apache.commons.lang3.StringUtils.EMPTY);
+					}
+				}
+			});
+
 			final List<Integer> observationDbIds =
 				new ArrayList<>(observationDtos.stream().map(o -> Integer.valueOf(o.getObservationDbId()))
 					.collect(Collectors.toSet()));
@@ -313,7 +328,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
             // so for other data types, NA (Not Available) should be treated as empty string.
             value = this.isNumericOrCategorical(variable) ? Phenotype.MISSING_VALUE : org.apache.commons.lang3.StringUtils.EMPTY;
         } else if (this.isDateTime(variable)) {
-			// If variable is datetime parse yyyy-MM-dd to yyyyMMdd format
+			// If variable is datetime convert yyyy-MM-dd (brapi standard) to yyyyMMdd format
 			try {
 				value = Util.convertDate(observation.getValue(), Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
 			} catch (final ParseException e) {
