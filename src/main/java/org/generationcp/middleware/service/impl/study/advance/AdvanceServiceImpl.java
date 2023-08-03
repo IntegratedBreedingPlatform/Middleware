@@ -431,7 +431,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 						// Propagate the Germplasm Passport from the original germplasm to the advanced germplasm
 						// Default passport descriptors variables should not be inherited from the source
 						this.propagateAttributesFromOriginalGermplasmToAdvancedGermplasm(advancingSource.getOriginGermplasm().getGid(),
-							germplasm.getGid(), germplasmDescriptorsMap, defaultPassportDescriptorsVariableIds, request);
+							germplasm.getGid(), germplasmDescriptorsMap, defaultPassportDescriptorsVariableIds, request, germplasm.getLocationId());
 
 						final GermplasmStudySourceInput germplasmStudySourceInput =
 							new GermplasmStudySourceInput(germplasm.getGid(), studyId,
@@ -673,15 +673,17 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	private void propagateAttributesFromOriginalGermplasmToAdvancedGermplasm(final Integer originalGermplasmGid,
 		final Integer advancedGermplasmGid,	final Map<Integer, List<GermplasmAttributeDto>> attributesMap,
-		final List<Integer> excludedVariableIdsForPropagation, final AdvanceRequest request) {
+		final List<Integer> excludedVariableIdsForPropagation, final AdvanceRequest request, final Integer locationId) {
 		if (attributesMap.containsKey(originalGermplasmGid)) {
+			final Integer date = Integer.valueOf(LocalDate.now().format(DATE_TIME_FORMATTER));
+
 			attributesMap.get(originalGermplasmGid).forEach((attributeDto -> {
 				// Default passport descriptors variables should not be inherited from the source
 				if (!excludedVariableIdsForPropagation.contains(attributeDto.getVariableId()) && request.getDescriptorIds().contains(attributeDto.getVariableId())) {
-					final Integer locationId = request.isOverrideDescriptorsLocation() ? request.getLocationOverrideId() : attributeDto.getLocationId();
+					final Integer attributeLocationId = request.isOverrideDescriptorsLocation() ? request.getLocationOverrideId() : locationId;
 					this.daoFactory.getAttributeDAO()
 						.save(this.createGermplasmAttribute(advancedGermplasmGid, attributeDto.getValue(), attributeDto.getcValueId(),
-							attributeDto.getVariableId(), locationId, Integer.valueOf(attributeDto.getDate())));
+							attributeDto.getVariableId(), attributeLocationId, date));
 				}
 			}));
 		}
