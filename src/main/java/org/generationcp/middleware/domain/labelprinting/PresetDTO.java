@@ -3,6 +3,7 @@ package org.generationcp.middleware.domain.labelprinting;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonView;
+import org.generationcp.middleware.api.study.AttributesPropagationPresetDTO;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -10,7 +11,9 @@ import java.io.Serializable;
 
 @AutoProperty
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
-@JsonSubTypes(value = {@JsonSubTypes.Type(value = LabelPrintingPresetDTO.class, name = "LabelPrintingPreset")})
+@JsonSubTypes(value = {
+		@JsonSubTypes.Type(value = LabelPrintingPresetDTO.class, name = "LabelPrintingPreset"),
+		@JsonSubTypes.Type(value = AttributesPropagationPresetDTO.class, name = "AttributesPropagationPreset")})
 public class PresetDTO implements Serializable{
 
 	public static class View {
