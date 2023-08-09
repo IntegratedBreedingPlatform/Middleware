@@ -81,8 +81,10 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 				final Integer variableId = Integer.valueOf(o.getObservationVariableDbId());
 				if (variablesMap.containsKey(variableId) && this.isDateTime(variablesMap.get(variableId))) {
 					try {
-						o.setValue(Util.convertDate(o.getValue(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
-					} catch (final ParseException e) {
+						if (org.apache.commons.lang3.StringUtils.isNotEmpty(o.getValue())) {
+							o.setValue(Util.convertDate(o.getValue(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
+						}
+					} catch (final Exception e) {
 						o.setValue(org.apache.commons.lang3.StringUtils.EMPTY);
 					}
 				}
