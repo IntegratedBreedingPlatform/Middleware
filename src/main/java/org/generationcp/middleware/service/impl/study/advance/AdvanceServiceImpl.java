@@ -674,7 +674,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 	private void propagateAttributesFromOriginalGermplasmToAdvancedGermplasm(final Integer originalGermplasmGid,
 		final Integer advancedGermplasmGid,	final Map<Integer, List<GermplasmAttributeDto>> attributesMap,
 		final List<Integer> excludedVariableIdsForPropagation, final AdvanceRequest request, final Integer locationId) {
-		if (attributesMap.containsKey(originalGermplasmGid) && !CollectionUtils.isEmpty(request.getDescriptorIds())) {
+		if (attributesMap.containsKey(originalGermplasmGid)) {
 			final Integer date = Integer.valueOf(LocalDate.now().format(DATE_TIME_FORMATTER));
 
 			attributesMap.get(originalGermplasmGid).forEach((attributeDto -> {

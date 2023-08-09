@@ -3,8 +3,7 @@ package org.generationcp.middleware.domain.labelprinting;
 public enum PresetType {
 
 	LABEL_PRINTING_PRESET ("LabelPrintingPreset"),
-	CROSSING_PRESET("CrossingPreset"),
-	ATTRIBUTES_PROPAGATION_PRESET("AttributesPropagationPreset");
+	CROSSING_PRESET("CrossingPreset");
 
 	private String name;
 
