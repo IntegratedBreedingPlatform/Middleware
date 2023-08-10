@@ -2,21 +2,20 @@ package org.generationcp.middleware.api.brapi.v2.observationlevel;
 
 /**
  * https://wiki.brapi.org/index.php/Observation_Levels#Accepted_Levels
+ * Sticking to uppercase for backwards compatibility, although they are lowercase in the standard
  */
 public enum ObservationLevelEnum {
 
 	// BRAPI Standard accepted levels
-	// These are in lowercase to conform to the standard
-	STUDY(1, "study"),
-	FIELD(2, "field"),
-	REP(5, "rep"),
-	BLOCK(4, "block"),
-	PLOT(6, "plot"),
-	SUB_PLOT(7, "sub-plot"),
-	PLANT(7, "plant"),
+	STUDY(1, "STUDY"),
+	FIELD(2, "FIELD"),
+	REP(5, "REP"),
+	BLOCK(4, "BLOCK"),
+	PLOT(6, "PLOT"),
+	SUB_PLOT(7, "SUB-PLOT"),
+	PLANT(7, "PLANT"),
 
 	// BMS Implementation additional levels
-	// These are in uppercase for BMS compatibility
 	TIMESERIES(7, "TIMESERIES"),
 	CUSTOM(7, "CUSTOM"),
 	SUMMARY_STATISTICS(1, "SUMMARY_STATISTICS"),
