@@ -17,6 +17,8 @@
         <mapping class="org.generationcp.middleware.pojos.ExperimentExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.SampleExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.CvTermExternalReference"/>
+        <mapping class="org.generationcp.middleware.pojos.Template"/>
+        <mapping class="org.generationcp.middleware.pojos.TemplateDetails"/>
         <mapping class="org.generationcp.middleware.pojos.PhenotypeExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.AttributeExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.FileMetadataExternalReference"/>

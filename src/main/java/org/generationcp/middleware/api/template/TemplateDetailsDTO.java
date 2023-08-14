@@ -1,0 +1,61 @@
+package org.generationcp.middleware.api.template;
+
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
+
+@AutoProperty
+public class TemplateDetailsDTO {
+
+    private Integer variableId;
+
+    private String name;
+
+    private String type;
+
+    public TemplateDetailsDTO() {
+    }
+
+    public TemplateDetailsDTO(final Integer variableId, final String name, final String type) {
+        this.variableId = variableId;
+        this.name = name;
+        this.type = type;
+    }
+    public Integer getVariableId() {
+        return variableId;
+    }
+
+    public void setVariableId(Integer variableId) {
+        this.variableId = variableId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Pojomatic.hashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return Pojomatic.toString(this);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        return Pojomatic.equals(this, o);
+    }
+}
