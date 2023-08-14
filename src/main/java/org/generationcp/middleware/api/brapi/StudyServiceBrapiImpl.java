@@ -213,6 +213,8 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 				environmentParameterVariables.addAll(this.createGeolocationVariables(environmentVariables, studyDbId));
 
+				this.addEnvironmentParameterVariablesWithoutValues(environmentParameterVariables, environmentVariables);
+
 				final List<EnvironmentParameter> environmentParameters = environmentParameterVariables.stream()
 					.map(EnvironmentParameter::new).collect(Collectors.toList());
 				studyInstanceDto.setEnvironmentParameters(environmentParameters);
@@ -791,6 +793,31 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 			return this.userService.getUsersByPersonIds(personIds);
 		}
 		return Collections.emptyList();
+	}
+
+	private void addEnvironmentParameterVariablesWithoutValues(final List<MeasurementVariable> environmentParameterVariables,
+		final List<MeasurementVariable> environmentVariables) {
+		// Filter standard environment factors
+		final List<Integer> filterVariables = Lists.newArrayList(
+			TermId.LOCATION_ID.getId(),
+			TermId.TRIAL_INSTANCE_FACTOR.getId(),
+			TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		//filter the variables already added
+		filterVariables.addAll(environmentParameterVariables.stream().map(MeasurementVariable::getTermId).collect(Collectors.toList()));
+
+		final List<MeasurementVariable> variables = environmentVariables
+			.stream()
+			.filter(measurementVariable -> !filterVariables.contains(measurementVariable.getTermId()))
+			.map(measurementVariable -> {
+				if (measurementVariable.getValue() == null) {
+					measurementVariable.setValue("");
+				}
+				return measurementVariable;
+			})
+			.collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(variables)) {
+			environmentParameterVariables.addAll(variables);
+		}
 	}
 
 }
