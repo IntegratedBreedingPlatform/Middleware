@@ -28,12 +28,12 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public Template getTemplateByIdAndProgramUUID(final Integer templateId, final String programUUID) {
+    public TemplateDTO getTemplateByIdAndProgramUUID(final Integer templateId, final String programUUID) {
         return this.daoFactory.getTemplateDAO().getTemplateByIdAndProgramUUID(templateId, programUUID);
     }
 
     @Override
-    public Template getTemplateByNameAndProgramUUID(final String name, final String programUUID) {
+    public TemplateDTO getTemplateByNameAndProgramUUID(final String name, final String programUUID) {
         return this.daoFactory.getTemplateDAO().getTemplateByNameAndProgramUUID(name, programUUID);
     }
 
@@ -74,7 +74,7 @@ public class TemplateServiceImpl implements TemplateService {
             templateDetails.setVariable(cvTerm);
             templateDetails.setName(templateDetailsDTO.getName());
             templateDetails.setType(templateDetailsDTO.getType());
-            template.getTemplateDetails().add(templateDetails);
+            templateDetailsList.add(templateDetails);
         }
         template.setTemplateDetails(templateDetailsList);
         this.daoFactory.getTemplateDAO().saveOrUpdate(template);

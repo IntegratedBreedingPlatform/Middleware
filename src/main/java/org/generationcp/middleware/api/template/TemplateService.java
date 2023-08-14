@@ -14,7 +14,7 @@ public interface TemplateService {
 
     List<TemplateDTO> getTemplateDTOsByType(String programUUID, String type);
 
-    Template getTemplateByNameAndProgramUUID(String name, String programUUID);
+    TemplateDTO getTemplateByNameAndProgramUUID(String name, String programUUID);
 
-    Template getTemplateByIdAndProgramUUID(Integer id, String programUUID);
+    TemplateDTO getTemplateByIdAndProgramUUID(Integer id, String programUUID);
 }

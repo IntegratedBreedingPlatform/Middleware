@@ -22,26 +22,46 @@ public class TemplateDAO extends GenericDAO<Template, Integer> {
         super(session);
     }
 
-    public Template getTemplateByIdAndProgramUUID(final Integer id, final String programUUID) {
+    public TemplateDTO getTemplateByIdAndProgramUUID(final Integer id, final String programUUID) {
         try {
-            final Criteria criteria = this.getSession().createCriteria(Template.class);
-            criteria.add(Restrictions.eq("programUUID", programUUID));
-            criteria.add(Restrictions.eq("templateId", id));
-
-            return (Template) criteria.uniqueResult();
+            final String templateDTOQuery = "SELECT temp.template_id AS templateId, "
+                    + " temp.template_name AS templateName,  "
+                    + " temp.program_uuid AS programUUID, "
+                    + " temp.template_type AS templateType "
+                    + " FROM template temp "
+                    + " WHERE temp.program_uuid = :programUUID AND temp.template_id = :id";
+            final SQLQuery setResultTransformer = this.getSession().createSQLQuery(templateDTOQuery);
+            setResultTransformer.setParameter("programUUID", programUUID);
+            setResultTransformer.setParameter("id", id);
+            setResultTransformer.addScalar("templateId", new IntegerType());
+            setResultTransformer.addScalar("templateName", new StringType());
+            setResultTransformer.addScalar("programUUID", new StringType());
+            setResultTransformer.addScalar("templateType", new StringType());
+            setResultTransformer.setResultTransformer(Transformers.aliasToBean(TemplateDTO.class));
+            return (TemplateDTO) setResultTransformer.uniqueResult();
         } catch (final HibernateException e) {
             throw new MiddlewareQueryException(
                     "error in: TemplateDAO.getTemplateByIdAndProgramUUID(programUUID=" + programUUID + "): " + e.getMessage(), e);
         }
     }
 
-    public Template getTemplateByNameAndProgramUUID(final String name, final String programUUID) {
+    public TemplateDTO getTemplateByNameAndProgramUUID(final String name, final String programUUID) {
         try {
-            final Criteria criteria = this.getSession().createCriteria(Template.class);
-            criteria.add(Restrictions.eq("programUUID", programUUID));
-            criteria.add(Restrictions.eq("templateName", name));
-
-            return (Template) criteria.uniqueResult();
+            final String templateDTOQuery = "SELECT temp.template_id AS templateId, "
+                    + " temp.template_name AS templateName,  "
+                    + " temp.program_uuid AS programUUID, "
+                    + " temp.template_type AS templateType "
+                    + " FROM template temp "
+                    + " WHERE temp.program_uuid = :programUUID AND temp.template_name = :name";
+            final SQLQuery setResultTransformer = this.getSession().createSQLQuery(templateDTOQuery);
+            setResultTransformer.setParameter("programUUID", programUUID);
+            setResultTransformer.setParameter("name", name);
+            setResultTransformer.addScalar("templateId", new IntegerType());
+            setResultTransformer.addScalar("templateName", new StringType());
+            setResultTransformer.addScalar("programUUID", new StringType());
+            setResultTransformer.addScalar("templateType", new StringType());
+            setResultTransformer.setResultTransformer(Transformers.aliasToBean(TemplateDTO.class));
+            return (TemplateDTO) setResultTransformer.uniqueResult();
         } catch (final HibernateException e) {
             throw new MiddlewareQueryException(
                     "error in: TemplateDAO.getTemplateByNameAndProgramUUID(programUUID=" + programUUID + "): " + e.getMessage(), e);
@@ -50,13 +70,13 @@ public class TemplateDAO extends GenericDAO<Template, Integer> {
 
     public List<TemplateDTO> getTemplateDTOsByType(final String programUUID, final String type) {
         try {
-            final String folderMetaDataQuery = "SELECT temp.template_id AS templateId, "
+            final String templateDTOQuery = "SELECT temp.template_id AS templateId, "
                     + " temp.template_name AS templateName,  "
                     + " temp.program_uuid AS programUUID, "
                     + " temp.template_type AS templateType "
                     + " FROM template temp "
                     + " WHERE temp.program_uuid = :programUUID AND temp.template_type = :type";
-            final SQLQuery setResultTransformer = this.getSession().createSQLQuery(folderMetaDataQuery);
+            final SQLQuery setResultTransformer = this.getSession().createSQLQuery(templateDTOQuery);
             setResultTransformer.setParameter("programUUID", programUUID);
             setResultTransformer.setParameter("type", type);
             setResultTransformer.addScalar("templateId", new IntegerType());
