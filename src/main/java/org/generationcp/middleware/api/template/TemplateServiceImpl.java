@@ -28,6 +28,16 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
+    public Template getTemplateByIdAndProgramUUID(final Integer templateId, final String programUUID) {
+        return this.daoFactory.getTemplateDAO().getTemplateByIdAndProgramUUID(templateId, programUUID);
+    }
+
+    @Override
+    public Template getTemplateByNameAndProgramUUID(final String name, final String programUUID) {
+        return this.daoFactory.getTemplateDAO().getTemplateByNameAndProgramUUID(name, programUUID);
+    }
+
+    @Override
     public TemplateDTO saveTemplate(TemplateDTO templateDTO) {
         final Template template = new Template();
         template.setTemplateName(templateDTO.getTemplateName());

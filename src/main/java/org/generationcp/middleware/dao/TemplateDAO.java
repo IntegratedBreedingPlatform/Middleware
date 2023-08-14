@@ -3,10 +3,13 @@ package org.generationcp.middleware.dao;
 import org.generationcp.middleware.api.template.TemplateDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ListMetadata;
+import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.generationcp.middleware.pojos.Template;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -17,6 +20,32 @@ public class TemplateDAO extends GenericDAO<Template, Integer> {
 
     public TemplateDAO(final Session session) {
         super(session);
+    }
+
+    public Template getTemplateByIdAndProgramUUID(final Integer id, final String programUUID) {
+        try {
+            final Criteria criteria = this.getSession().createCriteria(Template.class);
+            criteria.add(Restrictions.eq("programUUID", programUUID));
+            criteria.add(Restrictions.eq("templateId", id));
+
+            return (Template) criteria.uniqueResult();
+        } catch (final HibernateException e) {
+            throw new MiddlewareQueryException(
+                    "error in: TemplateDAO.getTemplateByIdAndProgramUUID(programUUID=" + programUUID + "): " + e.getMessage(), e);
+        }
+    }
+
+    public Template getTemplateByNameAndProgramUUID(final String name, final String programUUID) {
+        try {
+            final Criteria criteria = this.getSession().createCriteria(Template.class);
+            criteria.add(Restrictions.eq("programUUID", programUUID));
+            criteria.add(Restrictions.eq("templateName", name));
+
+            return (Template) criteria.uniqueResult();
+        } catch (final HibernateException e) {
+            throw new MiddlewareQueryException(
+                    "error in: TemplateDAO.getTemplateByNameAndProgramUUID(programUUID=" + programUUID + "): " + e.getMessage(), e);
+        }
     }
 
     public List<TemplateDTO> getTemplateDTOsByType(final String programUUID, final String type) {
