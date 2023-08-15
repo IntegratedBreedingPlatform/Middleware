@@ -48,7 +48,7 @@ public class TemplateDTO {
         return templateName;
     }
 
-    public void setTemplateName(String templateName) {
+    public void setTemplateName(final String templateName) {
         this.templateName = templateName;
     }
 

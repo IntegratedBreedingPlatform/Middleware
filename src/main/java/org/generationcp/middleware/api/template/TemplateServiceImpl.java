@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,12 +30,16 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public TemplateDTO getTemplateByIdAndProgramUUID(final Integer templateId, final String programUUID) {
-        return this.daoFactory.getTemplateDAO().getTemplateByIdAndProgramUUID(templateId, programUUID);
+        final TemplateDTO templateDTO = this.daoFactory.getTemplateDAO().getTemplateByIdAndProgramUUID(templateId, programUUID);
+        this.populateTemplateDetails(templateDTO);
+        return templateDTO;
     }
 
     @Override
     public TemplateDTO getTemplateByNameAndProgramUUID(final String name, final String programUUID) {
-        return this.daoFactory.getTemplateDAO().getTemplateByNameAndProgramUUID(name, programUUID);
+        final TemplateDTO templateDTO = this.daoFactory.getTemplateDAO().getTemplateByNameAndProgramUUID(name, programUUID);
+        this.populateTemplateDetails(templateDTO);
+        return templateDTO;
     }
 
     @Override
@@ -45,13 +50,7 @@ public class TemplateServiceImpl implements TemplateService {
         template.setProgramUUID(templateDTO.getProgramUUID());
         template.setTemplateDetails(new ArrayList<>());
         for(final TemplateDetailsDTO templateDetailsDTO: templateDTO.getTemplateDetails()) {
-            final TemplateDetails templateDetails = new TemplateDetails();
-            templateDetails.setTemplate(template);
-            final CVTerm cvTerm = new CVTerm();
-            cvTerm.setCvTermId(templateDetailsDTO.getVariableId());
-            templateDetails.setVariable(cvTerm);
-            templateDetails.setName(templateDetailsDTO.getName());
-            templateDetails.setType(templateDetailsDTO.getType());
+            final TemplateDetails templateDetails = this.mapTemplateDetails(template, templateDetailsDTO);
             template.getTemplateDetails().add(templateDetails);
         }
         this.daoFactory.getTemplateDAO().save(template);
@@ -65,20 +64,26 @@ public class TemplateServiceImpl implements TemplateService {
         template.setTemplateName(templateDTO.getTemplateName());
         template.setTemplateType(templateDTO.getTemplateType());
         template.setProgramUUID(templateDTO.getProgramUUID());
+        this.daoFactory.getTemplateDetailsDAO().deleteByTemplateId(templateDTO.getTemplateId());
         final List<TemplateDetails> templateDetailsList = new ArrayList<>();
         for(final TemplateDetailsDTO templateDetailsDTO: templateDTO.getTemplateDetails()) {
-            final TemplateDetails templateDetails = new TemplateDetails();
-            templateDetails.setTemplate(template);
-            final CVTerm cvTerm = new CVTerm();
-            cvTerm.setCvTermId(templateDetailsDTO.getVariableId());
-            templateDetails.setVariable(cvTerm);
-            templateDetails.setName(templateDetailsDTO.getName());
-            templateDetails.setType(templateDetailsDTO.getType());
+            final TemplateDetails templateDetails = this.mapTemplateDetails(template, templateDetailsDTO);
             templateDetailsList.add(templateDetails);
         }
         template.setTemplateDetails(templateDetailsList);
         this.daoFactory.getTemplateDAO().saveOrUpdate(template);
         return templateDTO;
+    }
+
+    private TemplateDetails mapTemplateDetails(final Template template, final TemplateDetailsDTO templateDetailsDTO) {
+        final TemplateDetails templateDetails = new TemplateDetails();
+        templateDetails.setTemplate(template);
+        final CVTerm cvTerm = new CVTerm();
+        cvTerm.setCvTermId(templateDetailsDTO.getVariableId());
+        templateDetails.setVariable(cvTerm);
+        templateDetails.setName(templateDetailsDTO.getName());
+        templateDetails.setType(templateDetailsDTO.getType());
+        return templateDetails;
     }
 
     @Override
@@ -98,6 +103,17 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public List<TemplateDTO> getTemplateDTOsByType(final String programUUID, final String type) {
         final List<TemplateDTO> templateDTOS = this.daoFactory.getTemplateDAO().getTemplateDTOsByType(programUUID, type);
+        this.populateTemplateDetails(templateDTOS);
+        return templateDTOS;
+    }
+
+    public void populateTemplateDetails(final TemplateDTO templateDTO) {
+        if (templateDTO != null) {
+            this.populateTemplateDetails(Collections.singletonList(templateDTO));
+        }
+    }
+
+    private void populateTemplateDetails(final List<TemplateDTO> templateDTOS) {
         if (CollectionUtils.isNotEmpty(templateDTOS)) {
             final Map<Integer, List<TemplateDetailsDTO>> templateDetailsMapByTemplateIds = this.daoFactory.getTemplateDetailsDAO()
                     .getTemplateDetailsMapByTemplateIds(templateDTOS.stream().map(TemplateDTO::getTemplateId).collect(Collectors.toList()));
@@ -107,6 +123,5 @@ public class TemplateServiceImpl implements TemplateService {
                 }
             }
         }
-        return templateDTOS;
     }
 }
