@@ -13,7 +13,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
@@ -40,45 +39,45 @@ public class Template extends AbstractEntity implements Serializable {
     private String templateName;
 
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<TemplateDetails> templateDetails = new ArrayList<>();
+    private final List<TemplateDetails> templateDetails = new ArrayList<>();
 
     public Integer getTemplateId() {
-        return templateId;
+        return this.templateId;
     }
 
-    public void setTemplateId(Integer templateId) {
+    public void setTemplateId(final Integer templateId) {
         this.templateId = templateId;
     }
 
     public String getProgramUUID() {
-        return programUUID;
+        return this.programUUID;
     }
 
-    public void setProgramUUID(String programUUID) {
+    public void setProgramUUID(final String programUUID) {
         this.programUUID = programUUID;
     }
 
     public String getTemplateType() {
-        return templateType;
+        return this.templateType;
     }
 
-    public void setTemplateType(String templateType) {
+    public void setTemplateType(final String templateType) {
         this.templateType = templateType;
     }
 
     public String getTemplateName() {
-        return templateName;
+        return this.templateName;
     }
 
-    public void setTemplateName(String templateName) {
+    public void setTemplateName(final String templateName) {
         this.templateName = templateName;
     }
 
     public List<TemplateDetails> getTemplateDetails() {
-        return templateDetails;
+        return this.templateDetails;
     }
 
-    public void setTemplateDetails(List<TemplateDetails> templateDetails) {
+    public void setTemplateDetails(final List<TemplateDetails> templateDetails) {
         this.templateDetails.clear();
         this.templateDetails.addAll(templateDetails);
     }

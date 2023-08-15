@@ -47,7 +47,7 @@ public class TemplateDetails extends AbstractEntity implements Serializable {
         return templateDetailsId;
     }
 
-    public void setTemplateDetailsId(Integer templateDetailsId) {
+    public void setTemplateDetailsId(final Integer templateDetailsId) {
         this.templateDetailsId = templateDetailsId;
     }
 
@@ -55,31 +55,31 @@ public class TemplateDetails extends AbstractEntity implements Serializable {
         return template;
     }
 
-    public void setTemplate(Template template) {
+    public void setTemplate(final Template template) {
         this.template = template;
     }
 
     public CVTerm getVariable() {
-        return variable;
+        return this.variable;
     }
 
-    public void setVariable(CVTerm variable) {
+    public void setVariable(final CVTerm variable) {
         this.variable = variable;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
     public String getType() {
-        return type;
+        return this.type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 

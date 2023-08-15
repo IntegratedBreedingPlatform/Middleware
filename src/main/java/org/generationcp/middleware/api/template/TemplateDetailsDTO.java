@@ -21,26 +21,26 @@ public class TemplateDetailsDTO {
         this.type = type;
     }
     public Integer getVariableId() {
-        return variableId;
+        return this.variableId;
     }
 
-    public void setVariableId(Integer variableId) {
+    public void setVariableId(final Integer variableId) {
         this.variableId = variableId;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
     public String getType() {
-        return type;
+        return this.type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 

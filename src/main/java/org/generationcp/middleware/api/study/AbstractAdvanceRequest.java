@@ -60,28 +60,28 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 
 	@Override
 	public List<Integer> getDescriptorIds() {
-		return descriptorIds;
+		return this.descriptorIds;
 	}
 
-	public void setDescriptorIds(List<Integer> descriptorIds) {
+	public void setDescriptorIds(final List<Integer> descriptorIds) {
 		this.descriptorIds = descriptorIds;
 	}
 
 	@Override
 	public boolean isOverrideDescriptorsLocation() {
-		return overrideDescriptorsLocation;
+		return this.overrideDescriptorsLocation;
 	}
 
-	public void setOverrideDescriptorsLocation(boolean overrideDescriptorsLocation) {
+	public void setOverrideDescriptorsLocation(final boolean overrideDescriptorsLocation) {
 		this.overrideDescriptorsLocation = overrideDescriptorsLocation;
 	}
 
 	@Override
 	public Integer getLocationOverrideId() {
-		return locationOverrideId;
+		return this.locationOverrideId;
 	}
 
-	public void setLocationOverrideId(Integer locationOverrideId) {
+	public void setLocationOverrideId(final Integer locationOverrideId) {
 		this.locationOverrideId = locationOverrideId;
 	}
 

@@ -38,7 +38,7 @@ public class TemplateDetailsDAO extends GenericDAO<TemplateDetails, Integer> {
                             + " WHERE td.template_id IN (:templateIds) ");
             query.setParameterList("templateIds", templateIds);
 
-            List<Object[]> list = query.list();
+            final List<Object[]> list = query.list();
 
             final Map<Integer, List<TemplateDetailsDTO>> templateDetailsMap = new HashMap<>();
             for (final Object[] row : list) {

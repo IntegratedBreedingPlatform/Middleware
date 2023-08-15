@@ -43,7 +43,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public TemplateDTO saveTemplate(TemplateDTO templateDTO) {
+    public TemplateDTO saveTemplate(final TemplateDTO templateDTO) {
         final Template template = new Template();
         template.setTemplateName(templateDTO.getTemplateName());
         template.setTemplateType(templateDTO.getTemplateType());
@@ -59,7 +59,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public TemplateDTO updateTemplate(TemplateDTO templateDTO) {
+    public TemplateDTO updateTemplate(final TemplateDTO templateDTO) {
         final Template template = this.daoFactory.getTemplateDAO().getById(templateDTO.getTemplateId());
         template.setTemplateName(templateDTO.getTemplateName());
         template.setTemplateType(templateDTO.getTemplateType());
@@ -87,7 +87,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public void deleteTemplate(Integer templateId) {
+    public void deleteTemplate(final Integer templateId) {
         Preconditions.checkNotNull(templateId);
         final Template template = this.daoFactory.getTemplateDAO().getById(templateId);
 

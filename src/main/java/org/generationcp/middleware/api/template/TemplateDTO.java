@@ -29,23 +29,23 @@ public class TemplateDTO {
     }
 
     public Integer getTemplateId() {
-        return templateId;
+        return this.templateId;
     }
 
-    public void setTemplateId(Integer templateId) {
+    public void setTemplateId(final Integer templateId) {
         this.templateId = templateId;
     }
 
     public String getProgramUUID() {
-        return programUUID;
+        return this.programUUID;
     }
 
-    public void setProgramUUID(String programUUID) {
+    public void setProgramUUID(final String programUUID) {
         this.programUUID = programUUID;
     }
 
     public String getTemplateName() {
-        return templateName;
+        return this.templateName;
     }
 
     public void setTemplateName(final String templateName) {
@@ -53,10 +53,10 @@ public class TemplateDTO {
     }
 
     public String getTemplateType() {
-        return templateType;
+        return this.templateType;
     }
 
-    public void setTemplateType(String templateType) {
+    public void setTemplateType(final String templateType) {
         this.templateType = templateType;
     }
 
@@ -64,7 +64,7 @@ public class TemplateDTO {
         return this.templateDetails;
     }
 
-    public void setTemplateDetails(List<TemplateDetailsDTO> templateDetails) {
+    public void setTemplateDetails(final List<TemplateDetailsDTO> templateDetails) {
         this.templateDetails = templateDetails;
     }
 
