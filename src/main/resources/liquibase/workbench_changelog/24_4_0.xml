@@ -16,4 +16,54 @@
             UPDATE r_package SET endpoint = 'https://opencpu.ibp.services/ocpu/library/ggplot2/R/qplot' WHERE (`package_id` = '3');
         </sql>
     </changeSet>
+
+    <changeSet author="cuenyad" id="v24.4.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM workbench_tool where group_name="cross_plan_manager";
+            </sqlCheck>
+        </preConditions>
+        <comment>Add Manage Cross Plan side menu</comment>
+        <sql dbms="mysql" splitStatements="true">
+            INSERT INTO workbench_tool (name, group_name, title, version, tool_type, path, parameter, user_tool)
+            VALUES ('cross_plan_manager', 'cross_plan_manager', 'Manage Cross Plan', '24.4', 'WEB', '/ibpworkbench/controller/jhipster#cross-plan-manager', '', 0);
+
+            INSERT INTO workbench_sidebar_category_link (`tool_name`, `sidebar_category_id`, `sidebar_link_name`, `sidebar_link_title`, `rank`)
+            VALUES ('cross_plan_manager', (SELECT sidebar_category_id FROM workbench_sidebar_category where
+                sidebar_category_name="studies"), 'cross_plan_manager', 'Manage Cross Plan', 1);
+        </sql>
+    </changeSet>
+
+    <changeSet author="cuenyad" id="v24.4.0-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT count(*) FROM permission where name ='MANAGE_CROSS_PLAN'</sqlCheck>
+        </preConditions>
+        <comment>insert MANAGE_CROSS_PLAN permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+
+            SET @studies_permission_id = (SELECT permission_id FROM permission where name ='STUDIES');
+            SET @sidebar_category_link_id = (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'cross_plan_manager');
+            INSERT INTO permission (name, description, parent_id, workbench_sidebar_category_link_id, rank)
+            VALUES ('MANAGE_CROSS_PLAN', 'Manage Cross Plan', @studies_permission_id , @sidebar_category_link_id , 1);
+
+            SET @manage_cross_plan_permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_CROSS_PLAN');
+
+            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @manage_cross_plan_permission_id, '1');
+            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @manage_cross_plan_permission_id, '1');
+            INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @manage_cross_plan_permission_id, '1');
+        </sql>
+    </changeSet>
+
+    <changeSet author="cuenyad" id="v24.4.0-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM workbench_sidebar_category_link WHERE tool_name = 'study_manager_fieldbook_web' AND RANK='2'</sqlCheck>
+        </preConditions>
+        <comment>Reorder Studies side menu</comment>
+        <sql dbms="mysql" splitStatements="true">
+            UPDATE workbench_sidebar_category_link SET rank = '2' WHERE (tool_name = 'study_manager_fieldbook_web');
+            UPDATE workbench_sidebar_category_link SET rank = '3' WHERE (tool_name = 'dataset_importer');
+            UPDATE workbench_sidebar_category_link SET rank = '4' WHERE (tool_name = 'breeding_view_wb');
+            UPDATE workbench_sidebar_category_link SET rank = '5' WHERE (tool_name = 'breeding_gxe');
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
