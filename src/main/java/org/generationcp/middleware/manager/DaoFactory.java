@@ -35,6 +35,8 @@ import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.StudyExternalReferenceDao;
 import org.generationcp.middleware.dao.StudyInstanceExternalReferenceDao;
 import org.generationcp.middleware.dao.StudyTypeDAO;
+import org.generationcp.middleware.dao.TemplateDAO;
+import org.generationcp.middleware.dao.TemplateDetailsDAO;
 import org.generationcp.middleware.dao.TrialSearchDao;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
@@ -113,6 +115,14 @@ public class DaoFactory {
 
 	public CropParameterDAO getCropParameterDAO() {
 		return new CropParameterDAO(this.sessionProvider.getSession());
+	}
+
+	public TemplateDAO getTemplateDAO() {
+		return new TemplateDAO(this.sessionProvider.getSession());
+	}
+
+	public TemplateDetailsDAO getTemplateDetailsDAO() {
+		return new TemplateDetailsDAO(this.sessionProvider.getSession());
 	}
 
 	public FormulaDAO getFormulaDAO() {
