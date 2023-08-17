@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.germplasm.search;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.List;
 import java.util.Set;
 
 @AutoProperty
@@ -12,7 +13,7 @@ public class GermplasmAttributeSearchRequest {
 
 	private String programUUID;
 
-	private Integer variableTypeId;
+	private List<Integer> variableTypeIds;
 
 	public Set<Integer> getGids() {
 		return this.gids;
@@ -30,12 +31,12 @@ public class GermplasmAttributeSearchRequest {
 		this.programUUID = programUUID;
 	}
 
-	public Integer getVariableTypeId() {
-		return this.variableTypeId;
+	public List<Integer> getVariableTypeIds() {
+		return this.variableTypeIds;
 	}
 
-	public void setVariableTypeId(final Integer variableTypeId) {
-		this.variableTypeId = variableTypeId;
+	public void setVariableTypeIds(final List<Integer> variableTypeIds) {
+		this.variableTypeIds = variableTypeIds;
 	}
 
 	@Override

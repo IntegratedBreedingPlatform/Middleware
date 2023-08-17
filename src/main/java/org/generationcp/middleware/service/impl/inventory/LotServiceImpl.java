@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
@@ -176,7 +177,7 @@ public class LotServiceImpl implements LotService {
 				.map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr).collect(Collectors.toList());
 
 			final Map<String, Integer> locationsByLocationAbbrMap = CollectionUtils.isEmpty(locationAbbreviations) ? new HashMap<>() :
-				this.buildLocationsByLocationAbbrMap(locationAbbreviations);
+				new CaseInsensitiveMap(this.buildLocationsByLocationAbbrMap(locationAbbreviations));
 
 			final Map<String, Integer> unitMapByName = this.buildUnitsByNameMap();
 			final Map<String, LotMultiUpdateRequestDto.LotUpdateDto> lotUpdateMapByLotUID =

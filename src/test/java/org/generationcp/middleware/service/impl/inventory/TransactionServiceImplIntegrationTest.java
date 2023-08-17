@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateBalanceRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
@@ -31,282 +32,367 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
-	private static final Integer DEFAULT_SEED_STORE_ID = 6000;
+    private static final Integer DEFAULT_SEED_STORE_ID = 6000;
 
-	private TransactionServiceImpl transactionService;
+    private TransactionServiceImpl transactionService;
 
-	private LotServiceImpl lotService;
+    private LotServiceImpl lotService;
 
-	private DaoFactory daoFactory;
+    private DaoFactory daoFactory;
 
-	private Integer studyId, userId, pendingWithdrawalId, pendingDepositId, gid;
+    private Integer studyId, userId, gid;
 
-	private Lot lot;
-
-	private String unitName;
+    private String unitName;
 
 
-	public static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
+    public static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
 
-	@Before
-	public void setUp() {
-		this.lotService = new LotServiceImpl(this.sessionProvder);
-		this.transactionService = new TransactionServiceImpl(this.sessionProvder);
-		this.transactionService.setLotService(this.lotService);
-		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.createGermplasmStudySource();
-		this.userId = this.findAdminUser();
-		this.createLot();
-		this.createTransactions();
-		this.resolveUnitName();
-	}
+    @Before
+    public void setUp() {
+        this.lotService = new LotServiceImpl(this.sessionProvder);
+        this.transactionService = new TransactionServiceImpl(this.sessionProvder);
+        this.transactionService.setLotService(this.lotService);
+        this.daoFactory = new DaoFactory(this.sessionProvder);
+        this.createGermplasmStudySource();
+        this.userId = this.findAdminUser();
+        this.resolveUnitName();
+    }
 
-	@Test(expected = MiddlewareRequestException.class)
-	public void testUpdatePendingTransactions_WithdrawalInvalidAvailableBalance() {
-		final TransactionUpdateRequestDto transactionUpdateRequestDto =
-			new TransactionUpdateRequestDto(this.pendingWithdrawalId, null, 30D, null);
-		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
-	}
+    @Test(expected = MiddlewareRequestException.class)
+    public void testUpdatePendingTransactions_WithdrawalInvalidAvailableBalance() {
 
-	@Test(expected = MiddlewareRequestException.class)
-	public void testUpdatePendingTransactions_DepositInvalidAvailableBalance() {
-		final TransactionUpdateRequestDto transactionUpdateRequestDto = new TransactionUpdateRequestDto(this.pendingDepositId, null, 2D, null);
-		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
-	}
+        final Lot lot = this.createLot();
+        final Optional<Transaction> pendingWithrawalOptional = this.createTransactions(lot).stream().filter(this::isPendingWithdrawal).findAny();
+        assertTrue(pendingWithrawalOptional.isPresent());
 
-	@Test(expected = MiddlewareRequestException.class)
-	public void testUpdatePendingTransactions_WithdrawalInvalidAmount() {
-		final TransactionUpdateRequestDto transactionUpdateRequestDto =
-			new TransactionUpdateRequestDto(this.pendingWithdrawalId, 22D, null, null);
-		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
-	}
+        final TransactionUpdateRequestDto transactionUpdateRequestDto =
+                new TransactionUpdateRequestDto(pendingWithrawalOptional.get().getId(), null, 30D, null);
+        this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
+    }
 
-	@Test
-	public void testUpdatePendingTransactions_WithdrawalNewAmount_Ok() {
-		final TransactionUpdateRequestDto transactionUpdateRequestDto =
-			new TransactionUpdateRequestDto(this.pendingWithdrawalId, 20D, null, null);
-		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
-		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(this.pendingWithdrawalId);
-		Assert.assertTrue(transaction.getQuantity().equals(-20D));
-	}
+    @Test(expected = MiddlewareRequestException.class)
+    public void testUpdatePendingTransactions_DepositInvalidAvailableBalance() {
 
-	@Test
-	public void testUpdatePendingTransactions_WithdrawalNewBalance_Ok() {
-		final TransactionUpdateRequestDto transactionUpdateRequestDto =
-			new TransactionUpdateRequestDto(this.pendingWithdrawalId, null, 0D, null);
-		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
-		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(this.pendingWithdrawalId);
-		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
-		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, null).get(0);
-		Assert.assertTrue(transaction.getQuantity().equals(-20D));
-		Assert.assertTrue(lotDto.getAvailableBalance().equals(0D));
-	}
-
-	@Test
-	public void testUpdatePendingTransactions_DepositNewBalance_Ok() {
-		final TransactionUpdateRequestDto transactionUpdateRequestDto =
-			new TransactionUpdateRequestDto(this.pendingDepositId, null, 20D, null);
-		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
-		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(this.pendingDepositId);
-		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
-		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, null).get(0);
-		Assert.assertTrue(transaction.getQuantity().equals(2D));
-		Assert.assertTrue(lotDto.getAvailableBalance().equals(18D));
-	}
-
-	@Test
-	public void testUpdatePendingTransactions_DepositNewAmount_Ok() {
-		final TransactionUpdateRequestDto transactionUpdateRequestDto =
-			new TransactionUpdateRequestDto(this.pendingDepositId, 5D, null, null);
-		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
-		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(this.pendingDepositId);
-		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
-		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, null).get(0);
-		Assert.assertTrue(transaction.getQuantity().equals(5D));
-		Assert.assertTrue(lotDto.getAvailableBalance().equals(18D));
-	}
-
-	@Test
-	public void testDepositLots_Ok() {
-		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-		final Map<String, Double> instructions = new HashMap<>();
-		instructions.put(this.unitName, 20D);
-		lotDepositRequestDto.setDepositsPerUnit(instructions);
-
-		final List<Integer> lotIds = Collections.singletonList(this.lot.getId());
-		this.transactionService.depositLots(this.userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED, null, null);
-
-		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(lotIds);
-		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
-		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
-		Assert.assertTrue(extendedLotDto.getAvailableBalance().equals(38D));
-	}
+        final Lot lot = this.createLot();
+        final Optional<Transaction> pendingDepositOptional = this.createTransactions(lot).stream().filter(this::isPendingDeposit).findAny();
+        assertTrue(pendingDepositOptional.isPresent());
 
 
-	@Test
-	public void testDepositLots_WithSourceStudy_Ok() {
-		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-		final Map<String, Double> instructions = new HashMap<>();
-		instructions.put(this.unitName, 20D);
-		lotDepositRequestDto.setDepositsPerUnit(instructions);
-		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
-		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY_SOURCE);
-		searchOriginCompositeDto.setSearchRequestId(1);
-		final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<SearchOriginCompositeDto, Integer>();
-		searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
-		lotDepositRequestDto.setSearchComposite(searchCompositeDto);
-		final List<Integer> lotIds = Collections.singletonList(this.lot.getId());
-		this.transactionService.depositLots(this.userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED, null, null);
+        final TransactionUpdateRequestDto transactionUpdateRequestDto = new TransactionUpdateRequestDto(pendingDepositOptional.get().getId(), null, 2D, null);
+        this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
+    }
 
-		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(lotIds);
-		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
-		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
-		Assert.assertTrue(extendedLotDto.getAvailableBalance().equals(38D));
+    @Test(expected = MiddlewareRequestException.class)
+    public void testUpdatePendingTransactions_WithdrawalInvalidAmount() {
 
-		final List<Transaction> transactions = this.daoFactory.getExperimentTransactionDao()
-			.getTransactionsByStudyId(this.studyId, TransactionStatus.CONFIRMED, ExperimentTransactionType.HARVESTING);
+        final Lot lot = this.createLot();
+        final Optional<Transaction> pendingWithrawalOptional = this.createTransactions(lot).stream().filter(this::isPendingWithdrawal).findAny();
+        assertTrue(pendingWithrawalOptional.isPresent());
 
-		Assert.assertEquals(1, transactions.size());
-	}
+        final TransactionUpdateRequestDto transactionUpdateRequestDto =
+                new TransactionUpdateRequestDto(pendingWithrawalOptional.get().getId(), 22D, null, null);
+        this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
+    }
 
-	@Test
-	public void testDepositLots_With_study_source_as_search_origin_Ok() {
-		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
-		final Map<String, Double> instructions = new HashMap<>();
-		instructions.put(this.unitName, 20D);
-		lotDepositRequestDto.setDepositsPerUnit(instructions);
-		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
-		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY_SOURCE);
-		searchOriginCompositeDto.setSearchRequestId(1);
-		final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<SearchOriginCompositeDto, Integer>();
-		searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
-		lotDepositRequestDto.setSearchComposite(searchCompositeDto);
-		final List<Integer> lotIds = Collections.singletonList(this.lot.getId());
-		this.transactionService.depositLots(
-			this.userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED,
-			TransactionSourceType.SPLIT_LOT, this.lot.getId());
+    @Test
+    public void testUpdatePendingTransactions_WithdrawalNewAmount_Ok() {
 
-		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(lotIds);
-		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
-		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
-		Assert.assertTrue(extendedLotDto.getAvailableBalance().equals(38D));
+        final Lot lot = this.createLot();
+        final Optional<Transaction> pendingWithrawalOptional = this.createTransactions(lot).stream().filter(this::isPendingWithdrawal).findAny();
+        assertTrue(pendingWithrawalOptional.isPresent());
 
-		final List<Transaction> transactions = this.sessionProvder.getSession().createQuery(
-			String.format("select T from %s T where lotId=%s",
-				Transaction.class.getCanonicalName(),
-				this.lot.getId()))
-			.list();
-		this.assertTransaction(transactions.get(transactions.size() - 1), TransactionType.DEPOSIT, TransactionStatus.CONFIRMED,
-			20D, TransactionSourceType.SPLIT_LOT, this.lot.getId());
-	}
+        final TransactionUpdateRequestDto transactionUpdateRequestDto =
+                new TransactionUpdateRequestDto(pendingWithrawalOptional.get().getId(), 20D, null, null);
+        this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
+        final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingWithrawalOptional.get().getId());
+        assertEquals(-20D, transaction.getQuantity(), 0.0);
+    }
 
-	@Test(expected = MiddlewareRequestException.class)
-	public void testSaveAdjustmentTransactions_InvalidNewBalance() {
-		this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singleton(this.lot.getId()), 1D, "");
-	}
+    @Test
+    public void testUpdatePendingTransactions_WithdrawalNewBalance_Ok() {
 
-	@Test
-	public void testSaveAdjustmentTransactions_OK() {
-		this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singleton(this.lot.getId()), 3D, "");
-		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
-		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
-		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
-		Assert.assertTrue(extendedLotDto.getActualBalance().equals(3D));
-	}
+        final Lot lot = this.createLot();
+        final Optional<Transaction> pendingWithrawalOptional = this.createTransactions(lot).stream().filter(this::isPendingWithdrawal).findAny();
+        assertTrue(pendingWithrawalOptional.isPresent());
 
-	@Test
-	public void testSaveAdjustmentTransactions_NoTransactionSaved() {
-		this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singleton(this.lot.getId()), 20D, "");
+        final TransactionUpdateRequestDto transactionUpdateRequestDto =
+                new TransactionUpdateRequestDto(pendingWithrawalOptional.get().getId(), null, 0D, null);
+        this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
+        final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingWithrawalOptional.get().getId());
+        final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+        lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+        final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, null).get(0);
+        assertEquals(-20D, transaction.getQuantity(), 0.0);
+        assertEquals(0D, lotDto.getAvailableBalance(), 0.0);
+    }
 
-		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
-		transactionsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
-		final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
+    @Test
+    public void testUpdatePendingTransactions_DepositNewBalance_Ok() {
 
-		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
-		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
-		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
-		Assert.assertTrue(extendedLotDto.getActualBalance().equals(20D));
+        final Lot lot = this.createLot();
+        final Optional<Transaction> pendingDepositOptional = this.createTransactions(lot).stream().filter(this::isPendingDeposit).findAny();
+        assertTrue(pendingDepositOptional.isPresent());
 
-		Assert.assertEquals(3, transactionDtos.size());
-	}
+        final TransactionUpdateRequestDto transactionUpdateRequestDto =
+                new TransactionUpdateRequestDto(pendingDepositOptional.get().getId(), null, 20D, null);
+        this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
+        final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingDepositOptional.get().getId());
+        final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+        lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+        final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, null).get(0);
+        assertEquals(2D, transaction.getQuantity(), 0.0);
+        assertEquals(18D, lotDto.getAvailableBalance(), 0.0);
+    }
 
-	private void createLot() {
-		this.lot = new Lot(null, this.userId, EntityType.GERMPLSM.name(), this.gid, DEFAULT_SEED_STORE_ID, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
-			"Lot", RandomStringUtils.randomAlphabetic(35));
-		this.daoFactory.getLotDao().save(this.lot);
-	}
+    @Test
+    public void testUpdatePendingTransactions_DepositNewAmount_Ok() {
 
-	private void createTransactions() {
+        final Lot lot = this.createLot();
+        final Optional<Transaction> pendingDepositOptional = this.createTransactions(lot).stream().filter(this::isPendingDeposit).findAny();
+        assertTrue(pendingDepositOptional.isPresent());
 
-		final Transaction confirmedDeposit =
-			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
-				20D, "Transaction 1", Util.getCurrentDateAsIntegerValue(), null, null, null, this.userId, TransactionType.DEPOSIT.getId());
+        final TransactionUpdateRequestDto transactionUpdateRequestDto =
+                new TransactionUpdateRequestDto(pendingDepositOptional.get().getId(), 5D, null, null);
+        this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
+        final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingDepositOptional.get().getId());
+        final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+        lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+        final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, null).get(0);
+        assertEquals(5D, transaction.getQuantity(), 0.0);
+        assertEquals(18D, lotDto.getAvailableBalance(), 0.0);
+    }
 
-		final Transaction pendingDeposit =
-			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
-				20D, "Transaction 2", 0, null, null, null, this.userId, TransactionType.DEPOSIT.getId());
+    @Test
+    public void testDepositLots_Ok() {
 
-		final Transaction pendingWithdrawal =
-			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
-				-2D, "Transaction 3", 0, null, null, null, this.userId, TransactionType.WITHDRAWAL.getId());
+        final Lot lot = this.createLot();
+        this.createTransactions(lot);
 
-		this.daoFactory.getTransactionDAO().save(confirmedDeposit);
-		this.daoFactory.getTransactionDAO().save(pendingDeposit);
-		this.pendingDepositId = pendingDeposit.getId();
-		this.daoFactory.getTransactionDAO().save(pendingWithdrawal);
-		this.pendingWithdrawalId = pendingWithdrawal.getId();
+        final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
+        final Map<String, Double> instructions = new HashMap<>();
+        instructions.put(this.unitName, 20D);
+        lotDepositRequestDto.setDepositsPerUnit(instructions);
 
-	}
+        final List<Integer> lotIds = Collections.singletonList(lot.getId());
+        this.transactionService.depositLots(this.userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED, null, null);
 
-	private void createGermplasmStudySource() {
-		final IntegrationTestDataInitializer integrationTestDataInitializer =
-			new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
+        final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+        lotsSearchDto.setLotIds(lotIds);
+        final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+        final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
+        assertEquals(38D, extendedLotDto.getAvailableBalance(), 0.0);
+    }
 
-		final DmsProject study = integrationTestDataInitializer
-			.createStudy(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), 1);
-		final DmsProject plot = integrationTestDataInitializer
-			.createDmsProject(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), study,
-				study, DatasetTypeEnum.PLOT_DATA);
-		final Geolocation geolocation = integrationTestDataInitializer.createInstance(study, "1", 1);
 
-		final GermplasmStudySource
-			germplasmStudySource = integrationTestDataInitializer.addGermplasmStudySource(study, plot, geolocation, "111", "222");
+    @Test
+    public void testDepositLots_WithSourceStudy_Ok() {
 
-		this.gid = germplasmStudySource.getGermplasm().getGid();
-		this.studyId = study.getProjectId();
-	}
+        final Lot lot = this.createLot();
+        this.createTransactions(lot);
 
-	private void resolveUnitName() {
-		this.unitName = this.daoFactory.getCvTermDao().getById(UNIT_ID).getName();
-	}
+        final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
+        final Map<String, Double> instructions = new HashMap<>();
+        instructions.put(this.unitName, 20D);
+        lotDepositRequestDto.setDepositsPerUnit(instructions);
+        final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
+        searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY_SOURCE);
+        searchOriginCompositeDto.setSearchRequestId(1);
+        final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<SearchOriginCompositeDto, Integer>();
+        searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
+        lotDepositRequestDto.setSearchComposite(searchCompositeDto);
+        final List<Integer> lotIds = Collections.singletonList(lot.getId());
+        this.transactionService.depositLots(this.userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED, null, null);
 
-	private void assertTransaction(final Transaction actualTransaction, final TransactionType type, final TransactionStatus status,
-		final double amount, final TransactionSourceType sourceType, final Integer sourceId) {
-		assertNotNull(actualTransaction);
-		assertThat(actualTransaction.getType(), is(type.getId()));
-		assertThat(actualTransaction.getStatus(), is(status.getIntValue()));
-		assertThat(actualTransaction.getQuantity(), is(amount));
-		assertThat(actualTransaction.getSourceType(), is(sourceType.name()));
-		assertThat(actualTransaction.getSourceId(), is(sourceId));
-	}
+        final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+        lotsSearchDto.setLotIds(lotIds);
+        final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+        final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
+        assertEquals(38D, extendedLotDto.getAvailableBalance(), 0.0);
+
+        final List<Transaction> transactions = this.daoFactory.getExperimentTransactionDao()
+                .getTransactionsByStudyId(this.studyId, TransactionStatus.CONFIRMED, ExperimentTransactionType.HARVESTING);
+
+        Assert.assertEquals(1, transactions.size());
+    }
+
+    @Test
+    public void testDepositLots_With_study_source_as_search_origin_Ok() {
+
+        final Lot lot = this.createLot();
+        this.createTransactions(lot);
+
+        final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
+        final Map<String, Double> instructions = new HashMap<>();
+        instructions.put(this.unitName, 20D);
+        lotDepositRequestDto.setDepositsPerUnit(instructions);
+        final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
+        searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY_SOURCE);
+        searchOriginCompositeDto.setSearchRequestId(1);
+        final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<SearchOriginCompositeDto, Integer>();
+        searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
+        lotDepositRequestDto.setSearchComposite(searchCompositeDto);
+        final List<Integer> lotIds = Collections.singletonList(lot.getId());
+        this.transactionService.depositLots(
+                this.userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED,
+                TransactionSourceType.SPLIT_LOT, lot.getId());
+
+        final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+        lotsSearchDto.setLotIds(lotIds);
+        final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+        final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
+        assertEquals(38D, extendedLotDto.getAvailableBalance(), 0.0);
+
+        final List<Transaction> transactions = this.sessionProvder.getSession().createQuery(
+                        String.format("select T from %s T where lotId=%s",
+                                Transaction.class.getCanonicalName(),
+                                lot.getId()))
+                .list();
+        this.assertTransaction(transactions.get(transactions.size() - 1), TransactionType.DEPOSIT, TransactionStatus.CONFIRMED,
+                20D, TransactionSourceType.SPLIT_LOT, lot.getId());
+    }
+
+    @Test(expected = MiddlewareRequestException.class)
+    public void testSaveAdjustmentTransactions_InvalidNewBalance() {
+
+        final Lot lot = this.createLot();
+        this.createTransactions(lot);
+
+        final LotUpdateBalanceRequestDto lotUpdateBalanceRequestDto = new LotUpdateBalanceRequestDto(lot.getLotUuId(), 1D, "");
+        this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singletonList(lotUpdateBalanceRequestDto));
+    }
+
+    @Test
+    public void testSaveAdjustmentTransactions_OK() {
+
+        // Create 2 lots to be updated
+        final Lot lot1 = this.createLot();
+        this.createTransactions(lot1);
+        final Lot lot2 = this.createLot();
+        this.createTransactions(lot2);
+
+        final LotUpdateBalanceRequestDto lotUpdateBalanceRequestDto1 = new LotUpdateBalanceRequestDto(lot1.getLotUuId(), 3D, "");
+        final LotUpdateBalanceRequestDto lotUpdateBalanceRequestDto2 = new LotUpdateBalanceRequestDto(lot2.getLotUuId(), 5D, "");
+
+        this.transactionService.saveAdjustmentTransactions(this.userId, Arrays.asList(lotUpdateBalanceRequestDto1, lotUpdateBalanceRequestDto2));
+
+        final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+        lotsSearchDto.setLotIds(Collections.singletonList(lot1.getId()));
+        final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+        final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
+        assertEquals(3D, extendedLotDto.getActualBalance(), 0.0);
+
+        final LotsSearchDto lotsSearchDto2 = new LotsSearchDto();
+        lotsSearchDto2.setLotIds(Collections.singletonList(lot2.getId()));
+        final List<ExtendedLotDto> extendedLotDtos2 = this.lotService.searchLots(lotsSearchDto2, null);
+        final ExtendedLotDto extendedLotDto2 = extendedLotDtos2.get(0);
+        assertEquals(5D, extendedLotDto2.getActualBalance(), 0.0);
+
+    }
+
+    @Test
+    public void testSaveAdjustmentTransactions_NoTransactionSaved() {
+
+        final Lot lot = this.createLot();
+        this.createTransactions(lot);
+
+        final LotUpdateBalanceRequestDto lotUpdateBalanceRequestDto = new LotUpdateBalanceRequestDto(lot.getLotUuId(), 20D, "");
+        this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singletonList(lotUpdateBalanceRequestDto));
+
+        final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
+        transactionsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+        final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
+
+        final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+        lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+        final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
+        final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
+        assertEquals(20D, extendedLotDto.getActualBalance(), 0.0);
+
+        Assert.assertEquals(3, transactionDtos.size());
+    }
+
+    private Lot createLot() {
+        final Lot lot = new Lot(null, this.userId, EntityType.GERMPLSM.name(), this.gid, DEFAULT_SEED_STORE_ID, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
+                "Lot", RandomStringUtils.randomAlphabetic(35));
+        lot.setLotUuId(UUID.randomUUID().toString());
+        this.daoFactory.getLotDao().save(lot);
+        return lot;
+    }
+
+    private List<Transaction> createTransactions(final Lot lot) {
+        final Transaction confirmedDeposit =
+                new Transaction(null, this.userId, lot, Util.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
+                        20D, "Transaction 1", Util.getCurrentDateAsIntegerValue(), null, null, null, this.userId, TransactionType.DEPOSIT.getId());
+
+        final Transaction pendingDeposit =
+                new Transaction(null, this.userId, lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
+                        20D, "Transaction 2", 0, null, null, null, this.userId, TransactionType.DEPOSIT.getId());
+
+        final Transaction pendingWithdrawal =
+                new Transaction(null, this.userId, lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
+                        -2D, "Transaction 3", 0, null, null, null, this.userId, TransactionType.WITHDRAWAL.getId());
+
+        this.daoFactory.getTransactionDAO().save(confirmedDeposit);
+        this.daoFactory.getTransactionDAO().save(pendingDeposit);
+        this.daoFactory.getTransactionDAO().save(pendingWithdrawal);
+
+        return Arrays.asList(confirmedDeposit, pendingDeposit, pendingWithdrawal);
+    }
+
+    private void createGermplasmStudySource() {
+        final IntegrationTestDataInitializer integrationTestDataInitializer =
+                new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
+
+        final DmsProject study = integrationTestDataInitializer
+                .createStudy(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), 1);
+        final DmsProject plot = integrationTestDataInitializer
+                .createDmsProject(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), study,
+                        study, DatasetTypeEnum.PLOT_DATA);
+        final Geolocation geolocation = integrationTestDataInitializer.createInstance(study, "1", 1);
+
+        final GermplasmStudySource
+                germplasmStudySource = integrationTestDataInitializer.addGermplasmStudySource(study, plot, geolocation, "111", "222");
+
+        this.gid = germplasmStudySource.getGermplasm().getGid();
+        this.studyId = study.getProjectId();
+    }
+
+    private void resolveUnitName() {
+        this.unitName = this.daoFactory.getCvTermDao().getById(UNIT_ID).getName();
+    }
+
+    private void assertTransaction(final Transaction actualTransaction, final TransactionType type, final TransactionStatus status,
+                                   final double amount, final TransactionSourceType sourceType, final Integer sourceId) {
+        assertNotNull(actualTransaction);
+        assertThat(actualTransaction.getType(), is(type.getId()));
+        assertThat(actualTransaction.getStatus(), is(status.getIntValue()));
+        assertThat(actualTransaction.getQuantity(), is(amount));
+        assertThat(actualTransaction.getSourceType(), is(sourceType.name()));
+        assertThat(actualTransaction.getSourceId(), is(sourceId));
+    }
+
+    private boolean isPendingWithdrawal(final Transaction t) {
+        return t.getType() == TransactionType.WITHDRAWAL.getId() && t.getStatus() == TransactionStatus.PENDING.getIntValue();
+    }
+
+    private boolean isPendingDeposit(final Transaction t) {
+        return t.getType() == TransactionType.DEPOSIT.getId() && t.getStatus() == TransactionStatus.PENDING.getIntValue();
+    }
 
 }

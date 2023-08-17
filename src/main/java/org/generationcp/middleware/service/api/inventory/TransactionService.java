@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.api.inventory;
 
 import org.generationcp.middleware.domain.inventory.manager.LotDepositDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateBalanceRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
@@ -47,6 +48,6 @@ public interface TransactionService {
 
 	void cancelPendingTransactions(List<TransactionDto> transactionDtoList);
 
-	void saveAdjustmentTransactions(Integer userId, Set<Integer> lotIds, Double balance, String notes);
+	void saveAdjustmentTransactions(Integer userId, List<LotUpdateBalanceRequestDto> lotUpdateBalanceRequestDtos);
 
 }

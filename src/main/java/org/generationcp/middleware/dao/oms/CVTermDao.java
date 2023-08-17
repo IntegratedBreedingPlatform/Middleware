@@ -2156,4 +2156,59 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 		// TODO Complete
 	}
+
+	/***
+	 Retrieves a mapping of variables' dataset usage based on the provided lists of variable IDs and geolocation IDs.
+	 @param variableIds A List of Integer values representing the IDs of variables to be considered for dataset usage.
+	 @param geolocationIds A List of Integer values representing the IDs of geolocations used to filter the datasets.
+	 @return A Map<Integer, Map<Integer, DatasetTypeEnum>> containing the variables' dataset usage mapping, where the
+	 outer map's key is the variable ID, and the inner map's key is the dataset ID associated with a DatasetTypeEnum.
+	 ***/
+	public Map<Integer, Map<Integer, DatasetTypeEnum>> getVariablesDatasetUsage(final List<Integer> variableIds, final List<Integer> geolocationIds) {
+
+		try {
+
+			final StringBuilder sqlString = new StringBuilder()
+					.append("SELECT DISTINCT " +
+							"pprop.variable_id AS variableId, " +
+							"p.project_id AS datasetId, " +
+							"p.dataset_type_id as datasetType FROM project p ")
+					.append("INNER JOIN projectprop pprop ON p.project_id = pprop.project_id ")
+					.append("INNER JOIN nd_experiment nde ON p.project_id = nde.project_id ")
+					.append("WHERE nd_geolocation_id IN (:geolocationIds) AND pprop.variable_id IN (:variableIds) ");
+
+			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
+			query.setParameterList("variableIds", variableIds);
+			query.setParameterList("geolocationIds", geolocationIds);
+
+			query.addScalar("variableId", IntegerType.INSTANCE);
+			query.addScalar("datasetId", IntegerType.INSTANCE);
+			query.addScalar("datasetType", IntegerType.INSTANCE);
+
+			query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+
+			final List<Map<String, Object>> results = query.list();
+			final Map<Integer, Map<Integer, DatasetTypeEnum>> resultMap = new HashMap<>();
+
+			for (final Map<String, Object> result : results) {
+				final Integer variableId = (Integer) result.get("variableId");
+				final Integer datasetId = (Integer) result.get("datasetId");
+				final Integer datasetType = (Integer) result.get("datasetType");
+
+				// Check if the subset map already exists in the existingMap for the given id
+				// If the subset map doesn't exist, create a new one
+				resultMap.computeIfAbsent(variableId, k -> new HashMap<>());
+
+				final Map<Integer, DatasetTypeEnum> subsetMap = resultMap.get(variableId);
+				// Populate the subset map with datasetId and datasetTypeEnum
+				subsetMap.put(datasetId, DatasetTypeEnum.get(datasetType));
+			}
+
+			return resultMap;
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getVariablesDatasetUsage(): " + e.getMessage(), e);
+		}
+
+
+	}
 }

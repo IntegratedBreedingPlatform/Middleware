@@ -229,8 +229,8 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 				conditions.add("a.gid IN (:gids)");
 			}
 
-			if (germplasmAttributeSearchRequest.getVariableTypeId() != null) {
-				conditions.add("cp.value = :variableTypeName");
+			if (CollectionUtils.isNotEmpty(germplasmAttributeSearchRequest.getVariableTypeIds())) {
+				conditions.add("cp.value IN (:variableTypeNames)");
 			}
 
 			queryString.append(conditions.stream().collect(Collectors.joining(" AND ")));
@@ -245,9 +245,10 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 				sqlQuery.setParameterList("gids", germplasmAttributeSearchRequest.getGids());
 			}
 
-			if (germplasmAttributeSearchRequest.getVariableTypeId() != null) {
-				sqlQuery.setParameter("variableTypeName",
-					VariableType.getById(germplasmAttributeSearchRequest.getVariableTypeId()).getName());
+			if (CollectionUtils.isNotEmpty(germplasmAttributeSearchRequest.getVariableTypeIds())) {
+				final List<String> variableTypeNames = new ArrayList<>();
+				germplasmAttributeSearchRequest.getVariableTypeIds().forEach((id) -> variableTypeNames.add(VariableType.getById(id).getName()));
+				sqlQuery.setParameterList("variableTypeNames", variableTypeNames);
 			}
 
 			sqlQuery.setParameter(PROGRAM_UUID, germplasmAttributeSearchRequest.getProgramUUID());

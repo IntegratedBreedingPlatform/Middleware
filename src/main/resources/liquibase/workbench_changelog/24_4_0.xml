@@ -1,0 +1,19 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="cuenyad" id="v24.4.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(1) > 0 FROM r_package WHERE endpoint like '%bms-uat-test.net%';
+            </sqlCheck>
+        </preConditions>
+        <comment>Update Open CPU endpoint</comment>
+        <sql dbms="mysql" splitStatements="true">
+            UPDATE r_package SET endpoint = 'https://opencpu.ibp.services/ocpu/library/reshape/R/cast' WHERE (`package_id` = '1');
+            UPDATE r_package SET endpoint = 'https://opencpu.ibp.services/ocpu/library/reshape/R/melt' WHERE (`package_id` = '2');
+            UPDATE r_package SET endpoint = 'https://opencpu.ibp.services/ocpu/library/ggplot2/R/qplot' WHERE (`package_id` = '3');
+        </sql>
+    </changeSet>
+</databaseChangeLog>

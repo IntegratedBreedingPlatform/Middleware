@@ -88,14 +88,14 @@ public class DatasetTypeServiceImplTest extends IntegrationTestBase {
 
 	public List<String> getObservationLevels(final boolean isSubObs) {
 		List<String> levels = new ArrayList<>();
-		levels.add("PLANT");
-		levels.add("SUB-PLOT");
+		levels.add("plant");
+		levels.add("sub-plot");
 		levels.add("TIMESERIES");
 		levels.add("CUSTOM");
 
 		if(!isSubObs) {
 			levels.add("MEANS");
-			levels.add("PLOT");
+			levels.add("plot");
 		}
 		return levels;
 	}
