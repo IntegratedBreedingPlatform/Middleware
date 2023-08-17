@@ -105,7 +105,6 @@
         <addUniqueConstraint columnNames="variable_id, template_id" constraintName="variable_id_template_id_uc" tableName="template_details" />
     </changeSet>
 	
-	
 	<changeSet id="v24.5.0-1" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
@@ -118,8 +117,7 @@
             VALUES (1011, 'Inventory', 'Inventory', null, 0, 0);
         </sql>
 	</changeSet>	
-	
-	
+		
 	<changeSet id="v24.5.0-2" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
@@ -165,7 +163,6 @@
             VALUES (1030, 'Packing status categories', 'Packing status categories', null, 0, 0);
         </sql>
     </changeSet>   
-	
 		
 	<changeSet id="v24.5.0-5" author="rowena">
         <preConditions onFail="MARK_RAN">
@@ -318,7 +315,6 @@
         </sql>
     </changeSet>	
 	
-	
 	<changeSet id="v24.5.0-11" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
@@ -454,7 +450,6 @@
         </sql>
     </changeSet>				
     
-  
 	<changeSet id="v24.5.0-16" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
