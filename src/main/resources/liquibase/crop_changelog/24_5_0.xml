@@ -629,7 +629,7 @@
 				
 				DROP TABLE IF EXISTS stock_seq_table;
 					
-				CREATE  TABLE stock_seq_table(
+				CREATE TABLE stock_seq_table(
 					seq INT(11) NOT NULL AUTO_INCREMENT,
 					entryid INT(11) DEFAULT NULL,
 					project_id INT(11) DEFAULT NULL,
@@ -655,7 +655,6 @@
 				SET s.uniquename = Q.list_seq
 				WHERE s.project_id = Q.project_id AND s.stock_id = Q.stock_id AND CAST(s.uniquename AS UNSIGNED)<>list_seq;	
 		
-				DROP TABLE IF EXISTS stock_seq_table;
 				DROP TABLE IF EXISTS stock_seq_table;
 				
 				END;
