@@ -25,10 +25,12 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -59,48 +61,76 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
-	@Override
-	public List<VariableDTO> getVariables(final VariableSearchRequestDTO requestDTO, final Pageable pageable,
-		final VariableTypeGroup variableTypeGroup) {
-		final List<VariableDTO> variableDTOS = this.daoFactory.getCvTermDao().getVariableDTOS(requestDTO, pageable, variableTypeGroup);
-		if (!CollectionUtils.isEmpty(variableDTOS)) {
-			final List<Integer> variableIds =
-				new ArrayList<>(variableDTOS.stream().map(v -> Integer.valueOf(v.getObservationVariableDbId()))
-					.collect(Collectors.toSet()));
-			variableIds.addAll(variableDTOS.stream().map(variableDTO -> Integer.valueOf(variableDTO.getTrait().getTraitDbId()))
-				.collect(Collectors.toSet()));
-			variableIds.addAll(variableDTOS.stream().map(variableDTO -> Integer.valueOf(variableDTO.getScale().getScaleDbId()))
-				.collect(Collectors.toSet()));
-			variableIds.addAll(variableDTOS.stream().map(variableDTO -> Integer.valueOf(variableDTO.getMethod().getMethodDbId()))
-				.collect(Collectors.toSet()));
+    @Override
+    public List<VariableDTO> getVariables(final VariableSearchRequestDTO requestDTO, final Pageable pageable,
+                                          final VariableTypeGroup variableTypeGroup) {
+        final List<VariableDTO> variableDTOS = this.daoFactory.getCvTermDao().getVariableDTOS(requestDTO, pageable, variableTypeGroup);
+        if (!CollectionUtils.isEmpty(variableDTOS)) {
+            final List<Integer> variableIds =
+                    new ArrayList<>(variableDTOS.stream().map(v -> Integer.valueOf(v.getObservationVariableDbId()))
+                            .collect(Collectors.toSet()));
+            variableIds.addAll(variableDTOS.stream().map(variableDTO -> Integer.valueOf(variableDTO.getTrait().getTraitDbId()))
+                    .collect(Collectors.toSet()));
+            variableIds.addAll(variableDTOS.stream().map(variableDTO -> Integer.valueOf(variableDTO.getScale().getScaleDbId()))
+                    .collect(Collectors.toSet()));
+            variableIds.addAll(variableDTOS.stream().map(variableDTO -> Integer.valueOf(variableDTO.getMethod().getMethodDbId()))
+                    .collect(Collectors.toSet()));
 
-			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
-				this.daoFactory.getCvTermExternalReferenceDAO().getExternalReferences(variableIds).stream()
-					.collect(groupingBy(
-						ExternalReferenceDTO::getEntityId));
-			for (final VariableDTO dto : variableDTOS) {
-				dto.setExternalReferences(externalReferencesMap.get(dto.getObservationVariableDbId()));
-				dto.getScale().setExternalReferences(externalReferencesMap.get(dto.getScale().getScaleDbId()));
-				dto.getMethod().setExternalReferences(externalReferencesMap.get(dto.getMethod().getMethodDbId()));
-				dto.getTrait().setExternalReferences(externalReferencesMap.get(dto.getTrait().getTraitDbId()));
-			}
+            final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
+                    this.daoFactory.getCvTermExternalReferenceDAO().getExternalReferences(variableIds).stream()
+                            .collect(groupingBy(
+                                    ExternalReferenceDTO::getEntityId));
 
-			final Multimap<Integer, VariableType> variableTypeMultimap =
-				this.ontologyVariableService.getVariableTypesOfVariables(variableIds);
-			for (final VariableDTO dto : variableDTOS) {
-				if (variableTypeMultimap.get(Integer.valueOf(dto.getObservationVariableDbId())).contains(VariableType.ANALYSIS)) {
-					dto.getContextOfUse().add(VariableDTO.ContextOfUseEnum.MEANS.toString());
-				} else if (variableTypeMultimap.get(Integer.valueOf(dto.getObservationVariableDbId()))
-					.contains(VariableType.ANALYSIS_SUMMARY)) {
-					dto.getContextOfUse().add(VariableDTO.ContextOfUseEnum.SUMMARY.toString());
-				} else {
-					dto.getContextOfUse().add(VariableDTO.ContextOfUseEnum.PLOT.toString());
-				}
-			}
+            // If the studyDbId is specified, this method aims to determine where the variables are used in datasets,
+			// which helps identify the exact observation level to which a variable belongs.
+            Map<Integer, Map<Integer, DatasetTypeEnum>> variablesDatasetUsage = new HashMap<>();
+            if (!CollectionUtils.isEmpty(requestDTO.getStudyDbId())) {
+                variablesDatasetUsage = this.daoFactory.getCvTermDao().getVariablesDatasetUsage(variableIds,
+                        requestDTO.getStudyDbId().stream().map(Integer::valueOf).collect(Collectors.toList()));
+            }
 
-		}
-		return variableDTOS;
-	}
+            for (final VariableDTO dto : variableDTOS) {
+                dto.setExternalReferences(externalReferencesMap.get(dto.getObservationVariableDbId()));
+                dto.getScale().setExternalReferences(externalReferencesMap.get(dto.getScale().getScaleDbId()));
+                dto.getMethod().setExternalReferences(externalReferencesMap.get(dto.getMethod().getMethodDbId()));
+                dto.getTrait().setExternalReferences(externalReferencesMap.get(dto.getTrait().getTraitDbId()));
+
+                if (variablesDatasetUsage.containsKey(Integer.valueOf(dto.getObservationVariableDbId()))) {
+					/**
+					 * Add observationLevelNames to the Observation Variable's additionalInfo field.
+					 * <p>
+					 * This information will be populated to address the issue in KSU-Fieldbook, where all available variables in the study are displayed.
+					 * As a short-term solution, we provide this custom data in the Observation Variable to overcome the problem.
+					 * <p>
+					 * By including observationLevelNames for each Observation Variable, the application gains the ability to filter and process only those variables
+					 * that are relevant to the selected Observation Level in the app.
+					 **/
+                    final Map<String, Object> additionalInfo = new HashMap<>();
+					final Map<Integer, DatasetTypeEnum> datasetUsage = variablesDatasetUsage.get(Integer.valueOf(dto.getObservationVariableDbId()));
+                    final Set<String> observationLevelNames = datasetUsage.values().stream().map(datasetTypeEnum ->
+						datasetTypeEnum.getObservationLevel() != null ? datasetTypeEnum.getObservationLevel().getLevelName() : null
+					).filter(Objects::nonNull).collect(Collectors.toSet());
+                    additionalInfo.put("observationLevelNames", observationLevelNames);
+                    dto.setAdditionalInfo(additionalInfo);
+                }
+            }
+
+            final Multimap<Integer, VariableType> variableTypeMultimap =
+                    this.ontologyVariableService.getVariableTypesOfVariables(variableIds);
+            for (final VariableDTO dto : variableDTOS) {
+                if (variableTypeMultimap.get(Integer.valueOf(dto.getObservationVariableDbId())).contains(VariableType.ANALYSIS)) {
+                    dto.getContextOfUse().add(VariableDTO.ContextOfUseEnum.MEANS.toString());
+                } else if (variableTypeMultimap.get(Integer.valueOf(dto.getObservationVariableDbId()))
+                        .contains(VariableType.ANALYSIS_SUMMARY)) {
+                    dto.getContextOfUse().add(VariableDTO.ContextOfUseEnum.SUMMARY.toString());
+                } else {
+                    dto.getContextOfUse().add(VariableDTO.ContextOfUseEnum.PLOT.toString());
+                }
+            }
+
+        }
+        return variableDTOS;
+    }
 
 	@Override
 	public long countVariables(final VariableSearchRequestDTO requestDTO, final VariableTypeGroup variableTypeGroup) {

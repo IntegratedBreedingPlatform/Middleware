@@ -22,7 +22,7 @@ public class VariableDTO {
 	}
 
 	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
-	private Map<String, String> additionalInfo = new HashMap<>();
+	private Map<String, Object> additionalInfo = new HashMap<>();
 
 	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private String commonCropName;
@@ -68,11 +68,11 @@ public class VariableDTO {
 	@JsonView(BrapiView.BrapiV1_3.class)
 	private String xref;
 
-	public Map<String, String> getAdditionalInfo() {
+	public Map<String, Object> getAdditionalInfo() {
 		return this.additionalInfo;
 	}
 
-	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
+	public void setAdditionalInfo(final Map<String, Object> additionalInfo) {
 		this.additionalInfo = additionalInfo;
 	}
 
