@@ -6,7 +6,7 @@
 
 
 	
-	<changeSet id="v24.3.0-1" author="rowena">
+	<changeSet id="v24.5.0-1" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Inventory" AND cv_id = 1011;
@@ -20,7 +20,7 @@
 	</changeSet>	
 	
 	
-	<changeSet id="v24.3.0-2" author="rowena">
+	<changeSet id="v24.5.0-2" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Packing status" AND cv_id = 1010;
@@ -40,7 +40,7 @@
         </sql>
     </changeSet>				
 	    
-    <changeSet id="v24.3.0-3" author="rowena">
+    <changeSet id="v24.5.0-3" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Described" AND cv_id = 1020;
@@ -53,7 +53,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="v24.3.0-4" author="rowena">
+    <changeSet id="v24.5.0-4" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Packing status categories" AND cv_id = 1030;
@@ -67,7 +67,7 @@
     </changeSet>   
 	
 		
-	<changeSet id="v24.3.0-5" author="rowena">
+	<changeSet id="v24.5.0-5" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Packing_Status" and cv_id = 1040 ;
@@ -103,7 +103,7 @@
         </sql>
     </changeSet>	
 	
-	<changeSet id="v24.3.0-6" author="rowena">
+	<changeSet id="v24.5.0-6" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 select count(*) from cv where name = "Packing_Status" ;
@@ -140,7 +140,7 @@
         </sql>
     </changeSet>	
 	
-	 <changeSet id="v24.3.0-7" author="rowena">
+	 <changeSet id="v24.5.0-7" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Plot Number" AND cv_id = 1010;
@@ -153,7 +153,7 @@
         </sql>
     </changeSet>				
 				
-    <changeSet id="v24.3.0-8" author="rowena">
+    <changeSet id="v24.5.0-8" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Assigned Passport Descriptor" AND cv_id = 1020;
@@ -166,7 +166,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="v24.3.0-9" author="rowena">
+    <changeSet id="v24.5.0-9" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Text" AND cv_id = 1030;
@@ -179,7 +179,7 @@
         </sql>
     </changeSet>   
 	
-	<changeSet id="v24.3.0-10" author="rowena">
+	<changeSet id="v24.5.0-10" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "PLOT_NUMBER_AP_text" and cv_id = 1040 ;
@@ -219,7 +219,7 @@
     </changeSet>	
 	
 	
-	<changeSet id="v24.3.0-11" author="rowena">
+	<changeSet id="v24.5.0-11" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Trial Instance Number" AND cv_id = 1010;
@@ -240,7 +240,7 @@
 	    </sql>
     </changeSet>				
     
-	<changeSet id="v24.3.0-12" author="rowena">
+	<changeSet id="v24.5.0-12" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "INSTANCE_NUMBER_AP_text" and cv_id = 1040 ;
@@ -276,7 +276,7 @@
         </sql>
     </changeSet>	
 	
-	<changeSet id="v24.3.0-13" author="rowena">
+	<changeSet id="v24.5.0-13" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Replication Number" AND cv_id = 1010;
@@ -297,7 +297,7 @@
     </changeSet>				
     
   
-	<changeSet id="v24.3.0-14" author="rowena">
+	<changeSet id="v24.5.0-14" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "REP_NUMBER_AP_text" and cv_id = 1040 ;
@@ -333,7 +333,7 @@
         </sql>
     </changeSet>	
 	
-    <changeSet id="v24.3.0-15" author="rowena">
+    <changeSet id="v24.5.0-15" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "Plant Number" AND cv_id = 1010;
@@ -355,7 +355,7 @@
     </changeSet>				
     
   
-	<changeSet id="v24.3.0-16" author="rowena">
+	<changeSet id="v24.5.0-16" author="rowena">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM cvterm WHERE name = "PLANT_NUMBER_AP_text" and cv_id = 1040 ;
@@ -389,4 +389,219 @@
 
         </sql>
     </changeSet>	
+	
+	  
+	<changeSet id="v24.5.1-1" author="rowena">
+        <preConditions onFail="MARK_RAN">
+			<and>
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1) > 0 FROM Listnms where listdate &lt; 20230000;
+			</sqlCheck>
+				<!-- Check if dataset check_listentry_table was created -->
+			<sqlCheck expectedResult="0">
+					SELECT
+					COUNT(*)
+					FROM
+					information_schema.routines
+					WHERE
+					routine_schema = DATABASE()
+					AND specific_name = 'check_listentry_sequence';
+				</sqlCheck>
+			</and>
+
+        </preConditions>
+		<comment>
+			Create stored procedure to correct any entryno that are not in sequence
+		</comment>
+		<sql dbms="mysql" splitStatements="false">
+			<![CDATA[
+				CREATE PROCEDURE check_listentry_sequence()
+				BEGIN
+				
+				DROP TABLE IF EXISTS list_seq_table;
+
+				CREATE  TABLE list_seq_table (
+					seq INT(11) NOT NULL AUTO_INCREMENT,
+					entryid INT(11) DEFAULT NULL,
+					listid INT(11) DEFAULT NULL,
+					lrecid INT(11) DEFAULT NULL,
+					PRIMARY KEY (seq),
+					KEY edx (entryid),
+					KEY ldx (lrecid)
+				) ENGINE=INNODB;
+
+
+				INSERT INTO list_seq_table ( entryid, listid, lrecid )
+				SELECT entryid, l.listid, lrecid FROM listdata l , listnms n where l.listid = n.listid ORDER BY listid, entryid ;
+
+				UPDATE listdata l,
+					(SELECT lists.listid, val, ((((max_seq - lists.seq)-(max_seq-min_seq))*(-1))+1)  AS list_seq ,  cnt, lrecid FROM 
+					(SELECT listid , MAX(seq) AS max_seq,MIN(seq) min_seq,MAX(entryid) max_val,MIN(entryid) AS min_val, COUNT(*) AS cnt
+					FROM list_seq_table GROUP BY listid )  AS minmaxlist
+				INNER JOIN 
+				(SELECT listid,seq, entryid AS val, lrecid  FROM list_seq_table) AS lists
+					ON lists.listid = minmaxlist.listid
+					ORDER BY seq
+				) AS ordered_list
+				SET l.entryid = ordered_list.list_seq
+					WHERE l.listid = ordered_list.listid AND l.lrecid = ordered_list.lrecid AND l.entryid<>list_seq;
+					
+				DROP TABLE IF EXISTS list_seq_table;
+				
+				END;
+				]]>
+		</sql>
+    </changeSet>
+	
+	<changeSet  id="v24.5.1-2" author="rowena">
+		<preConditions onFail="MARK_RAN">
+			<!-- Check if dataset check_listentry_table was created -->
+				<sqlCheck expectedResult="1">
+					SELECT
+					COUNT(*)
+					FROM
+					information_schema.routines
+					WHERE
+					routine_schema = DATABASE()
+					AND specific_name = 'check_listentry_sequence';
+				</sqlCheck>
+			
+        </preConditions>
+		<comment>
+			Call stored procedure check_listentry_sequence;
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CALL check_listentry_sequence();
+		</sql>
+	</changeSet>
+
+	<changeSet  id="v24.5.1-3" author="rowena">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'check_listentry_sequence';
+			</sqlCheck>
+		</preConditions>
+		<comment>Drop procedure check_listentry_sequence</comment>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE check_listentry_sequence;
+		</sql>
+	</changeSet>	
+	
+
+
+	<changeSet id="v24.5.2-1" author="rowena">
+        <preConditions onFail="MARK_RAN">
+			<and>
+			<!-- check if there studies made before 2023 -->
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) FROM workbench.workbench_project p
+						INNER JOIN workbench.workbench_crop c
+						WHERE c.crop_name = p.crop_type
+						AND c.db_name = DATABASE()
+						AND YEAR(p.start_date)&lt; 20230000;
+			</sqlCheck>
+			<!-- Check if procedure check_stockentry_sequence table was created -->
+			<sqlCheck expectedResult="0">
+					SELECT
+					COUNT(*)
+					FROM
+					information_schema.routines
+					WHERE
+					routine_schema = DATABASE()
+					AND specific_name = 'check_stockentry_sequence';
+				</sqlCheck>
+			</and>
+
+        </preConditions>
+		<comment>
+			Create stored procedure to correct any entryno (uniquename) that are not in sequence
+		</comment>
+		<sql dbms="mysql" splitStatements="false">
+			<![CDATA[
+				CREATE PROCEDURE check_stockentry_sequence()
+				BEGIN
+				
+				DROP TABLE IF EXISTS stock_seq_table;
+					
+				CREATE  TABLE stock_seq_table(
+					seq INT(11) NOT NULL AUTO_INCREMENT,
+					entryid INT(11) DEFAULT NULL,
+					project_id INT(11) DEFAULT NULL,
+					stock_id INT(11) DEFAULT NULL,
+					gid INT(11) DEFAULT NULL,
+					PRIMARY KEY (`seq`),
+					KEY edx (entryid),
+					KEY ldx (stock_id)
+				) ENGINE=INNODB;
+
+				INSERT INTO stock_seq_table ( entryid, project_id, stock_id, GID )
+						SELECT CAST(uniquename AS UNSIGNED) AS entryid, project_id, CAST(uniquename AS UNSIGNED), dbxref_id FROM stock ORDER BY project_id, entryid;
+
+				UPDATE stock s,
+					(SELECT stocklist.project_id, val, ((((max_seq - stocklist.seq)-(max_seq-min_seq))*(-1))+1)  AS list_seq ,  cnt, stock_id FROM 
+					(SELECT project_id , MAX(seq) AS max_seq,MIN(seq) min_seq,MAX(entryid) max_val,MIN(entryid) AS min_val, COUNT(*) AS cnt
+				FROM stock_seq_table GROUP BY project_id )  AS minmaxlist
+				INNER JOIN 
+				(SELECT project_id,seq, entryid AS val, stock_id  FROM stock_seq_table) AS stocklist
+					ON stocklist.project_id = minmaxlist.project_id
+				ORDER BY seq
+				) AS Q
+				SET s.uniquename = Q.list_seq
+				WHERE s.project_id = Q.project_id AND s.stock_id = Q.stock_id AND CAST(s.uniquename AS UNSIGNED)<>list_seq;	
+		
+				DROP TABLE IF EXISTS stock_seq_table;
+				DROP TABLE IF EXISTS stock_seq_table;
+				
+				END;
+			]]>
+			
+		</sql>
+    </changeSet>
+	
+	<changeSet  id="v24.5.2-2" author="rowena">
+		<preConditions onFail="MARK_RAN">
+			<!-- Check if dataset check_listentry_table was created -->
+				<sqlCheck expectedResult="1">
+					SELECT
+					COUNT(*)
+					FROM
+					information_schema.routines
+					WHERE
+					routine_schema = DATABASE()
+					AND specific_name = 'check_stockentry_sequence';
+				</sqlCheck>
+			
+        </preConditions>
+		<comment>
+			Call stored procedure check_stockentry_sequence;
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CALL check_stockentry_sequence();
+		</sql>
+	</changeSet>
+
+	<changeSet  id="v24.5.2-3" author="rowena">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'check_stockentry_sequence';
+			</sqlCheck>
+		</preConditions>
+		<comment>Drop procedure check_stockentry_sequence</comment>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE check_stockentry_sequence;
+		</sql>
+	</changeSet>	
+	
 </databaseChangeLog>
