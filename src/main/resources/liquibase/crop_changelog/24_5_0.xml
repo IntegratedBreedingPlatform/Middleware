@@ -212,7 +212,7 @@
 			set @scaleId = (select cvterm_id from cvterm where name = "Packing status categories" AND cv_id = 1030);
 			
 			INSERT INTO cv ( name, definition)
-			VALUES (@variableId, "Packing_Status");
+			VALUES (@ScaleID, "Packing status categories");
 			
 			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
             VALUES (1105, @scaleId, 1130);
@@ -527,7 +527,9 @@
 
 
 				INSERT INTO list_seq_table ( entryid, listid, lrecid )
-				SELECT entryid, l.listid, lrecid FROM listdata l , listnms n where l.listid = n.listid ORDER BY listid, entryid ;
+				SELECT entryid, l.listid, lrecid FROM listdata l , listnms n WHERE l.listid = n.listid 
+				AND listdate < 20230000
+				ORDER BY l.listid, entryid ; 
 
 				UPDATE listdata l,
 					(SELECT lists.listid, val, ((((max_seq - lists.seq)-(max_seq-min_seq))*(-1))+1)  AS list_seq ,  cnt, lrecid FROM 
@@ -599,7 +601,7 @@
 						INNER JOIN workbench.workbench_crop c
 						WHERE c.crop_name = p.crop_type
 						AND c.db_name = DATABASE()
-						AND YEAR(p.start_date)&lt; 20230000;
+						AND YEAR(p.start_date)&lt; 2023;
 			</sqlCheck>
 			<!-- Check if procedure check_stockentry_sequence table was created -->
 			<sqlCheck expectedResult="0">
@@ -636,8 +638,10 @@
 				) ENGINE=INNODB;
 
 				INSERT INTO stock_seq_table ( entryid, project_id, stock_id, GID )
-						SELECT CAST(uniquename AS UNSIGNED) AS entryid, project_id, CAST(uniquename AS UNSIGNED), dbxref_id FROM stock ORDER BY project_id, entryid;
-
+						SELECT CAST(uniquename AS UNSIGNED) AS entryid, s.project_id, s.stock_id, dbxref_id 
+						FROM stock s 
+						WHERE project_id IN (SELECT  project_id FROM stock s GROUP BY project_id HAVING MAX(CAST(uniquename AS UNSIGNED))<>COUNT(stock_id));
+						
 				UPDATE stock s,
 					(SELECT stocklist.project_id, val, ((((max_seq - stocklist.seq)-(max_seq-min_seq))*(-1))+1)  AS list_seq ,  cnt, stock_id FROM 
 					(SELECT project_id , MAX(seq) AS max_seq,MIN(seq) min_seq,MAX(entryid) max_val,MIN(entryid) AS min_val, COUNT(*) AS cnt
