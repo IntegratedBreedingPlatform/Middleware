@@ -10,6 +10,7 @@ import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
+import org.generationcp.middleware.dao.PhenotypeExternalReferenceDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -159,6 +160,9 @@ public class DatasetServiceImplTest {
 	private StockDao stockDao;
 
 	@Mock
+	private PhenotypeExternalReferenceDAO phenotypeExternalReferenceDAO;
+
+	@Mock
 	private UserDefinedFieldDAO userDefinedFieldDAO;
 	@InjectMocks
 	private DatasetServiceImpl datasetService = new DatasetServiceImpl();
@@ -193,6 +197,7 @@ public class DatasetServiceImplTest {
 		when(this.daoFactory.getObservationUnitsSearchDAO()).thenReturn(this.obsUnitsSearchDao);
 		when(this.daoFactory.getStockDao()).thenReturn(this.stockDao);
 		when(this.daoFactory.getUserDefinedFieldDAO()).thenReturn(this.userDefinedFieldDAO);
+		when(this.daoFactory.getPhenotypeExternalReferenceDAO()).thenReturn(this.phenotypeExternalReferenceDAO);
 	}
 
 	@Test
@@ -255,6 +260,7 @@ public class DatasetServiceImplTest {
 		final List<Integer> variableIds = Arrays.asList(ran.nextInt(), ran.nextInt());
 		this.datasetService.removeDatasetVariables(studyId, datasetId, variableIds);
 		Mockito.verify(this.phenotypeDao).deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
+		Mockito.verify(this.phenotypeExternalReferenceDAO).deleteByProjectIdAndVariableIds(datasetId, variableIds);
 		Mockito.verify(this.projectPropertyDao).deleteProjectVariables(datasetId, variableIds);
 	}
 
