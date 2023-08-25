@@ -14,9 +14,13 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 
 	private SelectionTraitRequest selectionTraitRequest;
 
-	private boolean propagateAttributesData;
+	private boolean propagateDescriptors;
 
-	private boolean propagatePassportDescriptorData;
+	private List<Integer> descriptorIds;
+
+	private boolean overrideDescriptorsLocation;
+
+	private Integer locationOverrideId;
 
 	@Override
 	public List<Integer> getInstanceIds() {
@@ -46,21 +50,39 @@ public abstract class AbstractAdvanceRequest implements AdvanceRequest {
 	}
 
 	@Override
-	public boolean isPropagateAttributesData() {
-		return this.propagateAttributesData;
+	public boolean isPropagateDescriptors() {
+		return this.propagateDescriptors;
 	}
 
-	public void setPropagateAttributesData(final boolean propagateAttributesData) {
-		this.propagateAttributesData = propagateAttributesData;
+	public void setPropagateDescriptors(final boolean propagateDescriptors) {
+		this.propagateDescriptors = propagateDescriptors;
 	}
 
 	@Override
-	public boolean isPropagatePassportDescriptorData() {
-		return this.propagatePassportDescriptorData;
+	public List<Integer> getDescriptorIds() {
+		return this.descriptorIds;
 	}
 
-	public void setPropagatePassportDescriptorData(final boolean propagatePassportDescriptorData) {
-		this.propagatePassportDescriptorData = propagatePassportDescriptorData;
+	public void setDescriptorIds(final List<Integer> descriptorIds) {
+		this.descriptorIds = descriptorIds;
+	}
+
+	@Override
+	public boolean isOverrideDescriptorsLocation() {
+		return this.overrideDescriptorsLocation;
+	}
+
+	public void setOverrideDescriptorsLocation(final boolean overrideDescriptorsLocation) {
+		this.overrideDescriptorsLocation = overrideDescriptorsLocation;
+	}
+
+	@Override
+	public Integer getLocationOverrideId() {
+		return this.locationOverrideId;
+	}
+
+	public void setLocationOverrideId(final Integer locationOverrideId) {
+		this.locationOverrideId = locationOverrideId;
 	}
 
 	@Override

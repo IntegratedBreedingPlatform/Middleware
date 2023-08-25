@@ -1,5 +1,7 @@
 package org.generationcp.middleware.enumeration;
 
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -7,18 +9,18 @@ import java.util.Map;
 
 public enum DatasetTypeEnum {
 
-	STUDY_CONDITIONS(1, "STUDY"),
-	MEANS_DATA(2, "MEANS"),
-	SUMMARY_DATA(3, "SUMMARY"),
-	PLOT_DATA(4, "PLOT"),
-	PLANT_SUBOBSERVATIONS(5, "PLANT"),
-	QUADRAT_SUBOBSERVATIONS(6, "QUADRAT"),
-	TIME_SERIES_SUBOBSERVATIONS(7, "TIMESERIES"),
-	CUSTOM_SUBOBSERVATIONS(8, "CUSTOM"),
-	SUB_SAMPLE_DATA(9, "SS"),
-	WEATHER_DATA(10, "WD"),
-	MEANS_OVER_TRIAL_INSTANCES(11, "OM"),
-	SUMMARY_STATISTICS_DATA(12, "SUMMARY_STATISTICS");
+	STUDY_CONDITIONS(1, "STUDY", ObservationLevelEnum.STUDY),
+	MEANS_DATA(2, "MEANS", ObservationLevelEnum.MEANS),
+	SUMMARY_DATA(3, "SUMMARY", null),
+	PLOT_DATA(4, "PLOT", ObservationLevelEnum.PLOT),
+	PLANT_SUBOBSERVATIONS(5, "PLANT", ObservationLevelEnum.PLANT),
+	QUADRAT_SUBOBSERVATIONS(6, "QUADRAT", ObservationLevelEnum.SUB_PLOT),
+	TIME_SERIES_SUBOBSERVATIONS(7, "TIMESERIES", ObservationLevelEnum.TIMESERIES),
+	CUSTOM_SUBOBSERVATIONS(8, "CUSTOM", ObservationLevelEnum.CUSTOM),
+	SUB_SAMPLE_DATA(9, "SS", null),
+	WEATHER_DATA(10, "WD", null),
+	MEANS_OVER_TRIAL_INSTANCES(11, "OM", null),
+	SUMMARY_STATISTICS_DATA(12, "SUMMARY_STATISTICS", ObservationLevelEnum.SUMMARY_STATISTICS);
 
 	public static final List<Integer> ANALYSIS_RESULTS_DATASET_IDS = Arrays.asList(MEANS_DATA.getId(), SUMMARY_STATISTICS_DATA.getId());
 
@@ -43,9 +45,12 @@ public enum DatasetTypeEnum {
 	private final int id;
 	private final String name;
 
-	DatasetTypeEnum(final int id, final String name) {
+	final ObservationLevelEnum observationLevelEnum;
+
+	DatasetTypeEnum(final int id, final String name, final ObservationLevelEnum observationLevelEnum) {
 		this.id = id;
 		this.name = name;
+		this.observationLevelEnum = observationLevelEnum;
 	}
 
 	public int getId() {
@@ -54,5 +59,9 @@ public enum DatasetTypeEnum {
 
 	public String getName() {
 		return name;
+	}
+
+	public ObservationLevelEnum getObservationLevel() {
+		return this.observationLevelEnum;
 	}
 }

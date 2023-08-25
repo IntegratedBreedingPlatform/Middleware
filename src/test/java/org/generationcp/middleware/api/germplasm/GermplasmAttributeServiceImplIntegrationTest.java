@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -105,7 +106,7 @@ public class GermplasmAttributeServiceImplIntegrationTest extends IntegrationTes
 
 		final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
 		germplasmAttributeSearchRequest.setGids(Sets.newHashSet(germplasm.getGid()));
-		germplasmAttributeSearchRequest.setVariableTypeId(VariableType.GERMPLASM_ATTRIBUTE.getId());
+		germplasmAttributeSearchRequest.setVariableTypeIds(Collections.singletonList(VariableType.GERMPLASM_ATTRIBUTE.getId()));
 		germplasmAttributeSearchRequest.setProgramUUID(null);
 		final List<GermplasmAttributeDto> germplasmAttributeDtos =
 			this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest);

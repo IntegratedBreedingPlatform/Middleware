@@ -15,7 +15,7 @@ import java.util.Map;
 
 @AutoProperty
 public class AttributeDTO {
-	private Map<String, String> additionalInfo = new HashMap<>();
+	private Map<String, Object> additionalInfo = new HashMap<>();
 	private String attributeCategory;
 	private String attributeDbId;
 	private String attributeDescription;
@@ -37,11 +37,11 @@ public class AttributeDTO {
 	private List<String> synonyms = new ArrayList<>();
 	private TraitDTO trait = new TraitDTO();
 
-	public Map<String, String> getAdditionalInfo() {
+	public Map<String, Object> getAdditionalInfo() {
 		return this.additionalInfo;
 	}
 
-	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
+	public void setAdditionalInfo(final Map<String, Object> additionalInfo) {
 		this.additionalInfo = additionalInfo;
 	}
 

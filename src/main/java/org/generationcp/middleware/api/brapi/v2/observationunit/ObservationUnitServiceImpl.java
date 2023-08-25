@@ -81,9 +81,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	private static final String PLOT_NO = "PLOT_NO";
 	private static final String REP_NO = "REP_NO";
 	private static final String BLOCK_NO = "BLOCK_NO";
-	private static final String PLOT = "PLOT";
-	private static final String REP = "REP";
-	private static final String BLOCK = "BLOCK";
+
 	public static final String ENTRY_NO = "ENTRY_NO";
 
 	private final ObjectMapper jacksonMapper;
@@ -650,11 +648,11 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		if (!CollectionUtils.isEmpty(relationships)) {
 			//Convert observation level relationship names to their equivalent in BMS database
 			for (final ObservationLevelRelationship relationship : relationships) {
-				if (PLOT.equalsIgnoreCase(relationship.getLevelName())) {
+				if (ObservationLevelEnum.PLOT.getLevelName().equalsIgnoreCase(relationship.getLevelName())) {
 					relationship.setLevelName(PLOT_NO);
-				} else if (REP.equalsIgnoreCase(relationship.getLevelName())) {
+				} else if (ObservationLevelEnum.REP.getLevelName().equalsIgnoreCase(relationship.getLevelName())) {
 					relationship.setLevelName(REP_NO);
-				} else if (BLOCK.equalsIgnoreCase(relationship.getLevelName())) {
+				} else if (ObservationLevelEnum.BLOCK.getLevelName().equalsIgnoreCase(relationship.getLevelName())) {
 					relationship.setLevelName(BLOCK_NO);
 				}
 			}
@@ -667,11 +665,11 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			//Reference: https://app.swaggerhub.com/apis/PlantBreedingAPI/BrAPI-Phenotyping/2.0#/ObservationUnitHierarchyLevel
 			for (final ObservationLevelRelationship relationship : relationships) {
 				if (PLOT_NO.equalsIgnoreCase(relationship.getLevelName())) {
-					relationship.setLevelName(PLOT);
+					relationship.setLevelName(ObservationLevelEnum.PLOT.getLevelName());
 				} else if (REP_NO.equalsIgnoreCase(relationship.getLevelName())) {
-					relationship.setLevelName(REP);
+					relationship.setLevelName(ObservationLevelEnum.REP.getLevelName());
 				} else if (BLOCK_NO.equalsIgnoreCase(relationship.getLevelName())) {
-					relationship.setLevelName(BLOCK);
+					relationship.setLevelName(ObservationLevelEnum.BLOCK.getLevelName());
 				}
 			}
 		}

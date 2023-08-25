@@ -6,6 +6,7 @@ import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
@@ -387,18 +388,18 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		observationUnitPosition.setPositionCoordinateY("2");
 		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
 		final ObservationLevelRelationship plotLevel = new ObservationLevelRelationship();
-		plotLevel.setLevelName(DatasetTypeEnum.PLOT_DATA.getName());
+		plotLevel.setLevelName(ObservationLevelEnum.PLOT.getLevelName());
 		observationUnitPosition.setObservationLevel(plotLevel);
 
 		final ObservationLevelRelationship plotRelationship = new ObservationLevelRelationship();
 		plotRelationship.setLevelCode("1");
-		plotRelationship.setLevelName("PLOT");
+		plotRelationship.setLevelName(ObservationLevelEnum.PLOT.getLevelName());
 		final ObservationLevelRelationship repRelationship = new ObservationLevelRelationship();
 		repRelationship.setLevelCode("1");
-		repRelationship.setLevelName("REP");
+		repRelationship.setLevelName(ObservationLevelEnum.REP.getLevelName());
 		final ObservationLevelRelationship blockRelationship = new ObservationLevelRelationship();
 		blockRelationship.setLevelCode("1");
-		blockRelationship.setLevelName("BLOCK");
+		blockRelationship.setLevelName(ObservationLevelEnum.BLOCK.getLevelName());
 		observationUnitPosition.setObservationLevelRelationships(Arrays.asList(plotRelationship, repRelationship, blockRelationship));
 
 		final Map<String, Object> geoCoodinates = new HashMap<>();

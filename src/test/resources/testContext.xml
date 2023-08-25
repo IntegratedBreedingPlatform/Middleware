@@ -125,6 +125,10 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="templateService" class="org.generationcp.middleware.api.template.TemplateServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
     <bean id="userProgramStateDataManager" class="org.generationcp.middleware.manager.UserProgramStateDataManagerImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
