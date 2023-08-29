@@ -490,7 +490,10 @@
         <preConditions onFail="MARK_RAN">
 			<and>
 			<sqlCheck expectedResult="1">
-				SELECT COUNT(1) > 0 FROM listnms where listdate &lt; 20230000;
+				SELECT CASE WHEN (SELECT (COUNT(1) IS NOT NULL) AS X FROM listdata l 
+				GROUP BY listid HAVING MAX(entryid)!=COUNT(entryid)) IS NULL THEN 0
+				ELSE 1 
+				END;
 			</sqlCheck>
 				<!-- Check if dataset check_listentry_table was created -->
 			<sqlCheck expectedResult="0">
@@ -595,13 +598,21 @@
 	<changeSet id="v24.5.2-1" author="rowena">
         <preConditions onFail="MARK_RAN">
 			<and>
-			<!-- check if there studies made before 2023 -->
+			<!-- check if there are uniquenames that is greater than count(uniquename) -->
 			<sqlCheck expectedResult="1">
-				SELECT COUNT(*) FROM workbench.workbench_project p
-						INNER JOIN workbench.workbench_crop c
-						WHERE c.crop_name = p.crop_type
-						AND c.db_name = DATABASE()
-						AND YEAR(p.start_date)&lt; 2023;
+				SELECT CASE WHEN 
+					( SELECT stock_id FROM stock s GROUP BY project_id HAVING MAX(CAST(uniquename AS UNSIGNED))!=COUNT(CAST(uniquename AS UNSIGNED)) 
+					AND stock_id NOT IN
+						(
+						SELECT  stock_id
+						FROM    nd_experiment nd
+						WHERE   nd.stock_id = stock_id
+					) LIMIT 1
+					) IS NULL THEN 0
+					ELSE 1 
+				END
+		;
+    
 			</sqlCheck>
 			<!-- Check if procedure check_stockentry_sequence table was created -->
 			<sqlCheck expectedResult="0">
