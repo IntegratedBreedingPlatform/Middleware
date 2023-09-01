@@ -23,27 +23,46 @@ import java.util.Map;
 @AutoProperty
 public class ObservationDto {
 	private static final Logger LOG = LoggerFactory.getLogger(ObservationDto.class);
+
+	@JsonView(BrapiView.BrapiV2.class)
 	private Map<String, String> additionalInfo;
+
 	private String collector;
+
+	@JsonView(BrapiView.BrapiV2.class)
 	private List<ExternalReferenceDTO> externalReferences;
 
 	@JsonView(BrapiView.BrapiV2_1.class)
 	private Map<String, Object> geoCoordinates;
+
+	@JsonView(BrapiView.BrapiV2.class)
 	private String germplasmDbId;
+
+	@JsonView(BrapiView.BrapiV2.class)
 	private String germplasmName;
+
 	private String observationDbId;
 
 	@JsonSerialize(as = Date.class)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
 	private Date observationTimeStamp;
 
+	@JsonView(BrapiView.BrapiV2.class)
 	private String observationUnitDbId;
+
+	@JsonView(BrapiView.BrapiV2.class)
 	private String observationUnitName;
+
 	private String observationVariableDbId;
 	private String observationVariableName;
 	private SeasonDto season;
+
+	@JsonView(BrapiView.BrapiV2.class)
 	private String studyDbId;
+
+	@JsonView(BrapiView.BrapiV2.class)
 	private String uploadedBy;
+
 	private String value;
 
 	@JsonIgnore

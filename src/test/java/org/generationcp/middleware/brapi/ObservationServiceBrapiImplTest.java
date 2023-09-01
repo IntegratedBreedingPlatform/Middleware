@@ -1,5 +1,6 @@
 package org.generationcp.middleware.brapi;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -12,6 +13,7 @@ import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
@@ -169,13 +171,13 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		observationUnitPosition.setPositionCoordinateY("2");
 		final ObservationLevelRelationship plotRelationship = new ObservationLevelRelationship();
 		plotRelationship.setLevelCode("1");
-		plotRelationship.setLevelName("PLOT");
+		plotRelationship.setLevelName(ObservationLevelEnum.PLOT.getLevelName());
 		final ObservationLevelRelationship repRelationship = new ObservationLevelRelationship();
 		repRelationship.setLevelCode("1");
-		repRelationship.setLevelName("REP");
+		repRelationship.setLevelName(ObservationLevelEnum.REP.getLevelName());
 		final ObservationLevelRelationship blockRelationship = new ObservationLevelRelationship();
 		blockRelationship.setLevelCode("1");
-		blockRelationship.setLevelName("BLOCK");
+		blockRelationship.setLevelName(ObservationLevelEnum.BLOCK.getLevelName());
 		observationUnitPosition.setObservationLevelRelationships(Arrays.asList(plotRelationship, repRelationship, blockRelationship));
 
 		final Map<String, Object> geoCoodinates = new HashMap<>();
@@ -214,11 +216,35 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchObservations() {
-		final List<ObservationDto> observationDtos = this.createObservationDtos();
+
+		// Create Trait Variables
+		final List<String> possibleValues = Arrays.asList("a", "b", "c");
+		final CVTerm categoricalVariable =
+				this.testDataInitializer.createCategoricalVariable(VariableType.TRAIT, possibleValues);
+		final CVTerm numericalVariable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.TRAIT);
+		final CVTerm datetimeVariable = this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.TRAIT);
+		final CVTerm characterVariable = this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.TRAIT);
+
+		final ObservationDto categoricalObservationDto = this.createObservationDto("a", categoricalVariable);
+		final ObservationDto numericalObservationDto = this.createObservationDto("123", numericalVariable);
+		final ObservationDto datetimeObservationDto = this.createObservationDto("2021-08-30", datetimeVariable);
+		final ObservationDto characterObservationDto = this.createObservationDto("Hello World", characterVariable);
+
+		// Create new observations. The value will be saved as draft value
+		final List<ObservationDto> createdObservations = this.observationServiceBrapi
+				.createObservations(Arrays.asList(categoricalObservationDto, numericalObservationDto, datetimeObservationDto, characterObservationDto));
+
+		// Populate observations' current value
+		final Integer experimentId = this.daoFactory.getExperimentDao()
+				.getByObsUnitIds(Arrays.asList(this.observationUnitDbId)).get(0).getNdExperimentId();
+		this.daoFactory.getPhenotypeDAO().updatePhenotypesByExperimentIdAndObervableId(experimentId, categoricalVariable.getCvTermId(), "b", this.testUser.getUserid());
+		this.daoFactory.getPhenotypeDAO().updatePhenotypesByExperimentIdAndObervableId(experimentId, numericalVariable.getCvTermId(), "456", this.testUser.getUserid());
+		this.daoFactory.getPhenotypeDAO().updatePhenotypesByExperimentIdAndObervableId(experimentId, datetimeVariable.getCvTermId(), "20210701", this.testUser.getUserid());
+		this.daoFactory.getPhenotypeDAO().updatePhenotypesByExperimentIdAndObervableId(experimentId, characterVariable.getCvTermId(), "Greetings!", this.testUser.getUserid());
 
 		final ObservationSearchRequestDto searchRequestDto = new ObservationSearchRequestDto();
 		searchRequestDto.setObservationDbIds(
-			observationDtos.stream().map(o -> o.getObservationDbId()).collect(Collectors.toList()));
+				createdObservations.stream().map(o -> o.getObservationDbId()).collect(Collectors.toList()));
 		searchRequestDto.setGermplasmNames(Collections.singletonList(this.germplasm.getPreferredName().getNval()));
 		searchRequestDto.setTrialDbIds(Collections.singletonList(this.trialSummary.getTrialDbId().toString()));
 		searchRequestDto.setTrialNames(Collections.singletonList(this.trialSummary.getName()));
@@ -226,34 +252,92 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		searchRequestDto.setStudyNames(Collections.singletonList(this.trialSummary.getName() + " Environment Number 1"));
 		searchRequestDto.setLocationDbIds(Collections.singletonList(this.studyInstanceDto.getLocationDbId()));
 		searchRequestDto.setLocationNames(Collections.singletonList(this.studyInstanceDto.getLocationName()));
-		searchRequestDto.setObservationVariableDbIds(Collections.singletonList(this.variableDTO.getObservationVariableDbId()));
-		searchRequestDto.setObservationVariableNames(Collections.singletonList(this.variableDTO.getObservationVariableName()));
+		searchRequestDto.setObservationVariableDbIds(createdObservations.stream().map(ObservationDto::getObservationVariableDbId).collect(Collectors.toList()));
+		searchRequestDto.setObservationVariableNames(createdObservations.stream().map(ObservationDto::getObservationVariableName).collect(Collectors.toList()));
 		searchRequestDto.setProgramDbIds(Collections.singletonList(this.trialSummary.getProgramDbId()));
 		searchRequestDto.setExternalReferenceIds(Collections.singletonList(REF_ID));
 		searchRequestDto.setExternalReferenceSources(Collections.singletonList(REF_SOURCE));
 		final ObservationLevelRelationship plotRelationship = new ObservationLevelRelationship();
 		plotRelationship.setLevelCode("1");
-		plotRelationship.setLevelName("PLOT");
+		plotRelationship.setLevelName(ObservationLevelEnum.PLOT.getLevelName());
 		searchRequestDto.setObservationLevels(Collections.singletonList(plotRelationship));
 
 
-		final ObservationDto observationDto = this.observationServiceBrapi
-			.searchObservations(searchRequestDto, null).get(0);
-		Assert.assertEquals(observationDtos.get(0).getObservationDbId(), observationDto.getObservationDbId());
-		Assert.assertEquals(this.observationUnitDbId, observationDto.getObservationUnitDbId());
-		Assert.assertEquals(this.variableDTO.getObservationVariableDbId(), observationDto.getObservationVariableDbId());
-		Assert.assertEquals(this.germplasm.getGermplasmUUID(), observationDto.getGermplasmDbId());
-		Assert.assertEquals(1, observationDto.getExternalReferences().size());
-		Assert.assertEquals(REF_ID, observationDto.getExternalReferences().get(0).getReferenceID());
-		Assert.assertEquals(REF_SOURCE, observationDto.getExternalReferences().get(0).getReferenceSource());
-		Assert.assertTrue(observationDto.getAdditionalInfo().containsKey(PROP1));
-		Assert.assertEquals(VALUE, observationDto.getAdditionalInfo().get(PROP1));
+		final List<ObservationDto> observationDtosResult = this.observationServiceBrapi.searchObservations(searchRequestDto, null);
 
-		final Integer experimentId = this.daoFactory.getExperimentDao()
-			.getByObsUnitIds(Arrays.asList(observationDto.getObservationUnitDbId())).get(0).getNdExperimentId();
+
+		final Optional<ObservationDto> categoricalObservationDtoOptional = observationDtosResult.stream()
+				.filter(o -> o.getObservationVariableName().equals(categoricalVariable.getName())).findAny();
+		final Optional<ObservationDto> numericalObservationDtoOptional = observationDtosResult.stream()
+				.filter(o -> o.getObservationVariableName().equals(numericalVariable.getName())).findAny();
+		final Optional<ObservationDto> datetimeObservationDtoOptional = observationDtosResult.stream()
+				.filter(o -> o.getObservationVariableName().equals(datetimeVariable.getName())).findAny();
+		final Optional<ObservationDto> characterObservationDtoOptional = observationDtosResult.stream()
+				.filter(o -> o.getObservationVariableName().equals(characterVariable.getName())).findAny();
+
+		Assert.assertTrue(categoricalObservationDtoOptional.isPresent());
+		final ObservationDto categoricalObservationResult = categoricalObservationDtoOptional.get();
+		Assert.assertEquals(categoricalObservationResult.getObservationDbId(), categoricalObservationResult.getObservationDbId());
+		Assert.assertEquals(this.observationUnitDbId, categoricalObservationResult.getObservationUnitDbId());
+		Assert.assertEquals(categoricalVariable.getCvTermId().toString(), categoricalObservationResult.getObservationVariableDbId());
+		Assert.assertEquals(this.germplasm.getGermplasmUUID(), categoricalObservationResult.getGermplasmDbId());
+		Assert.assertEquals(1, categoricalObservationResult.getExternalReferences().size());
+		Assert.assertEquals(REF_ID, categoricalObservationResult.getExternalReferences().get(0).getReferenceID());
+		Assert.assertEquals(REF_SOURCE, categoricalObservationResult.getExternalReferences().get(0).getReferenceSource());
+		Assert.assertTrue(categoricalObservationResult.getAdditionalInfo().containsKey(PROP1));
+		Assert.assertEquals(VALUE, categoricalObservationResult.getAdditionalInfo().get(PROP1));
+		Assert.assertEquals("b", categoricalObservationResult.getValue());
 		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
-			experimentId, Integer.parseInt(observationDto.getObservationVariableDbId()));
-		Assert.assertEquals(VALUE, phenotype.getDraftValue());
+			experimentId, Integer.parseInt(categoricalObservationResult.getObservationVariableDbId()));
+		Assert.assertEquals("a", phenotype.getDraftValue());
+
+		Assert.assertTrue(numericalObservationDtoOptional.isPresent());
+		final ObservationDto numericalObservationResult = numericalObservationDtoOptional.get();
+		Assert.assertEquals(numericalObservationResult.getObservationDbId(), numericalObservationResult.getObservationDbId());
+		Assert.assertEquals(this.observationUnitDbId, numericalObservationResult.getObservationUnitDbId());
+		Assert.assertEquals(numericalVariable.getCvTermId().toString(), numericalObservationResult.getObservationVariableDbId());
+		Assert.assertEquals(this.germplasm.getGermplasmUUID(), numericalObservationResult.getGermplasmDbId());
+		Assert.assertEquals(1, numericalObservationResult.getExternalReferences().size());
+		Assert.assertEquals(REF_ID, numericalObservationResult.getExternalReferences().get(0).getReferenceID());
+		Assert.assertEquals(REF_SOURCE, numericalObservationResult.getExternalReferences().get(0).getReferenceSource());
+		Assert.assertTrue(numericalObservationResult.getAdditionalInfo().containsKey(PROP1));
+		Assert.assertEquals(VALUE, numericalObservationResult.getAdditionalInfo().get(PROP1));
+		Assert.assertEquals("456", numericalObservationResult.getValue());
+		final Phenotype phenotype2 = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+				experimentId, Integer.parseInt(numericalObservationResult.getObservationVariableDbId()));
+		Assert.assertEquals("123", phenotype2.getDraftValue());
+
+		Assert.assertTrue(datetimeObservationDtoOptional.isPresent());
+		final ObservationDto datetimeObservationResult = datetimeObservationDtoOptional.get();
+		Assert.assertEquals(datetimeObservationResult.getObservationDbId(), datetimeObservationResult.getObservationDbId());
+		Assert.assertEquals(this.observationUnitDbId, datetimeObservationResult.getObservationUnitDbId());
+		Assert.assertEquals(datetimeVariable.getCvTermId().toString(), datetimeObservationResult.getObservationVariableDbId());
+		Assert.assertEquals(this.germplasm.getGermplasmUUID(), datetimeObservationResult.getGermplasmDbId());
+		Assert.assertEquals(1, datetimeObservationResult.getExternalReferences().size());
+		Assert.assertEquals(REF_ID, datetimeObservationResult.getExternalReferences().get(0).getReferenceID());
+		Assert.assertEquals(REF_SOURCE, datetimeObservationResult.getExternalReferences().get(0).getReferenceSource());
+		Assert.assertTrue(datetimeObservationResult.getAdditionalInfo().containsKey(PROP1));
+		Assert.assertEquals(VALUE, datetimeObservationResult.getAdditionalInfo().get(PROP1));
+		Assert.assertEquals("2021-07-01", datetimeObservationResult.getValue());
+		final Phenotype phenotype3 = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+				experimentId, Integer.parseInt(datetimeObservationDto.getObservationVariableDbId()));
+		Assert.assertEquals("20210830", phenotype3.getDraftValue());
+
+		Assert.assertTrue(characterObservationDtoOptional.isPresent());
+		final ObservationDto characterObservationResult = characterObservationDtoOptional.get();
+		Assert.assertEquals(characterObservationResult.getObservationDbId(), characterObservationResult.getObservationDbId());
+		Assert.assertEquals(this.observationUnitDbId, characterObservationResult.getObservationUnitDbId());
+		Assert.assertEquals(characterVariable.getCvTermId().toString(), characterObservationResult.getObservationVariableDbId());
+		Assert.assertEquals(this.germplasm.getGermplasmUUID(), characterObservationResult.getGermplasmDbId());
+		Assert.assertEquals(1, characterObservationResult.getExternalReferences().size());
+		Assert.assertEquals(REF_ID, characterObservationResult.getExternalReferences().get(0).getReferenceID());
+		Assert.assertEquals(REF_SOURCE, characterObservationResult.getExternalReferences().get(0).getReferenceSource());
+		Assert.assertTrue(characterObservationResult.getAdditionalInfo().containsKey(PROP1));
+		Assert.assertEquals(VALUE, characterObservationResult.getAdditionalInfo().get(PROP1));
+		Assert.assertEquals("Greetings!", characterObservationResult.getValue());
+		final Phenotype phenotype4 = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+				experimentId, Integer.parseInt(characterObservationDto.getObservationVariableDbId()));
+		Assert.assertEquals("Hello World", phenotype4.getDraftValue());
 	}
 
 	@Test
@@ -300,6 +384,45 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
 			experimentId, Integer.parseInt(resultObservationDto.getObservationVariableDbId()));
 		Assert.assertEquals(value, phenotype.getDraftValue());
+	}
+	@Test
+	public void createObservations_TranslateNAtoMissing() {
+
+		// Create Trait Variables
+		final List<String> possibleValues = Arrays.asList("a", "b", "c");
+		final CVTerm categoricalVariable =
+				this.testDataInitializer.createCategoricalVariable(VariableType.TRAIT, possibleValues);
+		final CVTerm numericalVariable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.TRAIT);
+		final CVTerm datetimeVariable = this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.TRAIT);
+		final CVTerm characterVariable = this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.TRAIT);
+
+		final ObservationDto categoricalObservationDto = this.createObservationDto("NA", categoricalVariable);
+		final ObservationDto numericalObservationDto = this.createObservationDto("NA", numericalVariable);
+		final ObservationDto datetimeObservationDto = this.createObservationDto("NA", datetimeVariable);
+		final ObservationDto characterObservationDto = this.createObservationDto("NA", characterVariable);
+
+		this.observationServiceBrapi
+				.createObservations(Arrays.asList(categoricalObservationDto, numericalObservationDto, datetimeObservationDto, characterObservationDto));
+
+		final Integer experimentId = this.daoFactory.getExperimentDao()
+				.getByObsUnitIds(Arrays.asList(this.observationUnitDbId)).get(0).getNdExperimentId();
+
+		final Phenotype categoricalPhenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+				experimentId, Integer.parseInt(categoricalObservationDto.getObservationVariableDbId()));
+		Assert.assertEquals("missing", categoricalPhenotype.getDraftValue());
+
+		final Phenotype numericPhenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+				experimentId, Integer.parseInt(numericalObservationDto.getObservationVariableDbId()));
+		Assert.assertEquals("missing", numericPhenotype.getDraftValue());
+
+		final Phenotype datetimePhenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+				experimentId, Integer.parseInt(datetimeObservationDto.getObservationVariableDbId()));
+		Assert.assertEquals(StringUtils.EMPTY, datetimePhenotype.getDraftValue());
+
+		final Phenotype characterPhenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+				experimentId, Integer.parseInt(characterObservationDto.getObservationVariableDbId()));
+		Assert.assertEquals(StringUtils.EMPTY, characterPhenotype.getDraftValue());
+
 	}
 
 	@Test
@@ -450,6 +573,52 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void updateObservations_TranslateNAtoMissing() {
+
+		// Create Trait Variables
+		final List<String> possibleValues = Arrays.asList("a", "b", "c");
+		final CVTerm categoricalVariable =
+				this.testDataInitializer.createCategoricalVariable(VariableType.TRAIT, possibleValues);
+		final CVTerm numericalVariable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.TRAIT);
+		final CVTerm datetimeVariable = this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.TRAIT);
+		final CVTerm characterVariable = this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.TRAIT);
+
+		final ObservationDto categoricalObservationDto = this.createObservationDto("a", categoricalVariable);
+		final ObservationDto numericalObservationDto = this.createObservationDto("123", numericalVariable);
+		final ObservationDto datetimeObservationDto = this.createObservationDto("2021-08-30", datetimeVariable);
+		final ObservationDto characterObservationDto = this.createObservationDto("Hello World", characterVariable);
+
+		final List<ObservationDto> createdObservations = this.observationServiceBrapi
+				.createObservations(Arrays.asList(categoricalObservationDto, numericalObservationDto, datetimeObservationDto, characterObservationDto));
+
+		// Update all created observations with NA value.
+		for (final ObservationDto dto : createdObservations) {
+			dto.setValue("NA");
+		}
+		this.observationServiceBrapi.updateObservations(createdObservations);
+
+		final Integer experimentId = this.daoFactory.getExperimentDao()
+				.getByObsUnitIds(Arrays.asList(this.observationUnitDbId)).get(0).getNdExperimentId();
+
+		final Phenotype categoricalPhenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+				experimentId, Integer.parseInt(categoricalObservationDto.getObservationVariableDbId()));
+		Assert.assertEquals("missing", categoricalPhenotype.getDraftValue());
+
+		final Phenotype numericPhenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+				experimentId, Integer.parseInt(numericalObservationDto.getObservationVariableDbId()));
+		Assert.assertEquals("missing", numericPhenotype.getDraftValue());
+
+		final Phenotype datetimePhenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+				experimentId, Integer.parseInt(datetimeObservationDto.getObservationVariableDbId()));
+		Assert.assertEquals(StringUtils.EMPTY, datetimePhenotype.getDraftValue());
+
+		final Phenotype characterPhenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+				experimentId, Integer.parseInt(characterObservationDto.getObservationVariableDbId()));
+		Assert.assertEquals(StringUtils.EMPTY, characterPhenotype.getDraftValue());
+
+	}
+
+	@Test
 	public void testUpdateObservations_UpdateExternalReferences() {
 		final List<ObservationDto> observationDtos = this.createObservationDtos();
 		Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(Integer.valueOf(observationDtos.get(0).getObservationDbId()));
@@ -478,8 +647,11 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(externalReferenceDTO.getReferenceID(), addedPhenotypeExternalReference.get().getReferenceId());
 	}
 
+
+
 	private ObservationDto createObservationDto(final String value, final CVTerm traitVariable) {
 		final ObservationDto observationDtoForTrait = new ObservationDto();
+		observationDtoForTrait.setObservationVariableName(traitVariable.getName());
 		observationDtoForTrait.setGermplasmDbId(this.germplasm.getGermplasmUUID());
 		observationDtoForTrait.setStudyDbId(this.studyInstanceDto.getStudyDbId());
 		observationDtoForTrait.setObservationVariableDbId(traitVariable.getCvTermId().toString());
@@ -489,6 +661,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		externalReferenceDTO.setReferenceSource(REF_SOURCE);
 		observationDtoForTrait.setExternalReferences(Collections.singletonList(externalReferenceDTO));
 		observationDtoForTrait.setValue(value);
+		observationDtoForTrait.setAdditionalInfo(Collections.singletonMap(PROP1, VALUE));
 		return observationDtoForTrait;
 	}
 

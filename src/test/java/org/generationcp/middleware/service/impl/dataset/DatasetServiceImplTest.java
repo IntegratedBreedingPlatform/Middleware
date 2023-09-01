@@ -10,6 +10,7 @@ import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
+import org.generationcp.middleware.dao.PhenotypeExternalReferenceDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -159,6 +160,9 @@ public class DatasetServiceImplTest {
 	private StockDao stockDao;
 
 	@Mock
+	private PhenotypeExternalReferenceDAO phenotypeExternalReferenceDAO;
+
+	@Mock
 	private UserDefinedFieldDAO userDefinedFieldDAO;
 	@InjectMocks
 	private DatasetServiceImpl datasetService = new DatasetServiceImpl();
@@ -193,6 +197,7 @@ public class DatasetServiceImplTest {
 		when(this.daoFactory.getObservationUnitsSearchDAO()).thenReturn(this.obsUnitsSearchDao);
 		when(this.daoFactory.getStockDao()).thenReturn(this.stockDao);
 		when(this.daoFactory.getUserDefinedFieldDAO()).thenReturn(this.userDefinedFieldDAO);
+		when(this.daoFactory.getPhenotypeExternalReferenceDAO()).thenReturn(this.phenotypeExternalReferenceDAO);
 	}
 
 	@Test
@@ -255,6 +260,7 @@ public class DatasetServiceImplTest {
 		final List<Integer> variableIds = Arrays.asList(ran.nextInt(), ran.nextInt());
 		this.datasetService.removeDatasetVariables(studyId, datasetId, variableIds);
 		Mockito.verify(this.phenotypeDao).deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
+		Mockito.verify(this.phenotypeExternalReferenceDAO).deleteByProjectIdAndVariableIds(datasetId, variableIds);
 		Mockito.verify(this.projectPropertyDao).deleteProjectVariables(datasetId, variableIds);
 	}
 
@@ -691,6 +697,7 @@ public class DatasetServiceImplTest {
 	public void testAcceptDraftData() {
 		final int studyId = 2;
 		final int datasetId = 3;
+		final Set<Integer> instanceIds = Sets.newHashSet(new Random().nextInt());
 
 		final DmsProject project = new DmsProject();
 		project.setProjectId(datasetId);
@@ -717,9 +724,9 @@ public class DatasetServiceImplTest {
 		// Setup formula variable with phenotype variable as input so dependent phenotypes should be set to out of sync
 		final Integer targetVariableId = new Random().nextInt();
 		this.setupTargetVariable(studyId, variableId, targetVariableId);
-		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId, instanceIds)).thenReturn(phenotypes);
 		Mockito.when(this.userService.getCurrentlyLoggedInUserId()).thenReturn(USER_ID);
-		this.datasetService.acceptAllDatasetDraftData(studyId, datasetId);
+		this.datasetService.acceptDatasetDraftData(studyId, datasetId, instanceIds);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).update(phenotypeArgumentCaptor.capture());
@@ -751,6 +758,7 @@ public class DatasetServiceImplTest {
 	public void testDiscardDraftData() {
 
 		final Integer datasetId = 3;
+		final Set<Integer> instanceIds = Sets.newHashSet(new Random().nextInt());
 		final DmsProject project = new DmsProject();
 		project.setProjectId(datasetId);
 
@@ -774,8 +782,8 @@ public class DatasetServiceImplTest {
 
 		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
 
-		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
-		this.datasetService.rejectDatasetDraftData(datasetId);
+		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId, instanceIds)).thenReturn(phenotypes);
+		this.datasetService.rejectDatasetDraftData(datasetId, instanceIds);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).update(phenotypeArgumentCaptor.capture());
@@ -792,6 +800,7 @@ public class DatasetServiceImplTest {
 	public void testAcceptDraftDataDeletingRow() {
 		final Integer studyId = 2;
 		final Integer datasetId = 3;
+		final Set<Integer> instanceIds = Sets.newHashSet(new Random().nextInt());
 
 		final DmsProject project = new DmsProject();
 		project.setProjectId(datasetId);
@@ -817,9 +826,9 @@ public class DatasetServiceImplTest {
 
 		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
 
-		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId, instanceIds)).thenReturn(phenotypes);
 		Mockito.when(this.daoFactory.getPhenotypeDAO().getById(phenotypeId)).thenReturn(phenotype);
-		this.datasetService.acceptAllDatasetDraftData(studyId, datasetId);
+		this.datasetService.acceptDatasetDraftData(studyId, datasetId, instanceIds);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
@@ -834,6 +843,7 @@ public class DatasetServiceImplTest {
 	public void testDiscardDraftDataDeletingRow() {
 
 		final Integer datasetId = 3;
+		final Set<Integer> instanceIds = Sets.newHashSet(new Random().nextInt());
 		final DmsProject project = new DmsProject();
 		project.setProjectId(datasetId);
 
@@ -857,9 +867,9 @@ public class DatasetServiceImplTest {
 
 		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
 
-		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId, instanceIds)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
-		this.datasetService.rejectDatasetDraftData(datasetId);
+		this.datasetService.rejectDatasetDraftData(datasetId, instanceIds);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
@@ -871,6 +881,7 @@ public class DatasetServiceImplTest {
 	public void testDiscardDraftDataDeletingRowWithEmpty() {
 
 		final Integer datasetId = 3;
+		final Set<Integer> instanceIds = Sets.newHashSet(new Random().nextInt());
 
 		final DmsProject project = new DmsProject();
 		project.setProjectId(datasetId);
@@ -895,9 +906,9 @@ public class DatasetServiceImplTest {
 
 		final List<Phenotype> phenotypes = Lists.newArrayList(phenotype);
 
-		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId, instanceIds)).thenReturn(phenotypes);
 		Mockito.when(this.phenotypeDao.getById(phenotype.getPhenotypeId())).thenReturn(phenotype);
-		this.datasetService.rejectDatasetDraftData(datasetId);
+		this.datasetService.rejectDatasetDraftData(datasetId, instanceIds);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
@@ -909,6 +920,7 @@ public class DatasetServiceImplTest {
 	public void testAcceptDraftDataDeletingRowWithEmpty() {
 		final int studyId = 2;
 		final Integer datasetId = 3;
+		final Set<Integer> instanceIds = Sets.newHashSet(new Random().nextInt());
 
 		final DmsProject project = new DmsProject();
 		project.setProjectId(datasetId);
@@ -937,10 +949,10 @@ public class DatasetServiceImplTest {
 		// Setup formula variable with phenotype variable as input so dependent phenotypes should be set to out of sync
 		final Integer targetVariableId = new Random().nextInt();
 		this.setupTargetVariable(studyId, variableId, targetVariableId);
-		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId, instanceIds)).thenReturn(phenotypes);
 		Mockito.when(this.daoFactory.getPhenotypeDAO().getById(phenotypeId)).thenReturn(phenotype);
 		Mockito.when(this.userService.getCurrentlyLoggedInUserId()).thenReturn(USER_ID);
-		this.datasetService.acceptAllDatasetDraftData(studyId, datasetId);
+		this.datasetService.acceptDatasetDraftData(studyId, datasetId, instanceIds);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).makeTransient(phenotypeArgumentCaptor.capture());
@@ -954,6 +966,7 @@ public class DatasetServiceImplTest {
 	public void testSetAsMissingDraftDataValidValue() {
 		final int studyId = 2;
 		final Integer datasetId = 3;
+		final Set<Integer> instanceIds = Sets.newHashSet(new Random().nextInt());
 
 		final DmsProject project = new DmsProject();
 		project.setProjectId(datasetId);
@@ -989,11 +1002,11 @@ public class DatasetServiceImplTest {
 		// Setup formula variable with phenotype variable as input so dependent phenotypes should be set to out of sync
 		final Integer targetVariableId = new Random().nextInt();
 		this.setupTargetVariable(studyId, variableId, targetVariableId);
-		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId, instanceIds)).thenReturn(phenotypes);
 		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES))
 			.thenReturn(variables);
 		Mockito.when(this.userService.getCurrentlyLoggedInUserId()).thenReturn(USER_ID);
-		this.datasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
+		this.datasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId, instanceIds);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).update(phenotypeArgumentCaptor.capture());
@@ -1009,6 +1022,7 @@ public class DatasetServiceImplTest {
 	public void testSetAsMissingDraftDataInvalidValue() {
 		final Integer studyId = 2;
 		final Integer datasetId = 3;
+		final Set<Integer> instanceIds = Sets.newHashSet(new Random().nextInt());
 
 		final DmsProject project = new DmsProject();
 		project.setProjectId(datasetId);
@@ -1042,10 +1056,10 @@ public class DatasetServiceImplTest {
 		variable.setPossibleValues(Lists.newArrayList(valueReference));
 		final List<MeasurementVariable> variables = Lists.newArrayList(variable);
 
-		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId)).thenReturn(phenotypes);
+		Mockito.when(this.phenotypeDao.getDatasetDraftData(datasetId, instanceIds)).thenReturn(phenotypes);
 		Mockito.when(this.dmsProjectDao.getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES))
 			.thenReturn(variables);
-		this.datasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
+		this.datasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId, instanceIds);
 
 		final ArgumentCaptor<Phenotype> phenotypeArgumentCaptor = ArgumentCaptor.forClass(Phenotype.class);
 		Mockito.verify(this.phenotypeDao).update(phenotypeArgumentCaptor.capture());

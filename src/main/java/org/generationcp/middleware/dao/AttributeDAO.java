@@ -14,13 +14,14 @@ package org.generationcp.middleware.dao;
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
+import org.generationcp.middleware.api.germplasm.search.GermplasmAttributeSearchRequest;
 import org.generationcp.middleware.dao.util.BrapiVariableUtils;
+import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
-import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.util.Util;
@@ -198,11 +199,12 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 		return attributeValue;
 	}
 
-	public List<AttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId,
-		final String programUUID) {
+	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("Select a.aid AS id, ");
+			queryString.append("a.gid as gid, ");
+			queryString.append("a.cval_id as cValueId, ");
 			queryString.append("cv.cvterm_id as variableId, ");
 			queryString.append("a.aval AS value, ");
 			queryString.append("IFNULL(vpo.alias, cv.name) AS variableName, ");
@@ -220,23 +222,42 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 				"INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id ");
 			queryString.append("LEFT JOIN location l on a.alocn = l.locid ");
 			queryString.append("LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = cv.cvterm_id AND vpo.program_uuid = :programUUID ");
-			queryString.append("WHERE a.gid = :gid ");
-			if (variableTypeId != null) {
-				queryString.append("AND cp.value = (select name from cvterm where cvterm_id = :variableTypeId) ");
-			}
-			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
-			this.addQueryScalars(sqlQuery);
-			sqlQuery.setParameter("gid", gid);
-			if (variableTypeId != null) {
-				sqlQuery.setParameter("variableTypeId", variableTypeId);
+			queryString.append("WHERE ");
+
+			final List<String> conditions = new ArrayList<>();
+			if (CollectionUtils.isNotEmpty(germplasmAttributeSearchRequest.getGids())) {
+				conditions.add("a.gid IN (:gids)");
 			}
 
-			sqlQuery.setParameter(PROGRAM_UUID, programUUID);
-			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(AttributeDto.class));
+			if (CollectionUtils.isNotEmpty(germplasmAttributeSearchRequest.getVariableTypeIds())) {
+				conditions.add("cp.value IN (:variableTypeNames)");
+			}
+
+			queryString.append(conditions.stream().collect(Collectors.joining(" AND ")));
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
+
+			sqlQuery.addScalar("gid");
+			sqlQuery.addScalar("cValueId");
+			this.addQueryScalars(sqlQuery);
+
+			if (CollectionUtils.isNotEmpty(germplasmAttributeSearchRequest.getGids())) {
+				sqlQuery.setParameterList("gids", germplasmAttributeSearchRequest.getGids());
+			}
+
+			if (CollectionUtils.isNotEmpty(germplasmAttributeSearchRequest.getVariableTypeIds())) {
+				final List<String> variableTypeNames = new ArrayList<>();
+				germplasmAttributeSearchRequest.getVariableTypeIds().forEach((id) -> variableTypeNames.add(VariableType.getById(id).getName()));
+				sqlQuery.setParameterList("variableTypeNames", variableTypeNames);
+			}
+
+			sqlQuery.setParameter(PROGRAM_UUID, germplasmAttributeSearchRequest.getProgramUUID());
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmAttributeDto.class));
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error with getGermplasmAttributeDtos(gid=" + gid + ", variableTypeId=" + variableTypeId + "): " + e.getMessage(), e);
+				"Error with getGermplasmAttributeDtos(germplasmAttributeSearchRequest=" + germplasmAttributeSearchRequest + "): "
+					+ e.getMessage(), e);
 		}
 	}
 

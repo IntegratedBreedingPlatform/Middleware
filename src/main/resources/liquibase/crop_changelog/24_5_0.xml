@@ -1,0 +1,107 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="mderamos" id="v24.5.0-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="template"/>
+            </not>
+        </preConditions>
+        <comment>
+            Create template table
+        </comment>
+        <createTable tableName="template">
+            <column name="template_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="program_uuid" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="template_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="template_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="int" defaultValue="0">
+                <constraints nullable="false" />
+            </column>
+            <column name="modified_date" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="modified_by" type="int">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v24.5.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'template' AND CONSTRAINT_NAME='name_program_uuid_uc' and TABLE_SCHEMA = DATABASE();
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Create unique constraint for columns template_name and program_uuid for table template
+        </comment>
+        <addUniqueConstraint columnNames="template_name, program_uuid" constraintName="name_program_uuid_uc" tableName="template" />
+    </changeSet>
+
+    <changeSet author="mderamos" id="v24.5.0-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="template_details"/>
+            </not>
+        </preConditions>
+        <comment>
+            Create template details table
+        </comment>
+        <createTable tableName="template_details">
+            <column name="template_details_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="variable_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_cvterm_id" references="cvterm(cvterm_id)"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="template_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_template_id" references="template(template_id)"/>
+            </column>
+            <column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="int" defaultValue="0">
+                <constraints nullable="false" />
+            </column>
+            <column name="modified_date" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="modified_by" type="int">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v24.5.0-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'template_details' AND CONSTRAINT_NAME='variable_id_template_id_uc' and TABLE_SCHEMA = DATABASE();
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Create unique constraint for columns variable_id and template_id for table template_details
+        </comment>
+        <addUniqueConstraint columnNames="variable_id, template_id" constraintName="variable_id_template_id_uc" tableName="template_details" />
+    </changeSet>
+</databaseChangeLog>

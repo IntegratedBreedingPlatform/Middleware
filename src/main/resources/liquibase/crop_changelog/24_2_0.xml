@@ -1,0 +1,74 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="mderamos" id="v24.2.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM cvterm WHERE name='Phenology' AND cv_id=1011;
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Add Phenology cvterm
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            VALUES (1011, 'Phenology','Phenology', null, 0, 0);
+        </sql>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v24.2.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM cvterm WHERE name='Phenology' AND cv_id=1011;
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Add Phenology Trait class
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            set @phenologyVarId = (select cvterm_id from cvterm where name = 'Phenology' AND cv_id = 1011);
+
+            DELETE FROM cvterm_relationship WHERE subject_id=@phenologyVarId AND type_id IN (1105, 1225);
+
+            INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+            VALUES (1105, @phenologyVarId, 1090), (1225, @phenologyVarId, 1330);
+        </sql>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v24.2.0-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM cvterm WHERE name='Fertility' AND cv_id=1011;
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Add Fertility cvterm
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            VALUES (1011, 'Fertility','Fertility', null, 0, 0);
+        </sql>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v24.2.0-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM cvterm WHERE name='Fertility' AND cv_id=1011;
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Add Fertility Trait class
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+            set @fertilityVarId = (select cvterm_id from cvterm where name = 'Fertility' AND cv_id = 1011);
+
+            DELETE FROM cvterm_relationship WHERE subject_id=@fertilityVarId AND type_id IN (1105, 1225);
+
+            INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+            VALUES (1105, @fertilityVarId, 1090), (1225, @fertilityVarId, 1330);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

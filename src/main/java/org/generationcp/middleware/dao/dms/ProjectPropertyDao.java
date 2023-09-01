@@ -383,8 +383,12 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return criteria.list();
 	}
 
-	public List<String> getAliasesForStudy(final Integer studyId) {
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(QUERY_ALL_STUDY_ALIASES);
+	public List<String> getAliasesForStudy(final Integer studyId, final Integer variableId) {
+		final StringBuilder sb = new StringBuilder(QUERY_ALL_STUDY_ALIASES);
+		if (variableId != null) {
+			sb.append(" AND pp.variable_id != " + variableId);
+		}
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sb.toString());
 		sqlQuery.setParameter("studyId", studyId);
 		return sqlQuery.list();
 	}

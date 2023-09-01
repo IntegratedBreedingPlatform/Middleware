@@ -595,6 +595,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		variable.setBreedingMethods((int) this.daoFactory.getMethodDAO().countByVariable(variable.getId()));
 
 		variable.setLists((int) this.daoFactory.getGermplasmListDataViewDAO().countListByVariableId(variable.getId()));
+		variable.setLots((int) this.daoFactory.getLotAttributeDAO().countByVariables(Lists.newArrayList(variable.getId())));
 
 		//setting variable observations, first observations will be null so set it to 0
 		Integer observations = 0;
@@ -930,6 +931,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		return this.daoFactory.getGermplasmListDataViewDAO().countListByVariableId(variableId) > 0;
 	}
 
+	private boolean isVariableAssignedToLots(final int variableId) {
+		return this.daoFactory.getLotAttributeDAO().countByVariables(Lists.newArrayList(variableId)) > 0;
+	}
+
+	private boolean isVariableUsedInTemplates(final int variableId) {
+		return this.daoFactory.getTemplateDetailsDAO().isVariableUsedByTemplate(variableId);
+	}
+
 	@Override
 	public boolean hasVariableAttributeGermplasmDeleted(final int variableId) {
 		return this.daoFactory.getAttributeDAO().countByVariablesUsedInHistoricalGermplasm(variableId) > 0;
@@ -1098,7 +1107,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		return this.isVariableUsedInStudy(variableId) ||
 			this.areVariablesUsedInAttributes(Lists.newArrayList(variableId)) ||
 			this.isVariableUsedInBreedingMethods(variableId) ||
-			this.isVariableAssignedToLists(variableId);
+			this.isVariableAssignedToLists(variableId) ||
+			this.isVariableAssignedToLots(variableId) ||
+			this.isVariableUsedInTemplates(variableId);
 	}
 
 	@Override

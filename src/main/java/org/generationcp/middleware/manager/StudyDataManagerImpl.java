@@ -1132,8 +1132,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<String> getAliasesForStudy(final Integer studyId) {
-		return this.daoFactory.getProjectPropertyDAO().getAliasesForStudy(studyId);
+	public List<String> getAliasesForStudy(final Integer studyId, final Integer variableId) {
+		return this.daoFactory.getProjectPropertyDAO().getAliasesForStudy(studyId, variableId);
 	}
 
 	void setDataSetBuilder(final DataSetBuilder dataSetBuilder) {

@@ -386,6 +386,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return studyDetailsDTO;
 	}
 
+	@Override
+	public DmsProject getDmSProjectByStudyId(final Integer studyIdentifier) {
+		return this.daoFactory.getDmsProjectDAO().getById(studyIdentifier);
+	}
+
 	private List<TreatmentVariable> transformTreatmentFactors(final Map<String, List<MeasurementVariable>> treatmentFactors,
 		final Integer plotDataSetId) {
 		return treatmentFactors.entrySet().stream().map(entry -> {

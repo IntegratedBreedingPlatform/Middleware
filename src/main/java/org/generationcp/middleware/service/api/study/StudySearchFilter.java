@@ -12,7 +12,7 @@ public class StudySearchFilter {
 
 	private String commonCropName;
 	private String studyTypeDbId;
-	private String programDbId;
+	private List<String> programDbIds = new ArrayList<>();
 	private String locationDbId;
 	private String seasonDbId;
 	private String trialPUI;
@@ -41,12 +41,12 @@ public class StudySearchFilter {
 		this.studyTypeDbId = studyTypeDbId;
 	}
 
-	public String getProgramDbId() {
-		return this.programDbId;
+	public List<String> getProgramDbIds() {
+		return this.programDbIds;
 	}
 
-	public void setProgramDbId(final String programDbId) {
-		this.programDbId = programDbId;
+	public void setProgramDbIds(final List<String> programDbIds) {
+		this.programDbIds = programDbIds;
 	}
 
 	public String getLocationDbId() {

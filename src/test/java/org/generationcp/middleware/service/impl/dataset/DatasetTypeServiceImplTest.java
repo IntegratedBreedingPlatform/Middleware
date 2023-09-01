@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.junit.Assert;
@@ -87,15 +88,15 @@ public class DatasetTypeServiceImplTest extends IntegrationTestBase {
 	}
 
 	public List<String> getObservationLevels(final boolean isSubObs) {
-		List<String> levels = new ArrayList<>();
-		levels.add("PLANT");
-		levels.add("SUB-PLOT");
-		levels.add("TIMESERIES");
-		levels.add("CUSTOM");
+		final List<String> levels = new ArrayList<>();
+		levels.add(ObservationLevelEnum.PLANT.getLevelName());
+		levels.add(ObservationLevelEnum.SUB_PLOT.getLevelName());
+		levels.add(ObservationLevelEnum.TIMESERIES.getLevelName());
+		levels.add(ObservationLevelEnum.CUSTOM.getLevelName());
 
 		if(!isSubObs) {
-			levels.add("MEANS");
-			levels.add("PLOT");
+			levels.add(ObservationLevelEnum.MEANS.getLevelName());
+			levels.add(ObservationLevelEnum.PLOT.getLevelName());
 		}
 		return levels;
 	}

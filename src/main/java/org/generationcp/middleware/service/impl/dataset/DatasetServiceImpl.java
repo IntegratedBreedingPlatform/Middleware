@@ -7,7 +7,11 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.location.LocationDTO;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.api.program.ProgramService;
@@ -40,6 +44,8 @@ import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -59,6 +65,7 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.study.StudyEntryGermplasmDescriptorColumns;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.generationcp.middleware.service.impl.study.StudyInstanceServiceImpl;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +89,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -94,6 +102,8 @@ public class DatasetServiceImpl implements DatasetService {
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
 	private static final String LOCATION_NAME = "LOCATION_NAME";
+	private static final String LOCATION_ID = "LOCATION_ID";
+	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 
 	private static final List<Integer> SUBOBS_COLUMNS_ALL_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.GERMPLASM_DESCRIPTOR.getId(),
@@ -158,6 +168,9 @@ public class DatasetServiceImpl implements DatasetService {
 		TermId.EXPERIMENT_DESIGN_FACTOR.getId());
 	private static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
 
+	private static final List<Integer> EXP_DESIGN_VARIABLES =
+			Arrays.asList(8170, 8135, 8131, 8842, 8132, 8133, 8134, 8136, 8137, 8138, 8139, 8142, 8165, 8831, 8411, 8412, 8413);
+
 	private DaoFactory daoFactory;
 
 	@Autowired
@@ -189,6 +202,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private PedigreeDataManager pedigreeDataManager;
+
+	@Autowired
+	private LocationService locationService;
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -570,6 +586,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void removeDatasetVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(datasetId, variableIds);
+		this.daoFactory.getPhenotypeExternalReferenceDAO().deleteByProjectIdAndVariableIds(datasetId, variableIds);
 		this.daoFactory.getPhenotypeDAO().deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
 		this.daoFactory.getStockDao().deleteStocksForStudyAndVariable(studyId, variableIds);
 	}
@@ -765,7 +782,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final List<ObservationUnitRow> list = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
 		if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
-			final Set<Integer> gids = list.stream().filter(s -> s.getGid() != null).map(ObservationUnitRow::getGid).collect(Collectors.toSet());
+			final Set<Integer> gids =
+				list.stream().filter(s -> s.getGid() != null).map(ObservationUnitRow::getGid).collect(Collectors.toSet());
 			this.addParentsFromPedigreeTable(gids, list);
 		}
 		return list;
@@ -934,8 +952,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void rejectDatasetDraftData(final Integer datasetId) {
-		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
+	public void rejectDatasetDraftData(final Integer datasetId, final Set<Integer> instanceIds) {
+		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId, instanceIds);
 		for (final Phenotype phenotype : phenotypes) {
 			if (StringUtils.isEmpty(phenotype.getValue())) {
 				this.deletePhenotype(phenotype.getPhenotypeId(), false);
@@ -961,7 +979,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public Boolean hasDatasetDraftDataOutOfBounds(final Integer datasetId) {
 
-		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
+		final List<Phenotype> phenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId, new HashSet<>());
 
 		if (!phenotypes.isEmpty()) {
 			final List<MeasurementVariable>
@@ -997,9 +1015,9 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void acceptAllDatasetDraftData(final Integer studyId, final Integer datasetId) {
+	public void acceptDatasetDraftData(final Integer studyId, final Integer datasetId, final Set<Integer> instanceIds) {
 
-		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
+		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId, instanceIds);
 
 		if (!draftPhenotypes.isEmpty()) {
 
@@ -1019,8 +1037,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void acceptDraftDataAndSetOutOfBoundsToMissing(final Integer studyId, final Integer datasetId) {
-		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId);
+	public void acceptDraftDataAndSetOutOfBoundsToMissing(final Integer studyId, final Integer datasetId, final Set<Integer> instanceIds) {
+		final List<Phenotype> draftPhenotypes = this.daoFactory.getPhenotypeDAO().getDatasetDraftData(datasetId, instanceIds);
 
 		if (!draftPhenotypes.isEmpty()) {
 			final List<MeasurementVariable>
@@ -1254,6 +1272,127 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public void importEnvironmentVariableValues(final Integer studyId, final Integer datasetId, final Table<String, String, String> table) {
+		final List<MeasurementVariable> measurementVariableList =
+				this.getDatasetMeasurementVariablesByVariableType(datasetId,
+						Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.ENVIRONMENT_CONDITION.getId()));
+
+		if (!measurementVariableList.isEmpty()) {
+			final Map<String, MeasurementVariable> mappedVariables = getMappedVariablesMap(measurementVariableList);
+
+			final Map<String, ObservationUnitRow> trialInstanceMap =
+					this.getEnvironmentObservationUnitRows(measurementVariableList, studyId, datasetId);
+
+			final List<String> observationUnitIds = new ArrayList<>();
+			final Map<String, String> observationUnitIdTrialInstanceNoMap = new HashMap<>();
+			final List<Integer> instanceIds = new ArrayList<>();
+			for(final String instanceNo: trialInstanceMap.keySet()) {
+				if(MapUtils.isNotEmpty(table.row(instanceNo))) {
+					instanceIds.add(trialInstanceMap.get(instanceNo).getInstanceId());
+					final String obsUnitId = trialInstanceMap.get(instanceNo).getVariables().get(OBS_UNIT_ID).getValue();
+					observationUnitIds.add(obsUnitId);
+					observationUnitIdTrialInstanceNoMap.put(obsUnitId, instanceNo);
+				}
+			}
+
+			final Map<String, Geolocation> geolocationMap = this.daoFactory.getGeolocationDao().findInDataSet(datasetId).stream()
+					.collect(Collectors.toMap(geolocation -> geolocation.getDescription(), Function.identity()));
+
+			final Map<String, ObservationUnitRow> currentData =
+					this.daoFactory.getExperimentDao().getObservationUnitsAsMap(datasetId, measurementVariableList,
+							observationUnitIds);
+
+			final Map<String, Map<Integer, GeolocationProperty>> instanceNoPropertyMap = getInstanceNoPropertyMap(instanceIds);
+			final Map<String, Integer> locationNameLocationIdMap = getLocationNameLocationIdMap(table);
+
+
+			boolean hasGeolocationMetaDataChanges = false;
+			for (final String observationUnitId : observationUnitIds) {
+				final String trialInstanceNumber = observationUnitIdTrialInstanceNoMap.get(observationUnitId);
+				final Set<Phenotype> phenotypes = new HashSet<>();
+				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
+				final Set<Integer> updatedVariableIds = new HashSet<>();
+
+				for (final String variableName : table.columnKeySet()) {
+					final String importedVariableValue = table.get(trialInstanceNumber, variableName);
+					// Ignore empty strings and LOCATION_ID, Location value will be set from LOCATION_NAME
+					if (StringUtils.isNotBlank(importedVariableValue) && !LOCATION_ID.equalsIgnoreCase(variableName)) {
+						final MeasurementVariable measurementVariable = mappedVariables.get(variableName);
+						if (StudyInstanceServiceImpl.GEOLOCATION_METADATA.contains(measurementVariable.getTermId())) {
+							hasGeolocationMetaDataChanges = true;
+							this.mapGeolocationMetaData(geolocationMap.get(trialInstanceNumber), measurementVariable.getTermId(), importedVariableValue, updatedVariableIds);
+						} else if (TermId.LOCATION_ID.getId() == measurementVariable.getTermId()) {
+							final GeolocationProperty locationProp = instanceNoPropertyMap.get(trialInstanceNumber).get(TermId.LOCATION_ID.getId());
+							final String newLoc = locationNameLocationIdMap.get(importedVariableValue.toUpperCase()).toString();
+							locationProp.setValue(newLoc);
+							if (!newLoc.equals(locationProp.getValue())) {
+								updatedVariableIds.add(measurementVariable.getTermId());
+							}
+							this.daoFactory.getGeolocationPropertyDao().save(locationProp);
+						} else if (!EXP_DESIGN_VARIABLES.contains(measurementVariable.getTermId()) && measurementVariable.getVariableType().getId().equals(VariableType.ENVIRONMENT_DETAIL.getId())) {
+							this.saveEnvironmentDetailValue(measurementVariable, geolocationMap.get(trialInstanceNumber), instanceNoPropertyMap.get(trialInstanceNumber).get(measurementVariable.getTermId()),
+									importedVariableValue, updatedVariableIds);
+						} else if (measurementVariable.getVariableType().getId().equals(VariableType.ENVIRONMENT_CONDITION.getId())) {
+							// Save environment conditions
+							this.saveImportedVariableValue(null, observationUnitId, phenotypes,
+									currentRow, importedVariableValue, measurementVariable, false, updatedVariableIds);
+						}
+					}
+				}
+				if (CollectionUtils.isNotEmpty(updatedVariableIds)) {
+					this.updateDependentPhenotypesStatusByGeolocation(
+							geolocationMap.get(trialInstanceNumber).getLocationId(), new ArrayList<>(updatedVariableIds));
+				}
+			}
+
+			// Save Geolocation metadata changes
+			if (hasGeolocationMetaDataChanges) {
+				for (final Geolocation geolocation: geolocationMap.values()) {
+					this.daoFactory.getGeolocationDao().save(geolocation);
+				}
+			}
+		}
+	}
+
+	private static Map<String, MeasurementVariable> getMappedVariablesMap(final List<MeasurementVariable> measurementVariableList) {
+		final Map<String, MeasurementVariable> mappedVariables = new HashMap<>();
+		measurementVariableList.forEach(measurementVariable -> {
+			mappedVariables.putIfAbsent(measurementVariable.getName(), measurementVariable);
+			mappedVariables.putIfAbsent(measurementVariable.getAlias(), measurementVariable);
+		});
+		return mappedVariables;
+	}
+
+	private Map<String, Integer> getLocationNameLocationIdMap(final Table<String, String, String> table) {
+		final List<String> locationNames = new ArrayList<>();
+		Map<String, Integer> locationNameLocationIdMap = new HashMap<>();
+		if (table.columnKeySet().contains(LOCATION_NAME)) {
+			for (final String observationUnitId : table.rowKeySet()) {
+				locationNames.add(table.get(observationUnitId, LOCATION_NAME));
+			}
+			if (!org.springframework.util.CollectionUtils.isEmpty(locationNames)) {
+				final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+				locationSearchRequest.setLocationNames(locationNames);
+				locationNameLocationIdMap = this.locationService.searchLocations(locationSearchRequest, null, null)
+						.stream().collect(Collectors.toMap(loc -> loc.getName().toUpperCase(), LocationDTO::getId));
+			}
+		}
+		return locationNameLocationIdMap;
+	}
+
+	private Map<String, Map<Integer, GeolocationProperty>> getInstanceNoPropertyMap(final List<Integer> instanceIds) {
+		final List<GeolocationProperty> geolocationProperties = this.daoFactory.getGeolocationPropertyDao()
+				.getByGeolocationByGeolocationIds(instanceIds);
+		final Map<String, Map<Integer, GeolocationProperty>> instanceNoPropertyMap = new HashMap<>();
+		for(final GeolocationProperty property: geolocationProperties) {
+			final String instanceNumber = property.getGeolocation().getDescription();
+			instanceNoPropertyMap.putIfAbsent(instanceNumber, new HashMap<>());
+			instanceNoPropertyMap.get(instanceNumber).put(property.getTypeId(), property);
+		}
+		return instanceNoPropertyMap;
+	}
+
+	@Override
 	public Table<String, Integer, Integer> importDataset(final Integer datasetId, final Table<String, String, String> table,
 		final Boolean draftMode, final Boolean allowDateAndCharacterBlankValue) {
 
@@ -1263,11 +1402,7 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 		if (!measurementVariableList.isEmpty()) {
-			final Map<String, MeasurementVariable> mappedVariables = new HashMap<>();
-			measurementVariableList.forEach(measurementVariable -> {
-				mappedVariables.putIfAbsent(measurementVariable.getName(), measurementVariable);
-				mappedVariables.putIfAbsent(measurementVariable.getAlias(), measurementVariable);
-			});
+			final Map<String, MeasurementVariable> mappedVariables = getMappedVariablesMap(measurementVariableList);
 			final List<String> observationUnitIds = new ArrayList<>(table.rowKeySet());
 
 			final Map<String, ObservationUnitRow> currentData =
@@ -1281,7 +1416,7 @@ public class DatasetServiceImpl implements DatasetService {
 				final ObservationUnitRow currentRow = currentData.get(observationUnitId);
 
 				for (final String variableName : table.columnKeySet()) {
-					String importedVariableValue = table.get(observationUnitId, variableName);
+					final String importedVariableValue = table.get(observationUnitId, variableName);
 
 					final MeasurementVariable measurementVariable = mappedVariables.get(variableName);
 
@@ -1289,64 +1424,8 @@ public class DatasetServiceImpl implements DatasetService {
 					// otherwise, just ignore blank values.
 					if ((allowDateAndCharacterBlankValue && isDateOrCharacterDataType(measurementVariable)) || StringUtils
 						.isNotBlank(importedVariableValue)) {
-						BigInteger categoricalValueId = null;
-						if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-							for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
-								if (importedVariableValue.equalsIgnoreCase(possibleValue.getName())) {
-									categoricalValueId = BigInteger.valueOf(possibleValue.getId());
-									break;
-								}
-							}
-						}
-						if (measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
-							// In case the date is in yyyy-MM-dd format, try to parse it as number format yyyyMMdd
-							final String parsedDate =
-								Util.tryConvertDate(importedVariableValue, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
-							if (parsedDate != null) {
-								importedVariableValue = parsedDate;
-							}
-						}
-
-						final ObservationUnitData observationUnitData = currentRow.getVariables().get(measurementVariable.getName());
-						final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
-						Phenotype phenotype = null;
-						if ((observationUnitData == null || observationUnitData.getObservationId() == null)) {
-							/*Phenotype does not exist*/
-
-							String status = null;
-							if (measurementVariable.getFormula() != null) {
-								status = Phenotype.ValueStatus.MANUALLY_EDITED.getName();
-							}
-
-							final ObservationDto observationDto =
-								new ObservationDto(measurementVariable.getTermId(), importedVariableValue, categoricalValue, status,
-									Util.getCurrentDateAsStringValue(), Util.getCurrentDateAsStringValue(),
-									currentRow.getObservationUnitId(), categoricalValue, importedVariableValue);
-
-							phenotype = this.createPhenotype(observationDto, draftMode);
-
-						} else if (observationUnitData.getObservationId() != null
-							&& importedVariableValue.equalsIgnoreCase(observationUnitData.getValue())
-							&& Boolean.TRUE.equals(draftMode)) {
-							/*Phenotype exists and imported value is equal to value => Erase draft data*/
-							phenotype =
-								this.updatePhenotype(observationUnitData.getObservationId(), observationUnitData.getCategoricalValueId(),
-									observationUnitData.getValue(), null, null, draftMode);
-						} else if (observationUnitData.getObservationId() != null &&
-							!importedVariableValue.equalsIgnoreCase(observationUnitData.getValue())) {
-							/*imported value is different to stored value*/
-							phenotype =
-								this.updatePhenotype(observationUnitData.getObservationId(), observationUnitData.getCategoricalValueId(),
-									observationUnitData.getValue(), categoricalValue, importedVariableValue, draftMode);
-						}
-
-						if (phenotype != null) {
-							phenotypes.add(phenotype);
-						}
-
-						// We need to return the observationDbIds (mapped in a table by observationUnitId and variableId) of the created/updated observations.
-						observationDbIdsTable
-							.put((String) observationUnitId, observationUnitData.getVariableId(), phenotype.getPhenotypeId());
+						this.saveImportedVariableValue(observationDbIdsTable, (String) observationUnitId, phenotypes,
+								currentRow, importedVariableValue, measurementVariable, draftMode, new HashSet<>());
 					}
 				}
 
@@ -1515,6 +1594,107 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 	}
 
+	private void saveEnvironmentDetailValue(final MeasurementVariable measurementVariable, final Geolocation geolocation, GeolocationProperty property,
+											String value, final Set<Integer> updatedVariableIds) {
+		final BigInteger categoricalValueId = this.getCategoricalValueId(value, measurementVariable);
+		value = getDateValueIfNecessary(value, measurementVariable);
+
+		if (property == null) {
+			property = new GeolocationProperty();
+			property.setRank(1);
+			property.setType(measurementVariable.getTermId());
+			property.setGeolocation(geolocation);
+		}
+		value = categoricalValueId == null ? value : categoricalValueId.toString();
+		if (!value.equals(property.getValue())) {
+			updatedVariableIds.add(measurementVariable.getTermId());
+		}
+		property.setValue(value);
+		this.daoFactory.getGeolocationPropertyDao().save(property);
+	}
+
+	private void saveImportedVariableValue(final Table<String, Integer, Integer> observationDbIdsTable, final String observationUnitId,
+										   final Set<Phenotype> phenotypes, final ObservationUnitRow currentRow, String importedVariableValue,
+										   final MeasurementVariable measurementVariable, final boolean draftMode, final Set<Integer> updatedVariableIds) {
+		final BigInteger categoricalValueId = this.getCategoricalValueId(importedVariableValue, measurementVariable);
+		importedVariableValue = getDateValueIfNecessary(importedVariableValue, measurementVariable);
+
+		final ObservationUnitData observationUnitData = currentRow.getVariables().get(measurementVariable.getName());
+		final Integer categoricalValue = categoricalValueId != null ? categoricalValueId.intValue() : null;
+		Phenotype phenotype = null;
+		if ((observationUnitData == null || observationUnitData.getObservationId() == null)) {
+			/*Phenotype does not exist*/
+			String status = null;
+			if (measurementVariable.getFormula() != null) {
+				status = Phenotype.ValueStatus.MANUALLY_EDITED.getName();
+			}
+
+			final ObservationDto observationDto =
+					new ObservationDto(measurementVariable.getTermId(), importedVariableValue, categoricalValue, status,
+							Util.getCurrentDateAsStringValue(), Util.getCurrentDateAsStringValue(),
+							currentRow.getObservationUnitId(), categoricalValue, importedVariableValue);
+
+			phenotype = this.createPhenotype(observationDto, draftMode);
+			updatedVariableIds.add(measurementVariable.getTermId());
+
+		} else if (observationUnitData.getObservationId() != null
+				&& importedVariableValue.equalsIgnoreCase(observationUnitData.getValue())
+				&& Boolean.TRUE.equals(draftMode)) {
+			/*Phenotype exists and imported value is equal to value => Erase draft data*/
+			phenotype =
+					this.updatePhenotype(observationUnitData.getObservationId(), observationUnitData.getCategoricalValueId(),
+							observationUnitData.getValue(), null, null, draftMode);
+		} else if (observationUnitData.getObservationId() != null) {
+			if (draftMode) {
+				/*imported value is different to stored value*/
+				phenotype =
+						this.updatePhenotype(observationUnitData.getObservationId(), observationUnitData.getCategoricalValueId(),
+								observationUnitData.getValue(), categoricalValue, importedVariableValue, draftMode);
+			} else {
+				if (!importedVariableValue.equalsIgnoreCase(observationUnitData.getValue())) {
+					updatedVariableIds.add(measurementVariable.getTermId());
+				}
+				phenotype =
+						this.updatePhenotype(observationUnitData.getObservationId(), categoricalValue,
+								importedVariableValue, null, null, draftMode);
+			}
+		}
+
+		if (phenotype != null) {
+			phenotypes.add(phenotype);
+		}
+		if (observationDbIdsTable != null) {
+			// We need to return the observationDbIds (mapped in a table by observationUnitId and variableId) of the created/updated observations.
+			observationDbIdsTable
+					.put(observationUnitId, observationUnitData.getVariableId(), phenotype.getPhenotypeId());
+		}
+	}
+
+	private static String getDateValueIfNecessary(String importedVariableValue, final MeasurementVariable measurementVariable) {
+		if (measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId()) {
+			// In case the date is in yyyy-MM-dd format, try to parse it as number format yyyyMMdd
+			final String parsedDate =
+					Util.tryConvertDate(importedVariableValue, Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
+			if (parsedDate != null) {
+				importedVariableValue = parsedDate;
+			}
+		}
+		return importedVariableValue;
+	}
+
+	private static BigInteger getCategoricalValueId(final String importedVariableValue, final MeasurementVariable measurementVariable) {
+		BigInteger categoricalValueId = null;
+		if (measurementVariable.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+			for (final ValueReference possibleValue : measurementVariable.getPossibleValues()) {
+				if (importedVariableValue.equalsIgnoreCase(possibleValue.getName())) {
+					categoricalValueId = BigInteger.valueOf(possibleValue.getId());
+					break;
+				}
+			}
+		}
+		return categoricalValueId;
+	}
+
 	private void updatePhenotypes(final List<Integer> phenotypeIds, final Integer variableId, final Integer newCValueId,
 		final String newValue, final Boolean draftMode) {
 		final Formula formula = this.daoFactory.getFormulaDAO().getByTargetVariableId(variableId);
@@ -1606,7 +1786,7 @@ public class DatasetServiceImpl implements DatasetService {
 	/**
 	 * @param draftMode False if either you are in Accepted view (e.g batch update in accepted view)
 	 *                  or you are going to accepted view (e.g accepting draft data)
-	 *                  FIXME IBP-2694
+	 *                                   FIXME IBP-2694
 	 */
 	private Phenotype updatePhenotypeValues(
 		final Integer categoricalValueId, final String value, final Integer draftCategoricalValueId, final String draftvalue,
@@ -1659,7 +1839,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final Phenotype savedRecord = this.daoFactory.getPhenotypeDAO().save(phenotype);
 		this.alignObservationValues(observation, savedRecord);
-
 		return phenotype;
 	}
 
@@ -1756,9 +1935,54 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 	}
 
+	private Map<String, ObservationUnitRow> getEnvironmentObservationUnitRows(
+			final List<MeasurementVariable> environmentVariables, final Integer studyId, final Integer datasetId) {
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+		final List<MeasurementVariableDto> environmentDetails = new ArrayList<>();
+		final List<MeasurementVariableDto> environmentConditions = new ArrayList<>();
+		for (final MeasurementVariable variable: environmentVariables) {
+			if (VariableType.ENVIRONMENT_DETAIL.getId().equals(variable.getVariableType().getId())) {
+				environmentDetails.add(new MeasurementVariableDto(variable.getTermId(), variable.getName()));
+			} else if (VariableType.ENVIRONMENT_CONDITION.getId().equals(variable.getVariableType().getId())) {
+				environmentConditions.add(new MeasurementVariableDto(variable.getTermId(), variable.getName()));
+			}
+		}
+		searchDTO.setEnvironmentDetails(environmentDetails);
+		searchDTO.setEnvironmentConditions(environmentConditions);
+		searchDTO.setEnvironmentDatasetId(datasetId);
+		final PageRequest pageRequest = new PageRequest(0, Integer.MAX_VALUE);
+		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> rows = this
+				.getObservationUnitRows(studyId, datasetId, searchDTO, pageRequest);
+		return rows.stream().collect(Collectors.toMap(row -> String.valueOf(row.getTrialInstance()), Function.identity()));
+	}
+
 	@Override
 	public List<GermplasmNameTypeDTO> getDatasetNameTypes(final Integer datasetId) {
 		return this.daoFactory.getUserDefinedFieldDAO().getDatasetNameTypes(datasetId);
+	}
+
+	private void mapGeolocationMetaData(final Geolocation geolocation, final int variableId, final String value, final Set<Integer> updatedVariableIds) {
+		boolean updated = false;
+		if (TermId.LATITUDE.getId() == variableId) {
+			final Double dValue = !StringUtils.isBlank(value) ? Double.valueOf(value) : null;
+			updated = dValue != geolocation.getLatitude();
+			geolocation.setLatitude(dValue);
+		} else if (TermId.LONGITUDE.getId() == variableId) {
+			final Double dValue = !StringUtils.isBlank(value) ? Double.valueOf(value) : null;
+			updated = dValue != geolocation.getLongitude();
+			geolocation.setLongitude(dValue);
+		} else if (TermId.GEODETIC_DATUM.getId() == variableId) {
+			updated = value != geolocation.getGeodeticDatum();
+			geolocation.setGeodeticDatum(value);
+		} else if (TermId.ALTITUDE.getId() == variableId) {
+			final Double dValue = !StringUtils.isBlank(value) ? Double.valueOf(value) : null;
+			updated = dValue != geolocation.getAltitude();
+			geolocation.setAltitude(dValue);
+		}
+
+		if (updated) {
+			updatedVariableIds.add(variableId);
+		}
 	}
 
 }
