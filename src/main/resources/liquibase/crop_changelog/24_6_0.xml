@@ -429,9 +429,11 @@
 
 
 				INSERT INTO list_seq_table ( entryid, listid, lrecid )
-				SELECT entryid, l.listid, lrecid FROM listdata l , listnms n WHERE l.listid = n.listid 
-				AND listdate < 20230000
-				ORDER BY l.listid, entryid ; 
+				SELECT entryid, l.listid, lrecid 
+				FROM listdata l , listnms n 
+				WHERE l.listid = n.listid 
+				AND listid IN (SELECT listid FROM listdata l GROUP BY listid HAVING MAX(entryid)!=COUNT(entryid))
+				ORDER BY listid, entryid ;
 
 				UPDATE listdata l,
 					(SELECT lists.listid, val, ((((max_seq - lists.seq)-(max_seq-min_seq))*(-1))+1)  AS list_seq ,  cnt, lrecid FROM 
