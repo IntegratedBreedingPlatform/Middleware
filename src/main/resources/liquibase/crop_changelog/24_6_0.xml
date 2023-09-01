@@ -116,7 +116,7 @@
 			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
             VALUES (1105, @scaleId, 1130);
 			
-			set @cvId = (select max(cv_id) from cv where definition = "Packing_Status");
+			set @cvId = (select max(cv_id) from cv where definition = "Packing status categories");
 			
 			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
             VALUES (@cvId, '1', '1=packed', null, 0, 0);
