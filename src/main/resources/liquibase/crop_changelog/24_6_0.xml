@@ -389,10 +389,11 @@
         <preConditions onFail="MARK_RAN">
 			<and>
 			<sqlCheck expectedResult="1">
-				SELECT CASE WHEN (SELECT (COUNT(1) IS NOT NULL) AS X FROM listdata l 
-				GROUP BY listid HAVING MAX(entryid)!=COUNT(entryid)) IS NULL THEN 0
-				ELSE 1 
-				END;
+				 SELECT CASE WHEN (SELECT (COUNT(1) IS NOT NULL) AS X FROM listdata l GROUP BY listid HAVING MAX(entryid)!=COUNT(entryid) LIMIT 1) IS NULL 
+	                    THEN 0
+                        ELSE 1 
+                        END
+						;
 			</sqlCheck>
 				<!-- Check if dataset check_listentry_table was created -->
 			<sqlCheck expectedResult="0">
