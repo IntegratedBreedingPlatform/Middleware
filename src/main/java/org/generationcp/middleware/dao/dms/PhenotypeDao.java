@@ -1883,7 +1883,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			stringBuilder.append("AND p.observable_id in (:observationVariableDbIds) ");
 		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationVariableNames())) {
-			stringBuilder.append("AND coalesce(vo.alias, cvterm.name) in (:observationVariableNames) ");
+			stringBuilder.append("AND pp.alias in (:observationVariableNames) ");
 		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getStudyDbIds())) {
 			stringBuilder.append("AND instance.nd_geolocation_id in (:studyDbIds) ");
