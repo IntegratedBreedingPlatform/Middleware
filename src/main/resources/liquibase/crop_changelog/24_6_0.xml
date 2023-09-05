@@ -384,6 +384,7 @@
         </sql>
     </changeSet>	
 	
+		
 	  
 	<changeSet id="v24.6.1-1" author="rowena">
         <preConditions onFail="MARK_RAN">
@@ -495,7 +496,25 @@
 		</sql>
 	</changeSet>	
 	
-
+	<changeSet  id="v24.6.2-0" author="rowena">
+		<preConditions onFail="MARK_RAN">
+			<!-- Check if dataset check_listentry_table was created -->
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) > 1 FROM stock WHERE uniquename NOT REGEXP '^[0-9]+$';
+				</sqlCheck>
+			
+        </preConditions>
+		<comment>
+			check non-integer entry_id in the stock table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE stock 
+			INNER JOIN (SELECT MAX(CAST(uniquename AS UNSIGNED)) MAX_VALUE, project_id, stock_id
+						FROM stock WHERE uniquename  REGEXP '^[0-9]+$' = 1 GROUP BY project_id ) t2 
+			ON stock.project_id = t2.project_id AND uniquename NOT REGEXP '^[0-9]+$' 
+			SET stock.uniquename = t2.max_value + 1;
+		</sql>
+	</changeSet>
 
 	<changeSet id="v24.6.2-1" author="rowena">
         <preConditions onFail="MARK_RAN">
@@ -553,7 +572,8 @@
 				INSERT INTO stock_seq_table ( entryid, project_id, stock_id, GID )
 						SELECT CAST(uniquename AS UNSIGNED) AS entryid, s.project_id, s.stock_id, dbxref_id 
 						FROM stock s 
-						WHERE project_id IN (SELECT  project_id FROM stock s GROUP BY project_id HAVING MAX(CAST(uniquename AS UNSIGNED))<>COUNT(stock_id));
+						WHERE project_id IN (SELECT  project_id FROM stock s WHERE uniquename REGEXP '^[0-9]+$'= 1 GROUP BY project_id HAVING MAX(CAST(uniquename AS UNSIGNED))<>COUNT(stock_id) AND uniquename REGEXP '^[0-9]+$'= 1)
+						;
 						
 				UPDATE stock s,
 					(SELECT stocklist.project_id, val, ((((max_seq - stocklist.seq)-(max_seq-min_seq))*(-1))+1)  AS list_seq ,  cnt, stock_id FROM 
@@ -565,7 +585,8 @@
 				ORDER BY seq
 				) AS Q
 				SET s.uniquename = Q.list_seq
-				WHERE s.project_id = Q.project_id AND s.stock_id = Q.stock_id AND CAST(s.uniquename AS UNSIGNED)<>list_seq;	
+				WHERE s.project_id = Q.project_id AND s.stock_id = Q.stock_id 
+				AND CAST(s.uniquename AS UNSIGNED)<>list_seq ;		
 		
 				DROP TABLE IF EXISTS stock_seq_table;
 				
