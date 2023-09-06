@@ -1746,7 +1746,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		sql.append("obs_unit.obs_unit_id AS observationUnitDbId, ");
 		sql.append("'' AS observationUnitName, ");
 		sql.append("p.observable_id AS observationVariableDbId, ");
-		sql.append("cvterm.name AS observationVariableName, ");
+		sql.append("pp.alias AS observationVariableName, ");
 		sql.append("instance.nd_geolocation_id AS studyDbId, ");
 		sql.append("p.value AS value, ");
 		sql.append("cvtermSeason.definition AS seasonName, ");
@@ -1772,6 +1772,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		stringBuilder.append("LEFT JOIN names ON stock.dbxref_id = names.gid AND names.nstat = 1 ");
 		stringBuilder.append("INNER JOIN cvterm ON p.observable_id = cvterm.cvterm_id ");
 		stringBuilder.append("INNER JOIN project plot ON plot.project_id = obs_unit.project_id ");
+		stringBuilder.append("INNER JOIN projectprop pp ON pp.project_id = plot.project_id AND pp.variable_id = cvterm.cvterm_id ");
 		stringBuilder.append("LEFT JOIN dataset_type ON dataset_type.dataset_type_id = plot.dataset_type_id ");
 		stringBuilder.append("INNER JOIN project trial ON plot.study_id = trial.project_id ");
 		stringBuilder.append(
@@ -1782,6 +1783,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			"LEFT OUTER JOIN nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = instance.nd_geolocation_id ");
 		stringBuilder.append("AND geopropSeason.type_id = " + TermId.SEASON_VAR.getId() + " ");
 		stringBuilder.append("LEFT OUTER JOIN cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value ");
+		stringBuilder.append("LEFT OUTER JOIN variable_overrides vo ON vo.cvterm_id = cvterm.cvterm_id ");
 		stringBuilder.append("WHERE 1=1 ");
 		// Exclude the SUMMARY (environments dataset) records
 		stringBuilder.append("AND plot.dataset_type_id <> " + DatasetTypeEnum.SUMMARY_DATA.getId() + " ");
@@ -1881,7 +1883,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			stringBuilder.append("AND p.observable_id in (:observationVariableDbIds) ");
 		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationVariableNames())) {
-			stringBuilder.append("AND cvterm.name in (:observationVariableNames) ");
+			stringBuilder.append("AND pp.alias in (:observationVariableNames) ");
 		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getStudyDbIds())) {
 			stringBuilder.append("AND instance.nd_geolocation_id in (:studyDbIds) ");
