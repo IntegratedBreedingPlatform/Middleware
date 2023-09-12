@@ -153,6 +153,87 @@ public class CopServiceImplTest extends IntegrationTestBase {
 		assertThat(this.copService.coefficientOfInbreeding(p6.getGid(), BTypeEnum.SELF_FERTILIZING), is(31 / 32d));
 	}
 
+	/**
+	 * <pre>
+	 *   AA  BB  CC  DD
+	 *     EE      FF
+	 *         GG
+	 *
+	 * gid1 gid2 cop
+	 * "AA" "AA" 1
+	 * "BB" "AA" 0
+	 * "BB" "BB" 1
+	 * "CC" "AA" 0
+	 * "CC" "BB" 0
+	 * "CC" "CC" 1
+	 * "DD" "AA" 0
+	 * "DD" "BB" 0
+	 * "DD" "CC" 0
+	 * "DD" "DD" 1
+	 * "EE" "AA" 0.5
+	 * "EE" "BB" 0.5
+	 * "EE" "CC" 0
+	 * "EE" "DD" 0
+	 * "EE" "EE" 0.5
+	 * "FF" "AA" 0
+	 * "FF" "BB" 0
+	 * "FF" "CC" 0.5
+	 * "FF" "DD" 0.5
+	 * "FF" "EE" 0
+	 * "FF" "FF" 0.5
+	 * "GG" "AA" 0.25
+	 * "GG" "BB" 0.25
+	 * "GG" "CC" 0.25
+	 * "GG" "DD" 0.25
+	 * "GG" "EE" 0.25
+	 * "GG" "FF" 0.25
+	 * "GG" "GG" 0.5
+	 * </pre>
+	 *
+	 */
+	@Test
+	public void testCase1() {
+		this.btype = BTypeEnum.SELF_FERTILIZING;
+
+		final Germplasm aa = this.createGermplasm("AA", 0, 0, 0);
+		final Germplasm bb = this.createGermplasm("BB", 0, 0, 0);
+		final Germplasm cc = this.createGermplasm("CC", 0, 0, 0);
+		final Germplasm dd = this.createGermplasm("DD", 0, 0, 0);
+		final Germplasm ee = this.createGermplasm("EE", 2, aa.getGid(), bb.getGid());
+		final Germplasm ff = this.createGermplasm("FF", 2, cc.getGid(), dd.getGid());
+		final Germplasm gg = this.createGermplasm("GG", 2, ee.getGid(), ff.getGid());
+
+		assertThat(this.copService.coefficientOfParentage(aa.getGid(), aa.getGid(), this.btype), is(1d));
+		assertThat(this.copService.coefficientOfParentage(bb.getGid(), aa.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(bb.getGid(), bb.getGid(), this.btype), is(1d));
+		assertThat(this.copService.coefficientOfParentage(cc.getGid(), aa.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(cc.getGid(), bb.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(cc.getGid(), cc.getGid(), this.btype), is(1d));
+		assertThat(this.copService.coefficientOfParentage(dd.getGid(), aa.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(dd.getGid(), bb.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(dd.getGid(), cc.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(dd.getGid(), dd.getGid(), this.btype), is(1d));
+		assertThat(this.copService.coefficientOfParentage(ee.getGid(), aa.getGid(), this.btype), is(1 / 2d));
+		assertThat(this.copService.coefficientOfParentage(ee.getGid(), bb.getGid(), this.btype), is(1 / 2d));
+		assertThat(this.copService.coefficientOfParentage(ee.getGid(), cc.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(ee.getGid(), dd.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(ee.getGid(), ee.getGid(), this.btype), is(1 / 2d));
+		assertThat(this.copService.coefficientOfParentage(ff.getGid(), aa.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(ff.getGid(), bb.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(ff.getGid(), cc.getGid(), this.btype), is(1 / 2d));
+		assertThat(this.copService.coefficientOfParentage(ff.getGid(), dd.getGid(), this.btype), is(1 / 2d));
+		assertThat(this.copService.coefficientOfParentage(ff.getGid(), ee.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(ff.getGid(), ff.getGid(), this.btype), is(1 / 2d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), aa.getGid(), this.btype), is(1 / 4d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), bb.getGid(), this.btype), is(1 / 4d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), cc.getGid(), this.btype), is(1 / 4d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), dd.getGid(), this.btype), is(1 / 4d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), ee.getGid(), this.btype), is(1 / 4d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), ff.getGid(), this.btype), is(1 / 4d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), gg.getGid(), this.btype), is(1 / 2d));
+	}
+
+
 	private Germplasm createGermplasm(final String name, final int gnpgs, final int gpid1, final int gpid2) {
 		final Name preferredName = new Name();
 		preferredName.setNval(name);
