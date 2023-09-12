@@ -192,13 +192,55 @@ public class CopServiceImplTest extends IntegrationTestBase {
 	 *
 	 */
 	@Test
-	public void testCase1() {
+	public void testCase_SelfFertilizingF2() {
 		this.btype = BTypeEnum.SELF_FERTILIZING;
 
 		final Germplasm aa = this.createGermplasm("AA", 0, 0, 0);
 		final Germplasm bb = this.createGermplasm("BB", 0, 0, 0);
 		final Germplasm cc = this.createGermplasm("CC", 0, 0, 0);
 		final Germplasm dd = this.createGermplasm("DD", 0, 0, 0);
+		final Germplasm ee = this.createGermplasm("EE", 2, aa.getGid(), bb.getGid());
+		final Germplasm ff = this.createGermplasm("FF", 2, cc.getGid(), dd.getGid());
+		final Germplasm gg = this.createGermplasm("GG", 2, ee.getGid(), ff.getGid());
+
+		assertThat(this.copService.coefficientOfParentage(aa.getGid(), aa.getGid(), this.btype), is(1d));
+		assertThat(this.copService.coefficientOfParentage(bb.getGid(), aa.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(bb.getGid(), bb.getGid(), this.btype), is(1d));
+		assertThat(this.copService.coefficientOfParentage(cc.getGid(), aa.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(cc.getGid(), bb.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(cc.getGid(), cc.getGid(), this.btype), is(1d));
+		assertThat(this.copService.coefficientOfParentage(dd.getGid(), aa.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(dd.getGid(), bb.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(dd.getGid(), cc.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(dd.getGid(), dd.getGid(), this.btype), is(1d));
+		assertThat(this.copService.coefficientOfParentage(ee.getGid(), aa.getGid(), this.btype), is(1 / 2d));
+		assertThat(this.copService.coefficientOfParentage(ee.getGid(), bb.getGid(), this.btype), is(1 / 2d));
+		assertThat(this.copService.coefficientOfParentage(ee.getGid(), cc.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(ee.getGid(), dd.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(ee.getGid(), ee.getGid(), this.btype), is(1 / 2d));
+		assertThat(this.copService.coefficientOfParentage(ff.getGid(), aa.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(ff.getGid(), bb.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(ff.getGid(), cc.getGid(), this.btype), is(1 / 2d));
+		assertThat(this.copService.coefficientOfParentage(ff.getGid(), dd.getGid(), this.btype), is(1 / 2d));
+		assertThat(this.copService.coefficientOfParentage(ff.getGid(), ee.getGid(), this.btype), is(0d));
+		assertThat(this.copService.coefficientOfParentage(ff.getGid(), ff.getGid(), this.btype), is(1 / 2d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), aa.getGid(), this.btype), is(1 / 4d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), bb.getGid(), this.btype), is(1 / 4d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), cc.getGid(), this.btype), is(1 / 4d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), dd.getGid(), this.btype), is(1 / 4d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), ee.getGid(), this.btype), is(1 / 4d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), ff.getGid(), this.btype), is(1 / 4d));
+		assertThat(this.copService.coefficientOfParentage(gg.getGid(), gg.getGid(), this.btype), is(1 / 2d));
+	}
+
+	@Test
+	public void testCase_SelfFertilizingF2WithIncorrectProgenitorNumberForF0() {
+		this.btype = BTypeEnum.SELF_FERTILIZING;
+
+		final Germplasm aa = this.createGermplasm("AA", -1, 0, 0);
+		final Germplasm bb = this.createGermplasm("BB", -1, 0, 0);
+		final Germplasm cc = this.createGermplasm("CC", -1, 0, 0);
+		final Germplasm dd = this.createGermplasm("DD", -1, 0, 0);
 		final Germplasm ee = this.createGermplasm("EE", 2, aa.getGid(), bb.getGid());
 		final Germplasm ff = this.createGermplasm("FF", 2, cc.getGid(), dd.getGid());
 		final Germplasm gg = this.createGermplasm("GG", 2, ee.getGid(), ff.getGid());
