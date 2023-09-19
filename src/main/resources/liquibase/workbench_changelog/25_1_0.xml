@@ -1,0 +1,35 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="dev-mderamos" id="v25.1.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM PERMISSION P WHERE P.NAME = 'VIEW_NAMES';
+            </sqlCheck>
+        </preConditions>
+        <comment>Add View Names permission</comment>
+        <sql dbms="mysql" splitStatements="true">
+            SET @germplasm_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM');
+
+            INSERT INTO permission (`name`, `description`, `parent_id`, `rank`) VALUES ('VIEW_NAMES', 'View Names', @germplasm_permission_id, 1);
+
+            SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'VIEW_NAMES');
+
+            insert into role_type_permission(role_type_id, permission_id, selectable) values (1, @permission_id , 1);
+            insert into role_type_permission(role_type_id, permission_id, selectable) values (2, @permission_id , 1);
+            insert into role_type_permission(role_type_id, permission_id, selectable) values (3, @permission_id , 1);
+
+            INSERT INTO role_permission(role_id, permission_id)
+            SELECT DISTINCT(rp.role_id), @permission_id FROM role_permission rp INNER JOIN  permission p ON rp.permission_id = p.permission_id
+            WHERE p.name IN ('MANAGE_GERMPLASM', 'IMPORT_GERMPLASM', 'MG_MANAGE_INVENTORY', 'MG_CREATE_LOTS', 'SEARCH_GERMPLASM', 'IMPORT_GERMPLASM_UPDATES',
+                             'GERMPLASM_LABEL_PRINTING', 'EDIT_GERMPLASM', 'MODIFY_BASIC_DETAILS', 'MODIFY_NAMES', 'MODIFY_ATTRIBUTES', 'MODIFY_PEDIGREE',
+                             'MG_MANAGE_FILES', 'DELETE_GERMPLASM', 'CODE_GERMPLASM', 'GROUP_GERMPLASM', 'UNGROUP_GERMPLASM', 'VIEW_GERMPLASM_CHANGE_HISTORY',
+                             'MERGE_GERMPLASM', 'MG_ADD_ENTRIES_TO_LIST', 'CREATE_LIST')
+              AND NOT exists (select role_perm.role_id from role_permission role_perm where role_perm.role_id = rp.role_id AND role_perm.permission_id = @permission_id)
+            GROUP BY rp.role_id;
+        </sql>
+    </changeSet>
+</databaseChangeLog>
