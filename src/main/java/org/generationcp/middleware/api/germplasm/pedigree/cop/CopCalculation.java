@@ -248,7 +248,7 @@ public class CopCalculation {
 		 *  D
 		 */
 		GermplasmTreeNode source = g.getMaleParentNode();
-		while (!isUnknown(source) && isDerivative(source)) {
+		while (hasSourceParent(source)) {
 			source = source.getMaleParentNode();
 		}
 		/*
@@ -388,7 +388,7 @@ public class CopCalculation {
 		}
 
 		int count = 1;
-		while (!isUnknown(source) && isDerivative(source) && !isUnknown(source.getMaleParentNode())) {
+		while (hasSourceParent(source)) {
 			count++;
 			source = source.getMaleParentNode();
 		}
@@ -538,6 +538,10 @@ public class CopCalculation {
 
 	private static boolean isUnknown(final GermplasmTreeNode node) {
 		return node == null || node.getGid() == UNKNOWN_GID;
+	}
+
+	private static boolean hasSourceParent(final GermplasmTreeNode source) {
+		return !isUnknown(source) && isDerivative(source) && !isUnknown(source.getMaleParentNode());
 	}
 
 	/**
