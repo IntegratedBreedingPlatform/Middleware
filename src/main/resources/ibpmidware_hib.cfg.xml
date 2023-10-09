@@ -143,5 +143,7 @@
         <mapping class="org.generationcp.middleware.pojos.CropParameter"/>
         <mapping class="org.generationcp.middleware.pojos.Genotype"/>
 
+        <mapping class="org.generationcp.middleware.pojos.CrossPlan"/>
+        <mapping class="org.generationcp.middleware.pojos.CrossPlanDetails"/>
     </session-factory>
 </hibernate-configuration>

@@ -1,103 +1,17 @@
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.AttributeExternalReferenceDAO;
-import org.generationcp.middleware.dao.BibrefDAO;
-import org.generationcp.middleware.dao.CopMatrixDao;
-import org.generationcp.middleware.dao.CountryDAO;
-import org.generationcp.middleware.dao.CropParameterDAO;
-import org.generationcp.middleware.dao.CropTypeDAO;
-import org.generationcp.middleware.dao.CvTermExternalReferenceDAO;
-import org.generationcp.middleware.dao.ExperimentExternalReferenceDao;
-import org.generationcp.middleware.dao.FileMetadataDAO;
-import org.generationcp.middleware.dao.FileMetadataExternalReferenceDAO;
-import org.generationcp.middleware.dao.FormulaDAO;
-import org.generationcp.middleware.dao.GenotypeDao;
-import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.GermplasmExternalReferenceDAO;
-import org.generationcp.middleware.dao.GermplasmListExternalReferenceDAO;
-import org.generationcp.middleware.dao.GermplasmSearchDAO;
-import org.generationcp.middleware.dao.GermplasmStudySourceDAO;
-import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
-import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.dao.LocdesDAO;
-import org.generationcp.middleware.dao.MethodDAO;
-import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.NamingConfigurationDAO;
-import org.generationcp.middleware.dao.PhenotypeExternalReferenceDAO;
-import org.generationcp.middleware.dao.ProgenitorDAO;
-import org.generationcp.middleware.dao.ProgramLocationDefaultDAO;
-import org.generationcp.middleware.dao.ProgramPresetDAO;
-import org.generationcp.middleware.dao.SampleDao;
-import org.generationcp.middleware.dao.SampleExternalReferenceDAO;
-import org.generationcp.middleware.dao.SampleListDao;
-import org.generationcp.middleware.dao.SearchRequestDAO;
-import org.generationcp.middleware.dao.StudyExternalReferenceDao;
-import org.generationcp.middleware.dao.StudyInstanceExternalReferenceDao;
-import org.generationcp.middleware.dao.StudyTypeDAO;
-import org.generationcp.middleware.dao.TemplateDAO;
-import org.generationcp.middleware.dao.TemplateDetailsDAO;
-import org.generationcp.middleware.dao.TrialSearchDao;
-import org.generationcp.middleware.dao.UserDefinedFieldDAO;
-import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
+import org.generationcp.middleware.dao.*;
 import org.generationcp.middleware.dao.audit.germplasm.GermplasmAuditDAO;
-import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
-import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
-import org.generationcp.middleware.dao.dms.GeolocationDao;
-import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
-import org.generationcp.middleware.dao.dms.LocationSearchDao;
-import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
-import org.generationcp.middleware.dao.dms.PhenotypeAuditDao;
-import org.generationcp.middleware.dao.dms.PhenotypeDao;
-import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
-import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
-import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.dao.dms.StockDao;
-import org.generationcp.middleware.dao.dms.StockPropertyDao;
-import org.generationcp.middleware.dao.dms.StudySearchDao;
-import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
-import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
-import org.generationcp.middleware.dao.gdms.CharValuesDAO;
-import org.generationcp.middleware.dao.gdms.DartValuesDAO;
-import org.generationcp.middleware.dao.gdms.DatasetDAO;
-import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
-import org.generationcp.middleware.dao.gdms.ExtendedMarkerInfoDAO;
-import org.generationcp.middleware.dao.gdms.MapDAO;
-import org.generationcp.middleware.dao.gdms.MappingDataDAO;
-import org.generationcp.middleware.dao.gdms.MappingPopDAO;
-import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
-import org.generationcp.middleware.dao.gdms.MarkerAliasDAO;
-import org.generationcp.middleware.dao.gdms.MarkerDAO;
-import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
-import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
-import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
-import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
-import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
-import org.generationcp.middleware.dao.gdms.MtaDAO;
-import org.generationcp.middleware.dao.gdms.MtaMetadataDAO;
-import org.generationcp.middleware.dao.gdms.QtlDAO;
-import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
-import org.generationcp.middleware.dao.gdms.TrackDataDAO;
-import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDefaultViewDAO;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDetailDAO;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataSearchDAO;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataViewDAO;
+import org.generationcp.middleware.dao.crossplan.CrossPlanDAO;
+import org.generationcp.middleware.dao.crossplan.CrossPlanDetailsDAO;
+import org.generationcp.middleware.dao.dms.*;
+import org.generationcp.middleware.dao.gdms.*;
+import org.generationcp.middleware.dao.germplasmlist.*;
 import org.generationcp.middleware.dao.ims.ExperimentTransactionDAO;
 import org.generationcp.middleware.dao.ims.LotAttributeDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
-import org.generationcp.middleware.dao.oms.CVDao;
-import org.generationcp.middleware.dao.oms.CVTermDao;
-import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
-import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
-import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
-import org.generationcp.middleware.dao.oms.StandardVariableDao;
-import org.generationcp.middleware.dao.oms.VariableOverridesDao;
+import org.generationcp.middleware.dao.oms.*;
 import org.generationcp.middleware.dao.study.StudyEntrySearchDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
@@ -512,5 +426,13 @@ public class DaoFactory {
 	public TrialSearchDao getTrialSearchDao() {
 		return new TrialSearchDao(this.sessionProvider.getSession());
 
+	}
+
+	public CrossPlanDAO getCrossPlanDAO() {
+		return new CrossPlanDAO(this.sessionProvider.getSession());
+	}
+
+	public CrossPlanDetailsDAO getCrossPlanDetailsDAO() {
+		return new CrossPlanDetailsDAO(this.sessionProvider.getSession());
 	}
 }
