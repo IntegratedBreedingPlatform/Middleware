@@ -29,11 +29,13 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.EnvironmentParameter;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
+import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -187,7 +189,11 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
 		Assert.assertEquals(dto.getTrialDbId(), savedInstance.getTrialDbId());
 		Assert.assertEquals(dto.getLocationDbId(), savedInstance.getLocationDbId());
-		Assert.assertTrue(CollectionUtils.isEmpty(savedInstance.getEnvironmentParameters()));
+
+		assertThat(savedInstance.getEnvironmentParameters(), hasSize(1));
+		final EnvironmentParameter environmentParameter = savedInstance.getEnvironmentParameters().get(0);
+		assertThat(environmentParameter.getParameterPUI(), is(numericVariable.getCvTermId().toString()));
+		assertThat(environmentParameter.getValue(), is(""));
 	}
 
 	@Test
